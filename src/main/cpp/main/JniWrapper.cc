@@ -13,16 +13,5 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
-
-#include "velox4j.h"
-#include "velox/common/memory/Memory.h"
-
-
-using namespace facebook::velox;
-
-int main() {
-  memory::MemoryManager::initialize({});
-  velox4j::foo();
-  return 0;
-}
+ */
+#include "JniWrapper.h"

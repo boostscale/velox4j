@@ -15,15 +15,14 @@
 * limitations under the License.
 */
 
-#include <iostream>
-#include "velox/vector/ComplexVector.h"
-#include "velox4j.h"
+#include "Velox4j.h"
+#include "velox/common/memory/Memory.h"
+
 
 using namespace facebook::velox;
 
-namespace velox4j {
-  void foo() {
-    auto vector = BaseVector::create(VARCHAR(), 100, memory::memoryManager()->spillPool());
-    std::cout << "Hello, World! " << vector->toString() << std::endl;
-  }
+int main() {
+  memory::MemoryManager::initialize({});
+  velox4j::foo();
+  return 0;
 }
