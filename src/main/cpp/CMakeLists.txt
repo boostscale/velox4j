@@ -10,5 +10,13 @@ set(VELOX_URL_MD5 ebbfec532e1ad3fe6598279da70fe56e)
 set(VELOX_SOURCE_URL "https://github.com/zhztheplayer/velox/archive/${VELOX_REF}.zip")
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_URL_MD5} OPTIONS "VELOX_MONO_LIBRARY ON")
 
-add_library(velox4j SHARED src/main.cpp)
-target_link_libraries(velox4j LINK_PRIVATE velox)
+set(VELOX4J_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+set(VELOX4J_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
+
+add_library(velox4j SHARED ${VELOX4J_SOURCE_DIR}/velox4j.cpp)
+target_include_directories(velox4j PUBLIC ${velox_SOURCE_DIR})
+target_link_libraries(velox4j LINK_PUBLIC velox)
+
+add_executable(velox4j-test ${VELOX4J_TEST_DIR}/test.cpp)
+target_include_directories(velox4j-test PRIVATE ${VELOX4J_SOURCE_DIR})
+target_link_libraries(velox4j-test velox4j)
