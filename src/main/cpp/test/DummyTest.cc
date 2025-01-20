@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-#include "Velox4j.h"
+#include "DummySource.h"
 #include "velox/common/memory/Memory.h"
 
 

@@ -15,9 +15,9 @@
 * limitations under the License.
 */
 
+#include "DummySource.h"
 #include <iostream>
 #include "velox/vector/ComplexVector.h"
-#include "Velox4j.h"
 
 using namespace facebook::velox;
 
@@ -25,5 +25,6 @@ namespace velox4j {
   void foo() {
     auto vector = BaseVector::create(VARCHAR(), 100, memory::memoryManager()->spillPool());
     std::cout << "Hello, World! " << vector->toString() << std::endl;
+
   }
 }
