@@ -25,3 +25,6 @@ replay_pid*
 
 # IDEs
 .idea
+
+# C++
+cmake-build-*
