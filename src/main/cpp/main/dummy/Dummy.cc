@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DummySource.h"
+#include "Dummy.h"
 #include <iostream>
 #include "init/Init.h"
 #include "velox/exec/tests/utils/PlanBuilder.h"

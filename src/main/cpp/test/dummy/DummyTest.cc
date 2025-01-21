@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-#include "DummySource.h"
+#include "dummy/Dummy.h"
 #include "velox/common/memory/Memory.h"
 
 

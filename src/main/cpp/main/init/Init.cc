@@ -16,13 +16,12 @@
  */
 
 #include "Init.h"
-#include "velox/common/memory/Memory.h"
-#include "velox/common/base/Exceptions.h"
-#include "velox/functions/sparksql/registration/Register.h"
-#include "velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h"
-#include "velox/functions/sparksql/aggregates/Register.h"
-#include "velox/functions/sparksql/window/WindowFunctionsRegistration.h"
-#include "velox/functions/prestosql/window/WindowFunctionsRegistration.h"
+#include <velox/common/memory/Memory.h>
+#include <velox/functions/sparksql/registration/Register.h>
+#include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
+#include <velox/functions/sparksql/aggregates/Register.h>
+#include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
+#include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
 
 using namespace facebook::velox;
 namespace {

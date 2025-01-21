@@ -15,6 +15,8 @@
 * limitations under the License.
  */
 
+#pragma once
+
 namespace velox4j {
   void initForSpark();
 }
