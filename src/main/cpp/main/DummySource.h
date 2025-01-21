@@ -19,4 +19,5 @@
 
 namespace velox4j {
 void foo();
+void foo1();
 }

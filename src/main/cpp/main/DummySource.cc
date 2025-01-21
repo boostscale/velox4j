@@ -17,10 +17,11 @@
 
 #include "DummySource.h"
 #include <iostream>
+#include "init/Init.h"
 #include "velox/exec/tests/utils/PlanBuilder.h"
-#include "velox/functions/sparksql/registration/Register.h"
 #include "velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h"
 #include "velox/functions/sparksql/aggregates/Register.h"
+#include "velox/functions/sparksql/registration/Register.h"
 #include "velox/vector/tests/utils/VectorTestBase.h"
 
 using namespace facebook::velox;
@@ -30,11 +31,6 @@ namespace velox4j {
 class VectorTest : public facebook::velox::test::VectorTestBase {
  public:
   void foo() {
-    functions::sparksql::registerFunctions();
-    aggregate::prestosql::registerAllAggregateFunctions(
-        "", true /*registerCompanionFunctions*/, false /*onlyPrestoSignatures*/, true /*overwrite*/);
-    functions::aggregate::sparksql::registerAggregateFunctions(
-        "", true /*registerCompanionFunctions*/, true /*overwrite*/);
     std::vector<RowVectorPtr> data{makeRowVector({
         makeFlatVector<int64_t>({1, 2, 3}),
         makeFlatVector<int32_t>({10, 20, 30}),
@@ -51,6 +47,25 @@ class VectorTest : public facebook::velox::test::VectorTestBase {
 };
 
 void foo() {
+  memory::MemoryManager::initialize({});
+  functions::sparksql::registerFunctions();
+  aggregate::prestosql::registerAllAggregateFunctions(
+      "",
+      true /*registerCompanionFunctions*/,
+      false /*onlyPrestoSignatures*/,
+      true /*overwrite*/);
+  functions::aggregate::sparksql::registerAggregateFunctions(
+      "", true /*registerCompanionFunctions*/, true /*overwrite*/);
+  auto vector =
+      BaseVector::create(VARCHAR(), 100, memory::memoryManager()->spillPool());
+  std::cout << "Hello, World! " << vector->toString() << std::endl;
+
+  VectorTest vectorTest;
+  vectorTest.foo();
+}
+
+void foo1() {
+  velox4j::initForSpark();
   auto vector =
       BaseVector::create(VARCHAR(), 100, memory::memoryManager()->spillPool());
   std::cout << "Hello, World! " << vector->toString() << std::endl;
