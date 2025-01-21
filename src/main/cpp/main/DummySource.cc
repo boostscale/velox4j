@@ -26,8 +26,5 @@ namespace velox4j {
   void foo() {
     auto vector = BaseVector::create(VARCHAR(), 100, memory::memoryManager()->spillPool());
     std::cout << "Hello, World! " << vector->toString() << std::endl;
-
-    std::make_shared<core::ValuesNode>(
-        0, std::move(valuesCopy), parallelizable, repeatTimes);
   }
 }
