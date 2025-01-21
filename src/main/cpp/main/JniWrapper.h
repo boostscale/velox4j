@@ -15,5 +15,4 @@
 * limitations under the License.
  */
 
-class jni_wrapper {};
 
