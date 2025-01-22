@@ -12,9 +12,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 if (JNI_FOUND)
-    message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
-    message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
-endif()
+    message(STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
+    message(STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
+endif ()
 include(UseJava)
 
 # Import Velox.
@@ -22,7 +22,12 @@ set(VELOX_REPO zhztheplayer/velox)
 set(VELOX_REF 4638ba3916fbd9fc41a0ccb8b9cd45796051ede8)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
 set(VELOX_SOURCE_URL_MD5 2fbce0fc077077c2a73767337737da6b)
-CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5} OPTIONS "VELOX_MONO_LIBRARY ON" "VELOX_BUILD_TESTING ON")
+CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
+        OPTIONS
+        "VELOX_ENABLE_CCACHE ON"
+        "VELOX_MONO_LIBRARY ON"
+        "VELOX_BUILD_TESTING ON"
+)
 
 # Import JniHelpers.
 set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)
