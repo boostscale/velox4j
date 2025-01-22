@@ -10,7 +10,7 @@ add_library(velox4j SHARED
         dummy/Dummy.cc
         init/Init.cc
         jni/JniCommon.cc
-        JniWrapper.cc
+        jni/JniWrapper.cc
 )
 target_include_directories(velox4j PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
