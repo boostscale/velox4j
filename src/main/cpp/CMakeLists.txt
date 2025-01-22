@@ -18,10 +18,10 @@ endif()
 include(UseJava)
 
 # Import Velox.
-set(VELOX_REPO facebookincubator/velox)
-set(VELOX_REF 1426473ed52ff0f35e10462f1b0cb9d35fbbc1a0)
+set(VELOX_REPO zhztheplayer/velox)
+set(VELOX_REF 4638ba3916fbd9fc41a0ccb8b9cd45796051ede8)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-set(VELOX_SOURCE_URL_MD5 d451b4862eac761d776c034a07a9b2cc)
+set(VELOX_SOURCE_URL_MD5 2fbce0fc077077c2a73767337737da6b)
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5} OPTIONS "VELOX_MONO_LIBRARY ON" "VELOX_BUILD_TESTING ON")
 
 # Import JniHelpers.
