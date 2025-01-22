@@ -13,7 +13,6 @@
         <junit.version>4.13.1</junit.version>
         <arrow.version>18.1.0</arrow.version>
         <guava.version>33.3.1-jre</guava.version>
-        <cpp.lib.dir>{project.basedir}/src/main/cpp/build/lib</cpp.lib.dir>
         <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
         <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
         <maven.compiler.source>11</maven.compiler.source>
@@ -27,11 +26,15 @@
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
             <resource>
-                <directory>${cpp.lib.dir}</directory>
+                <directory>${project.basedir}/src/main/cpp/build/lib</directory>
                 <targetPath>lib</targetPath>
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

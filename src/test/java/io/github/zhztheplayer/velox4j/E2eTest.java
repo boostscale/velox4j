@@ -23,12 +23,18 @@ import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class E2eTest {
+  @Before
+  public void setUp() throws Exception {
+    Velox4J.initialize();
+  }
+
   @Test
   public void testSanity() {
     final String json = Resources.readTextResource("plan/example-1.json");
