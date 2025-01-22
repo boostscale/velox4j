@@ -20,7 +20,7 @@
 #pragma once
 
 namespace velox4j {
-class JniWrapper : public spotify::jni::JavaClass {
+class JniWrapper final : public spotify::jni::JavaClass {
  public:
   explicit JniWrapper(JNIEnv* env) : JavaClass(env) {
     JniWrapper::initialize(env);
@@ -30,9 +30,11 @@ class JniWrapper : public spotify::jni::JavaClass {
 
   void initialize(JNIEnv* env) override;
 
+  void mapFields() override;
+
  private:
   static jlong executePlan(JNIEnv* env, jobject javaThis, jstring jsonPlan);
-  static jlong closeCppObject(JNIEnv* env, jobject javaThis, jlong address);
+  static void closeCppObject(JNIEnv* env, jobject javaThis, jlong address);
   static jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong address);
   static jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong address);
   static void rowVectorExportToArrow(JNIEnv* env, jobject javaThis, jlong rvAddress, jlong cSchema, jlong cArray);

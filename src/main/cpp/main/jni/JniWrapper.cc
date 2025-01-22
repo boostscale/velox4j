@@ -19,6 +19,8 @@
 #include "JniCommon.h"
 #include "JniError.h"
 
+void velox4j::JniWrapper::mapFields() {}
+
 const char* velox4j::JniWrapper::getCanonicalName() const {
   return "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 }
@@ -29,7 +31,7 @@ void velox4j::JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "executePlan", (void*)executePlan, kTypeLong, kTypeString, NULL);
   addNativeMethod(
-      "closeCppObject", (void*)closeCppObject, kTypeLong, kTypeLong, NULL);
+      "closeCppObject", (void*)closeCppObject, kTypeVoid, kTypeLong, NULL);
   addNativeMethod(
       "upIteratorHasNext",
       (void*)upIteratorHasNext,
@@ -46,6 +48,8 @@ void velox4j::JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeLong,
       NULL);
+
+  registerNativeMethods(env);
 }
 
 jlong velox4j::JniWrapper::executePlan(
@@ -57,13 +61,12 @@ jlong velox4j::JniWrapper::executePlan(
   JNI_METHOD_END(-1L)
 }
 
-jlong velox4j::JniWrapper::closeCppObject(
+void velox4j::JniWrapper::closeCppObject(
     JNIEnv* env,
     jobject javaThis,
     jlong address) {
   JNI_METHOD_START
-  return 0;
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END()
 }
 
 jboolean velox4j::JniWrapper::upIteratorHasNext(
