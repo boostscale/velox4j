@@ -12,12 +12,16 @@ add_library(velox4j SHARED
         jni/JniCommon.cc
         jni/JniWrapper.cc
 )
+
 target_include_directories(velox4j PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
         ${velox_SOURCE_DIR}
+        ${jni-helpers_SOURCE_DIR}
         ${JNI_INCLUDE_DIRS}
 )
+
 target_link_libraries(velox4j LINK_PUBLIC
         velox
+        JniHelpers
         ${JNI_LIBRARIES}
 )
