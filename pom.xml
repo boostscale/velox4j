@@ -15,6 +15,7 @@
         <junit.version>4.13.1</junit.version>
         <arrow.version>18.1.0</arrow.version>
         <guava.version>33.3.1-jre</guava.version>
+        <cpp.build.dir>{project.basedir}/src/main/cpp/build/</cpp.build.dir>
     </properties>
 
     <build>

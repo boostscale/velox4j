@@ -1,15 +1,9 @@
-find_package(Java REQUIRED)
-find_package(JNI REQUIRED)
-if (JNI_FOUND)
-    message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
-    message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
-endif()
-include(UseJava)
-
 add_library(velox4j SHARED
         dummy/Dummy.cc
         init/Init.cc
         jni/JniCommon.cc
+        jni/JniError.cc
+        jni/JniLoader.cc
         jni/JniWrapper.cc
 )
 
@@ -25,3 +19,5 @@ target_link_libraries(velox4j LINK_PUBLIC
         JniHelpers
         ${JNI_LIBRARIES}
 )
+
+set_target_properties(velox4j PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)

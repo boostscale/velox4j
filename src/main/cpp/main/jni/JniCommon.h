@@ -18,12 +18,26 @@
 #include <jni.h>
 #include <string>
 #include <mutex>
-#include <math.h>
+#include <cmath>
 
 #pragma once
 
-namespace velox4j {
+#ifndef JNI_METHOD_START
+#define JNI_METHOD_START try {
+// macro ended
+#endif
 
+#ifndef JNI_METHOD_END
+#define JNI_METHOD_END(fallback_expr)                                            \
+  }                                                                              \
+  catch (std::exception & e) {                                                   \
+    env->ThrowNew(velox4j::getJniErrorState()->veloxExceptionClass(), e.what()); \
+    return fallback_expr;                                                        \
+  }
+// macro ended
+#endif
+
+namespace velox4j {
 void checkException(JNIEnv* env);
 std::string jStringToCString(JNIEnv* env, jstring string);
 jclass createGlobalClassReference(JNIEnv* env, const char* className);
@@ -54,7 +68,6 @@ void attachCurrentThreadAsDaemonOrThrow(
 
 template <typename T>
 static T* jniCastOrThrow(jlong handle);
-
 
 #define CONCATENATE(t1, t2, t3) t1##t2##t3
 

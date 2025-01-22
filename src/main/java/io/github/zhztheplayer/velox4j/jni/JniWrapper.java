@@ -18,13 +18,21 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 public final class JniWrapper {
-  static native long executePlan(String jsonPlan);
-  static native void closeCppObject(long address);
+  private static final JniWrapper INSTANCE = new JniWrapper();
+  private JniWrapper() {
+  }
+
+  public static JniWrapper get() {
+    return INSTANCE;
+  }
+
+  native long executePlan(String jsonPlan);
+  native void closeCppObject(long address);
 
   // For UpIterator.
-  static native boolean upIteratorHasNext(long address);
-  static native long upIteratorNext(long address);
+  native boolean upIteratorHasNext(long address);
+  native long upIteratorNext(long address);
 
   // For RowVector.
-  static native void rowVectorExportToArrow(long rvAddress, long cSchema, long cArray);
+  native void rowVectorExportToArrow(long rvAddress, long cSchema, long cArray);
 }

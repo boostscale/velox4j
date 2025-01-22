@@ -11,23 +11,25 @@ import org.apache.arrow.c.ArrowSchema;
  * developers with providing objective representations in Java to caller.
  */
 public final class JniApi {
+  private static final JniWrapper jni = JniWrapper.get();
+
   public static UpIterator executePlan(String jsonPlan) {
-    return new UpIterator(JniWrapper.executePlan(jsonPlan));
+    return new UpIterator(jni.executePlan(jsonPlan));
   }
 
   public static void closeCppObject(CppObject obj) {
-    JniWrapper.closeCppObject(obj.address());
+    jni.closeCppObject(obj.address());
   }
 
   public static boolean upIteratorHasNext(UpIterator itr) {
-    return JniWrapper.upIteratorHasNext(itr.address());
+    return jni.upIteratorHasNext(itr.address());
   }
 
   public static RowVector upIteratorNext(UpIterator itr) {
-    return new RowVector(JniWrapper.upIteratorNext(itr.address()));
+    return new RowVector(jni.upIteratorNext(itr.address()));
   }
 
   public static void rowVectorExportToArrow(RowVector rowVector, ArrowSchema schema, ArrowArray array) {
-    JniWrapper.rowVectorExportToArrow(rowVector.address(), schema.memoryAddress(), array.memoryAddress());
+    jni.rowVectorExportToArrow(rowVector.address(), schema.memoryAddress(), array.memoryAddress());
   }
 }

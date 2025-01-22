@@ -15,26 +15,48 @@
  * limitations under the License.
  */
 
-#include <JniHelpers.h>
-
 #pragma once
 
+#include <stdexcept>
+
+#include "JniCommon.h"
+
 namespace velox4j {
-class JniWrapper : public spotify::jni::JavaClass {
+
+class JniErrorState {
  public:
-  explicit JniWrapper(JNIEnv* env) : JavaClass(env) {
-    JniWrapper::initialize(env);
-  }
+  virtual ~JniErrorState() = default;
 
-  const char* getCanonicalName() const override;
+  void ensureInitialized(JNIEnv* env);
 
-  void initialize(JNIEnv* env) override;
+  void assertInitialized() const;
+
+  void close();
+
+  jclass runtimeExceptionClass();
+
+  jclass illegalAccessExceptionClass();
+
+  jclass veloxExceptionClass();
 
  private:
-  static jlong executePlan(JNIEnv* env, jobject javaThis, jstring jsonPlan);
-  static jlong closeCppObject(JNIEnv* env, jobject javaThis, jlong address);
-  static jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong address);
-  static jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong address);
-  static void rowVectorExportToArrow(JNIEnv* env, jobject javaThis, jlong rvAddress, jlong cSchema, jlong cArray);
+  void initialize(JNIEnv* env);
+
+  jclass ioExceptionClass_ = nullptr;
+  jclass runtimeExceptionClass_ = nullptr;
+  jclass unsupportedOperationExceptionClass_ = nullptr;
+  jclass illegalAccessExceptionClass_ = nullptr;
+  jclass illegalArgumentExceptionClass_ = nullptr;
+  jclass veloxExceptionClass_ = nullptr;
+  JavaVM* vm_;
+  bool initialized_{false};
+  bool closed_{false};
+  std::mutex mtx_;
 };
-} // namespace velox4j
+
+inline JniErrorState* getJniErrorState() {
+  static JniErrorState jniErrorState;
+  return &jniErrorState;
+}
+
+} // namespace gluten

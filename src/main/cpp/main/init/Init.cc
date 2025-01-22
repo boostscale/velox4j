@@ -17,13 +17,16 @@
 
 #include "Init.h"
 #include <velox/common/memory/Memory.h>
-#include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
-#include <velox/functions/sparksql/aggregates/Register.h>
-#include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
+#include <velox/functions/sparksql/aggregates/Register.h>
+#include <velox/functions/sparksql/registration/Register.h>
+#include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 
 using namespace facebook::velox;
+
+namespace velox4j {
+
 namespace {
 void init(const std::function<void()>& f) {
   static std::atomic<bool> initialized{false};
@@ -35,13 +38,15 @@ void init(const std::function<void()>& f) {
 }
 } // namespace
 
-namespace velox4j {
 void initForSpark() {
   init([]() -> void {
     memory::MemoryManager::initialize({});
     functions::sparksql::registerFunctions();
     aggregate::prestosql::registerAllAggregateFunctions(
-        "", true /*registerCompanionFunctions*/, false /*onlyPrestoSignatures*/, true /*overwrite*/);
+        "",
+        true /*registerCompanionFunctions*/,
+        false /*onlyPrestoSignatures*/,
+        true /*overwrite*/);
     functions::aggregate::sparksql::registerAggregateFunctions(
         "", true /*registerCompanionFunctions*/, true /*overwrite*/);
     window::prestosql::registerAllWindowFunctions();
