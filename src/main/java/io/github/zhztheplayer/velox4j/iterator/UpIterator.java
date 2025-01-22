@@ -29,7 +29,7 @@ public class UpIterator implements CppObject, Iterator<RowVector> {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     JniApi.closeCppObject(this);
   }
 }

@@ -17,11 +17,24 @@
 
 package io.github.zhztheplayer.velox4j;
 
+import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.test.Iterators;
+import io.github.zhztheplayer.velox4j.test.Resources;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class E2eTest {
   @Test
   public void testSanity() {
-    
+    final String json = Resources.readTextResource("plan/example-1.json");
+    try (final UpIterator itr = JniApi.executePlan(json)) {
+      final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
+      Assert.assertEquals(3, vectors.size());
+    }
   }
 }
