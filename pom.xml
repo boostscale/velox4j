@@ -14,9 +14,7 @@
         <arrow.version>18.1.0</arrow.version>
         <guava.version>33.3.1-jre</guava.version>
         <cpp.lib.dir>{project.basedir}/src/main/cpp/build/lib</cpp.lib.dir>
-        <!-- List of add-opens arg line arguments for tests -->
         <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
-        <!-- org.apache:apache overrides -->
         <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
