@@ -20,8 +20,10 @@
 #include "JniError.h"
 #include "velox4j/lifecycle/ObjectStore.h"
 #include "velox4j/exec/Executor.h"
+#include <velox/common/memory/Memory.h>
 
 namespace velox4j {
+using namespace facebook::velox;
 
 namespace {
 ObjectStore* store() {
@@ -64,9 +66,11 @@ void JniWrapper::initialize(JNIEnv* env) {
   registerNativeMethods(env);
 }
 
-jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring jsonPlan) {
+jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
   JNI_METHOD_START
-  return 0;
+  spotify::jni::JavaString jPlanJson{env, planJson};
+  Executor exec{memory::memoryManager(), jPlanJson.get()};
+  return store()->save(exec.execute());
   JNI_METHOD_END(-1L)
 }
 

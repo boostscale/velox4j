@@ -33,7 +33,7 @@ class JniWrapper final : public spotify::jni::JavaClass {
   void mapFields() override;
 
  private:
-  static jlong executePlan(JNIEnv* env, jobject javaThis, jstring jsonPlan);
+  static jlong executePlan(JNIEnv* env, jobject javaThis, jstring planJson);
   static void closeCppObject(JNIEnv* env, jobject javaThis, jlong address);
   static jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong address);
   static jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong address);
