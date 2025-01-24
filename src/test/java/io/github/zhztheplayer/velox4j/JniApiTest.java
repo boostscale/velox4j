@@ -29,7 +29,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class E2eTest {
+public class JniApiTest {
   @Before
   public void setUp() throws Exception {
     Velox4j.initialize();
