@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class E2eTest {
   @Before
   public void setUp() throws Exception {
-    Velox4J.initialize();
+    Velox4j.initialize();
   }
 
   @Test

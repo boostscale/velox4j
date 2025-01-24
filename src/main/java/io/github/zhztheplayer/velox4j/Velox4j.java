@@ -5,7 +5,7 @@ import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Velox4J {
+public class Velox4j {
   private static final AtomicBoolean initialized = new AtomicBoolean(false);
 
   public static void initialize() {
