@@ -125,9 +125,9 @@ void attachCurrentThreadAsDaemonOrThrow(JavaVM* vm, JNIEnv** out) {
     getEnvStat =
         vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(out), NULL);
     if (getEnvStat != JNI_OK) {
-      VELOX_FAIL("Failed to reattach current thread to JVM.");
+      VELOX_FAIL("Failed to reattach current thread to JVM");
     }
-    DLOG(INFO) << "Succeeded attaching current thread.";
+    DLOG(INFO) << "Succeeded attaching current thread";
     return;
   }
   if (getEnvStat != JNI_OK) {

@@ -18,14 +18,26 @@
 #include "JniWrapper.h"
 #include "JniCommon.h"
 #include "JniError.h"
+#include "velox4j/lifecycle/ObjectStore.h"
+#include "velox4j/exec/Executor.h"
 
-void velox4j::JniWrapper::mapFields() {}
+namespace velox4j {
 
-const char* velox4j::JniWrapper::getCanonicalName() const {
+namespace {
+ObjectStore* store() {
+  // TODO: Make the object store session-wise to avoid leakages.
+  static std::unique_ptr<ObjectStore> objectStore = ObjectStore::create();
+  return objectStore.get();
+}
+}
+
+void JniWrapper::mapFields() {}
+
+const char* JniWrapper::getCanonicalName() const {
   return "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 }
 
-void velox4j::JniWrapper::initialize(JNIEnv* env) {
+void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   addNativeMethod(
@@ -52,24 +64,16 @@ void velox4j::JniWrapper::initialize(JNIEnv* env) {
   registerNativeMethods(env);
 }
 
-jlong velox4j::JniWrapper::executePlan(
-    JNIEnv* env,
-    jobject javaThis,
-    jstring jsonPlan) {
+jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring jsonPlan) {
   JNI_METHOD_START
   return 0;
   JNI_METHOD_END(-1L)
 }
 
-void velox4j::JniWrapper::closeCppObject(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong address) {
-  JNI_METHOD_START
-  JNI_METHOD_END()
-}
+void JniWrapper::closeCppObject(JNIEnv* env, jobject javaThis, jlong address){
+    JNI_METHOD_START JNI_METHOD_END()}
 
-jboolean velox4j::JniWrapper::upIteratorHasNext(
+jboolean JniWrapper::upIteratorHasNext(
     JNIEnv* env,
     jobject javaThis,
     jlong address) {
@@ -78,16 +82,13 @@ jboolean velox4j::JniWrapper::upIteratorHasNext(
   JNI_METHOD_END(false)
 }
 
-jlong velox4j::JniWrapper::upIteratorNext(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong address) {
+jlong JniWrapper::upIteratorNext(JNIEnv* env, jobject javaThis, jlong address) {
   JNI_METHOD_START
   return 0;
   JNI_METHOD_END(-1L)
 }
 
-void velox4j::JniWrapper::rowVectorExportToArrow(
+void JniWrapper::rowVectorExportToArrow(
     JNIEnv* env,
     jobject javaThis,
     jlong rvAddress,
@@ -96,3 +97,5 @@ void velox4j::JniWrapper::rowVectorExportToArrow(
   JNI_METHOD_START
   JNI_METHOD_END()
 }
+
+} // namespace velox4j

@@ -1,10 +1,13 @@
 add_library(velox4j SHARED
-        dummy/Dummy.cc
-        init/Init.cc
-        jni/JniCommon.cc
-        jni/JniError.cc
-        jni/JniLoader.cc
-        jni/JniWrapper.cc
+        velox4j/dummy/Dummy.cc
+        velox4j/init/Init.cc
+        velox4j/jni/JniCommon.cc
+        velox4j/jni/JniError.cc
+        velox4j/jni/JniLoader.cc
+        velox4j/jni/JniWrapper.cc
+        velox4j/exec/Executor.cc
+        velox4j/iterator/UpIterator.cc
+        velox4j/lifecycle/ObjectStore.cc
 )
 
 target_include_directories(velox4j PUBLIC

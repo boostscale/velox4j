@@ -23,9 +23,9 @@
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 
-using namespace facebook::velox;
-
 namespace velox4j {
+
+using namespace facebook::velox;
 
 namespace {
 void init(const std::function<void()>& f) {

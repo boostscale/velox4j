@@ -17,17 +17,17 @@
 
 #include "Dummy.h"
 #include <iostream>
-#include "init/Init.h"
+#include "velox4j/init/Init.h"
 #include "velox/exec/tests/utils/PlanBuilder.h"
 #include "velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h"
 #include "velox/functions/sparksql/aggregates/Register.h"
 #include "velox/functions/sparksql/registration/Register.h"
 #include "velox/vector/tests/utils/VectorTestBase.h"
 
+namespace velox4j {
+
 using namespace facebook::velox;
 using namespace facebook::velox::exec::test;
-
-namespace velox4j {
 class VectorTest : public facebook::velox::test::VectorTestBase {
  public:
   void foo() {

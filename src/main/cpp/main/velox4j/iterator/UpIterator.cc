@@ -15,23 +15,4 @@
 * limitations under the License.
  */
 
-#include <glog/logging.h>
-#include <jni.h>
-#include <JniHelpers.h>
-#include "init/Init.h"
-#include "JniWrapper.h"
-
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void*) {
-  LOG(INFO) << "Initializing Velox4j...";
-  JNIEnv *env = jniHelpersInitialize(jvm);
-  if (env == nullptr) {
-    return -1;
-  }
-
-  velox4j::initForSpark();
-  static spotify::jni::ClassRegistry gClasses;
-  gClasses.add(env, new velox4j::JniWrapper(env));
-
-  LOG(INFO) << "Velox4j initialized.";
-  return JAVA_VERSION;
-}
+#include "UpIterator.h"
