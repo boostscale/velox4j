@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j;
 
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
@@ -27,6 +28,7 @@ import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +55,18 @@ public class JniApiTest {
     final JniApi jniApi2 = JniApi.create();
     jniApi1.close();
     jniApi2.close();
+  }
+
+  @Test
+  public void testCloseTwice() {
+    final JniApi jniApi = JniApi.create();
+    jniApi.close();
+    Assert.assertThrows(VeloxException.class, new ThrowingRunnable() {
+      @Override
+      public void run() {
+        jniApi.close();
+      }
+    });
   }
 
 
