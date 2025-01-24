@@ -19,7 +19,7 @@
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/lifecycle/ObjectStore.h"
-#include "velox4j/exec/Executor.h"
+#include "velox4j/exec/TaskRunner.h"
 #include <velox/common/memory/Memory.h>
 
 namespace velox4j {
@@ -69,8 +69,8 @@ void JniWrapper::initialize(JNIEnv* env) {
 jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
   JNI_METHOD_START
   spotify::jni::JavaString jPlanJson{env, planJson};
-  Executor exec{memory::memoryManager(), jPlanJson.get()};
-  return store()->save(exec.execute());
+  TaskRunner runner{memory::memoryManager(), jPlanJson.get()};
+  return store()->save(runner.execute());
   JNI_METHOD_END(-1L)
 }
 

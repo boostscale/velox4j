@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Executor.h"
+#include "TaskRunner.h"
 #include <velox/exec/Task.h>
 
 #include <utility>
@@ -93,10 +93,10 @@ class Out : public UpIterator {
   RowVectorPtr pending_;
 };
 
-Executor::Executor(memory::MemoryManager* memoryManager, std::string planJson)
+TaskRunner::TaskRunner(memory::MemoryManager* memoryManager, std::string planJson)
     : memoryManager_(memoryManager), planJson_(std::move(planJson)) {}
 
-std::unique_ptr<UpIterator> Executor::execute() const {
+std::unique_ptr<UpIterator> TaskRunner::execute() const {
   // Deserialize plan.
   auto planSerdePool = memoryManager_->addLeafPool("plan");
   auto plan = ISerializable::deserialize<core::PlanNode>(

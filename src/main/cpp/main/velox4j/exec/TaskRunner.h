@@ -24,9 +24,9 @@
 namespace velox4j {
 using namespace facebook::velox;
 
-class Executor {
+class TaskRunner {
  public:
-  Executor(memory::MemoryManager* memoryManager, std::string planJson);
+  TaskRunner(memory::MemoryManager* memoryManager, std::string planJson);
 
   std::unique_ptr<UpIterator> execute() const;
 
