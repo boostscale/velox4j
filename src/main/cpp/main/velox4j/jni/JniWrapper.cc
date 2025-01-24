@@ -88,10 +88,12 @@ const char* JniWrapper::getCanonicalName() const {
 void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
-  VELOX_CHECK_NULL(mSessionId);
-  std::string sSessionId;
-  spotify::jni::JavaClassUtils::makeSignature(sSessionId, kTypeLong, NULL);
-  mSessionId = env->GetMethodID(_clazz, "sessionId", sSessionId.c_str());
+  {
+    VELOX_CHECK_NULL(mSessionId);
+    std::string signature;
+    spotify::jni::JavaClassUtils::makeSignature(signature, kTypeLong, NULL);
+    mSessionId = env->GetMethodID(_clazz, "sessionId", signature.c_str());
+  }
 
   addNativeMethod("createSession", (void*)createSession, kTypeLong, NULL);
   addNativeMethod(
