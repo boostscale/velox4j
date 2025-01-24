@@ -40,6 +40,8 @@ void init(const std::function<void()>& f) {
 
 void initForSpark() {
   init([]() -> void {
+    config::globalConfig.exceptionSystemStacktraceEnabled = true;
+    config::globalConfig.exceptionUserStacktraceEnabled = true;
     memory::MemoryManager::initialize({});
     functions::sparksql::registerFunctions();
     aggregate::prestosql::registerAllAggregateFunctions(
