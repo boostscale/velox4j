@@ -22,6 +22,13 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
+#include "velox/parse/TypeResolver.h"
+#include "velox/core/PlanNode.h"
+#include "velox/type/Filter.h"
+#include "velox/connectors/hive/TableHandle.h"
+#include "velox/connectors/hive/HiveDataSink.h"
+#include "velox/connectors/hive/HiveConnector.h"
+#include "velox/exec/PartitionFunction.h"
 
 namespace velox4j {
 
@@ -53,6 +60,17 @@ void initForSpark() {
         "", true /*registerCompanionFunctions*/, true /*overwrite*/);
     window::prestosql::registerAllWindowFunctions();
     functions::window::sparksql::registerWindowFunctions("");
+
+    Type::registerSerDe();
+    common::Filter::registerSerDe();
+    connector::hive::HiveTableHandle::registerSerDe();
+    connector::hive::LocationHandle::registerSerDe();
+    connector::hive::HiveColumnHandle::registerSerDe();
+    connector::hive::HiveInsertTableHandle::registerSerDe();
+    connector::hive::registerHivePartitionFunctionSerDe();
+    core::PlanNode::registerSerDe();
+    core::ITypedExpr::registerSerDe();
+    exec::registerPartitionFunctionSerDe();
   });
 }
 } // namespace velox4j
