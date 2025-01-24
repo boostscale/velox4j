@@ -16,7 +16,6 @@
  */
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +30,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JniWorkspace {
   private static final Logger LOG = LoggerFactory.getLogger(JniWorkspace.class);
   private static final Map<String, JniWorkspace> INSTANCES = new ConcurrentHashMap<>();
-  private static final String DEFAULT_WORK_DIR;
+  private static final String DEFAULT_ROOT_DIR;
 
   static {
     try {
-      DEFAULT_WORK_DIR = Files.createTempDirectory("velox4j").toFile().getAbsolutePath();
+      DEFAULT_ROOT_DIR = Files.createTempDirectory("velox4j-").toFile().getAbsolutePath();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -47,18 +46,18 @@ public class JniWorkspace {
   private JniWorkspace(String rootDir) {
     try {
       LOG.info("Creating JNI workspace in root directory {}", rootDir);
-      Path root = Paths.get(rootDir);
-      Path created = Files.createTempDirectory(root, "gluten-");
-      this.workDir = created.toAbsolutePath().toString();
-      this.jniLibLoader = new JniLibLoader(workDir);
-      LOG.info("JNI workspace {} created in root directory {}", workDir, rootDir);
+      final Path root = Paths.get(rootDir);
+      final Path work = Files.createTempDirectory(root, "work-").toAbsolutePath();
+      this.workDir = work.toString();
+      this.jniLibLoader = new JniLibLoader(this.workDir);
+      LOG.info("JNI workspace {} created in root directory {}", this.workDir, rootDir);
     } catch (Exception e) {
       throw new VeloxException(e);
     }
   }
 
   public static JniWorkspace getDefault() {
-    return createOrGet(DEFAULT_WORK_DIR);
+    return createOrGet(DEFAULT_ROOT_DIR);
   }
 
   private static JniWorkspace createOrGet(String rootDir) {
