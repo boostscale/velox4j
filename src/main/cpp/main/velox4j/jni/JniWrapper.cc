@@ -90,7 +90,7 @@ void JniWrapper::initialize(JNIEnv* env) {
 
   VELOX_CHECK_NULL(mSessionId);
   std::string sSessionId;
-  spotify::jni::JavaClassUtils::makeSignature(sSessionId, getCanonicalName(), kTypeLong, NULL);
+  spotify::jni::JavaClassUtils::makeSignature(sSessionId, kTypeLong, NULL);
   mSessionId = env->GetMethodID(_clazz, "sessionId", sSessionId.c_str());
 
   addNativeMethod("createSession", (void*)createSession, kTypeLong, NULL);
