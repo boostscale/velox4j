@@ -93,14 +93,17 @@ class Out : public UpIterator {
   RowVectorPtr pending_;
 };
 
-TaskRunner::TaskRunner(memory::MemoryManager* memoryManager, std::string planJson)
+TaskRunner::TaskRunner(
+    memory::MemoryManager* memoryManager,
+    std::string planJson)
     : memoryManager_(memoryManager), planJson_(std::move(planJson)) {}
 
 std::unique_ptr<UpIterator> TaskRunner::execute() const {
   // Deserialize plan.
   auto planSerdePool = memoryManager_->addLeafPool("plan");
+  auto planDynamic = folly::parseJson(planJson_);
   auto plan = ISerializable::deserialize<core::PlanNode>(
-      planJson_, planSerdePool.get());
+      planDynamic, planSerdePool.get());
   core::PlanFragment planFragment{
       plan, core::ExecutionStrategy::kUngrouped, 1, {}};
 
