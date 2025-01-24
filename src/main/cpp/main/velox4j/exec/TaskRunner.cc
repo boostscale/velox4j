@@ -115,7 +115,8 @@ std::unique_ptr<UpIterator> TaskRunner::execute() const {
       core::QueryConfig{{}},
       {},
       cache::AsyncDataCache::getInstance(),
-      memoryManager_->addRootPool(),
+      memoryManager_->addRootPool(
+          fmt::format("Memory Pool - EID {}", std::to_string(eid))),
       nullptr,
       fmt::format("Query Context - EID {}", std::to_string(eid)));
 

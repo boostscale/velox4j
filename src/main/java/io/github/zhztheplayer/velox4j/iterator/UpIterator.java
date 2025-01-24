@@ -7,29 +7,36 @@ import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 import java.util.Iterator;
 
 public class UpIterator implements CppObject, Iterator<RowVector> {
-  private final long address;
+  private final JniApi jniApi;
+  private final long id;
 
-  public UpIterator(long address) {
-    this.address = address;
+  public UpIterator(JniApi jniApi, long id) {
+    this.jniApi = jniApi;
+    this.id = id;
   }
 
   @Override
   public boolean hasNext() {
-    return JniApi.upIteratorHasNext(this);
+    return jniApi.upIteratorHasNext(this);
   }
 
   @Override
   public RowVector next() {
-    return JniApi.upIteratorNext(this);
+    return jniApi.upIteratorNext(this);
   }
 
   @Override
-  public long address() {
-    return address;
+  public JniApi jniApi() {
+    return jniApi;
+  }
+
+  @Override
+  public long id() {
+    return id;
   }
 
   @Override
   public void close() {
-    JniApi.closeCppObject(this);
+    jniApi.releaseCppObject(this);
   }
 }

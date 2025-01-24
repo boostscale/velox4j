@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
  * The classes marked by this annotation can be accessed from native code.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 public @interface AccessedFromNative {
 }

@@ -1,7 +1,14 @@
 package io.github.zhztheplayer.velox4j.lifecycle;
 
+import io.github.zhztheplayer.velox4j.jni.JniApi;
+
 public interface CppObject extends AutoCloseable {
-  long address();
+  JniApi jniApi();
+
+  long id();
+
   @Override
-  void close();
+  default void close() {
+    jniApi().releaseCppObject(this);
+  };
 }

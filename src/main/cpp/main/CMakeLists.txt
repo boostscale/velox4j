@@ -8,6 +8,7 @@ add_library(velox4j SHARED
         velox4j/exec/TaskRunner.cc
         velox4j/iterator/UpIterator.cc
         velox4j/lifecycle/ObjectStore.cc
+        velox4j/lifecycle/Session.cc
 )
 
 target_include_directories(velox4j PUBLIC

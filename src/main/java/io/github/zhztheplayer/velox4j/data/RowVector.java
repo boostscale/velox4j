@@ -4,19 +4,26 @@ import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 
 public class RowVector implements CppObject {
-  private final long address;
+  private final JniApi jniApi;
+  private final long id;
 
-  public RowVector(long address) {
-    this.address = address;
+  public RowVector(JniApi jniApi, long id) {
+    this.jniApi = jniApi;
+    this.id = id;
   }
 
   @Override
-  public long address() {
-    return address;
+  public JniApi jniApi() {
+    return jniApi;
+  }
+
+  @Override
+  public long id() {
+    return id;
   }
 
   @Override
   public void close() {
-    JniApi.closeCppObject(this);
+    jniApi.releaseCppObject(this);
   }
 }

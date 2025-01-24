@@ -15,35 +15,23 @@
  * limitations under the License.
  */
 
-package io.github.zhztheplayer.velox4j.jni;
+#pragma once
 
-public final class JniWrapper {
-  public static JniWrapper create() {
-    return new JniWrapper();
+#include <memory>
+#include "ObjectStore.h"
+
+namespace velox4j {
+class Session {
+ public:
+  Session() : objectStore_(ObjectStore::create()) {};
+  virtual ~Session() = default;
+
+  ObjectStore* objectStore() {
+    return objectStore_.get();
   }
 
-  private final long sessionId;
+ private:
+  std::unique_ptr<ObjectStore> objectStore_;
+};
 
-  private JniWrapper() {
-    this.sessionId = createSession();
-  }
-
-  @AccessedFromNative
-  public long sessionId() {
-    return sessionId;
-  }
-
-  // Lifecycle.
-  native long createSession();
-  native void releaseCppObject(long objectId);
-
-  // Plan execution.
-  native long executePlan(String jsonPlan);
-
-  // For UpIterator.
-  native boolean upIteratorHasNext(long address);
-  native long upIteratorNext(long address);
-
-  // For RowVector.
-  native void rowVectorExportToArrow(long rvAddress, long cSchema, long cArray);
-}
+} // namespace velox4j

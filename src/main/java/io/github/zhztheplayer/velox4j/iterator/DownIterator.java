@@ -5,7 +5,6 @@ import io.github.zhztheplayer.velox4j.jni.AccessedFromNative;
 
 import java.util.Iterator;
 
-@AccessedFromNative
 public class DownIterator {
   private final Iterator<RowVector> delegated;
 
@@ -13,11 +12,13 @@ public class DownIterator {
     this.delegated = delegated;
   }
 
+  @AccessedFromNative
   public boolean hasNext() {
     return delegated.hasNext();
   }
 
+  @AccessedFromNative
   public long next() {
-    return delegated.next().address();
+    return delegated.next().id();
   }
 }

@@ -22,7 +22,6 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

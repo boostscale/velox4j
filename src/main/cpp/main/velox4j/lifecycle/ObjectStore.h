@@ -39,6 +39,11 @@ constexpr static ObjectHandle kInvalidObjectHandle = -1;
 // a shared-ptr's lifecycle to a Java-side object or some kind of resource manager.
 class ObjectStore {
 public:
+ static ObjectStore* global() {
+   static std::unique_ptr<ObjectStore> globalStore = create();
+   return globalStore.get();
+ }
+
  static std::unique_ptr<ObjectStore> create() {
    static std::mutex mtx;
    std::lock_guard<std::mutex> lock(mtx);

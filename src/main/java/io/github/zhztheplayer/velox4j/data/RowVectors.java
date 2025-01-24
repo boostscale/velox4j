@@ -13,7 +13,7 @@ public final class RowVectors {
     final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
     final ArrowArray array = ArrowArray.allocateNew(alloc);
     try {
-      JniApi.rowVectorExportToArrow(vector, schema, array);
+      vector.jniApi().rowVectorExportToArrow(vector, schema, array);
       final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, array, schema, null);
       return new Table(vsr);
     } finally {

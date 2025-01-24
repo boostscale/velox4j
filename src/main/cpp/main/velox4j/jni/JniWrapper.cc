@@ -20,16 +20,62 @@
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/exec/TaskRunner.h"
-#include "velox4j/lifecycle/ObjectStore.h"
+#include "velox4j/lifecycle/Session.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-ObjectStore* store() {
-  // TODO: Make the object store session-wise to avoid leakages.
-  static std::unique_ptr<ObjectStore> objectStore = ObjectStore::create();
-  return objectStore.get();
+jmethodID mSessionId = nullptr;
+
+long createSession(JNIEnv* env, jobject javaThis) {
+  JNI_METHOD_START
+  return ObjectStore::global()->save(std::make_unique<Session>());
+  JNI_METHOD_END(-1L)
+}
+
+Session* sessionOf(JNIEnv* env, jobject javaThis) {
+  jlong sessionId = env->CallLongMethod(javaThis, mSessionId);
+  return ObjectStore::retrieve<Session>(sessionId).get();
+}
+
+void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
+  JNI_METHOD_START
+  ObjectStore::release(objId);
+  JNI_METHOD_END()
+}
+
+jlong executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
+  JNI_METHOD_START
+  spotify::jni::JavaString jPlanJson{env, planJson};
+  TaskRunner runner{memory::memoryManager(), jPlanJson.get()};
+  return sessionOf(env, javaThis)->objectStore()->save(runner.execute());
+  JNI_METHOD_END(-1L)
+}
+
+jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(itrId);
+  return itr->hasNext();
+  JNI_METHOD_END(false)
+}
+
+jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(itrId);
+  return sessionOf(env, javaThis)->objectStore()->save(itr->next());
+  JNI_METHOD_END(-1L)
+}
+
+void rowVectorExportToArrow(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong rvId,
+    jlong cSchema,
+    jlong cArray) {
+  JNI_METHOD_START
+  VELOX_NYI();
+  JNI_METHOD_END()
 }
 } // namespace
 
@@ -42,10 +88,16 @@ const char* JniWrapper::getCanonicalName() const {
 void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
+  VELOX_CHECK_NULL(mSessionId);
+  std::string sSessionId;
+  spotify::jni::JavaClassUtils::makeSignature(sSessionId, getCanonicalName(), kTypeLong, NULL);
+  mSessionId = env->GetMethodID(_clazz, "sessionId", sSessionId.c_str());
+
+  addNativeMethod("createSession", (void*)createSession, kTypeLong, NULL);
+  addNativeMethod(
+      "releaseCppObject", (void*)releaseCppObject, kTypeVoid, kTypeLong, NULL);
   addNativeMethod(
       "executePlan", (void*)executePlan, kTypeLong, kTypeString, NULL);
-  addNativeMethod(
-      "closeCppObject", (void*)closeCppObject, kTypeVoid, kTypeLong, NULL);
   addNativeMethod(
       "upIteratorHasNext",
       (void*)upIteratorHasNext,
@@ -64,46 +116,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       NULL);
 
   registerNativeMethods(env);
-}
-
-jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
-  JNI_METHOD_START
-  spotify::jni::JavaString jPlanJson{env, planJson};
-  TaskRunner runner{memory::memoryManager(), jPlanJson.get()};
-  return store()->save(runner.execute());
-  JNI_METHOD_END(-1L)
-}
-
-void JniWrapper::closeCppObject(JNIEnv* env, jobject javaThis, jlong address) {
-  JNI_METHOD_START
-  store()->release(address);
-  JNI_METHOD_END()
-}
-
-jboolean
-JniWrapper::upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong address) {
-  JNI_METHOD_START
-  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(address);
-  return itr->hasNext();
-  JNI_METHOD_END(false)
-}
-
-jlong JniWrapper::upIteratorNext(JNIEnv* env, jobject javaThis, jlong address) {
-  JNI_METHOD_START
-  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(address);
-  return store()->save(itr->next());
-  JNI_METHOD_END(-1L)
-}
-
-void JniWrapper::rowVectorExportToArrow(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong rvAddress,
-    jlong cSchema,
-    jlong cArray) {
-  JNI_METHOD_START
-  VELOX_NYI();
-  JNI_METHOD_END()
 }
 
 } // namespace velox4j

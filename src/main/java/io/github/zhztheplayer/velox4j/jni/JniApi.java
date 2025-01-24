@@ -10,26 +10,43 @@ import org.apache.arrow.c.ArrowSchema;
  * The higher-level JNI-based API than {@link JniWrapper}. The API hides C++ pointers from
  * developers with providing objective representations in Java to caller.
  */
-public final class JniApi {
-  private static final JniWrapper jni = JniWrapper.get();
-
-  public static UpIterator executePlan(String jsonPlan) {
-    return new UpIterator(jni.executePlan(jsonPlan));
+public final class JniApi implements CppObject {
+  public static JniApi create() {
+    return new JniApi();
   }
 
-  public static void closeCppObject(CppObject obj) {
-    jni.closeCppObject(obj.address());
+  private final JniWrapper jni = JniWrapper.create();
+
+  private JniApi() {
   }
 
-  public static boolean upIteratorHasNext(UpIterator itr) {
-    return jni.upIteratorHasNext(itr.address());
+  public UpIterator executePlan(String jsonPlan) {
+    return new UpIterator(this, jni.executePlan(jsonPlan));
   }
 
-  public static RowVector upIteratorNext(UpIterator itr) {
-    return new RowVector(jni.upIteratorNext(itr.address()));
+  public void releaseCppObject(CppObject obj) {
+    jni.releaseCppObject(obj.id());
   }
 
-  public static void rowVectorExportToArrow(RowVector rowVector, ArrowSchema schema, ArrowArray array) {
-    jni.rowVectorExportToArrow(rowVector.address(), schema.memoryAddress(), array.memoryAddress());
+  public boolean upIteratorHasNext(UpIterator itr) {
+    return jni.upIteratorHasNext(itr.id());
+  }
+
+  public RowVector upIteratorNext(UpIterator itr) {
+    return new RowVector(this, jni.upIteratorNext(itr.id()));
+  }
+
+  public void rowVectorExportToArrow(RowVector rowVector, ArrowSchema schema, ArrowArray array) {
+    jni.rowVectorExportToArrow(rowVector.id(), schema.memoryAddress(), array.memoryAddress());
+  }
+
+  @Override
+  public JniApi jniApi() {
+    return this;
+  }
+
+  @Override
+  public long id() {
+    return jni.sessionId();
   }
 }
