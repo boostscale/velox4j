@@ -25,7 +25,6 @@ import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
