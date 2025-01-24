@@ -22,7 +22,6 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
-#include "velox/parse/TypeResolver.h"
 #include "velox/core/PlanNode.h"
 #include "velox/type/Filter.h"
 #include "velox/connectors/hive/TableHandle.h"
@@ -47,6 +46,7 @@ void init(const std::function<void()>& f) {
 
 void initForSpark() {
   init([]() -> void {
+    config::globalConfig.memoryLeakCheckEnabled = true;
     config::globalConfig.exceptionSystemStacktraceEnabled = true;
     config::globalConfig.exceptionUserStacktraceEnabled = true;
     memory::MemoryManager::initialize({});
