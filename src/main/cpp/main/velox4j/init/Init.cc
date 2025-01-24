@@ -47,6 +47,7 @@ void init(const std::function<void()>& f) {
 void initForSpark() {
   init([]() -> void {
     config::globalConfig.memoryLeakCheckEnabled = true;
+    config::globalConfig.memoryPoolCapacityTransferAcrossTasks = true;
     config::globalConfig.exceptionSystemStacktraceEnabled = true;
     config::globalConfig.exceptionUserStacktraceEnabled = true;
     memory::MemoryManager::initialize({});
