@@ -28,7 +28,7 @@ public final class JniWrapper {
     this.sessionId = createSession();
   }
 
-  @AccessedFromNative
+  @CalledFromNative
   public long sessionId() {
     return sessionId;
   }

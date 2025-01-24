@@ -1,7 +1,7 @@
 package io.github.zhztheplayer.velox4j.iterator;
 
 import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.jni.AccessedFromNative;
+import io.github.zhztheplayer.velox4j.jni.CalledFromNative;
 
 import java.util.Iterator;
 
@@ -12,12 +12,12 @@ public class DownIterator {
     this.delegated = delegated;
   }
 
-  @AccessedFromNative
+  @CalledFromNative
   public boolean hasNext() {
     return delegated.hasNext();
   }
 
-  @AccessedFromNative
+  @CalledFromNative
   public long next() {
     return delegated.next().id();
   }
