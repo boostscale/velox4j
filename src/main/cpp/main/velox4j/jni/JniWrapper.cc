@@ -16,11 +16,11 @@
  */
 
 #include "JniWrapper.h"
+#include <velox/common/memory/Memory.h>
 #include "JniCommon.h"
 #include "JniError.h"
-#include "velox4j/lifecycle/ObjectStore.h"
 #include "velox4j/exec/TaskRunner.h"
-#include <velox/common/memory/Memory.h>
+#include "velox4j/lifecycle/ObjectStore.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -31,7 +31,7 @@ ObjectStore* store() {
   static std::unique_ptr<ObjectStore> objectStore = ObjectStore::create();
   return objectStore.get();
 }
-}
+} // namespace
 
 void JniWrapper::mapFields() {}
 
@@ -74,21 +74,24 @@ jlong JniWrapper::executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
   JNI_METHOD_END(-1L)
 }
 
-void JniWrapper::closeCppObject(JNIEnv* env, jobject javaThis, jlong address){
-    JNI_METHOD_START JNI_METHOD_END()}
-
-jboolean JniWrapper::upIteratorHasNext(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong address) {
+void JniWrapper::closeCppObject(JNIEnv* env, jobject javaThis, jlong address) {
   JNI_METHOD_START
-  return 0;
+  store()->release(address);
+  JNI_METHOD_END()
+}
+
+jboolean
+JniWrapper::upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong address) {
+  JNI_METHOD_START
+  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(address);
+  return itr->hasNext();
   JNI_METHOD_END(false)
 }
 
 jlong JniWrapper::upIteratorNext(JNIEnv* env, jobject javaThis, jlong address) {
   JNI_METHOD_START
-  return 0;
+  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(address);
+  return store()->save(itr->next());
   JNI_METHOD_END(-1L)
 }
 
@@ -99,6 +102,7 @@ void JniWrapper::rowVectorExportToArrow(
     jlong cSchema,
     jlong cArray) {
   JNI_METHOD_START
+  VELOX_NYI();
   JNI_METHOD_END()
 }
 

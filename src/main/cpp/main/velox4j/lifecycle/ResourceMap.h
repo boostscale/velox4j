@@ -58,14 +58,14 @@ class ResourceMap {
     const std::lock_guard<std::mutex> lock(mtx_);
     VELOX_CHECK(
         map_.erase(moduleId) == 1,
-        "ResourceHandle not found in resource map when try to erase: " + std::to_string(moduleId));
+        "ResourceHandle not found in resource map when trying to erase: " + std::to_string(moduleId));
   }
 
   TResource lookup(ResourceHandle moduleId) {
     const std::lock_guard<std::mutex> lock(mtx_);
     auto it = map_.find(moduleId);
     VELOX_CHECK(
-        it != map_.end(), "ResourceHandle not found in resource map when try to lookup: " + std::to_string(moduleId));
+        it != map_.end(), "ResourceHandle not found in resource map when trying to lookup: " + std::to_string(moduleId));
     return it->second;
   }
 
