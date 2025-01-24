@@ -48,7 +48,6 @@ public class JniApiTest {
     jniApi.close();
   }
 
-
   @Test
   public void testCreateTwice() {
     final JniApi jniApi1 = JniApi.create();
@@ -68,7 +67,6 @@ public class JniApiTest {
       }
     });
   }
-
 
   @Test
   public void testExecutePlanTryRun() {
