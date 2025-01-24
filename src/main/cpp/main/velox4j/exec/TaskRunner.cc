@@ -26,8 +26,37 @@ using namespace facebook::velox;
 
 class Out : public UpIterator {
  public:
-  explicit Out(const std::shared_ptr<exec::Task>& task)
-      : UpIterator(), task_(task) {
+  Out(memory::MemoryManager* memoryManager, std::string planJson)
+      : memoryManager_(memoryManager), planJson_(std::move(planJson)) {
+    auto planSerdePool = memoryManager_->addLeafPool("plan");
+    // Keep the pool alive until the task is finished.
+    leafPools_.push_back(planSerdePool);
+    auto planDynamic = folly::parseJson(planJson_);
+    auto plan = ISerializable::deserialize<core::PlanNode>(
+        planDynamic, planSerdePool.get());
+    core::PlanFragment planFragment{
+        plan, core::ExecutionStrategy::kUngrouped, 1, {}};
+
+    static std::atomic<uint32_t> executionId{
+        0}; // Velox query ID, same with taskId.
+    const uint32_t eid = executionId++;
+    std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
+        nullptr,
+        core::QueryConfig{{}},
+        {},
+        cache::AsyncDataCache::getInstance(),
+        memoryManager_->addRootPool(
+            fmt::format("Memory Pool - EID {}", std::to_string(eid))),
+        nullptr,
+        fmt::format("Query Context - EID {}", std::to_string(eid)));
+
+    auto task = exec::Task::create(
+        fmt::format("Task - EID {}", std::to_string(eid)),
+        std::move(planFragment),
+        0,
+        std::move(queryCtx),
+        exec::Task::ExecutionMode::kSerial);
+
     if (!task_->supportSerialExecutionMode()) {
       VELOX_FAIL(
           "Task doesn't support single threaded execution: " +
@@ -89,6 +118,9 @@ class Out : public UpIterator {
     pending_ = vector;
   }
 
+  memory::MemoryManager* const memoryManager_;
+  const std::string planJson_;
+  std::vector<std::shared_ptr<memory::MemoryPool>> leafPools_;
   std::shared_ptr<exec::Task> task_;
   RowVectorPtr pending_;
 };
@@ -100,33 +132,7 @@ TaskRunner::TaskRunner(
 
 std::unique_ptr<UpIterator> TaskRunner::execute() const {
   // Deserialize plan.
-  auto planSerdePool = memoryManager_->addLeafPool("plan");
-  auto planDynamic = folly::parseJson(planJson_);
-  auto plan = ISerializable::deserialize<core::PlanNode>(
-      planDynamic, planSerdePool.get());
-  core::PlanFragment planFragment{
-      plan, core::ExecutionStrategy::kUngrouped, 1, {}};
 
-  static std::atomic<uint32_t> executionId{
-      0}; // Velox query ID, same with taskId.
-  const uint32_t eid = executionId++;
-  std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
-      nullptr,
-      core::QueryConfig{{}},
-      {},
-      cache::AsyncDataCache::getInstance(),
-      memoryManager_->addRootPool(
-          fmt::format("Memory Pool - EID {}", std::to_string(eid))),
-      nullptr,
-      fmt::format("Query Context - EID {}", std::to_string(eid)));
-
-  auto task = exec::Task::create(
-      fmt::format("Task - EID {}", std::to_string(eid)),
-      std::move(planFragment),
-      0,
-      std::move(queryCtx),
-      exec::Task::ExecutionMode::kSerial);
-
-  return std::make_unique<Out>(task);
+  return std::make_unique<Out>(memoryManager_, planJson_);
 }
 } // namespace velox4j
