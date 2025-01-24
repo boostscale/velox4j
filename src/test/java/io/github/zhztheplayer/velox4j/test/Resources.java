@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 public final class Resources {
-  public static String readTextResource(String path) {
+  public static String readResourceAsString(String path) {
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
     try (final InputStream is = classloader.getResourceAsStream(path)) {
       Preconditions.checkArgument(is != null, "Resource %s not found", path);
