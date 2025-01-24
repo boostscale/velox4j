@@ -41,9 +41,18 @@ public class JniApiTest {
   }
 
   @Test
-  public void testCreationAndClose() {
+  public void testCreateAndClose() {
     final JniApi jniApi = JniApi.create();
     jniApi.close();
+  }
+
+
+  @Test
+  public void testCreateTwice() {
+    final JniApi jniApi1 = JniApi.create();
+    final JniApi jniApi2 = JniApi.create();
+    jniApi1.close();
+    jniApi2.close();
   }
 
 
