@@ -19,6 +19,7 @@
 #include <velox/common/memory/Memory.h>
 #include "JniCommon.h"
 #include "JniError.h"
+#include "velox4j/arrow/Arrow.h"
 #include "velox4j/exec/TaskRunner.h"
 #include "velox4j/lifecycle/Session.h"
 
@@ -55,14 +56,14 @@ jlong executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
 
 jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
-  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(itrId);
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return itr->hasNext();
   JNI_METHOD_END(false)
 }
 
 jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
-  auto itr = velox4j::ObjectStore::retrieve<UpIterator>(itrId);
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->next());
   JNI_METHOD_END(-1L)
 }
@@ -74,7 +75,11 @@ void rowVectorExportToArrow(
     jlong cSchema,
     jlong cArray) {
   JNI_METHOD_START
-  VELOX_NYI();
+  auto rv = ObjectStore::retrieve<RowVector>(rvId);
+  exportRowVectorAsArrow(
+      rv,
+      reinterpret_cast<struct ArrowSchema*>(cSchema),
+      reinterpret_cast<struct ArrowArray*>(cArray));
   JNI_METHOD_END()
 }
 } // namespace
