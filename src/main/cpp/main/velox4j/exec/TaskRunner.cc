@@ -56,6 +56,7 @@ class Out : public UpIterator {
         0,
         std::move(queryCtx),
         exec::Task::ExecutionMode::kSerial);
+    task_ = task;
 
     if (!task_->supportSerialExecutionMode()) {
       VELOX_FAIL(
