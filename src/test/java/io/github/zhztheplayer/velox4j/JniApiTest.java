@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class JniApiTest {
   public static final String PLAN_PATH = "plan/example-1.json";
-  public static final String PLAN_OUTPUT_PATH = "plan-output/example-1.csv";
+  public static final String PLAN_OUTPUT_PATH = "plan-output/example-1.tsv";
 
   @BeforeClass
   public static void beforeClass() throws Exception {
