@@ -59,4 +59,4 @@ inline JniErrorState* getJniErrorState() {
   return &jniErrorState;
 }
 
-} // namespace gluten
+} // namespace velox4j
