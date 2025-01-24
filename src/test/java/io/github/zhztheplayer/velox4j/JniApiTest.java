@@ -18,10 +18,14 @@
 package io.github.zhztheplayer.velox4j;
 
 import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.table.Table;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,12 +40,34 @@ public class JniApiTest {
   }
 
   @Test
-  public void testSanity() {
+  public void testExecutePlanTryRun() {
     final String json = Resources.readResourceAsString("plan/example-1.json");
     final JniApi jniApi = JniApi.create();
     final UpIterator itr = jniApi.executePlan(json);
+    itr.close();
+    jniApi.close();
+  }
+
+  @Test
+  public void testExecutePlanTwice() {
+    final JniApi jniApi = JniApi.create();
+    final String json = Resources.readResourceAsString("plan/example-1.json");
+    final UpIterator itr1 = jniApi.executePlan(json);
+    final UpIterator itr2 = jniApi.executePlan(json);
+    itr1.close();
+    itr2.close();
+    jniApi.close();
+  }
+
+  @Test
+  public void testExecutePlanToArrow() {
+    final JniApi jniApi = JniApi.create();
+    final String json = Resources.readResourceAsString("plan/example-1.json");
+    final UpIterator itr = jniApi.executePlan(json);
     final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
     Assert.assertEquals(1, vectors.size());
+    final Table arrowTable = RowVectors.toArrowTable(new RootAllocator(), vectors.get(0));
+    arrowTable.close();
     vectors.forEach(RowVector::close);
     itr.close();
     jniApi.close();

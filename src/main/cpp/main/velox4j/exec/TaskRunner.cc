@@ -28,7 +28,11 @@ class Out : public UpIterator {
  public:
   Out(memory::MemoryManager* memoryManager, std::string planJson)
       : memoryManager_(memoryManager), planJson_(std::move(planJson)) {
-    auto planSerdePool = memoryManager_->addLeafPool("plan");
+    static std::atomic<uint32_t> executionId{
+        0}; // Velox query ID, same with taskId.
+    const uint32_t eid = executionId++;
+    auto planSerdePool = memoryManager_->addLeafPool(
+        fmt::format("Plan Serde Memory Pool - EID {}", std::to_string(eid)));
     // Keep the pool alive until the task is finished.
     leafPools_.push_back(planSerdePool);
     auto planDynamic = folly::parseJson(planJson_);
@@ -36,17 +40,13 @@ class Out : public UpIterator {
         planDynamic, planSerdePool.get());
     core::PlanFragment planFragment{
         plan, core::ExecutionStrategy::kUngrouped, 1, {}};
-
-    static std::atomic<uint32_t> executionId{
-        0}; // Velox query ID, same with taskId.
-    const uint32_t eid = executionId++;
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
         nullptr,
         core::QueryConfig{{}},
         {},
         cache::AsyncDataCache::getInstance(),
         memoryManager_->addRootPool(
-            fmt::format("Memory Pool - EID {}", std::to_string(eid))),
+            fmt::format("Query Memory Pool - EID {}", std::to_string(eid))),
         nullptr,
         fmt::format("Query Context - EID {}", std::to_string(eid)));
 
