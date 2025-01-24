@@ -24,4 +24,10 @@ public final class RowVectors {
       array.close();
     }
   }
+
+  public static String toString(BufferAllocator alloc, RowVector rv) {
+    try (final Table t = toArrowTable(alloc, rv); final VectorSchemaRoot vsr = t.toVectorSchemaRoot()) {
+      return vsr.contentToTSVString();
+    }
+  }
 }

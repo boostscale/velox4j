@@ -23,53 +23,70 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
-import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.table.Table;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JniApiTest {
-  @Before
-  public void setUp() throws Exception {
+  public static final String PLAN_PATH = "plan/example-1.json";
+  public static final String PLAN_OUTPUT_PATH = "plan-output/example-1.csv";
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
     Velox4j.initialize();
   }
 
   @Test
+  public void testCreationAndClose() {
+    final JniApi jniApi = JniApi.create();
+    jniApi.close();
+  }
+
+
+  @Test
   public void testExecutePlanTryRun() {
-    final String json = Resources.readResourceAsString("plan/example-1.json");
+    final String json = readPlanJson();
     final JniApi jniApi = JniApi.create();
     final UpIterator itr = jniApi.executePlan(json);
     itr.close();
+    jniApi.close();
+  }
+
+  @Test
+  public void testExecutePlan() {
+    final JniApi jniApi = JniApi.create();
+    final String json = readPlanJson();
+    final UpIterator itr = jniApi.executePlan(json);
+    assertIterator(itr);
     jniApi.close();
   }
 
   @Test
   public void testExecutePlanTwice() {
     final JniApi jniApi = JniApi.create();
-    final String json = Resources.readResourceAsString("plan/example-1.json");
+    final String json = readPlanJson();
     final UpIterator itr1 = jniApi.executePlan(json);
     final UpIterator itr2 = jniApi.executePlan(json);
-    itr1.close();
-    itr2.close();
+    assertIterator(itr1);
+    assertIterator(itr2);
     jniApi.close();
   }
 
-  @Test
-  public void testExecutePlanToArrow() {
-    final JniApi jniApi = JniApi.create();
-    final String json = Resources.readResourceAsString("plan/example-1.json");
-    final UpIterator itr = jniApi.executePlan(json);
+  private static String readPlanJson() {
+    return Resources.readResourceAsString(PLAN_PATH);
+  }
+
+  private void assertIterator(UpIterator itr) {
     final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
     Assert.assertEquals(1, vectors.size());
-    final Table arrowTable = RowVectors.toArrowTable(new RootAllocator(), vectors.get(0));
-    arrowTable.close();
+    Assert.assertEquals(Resources.readResourceAsString(PLAN_OUTPUT_PATH),
+        RowVectors.toString(new RootAllocator(), vectors.get(0)));
     vectors.forEach(RowVector::close);
     itr.close();
-    jniApi.close();
   }
 }
