@@ -31,7 +31,5 @@ class JniWrapper final : public spotify::jni::JavaClass {
   void initialize(JNIEnv* env) override;
 
   void mapFields() override;
-
-  static getSessionId
 };
 } // namespace velox4j
