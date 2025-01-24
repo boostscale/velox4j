@@ -16,7 +16,7 @@ public class RowVector implements CppObject {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     JniApi.closeCppObject(this);
   }
 }
