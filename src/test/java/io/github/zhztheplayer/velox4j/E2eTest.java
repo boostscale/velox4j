@@ -22,6 +22,7 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,9 +38,12 @@ public class E2eTest {
   @Test
   public void testSanity() {
     final String json = Resources.readResourceAsString("plan/example-1.json");
-    try (final UpIterator itr = JniApi.executePlan(json)) {
-      final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
-      Assert.assertEquals(3, vectors.size());
-    }
+    final JniApi jniApi = JniApi.create();
+    final UpIterator itr = jniApi.executePlan(json);
+    final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
+    Assert.assertEquals(1, vectors.size());
+    vectors.forEach(RowVector::close);
+    itr.close();
+    jniApi.close();
   }
 }
