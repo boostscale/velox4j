@@ -18,6 +18,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
@@ -124,19 +125,11 @@ public class JniApiTest {
     final RowVector vector = collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(vector);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
-    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
-        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
-      jniApi.baseVectorExportToArrow(vector, cSchema, cArray);
-      final FieldVector arrowVector = Data.importVector(alloc, cArray, cSchema, null);
-      try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
-          final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
-        Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
-        final BaseVector imported = jniApi.arrowImportToBaseVector(cSchema1, cArray1);
-        final String serializedImported = jniApi.baseVectorSerialize(imported);
-        Assert.assertEquals(serialized, serializedImported);
-      }
-      arrowVector.close();
-    }
+    final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
+    final BaseVector imported = Arrow.fromArrowVector(jniApi, alloc, arrowVector);
+    final String serializedImported = jniApi.baseVectorSerialize(imported);
+    Assert.assertEquals(serialized, serializedImported);
+    arrowVector.close();
     jniApi.close();
   }
 
