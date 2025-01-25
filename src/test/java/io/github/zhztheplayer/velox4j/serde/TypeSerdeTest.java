@@ -72,6 +72,11 @@ public class TypeSerdeTest {
 
   @Test
   public void testArrayType() {
-    Serdes.testRoundTrip(new ArrayType(Arrays.asList(new TimestampType())));
+    Serdes.testRoundTrip(new ArrayType(Arrays.asList(new IntegerType())));
+  }
+
+  @Test
+  public void testMapType() {
+    Serdes.testRoundTrip(new MapType(Arrays.asList(new IntegerType(), new VarcharType())));
   }
 }

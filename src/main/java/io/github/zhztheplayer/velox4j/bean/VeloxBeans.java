@@ -26,5 +26,6 @@ public final class VeloxBeans {
     typeRegistry.registerClass("VARBINARY", VarbinaryType.class);
     typeRegistry.registerClass("TIMESTAMP", TimestampType.class);
     typeRegistry.registerClass("ARRAY", ArrayType.class);
+    typeRegistry.registerClass("MAP", MapType.class);
   }
 }

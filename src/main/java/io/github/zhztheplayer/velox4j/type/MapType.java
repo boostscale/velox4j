@@ -7,13 +7,13 @@ import com.google.common.base.Preconditions;
 
 import java.util.List;
 
-public class ArrayType extends Type {
+public class MapType extends Type {
   private final List<Type> children;
 
   @JsonCreator
-  public ArrayType(@JsonProperty("cTypes") List<Type> children) {
-    Preconditions.checkArgument(children.size() == 1,
-        "ArrayType should have 1 child, but has %s", children.size());
+  public MapType(@JsonProperty("cTypes") List<Type> children) {
+    Preconditions.checkArgument(children.size() == 2,
+        "MapType should have 2 children, but has %s", children.size());
     this.children = children;
   }
 
