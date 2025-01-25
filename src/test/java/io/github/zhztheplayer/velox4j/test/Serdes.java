@@ -12,14 +12,14 @@ public final class Serdes {
       final String afterNative = jniApi.deserializeAndSerialize(beforeNative);
       final VeloxBean deserialized = Serde.fromJson(afterNative);
       final String serialized = Serde.toPrettyJson(deserialized);
-      Assert.assertEquals(serialized, beforeNative);
+      Assert.assertEquals(beforeNative, serialized);
     }
   }
 
   public static void testRoundTrip(String json) {
     try(final JniApi jniApi = JniApi.create()) {
       final String afterNative = jniApi.deserializeAndSerialize(json);
-      Assert.assertEquals(afterNative, json);
+      Assert.assertEquals(json, afterNative);
     }
   }
 }

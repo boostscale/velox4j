@@ -65,7 +65,7 @@ public class ExprSerdeTest {
   public void testConstantTypedExprCreatedByString() {
     final JniApi jniApi = JniApi.create();
     final ConstantTypedExpr expr = ConstantTypedExpr.create(jniApi,
-        "AAAAACAAAAB7InR5cGUiOiJJTlRFR0VSIiwibmFtZSI6IlR5cGUifQEAAAAAAQQAAAAPAAAA");
+        "AQAAACAAAAB7InR5cGUiOiJJTlRFR0VSIiwibmFtZSI6IlR5cGUifQEAAAAAAQ8AAAA=");
     Serdes.testRoundTrip(expr);
   }
 }
