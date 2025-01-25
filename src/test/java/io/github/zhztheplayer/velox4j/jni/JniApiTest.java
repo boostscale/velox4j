@@ -31,8 +31,6 @@ import org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
-import org.apache.arrow.vector.VectorSchemaRoot;
-import org.apache.arrow.vector.table.Table;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
