@@ -48,6 +48,7 @@ public final class JniWrapper {
   native long arrowImportToBaseVector(long cSchema, long cArray);
   native void baseVectorExportToArrow(long rvAddress, long cSchema, long cArray);
   native String baseVectorSerialize(long id);
+  native long baseVectorDeserialize(String serialized);
 
   // For tests.
   native String deserializeAndSerialize(String json);

@@ -38,7 +38,7 @@ public final class JniApi implements CppObject {
   }
 
   public BaseVector arrowImportToBaseVector(ArrowSchema schema, ArrowArray array) {
-    jni.arrowImportToBaseVector(schema.memoryAddress(), array.memoryAddress());
+    return new RowVector(this, jni.arrowImportToBaseVector(schema.memoryAddress(), array.memoryAddress()));
   }
 
   public void baseVectorExportToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
@@ -47,6 +47,10 @@ public final class JniApi implements CppObject {
 
   public String baseVectorSerialize(BaseVector vector) {
     return jni.baseVectorSerialize(vector.id());
+  }
+
+  public BaseVector baseVectorDeserialize(String serialized) {
+    return new RowVector(this, jni.baseVectorDeserialize(serialized));
   }
 
   public String deserializeAndSerialize(String json) {

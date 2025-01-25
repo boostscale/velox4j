@@ -111,11 +111,28 @@ jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlong vid) {
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   std::ostringstream out;
   saveVector(*vector, out);
-  auto serializedValue = out.str();
-  auto serialized =
-      encoding::Base64::encode(serializedValue.data(), serializedValue.size());
-  return env->NewStringUTF(serialized.data());
+  auto serializedData = out.str();
+  auto encoded =
+      encoding::Base64::encode(serializedData.data(), serializedData.size());
+  return env->NewStringUTF(encoded.data());
   JNI_METHOD_END(nullptr)
+}
+
+jlong baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jSerialized{env, serialized};
+  auto decoded = encoding::Base64::decode(jSerialized.get());
+  std::istringstream dataStream(decoded);
+
+  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
+  const uint32_t id = nextId++;
+  auto pool = memory::memoryManager()->addLeafPool(
+      fmt::format("Decoding Memory Pool - ID {}", id));
+  session->objectStore()->save(pool);
+  auto vector = restoreVector(dataStream, pool.get());
+  return session->objectStore()->save(vector);
+  JNI_METHOD_END(-1L)
 }
 
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
@@ -182,6 +199,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)baseVectorSerialize,
       kTypeString,
       kTypeLong,
+      NULL);
+  addNativeMethod(
+      "baseVectorDeserialize",
+      (void*)baseVectorDeserialize,
+      kTypeLong,
+      kTypeString,
       NULL);
   addNativeMethod(
       "deserializeAndSerialize",
