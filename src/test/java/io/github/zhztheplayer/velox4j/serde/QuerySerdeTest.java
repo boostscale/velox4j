@@ -14,7 +14,7 @@ public class QuerySerdeTest {
   }
 
   @Test
-  public void testQuery() {
+  public void testJsonQuery() {
     final String queryJson = Resources.readResourceAsString("query/example-1.json");
     Serdes.testRoundTrip(queryJson);
   }
