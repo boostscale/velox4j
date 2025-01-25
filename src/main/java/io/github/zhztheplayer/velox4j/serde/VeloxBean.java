@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class DeserializedByKey {
+public abstract class VeloxBean {
   private final String key;
 
   @JsonCreator
-  public DeserializedByKey(@JsonProperty("name") String key) {
+  public VeloxBean(@JsonProperty("name") String key) {
     this.key = key;
   }
 
