@@ -7,6 +7,8 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Collections;
+
 public class ExprSerdeTest {
 
   @BeforeClass
@@ -16,6 +18,6 @@ public class ExprSerdeTest {
 
   @Test
   public void testCallTypeExpr() {
-    Serdes.testRoundTrip(new CallTypedExpr(new IntegerType(), "add", null));
+    Serdes.testRoundTrip(new CallTypedExpr(new IntegerType(), "add", Collections.emptyList()));
   }
 }
