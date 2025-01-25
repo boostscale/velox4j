@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.type;
 
-public class RealType extends SimpleType {
+public class RealType extends Type {
   public RealType() {
-    super("REAL");
   }
 }

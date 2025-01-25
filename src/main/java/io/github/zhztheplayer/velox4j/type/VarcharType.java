@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.type;
 
-public class VarcharType extends SimpleType {
+public class VarcharType extends Type {
   public VarcharType() {
-    super("VARCHAR");
   }
 }
