@@ -85,4 +85,15 @@ public class TypeSerdeTest {
     Serdes.testRoundTrip(new RowType(Arrays.asList("foo", "bar"),
         Arrays.asList(new IntegerType(), new VarcharType())));
   }
+
+  @Test
+  public void testFunctionType() {
+    Serdes.testRoundTrip(new FunctionType(Arrays.asList(
+        new IntegerType(), new VarcharType(), new VarbinaryType())));
+  }
+
+  @Test
+  public void testUnknownType() {
+    Serdes.testRoundTrip(new UnknownType());
+  }
 }
