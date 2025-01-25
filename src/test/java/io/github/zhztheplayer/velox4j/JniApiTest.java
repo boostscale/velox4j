@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JniApiTest {
-  public static final String PLAN_PATH = "plan/example-1.json";
-  public static final String PLAN_OUTPUT_PATH = "plan-output/example-1.tsv";
+  public static final String QUERY_PATH = "query/example-1.json";
+  public static final String QUERY_OUTPUT_PATH = "query-output/example-1.tsv";
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -69,42 +69,42 @@ public class JniApiTest {
   }
 
   @Test
-  public void testExecutePlanTryRun() {
-    final String json = readPlanJson();
+  public void testExecuteQueryTryRun() {
+    final String json = readQueryJson();
     final JniApi jniApi = JniApi.create();
-    final UpIterator itr = jniApi.executePlan(json);
+    final UpIterator itr = jniApi.executeQuery(json);
     itr.close();
     jniApi.close();
   }
 
   @Test
-  public void testExecutePlan() {
+  public void testExecuteQuery() {
     final JniApi jniApi = JniApi.create();
-    final String json = readPlanJson();
-    final UpIterator itr = jniApi.executePlan(json);
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
     assertIterator(itr);
     jniApi.close();
   }
 
   @Test
-  public void testExecutePlanTwice() {
+  public void testExecuteQueryTwice() {
     final JniApi jniApi = JniApi.create();
-    final String json = readPlanJson();
-    final UpIterator itr1 = jniApi.executePlan(json);
-    final UpIterator itr2 = jniApi.executePlan(json);
+    final String json = readQueryJson();
+    final UpIterator itr1 = jniApi.executeQuery(json);
+    final UpIterator itr2 = jniApi.executeQuery(json);
     assertIterator(itr1);
     assertIterator(itr2);
     jniApi.close();
   }
 
-  private static String readPlanJson() {
-    return Resources.readResourceAsString(PLAN_PATH);
+  private static String readQueryJson() {
+    return Resources.readResourceAsString(QUERY_PATH);
   }
 
   private void assertIterator(UpIterator itr) {
     final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
     Assert.assertEquals(1, vectors.size());
-    Assert.assertEquals(Resources.readResourceAsString(PLAN_OUTPUT_PATH),
+    Assert.assertEquals(Resources.readResourceAsString(QUERY_OUTPUT_PATH),
         RowVectors.toString(new RootAllocator(), vectors.get(0)));
     vectors.forEach(RowVector::close);
     itr.close();

@@ -20,7 +20,7 @@
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
-#include "velox4j/exec/TaskRunner.h"
+#include "velox4j/exec/QueryExecutor.h"
 #include "velox4j/lifecycle/Session.h"
 
 namespace velox4j {
@@ -46,11 +46,11 @@ void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
   JNI_METHOD_END()
 }
 
-jlong executePlan(JNIEnv* env, jobject javaThis, jstring planJson) {
+jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_START
-  spotify::jni::JavaString jPlanJson{env, planJson};
-  TaskRunner runner{memory::memoryManager(), jPlanJson.get()};
-  return sessionOf(env, javaThis)->objectStore()->save(runner.execute());
+  spotify::jni::JavaString jQueryJson{env, queryJson};
+  QueryExecutor exec{memory::memoryManager(), jQueryJson.get()};
+  return sessionOf(env, javaThis)->objectStore()->save(exec.execute());
   JNI_METHOD_END(-1L)
 }
 
@@ -104,7 +104,7 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "releaseCppObject", (void*)releaseCppObject, kTypeVoid, kTypeLong, NULL);
   addNativeMethod(
-      "executePlan", (void*)executePlan, kTypeLong, kTypeString, NULL);
+      "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, NULL);
   addNativeMethod(
       "upIteratorHasNext",
       (void*)upIteratorHasNext,

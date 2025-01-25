@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include "TaskRunner.h"
 #include <velox/exec/Task.h>
+#include "QueryExecutor.h"
 
 #include <utility>
 
@@ -126,12 +126,12 @@ class Out : public UpIterator {
   RowVectorPtr pending_;
 };
 
-TaskRunner::TaskRunner(
+QueryExecutor::QueryExecutor(
     memory::MemoryManager* memoryManager,
     std::string planJson)
     : memoryManager_(memoryManager), planJson_(std::move(planJson)) {}
 
-std::unique_ptr<UpIterator> TaskRunner::execute() const {
+std::unique_ptr<UpIterator> QueryExecutor::execute() const {
   // Deserialize plan.
 
   return std::make_unique<Out>(memoryManager_, planJson_);

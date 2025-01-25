@@ -20,8 +20,8 @@ public final class JniApi implements CppObject {
   private JniApi() {
   }
 
-  public UpIterator executePlan(String jsonPlan) {
-    return new UpIterator(this, jni.executePlan(jsonPlan));
+  public UpIterator executeQuery(String jsonQuery) {
+    return new UpIterator(this, jni.executeQuery(jsonQuery));
   }
 
   public void releaseCppObject(CppObject obj) {

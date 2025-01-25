@@ -14,39 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.github.zhztheplayer.velox4j.query;
 
-package io.github.zhztheplayer.velox4j.jni;
+import io.github.zhztheplayer.velox4j.plan.PlanNode;
 
-public final class JniWrapper {
-  public static JniWrapper create() {
-    return new JniWrapper();
+public class Query {
+  private final PlanNode plan;
+
+  public Query(PlanNode plan) {
+    this.plan = plan;
   }
-
-  private final long sessionId;
-
-  private JniWrapper() {
-    this.sessionId = createSession();
-  }
-
-  @CalledFromNative
-  public long sessionId() {
-    return sessionId;
-  }
-
-  // Lifecycle.
-  native long createSession();
-  native void releaseCppObject(long objectId);
-
-  // Plan execution.
-  native long executeQuery(String jsonQuery);
-
-  // For UpIterator.
-  native boolean upIteratorHasNext(long address);
-  native long upIteratorNext(long address);
-
-  // For RowVector.
-  native void rowVectorExportToArrow(long rvAddress, long cSchema, long cArray);
-
-  // For tests.
-  native String testDeserializeAndSerializeQuery(String jsonQuery);
 }
