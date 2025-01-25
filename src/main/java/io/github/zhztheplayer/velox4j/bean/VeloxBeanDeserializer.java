@@ -73,7 +73,7 @@ public class VeloxBeanDeserializer extends JsonDeserializer<Object> {
     public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
       if (VeloxBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
         if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
-          // We only use the
+          // We use the custom deserializer for abstract classes to find the concrete type information of the object.
           return new VeloxBeanDeserializer();
         }
       }
