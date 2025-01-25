@@ -7,7 +7,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class QuerySerdeTest {
-  public static final String QUERY_PATH = "query/example-1.json";
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -16,11 +15,7 @@ public class QuerySerdeTest {
 
   @Test
   public void testQuery() {
-    final String queryJson = readQueryJson();
+    final String queryJson = Resources.readResourceAsString("query/example-1.json");
     Serdes.testRoundTrip(queryJson);
-  }
-
-  private static String readQueryJson() {
-    return Resources.readResourceAsString(QUERY_PATH);
   }
 }
