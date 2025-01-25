@@ -15,18 +15,17 @@ import java.io.IOException;
 import java.util.List;
 
 public final class VeloxBeanSerializer {
-  private VeloxBeanSerializer() {}
+  private VeloxBeanSerializer() {
+  }
 
   private static class EmptyBeanSerializer extends JsonSerializer<Object> {
     @Override
     public void serialize(Object bean, JsonGenerator gen, SerializerProvider serializers) throws IOException {
       gen.writeStartObject();
       final Class<?> clazz = bean.getClass();
-      if (SerdeRegistry.isRegistered(clazz)) {
-        final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
-        for (SerdeRegistry.KvPair kv : kvs) {
-          gen.writeStringField(kv.getKey(), kv.getValue());
-        }
+      final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
+      for (SerdeRegistry.KvPair kv : kvs) {
+        gen.writeStringField(kv.getKey(), kv.getValue());
       }
       gen.writeEndObject();
     }
@@ -40,11 +39,9 @@ public final class VeloxBeanSerializer {
     @Override
     protected void serializeFields(Object bean, JsonGenerator gen, SerializerProvider provider) throws IOException {
       final Class<?> clazz = bean.getClass();
-      if (SerdeRegistry.isRegistered(clazz)) {
-        final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
-        for (SerdeRegistry.KvPair kv : kvs) {
-          gen.writeStringField(kv.getKey(), kv.getValue());
-        }
+      final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
+      for (SerdeRegistry.KvPair kv : kvs) {
+        gen.writeStringField(kv.getKey(), kv.getValue());
       }
       super.serializeFields(bean, gen, provider);
     }

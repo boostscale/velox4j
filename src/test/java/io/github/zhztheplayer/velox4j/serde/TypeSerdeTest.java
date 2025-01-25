@@ -79,4 +79,10 @@ public class TypeSerdeTest {
   public void testMapType() {
     Serdes.testRoundTrip(new MapType(Arrays.asList(new IntegerType(), new VarcharType())));
   }
+
+  @Test
+  public void testRowType() {
+    Serdes.testRoundTrip(new RowType(Arrays.asList("foo", "bar"),
+        Arrays.asList(new IntegerType(), new VarcharType())));
+  }
 }
