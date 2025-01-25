@@ -1,17 +1,12 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(using = VeloxBeanDeserializer.class)
 public abstract class VeloxBean {
   private final String key;
 
-  @JsonCreator
-  public VeloxBean(@JsonProperty("name") String key) {
-    this.key = key;
+  protected VeloxBean() {
+    key = VeloxBeanRegistry.findKeyByClass(this.getClass());
   }
 
   @JsonGetter("name")

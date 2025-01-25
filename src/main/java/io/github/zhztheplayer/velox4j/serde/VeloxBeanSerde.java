@@ -16,7 +16,7 @@ public final class VeloxBeanSerde {
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     jsonMapper.enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION);
-    jsonMapper.registerModule(new SimpleModule().setSerializerModifier(new VeloxBeanSerializer.Modifier()));
+    jsonMapper.registerModule(new SimpleModule().setDeserializerModifier(new VeloxBeanDeserializer.Modifier()));
     return jsonMapper;
   }
 

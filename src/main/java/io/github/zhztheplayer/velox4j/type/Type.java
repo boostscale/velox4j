@@ -1,9 +1,20 @@
 package io.github.zhztheplayer.velox4j.type;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.serde.VeloxBean;
 
 public abstract class Type extends VeloxBean {
-  public Type(String key) {
-    super(key);
+  private final String type;
+
+  @JsonCreator
+  protected Type(@JsonProperty("type") String type) {
+    this.type = type;
+  }
+
+  @JsonGetter("type")
+  public String getType() {
+    return type;
   }
 }
