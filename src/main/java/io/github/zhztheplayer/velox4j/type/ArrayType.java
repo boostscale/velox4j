@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class ArrayType extends SimpleType {
   }
 
   @JsonGetter("cTypes")
+  @JsonDeserialize(contentAs = Type.class)
   public List<Type> getChildren() {
     return children;
   }

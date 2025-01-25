@@ -16,20 +16,16 @@
  */
 package io.github.zhztheplayer.velox4j.query;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
+import io.github.zhztheplayer.velox4j.serde.DeserializedByKey;
 
-public class Query {
+public class Query extends DeserializedByKey {
   public static final String SERDE_KEY = "Velox4jQuery";
 
   private final PlanNode plan;
 
   public Query(PlanNode plan) {
+    super(SERDE_KEY);
     this.plan = plan;
-  }
-
-  @JsonGetter("name")
-  public String name() {
-    return SERDE_KEY;
   }
 }

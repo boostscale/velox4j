@@ -3,20 +3,15 @@ package io.github.zhztheplayer.velox4j.type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.zhztheplayer.velox4j.serde.DeserializedByKey;
 
-public abstract class Type {
-  private final String name;
+public abstract class Type extends DeserializedByKey {
   private final String type;
 
   @JsonCreator
-  protected Type(@JsonProperty("name") String name, @JsonProperty("type") String type) {
-    this.name = name;
+  protected Type(String name, @JsonProperty("type") String type) {
+    super(name);
     this.type = type;
-  }
-
-  @JsonGetter("name")
-  public String getName() {
-    return name;
   }
 
   @JsonGetter("type")
