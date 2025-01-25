@@ -57,7 +57,10 @@ void exportBaseVectorAsArrow(
   exportToArrow(vector, *cArray, vector->pool(), options);
 }
 
-VectorPtr importArrowAsBaseVector(memory::MemoryPool* pool, ArrowSchema* cSchema, ArrowArray* cArray) {
+VectorPtr importArrowAsBaseVector(
+    memory::MemoryPool* pool,
+    ArrowSchema* cSchema,
+    ArrowArray* cArray) {
   auto options = makeOptions();
   return importFromArrowAsOwner(*cSchema, *cArray, pool);
 }
