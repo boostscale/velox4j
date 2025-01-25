@@ -14,11 +14,11 @@ public class CallTypedExpr extends TypedExpr {
   private final List<TypedExpr> inputs;
 
   @JsonCreator
-  public CallTypedExpr(@JsonProperty("type") Type returnType, @JsonProperty("functionName") String functionName,
-      @JsonProperty(value = "inputs") List<TypedExpr> inputs) {
+  public CallTypedExpr(@JsonProperty("type") Type returnType,
+      @JsonProperty("inputs") List<TypedExpr> inputs, @JsonProperty("functionName") String functionName) {
     super(returnType);
+    this.inputs = inputs == null ? Collections.emptyList() : Collections.unmodifiableList(inputs);
     this.functionName = functionName;
-    this.inputs = inputs == null ? Collections.emptyList() : inputs;
   }
 
   @JsonGetter("functionName")
