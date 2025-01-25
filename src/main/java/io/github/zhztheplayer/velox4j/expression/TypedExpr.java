@@ -2,7 +2,6 @@ package io.github.zhztheplayer.velox4j.expression;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.type.Type;
 
@@ -10,7 +9,7 @@ public abstract class TypedExpr extends VeloxBean {
   private final Type returnType;
 
   @JsonCreator
-  protected TypedExpr(@JsonProperty("type") Type returnType) {
+  protected TypedExpr(Type returnType) {
     this.returnType = returnType;
   }
 
