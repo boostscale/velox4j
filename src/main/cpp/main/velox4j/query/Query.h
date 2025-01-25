@@ -14,25 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <velox/core/PlanNode.h>
 
-#include <velox/common/memory/Memory.h>
-#include <string>
-#include "velox4j/iterator/UpIterator.h"
+#include <utility>
 
 #pragma once
 
 namespace velox4j {
 using namespace facebook::velox;
-
-class QueryExecutor {
+class Query : public ISerializable {
  public:
-  QueryExecutor(memory::MemoryManager* memoryManager, std::string queryJson);
+  explicit Query(std::shared_ptr<core::PlanNode> plan)
+      : plan_(std::move(plan)) {}
 
-  std::unique_ptr<UpIterator> execute() const;
+  const std::shared_ptr<core::PlanNode>& plan() const {
+    return plan_;
+  }
+
+  folly::dynamic serialize() const override {
+    folly::dynamic obj = folly::dynamic::object;
+    obj["plan"] = plan_->serialize();
+    return obj;
+  }
+
+  static std::shared_ptr<Query> create(
+      const folly::dynamic& obj,
+      void* context) {
+    auto plan = std::const_pointer_cast<core::PlanNode>(
+        ISerializable::deserialize<core::PlanNode>(obj["plan"], context));
+    return std::make_shared<Query>(plan);
+  }
+
+  static void registerSerDe() {
+    auto& registry = DeserializationWithContextRegistryForSharedPtr();
+    registry.Register("Velox4jQuery", create);
+  }
 
  private:
-  memory::MemoryManager* const memoryManager_;
-  const std::string queryJson_;
+  std::shared_ptr<core::PlanNode> plan_;
 };
-
 } // namespace velox4j

@@ -16,12 +16,20 @@
  */
 package io.github.zhztheplayer.velox4j.query;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 
 public class Query {
+  public static final String SERDE_KEY = "Velox4jQuery";
+
   private final PlanNode plan;
 
   public Query(PlanNode plan) {
     this.plan = plan;
+  }
+
+  @JsonGetter("name")
+  public String name() {
+    return SERDE_KEY;
   }
 }

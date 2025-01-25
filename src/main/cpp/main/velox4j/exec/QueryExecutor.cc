@@ -17,6 +17,7 @@
 
 #include <velox/exec/Task.h>
 #include "QueryExecutor.h"
+#include "velox4j/query/Query.h"
 
 #include <utility>
 
@@ -26,20 +27,20 @@ using namespace facebook::velox;
 
 class Out : public UpIterator {
  public:
-  Out(memory::MemoryManager* memoryManager, std::string planJson)
-      : memoryManager_(memoryManager), planJson_(std::move(planJson)) {
+  Out(memory::MemoryManager* memoryManager, std::string queryJson)
+      : memoryManager_(memoryManager), queryJson_(std::move(queryJson)) {
     static std::atomic<uint32_t> executionId{
         0}; // Velox query ID, same with taskId.
     const uint32_t eid = executionId++;
-    auto planSerdePool = memoryManager_->addLeafPool(
-        fmt::format("Plan Serde Memory Pool - EID {}", std::to_string(eid)));
+    auto querySerdePool = memoryManager_->addLeafPool(
+        fmt::format("Query Serde Memory Pool - EID {}", std::to_string(eid)));
     // Keep the pool alive until the task is finished.
-    leafPools_.push_back(planSerdePool);
-    auto planDynamic = folly::parseJson(planJson_);
-    auto plan = ISerializable::deserialize<core::PlanNode>(
-        planDynamic, planSerdePool.get());
+    leafPools_.push_back(querySerdePool);
+    auto queryDynamic = folly::parseJson(queryJson_);
+    auto query = ISerializable::deserialize<Query>(
+        queryDynamic, querySerdePool.get());
     core::PlanFragment planFragment{
-        plan, core::ExecutionStrategy::kUngrouped, 1, {}};
+        query->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
         nullptr,
         core::QueryConfig{{}},
@@ -120,7 +121,7 @@ class Out : public UpIterator {
   }
 
   memory::MemoryManager* const memoryManager_;
-  const std::string planJson_;
+  const std::string queryJson_;
   std::vector<std::shared_ptr<memory::MemoryPool>> leafPools_;
   std::shared_ptr<exec::Task> task_;
   RowVectorPtr pending_;
@@ -129,11 +130,9 @@ class Out : public UpIterator {
 QueryExecutor::QueryExecutor(
     memory::MemoryManager* memoryManager,
     std::string planJson)
-    : memoryManager_(memoryManager), planJson_(std::move(planJson)) {}
+    : memoryManager_(memoryManager), queryJson_(std::move(planJson)) {}
 
 std::unique_ptr<UpIterator> QueryExecutor::execute() const {
-  // Deserialize plan.
-
-  return std::make_unique<Out>(memoryManager_, planJson_);
+  return std::make_unique<Out>(memoryManager_, queryJson_);
 }
 } // namespace velox4j

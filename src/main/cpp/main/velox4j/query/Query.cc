@@ -15,24 +15,4 @@
  * limitations under the License.
  */
 
-#include <velox/common/memory/Memory.h>
-#include <string>
-#include "velox4j/iterator/UpIterator.h"
-
-#pragma once
-
-namespace velox4j {
-using namespace facebook::velox;
-
-class QueryExecutor {
- public:
-  QueryExecutor(memory::MemoryManager* memoryManager, std::string queryJson);
-
-  std::unique_ptr<UpIterator> execute() const;
-
- private:
-  memory::MemoryManager* const memoryManager_;
-  const std::string queryJson_;
-};
-
-} // namespace velox4j
+#include "Query.h"

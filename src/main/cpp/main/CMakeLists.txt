@@ -10,6 +10,7 @@ add_library(velox4j SHARED
         velox4j/lifecycle/ObjectStore.cc
         velox4j/lifecycle/Session.cc
         velox4j/arrow/Arrow.cc
+        velox4j/query/Query.cc
 )
 
 target_include_directories(velox4j PUBLIC
