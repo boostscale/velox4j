@@ -72,7 +72,10 @@ public class VeloxBeanDeserializer extends JsonDeserializer<Object> {
     @Override
     public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
       if (VeloxBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
-        return new VeloxBeanDeserializer();
+        if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
+          // We only use the
+          return new VeloxBeanDeserializer();
+        }
       }
       return deserializer;
     }
