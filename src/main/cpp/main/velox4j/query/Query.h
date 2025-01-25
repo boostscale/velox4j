@@ -24,31 +24,17 @@ namespace velox4j {
 using namespace facebook::velox;
 class Query : public ISerializable {
  public:
-  explicit Query(std::shared_ptr<core::PlanNode> plan)
-      : plan_(std::move(plan)) {}
+  explicit Query(std::shared_ptr<core::PlanNode> plan);
 
-  const std::shared_ptr<core::PlanNode>& plan() const {
-    return plan_;
-  }
+  const std::shared_ptr<core::PlanNode>& plan() const;
 
-  folly::dynamic serialize() const override {
-    folly::dynamic obj = folly::dynamic::object;
-    obj["plan"] = plan_->serialize();
-    return obj;
-  }
+  folly::dynamic serialize() const override;
 
   static std::shared_ptr<Query> create(
       const folly::dynamic& obj,
-      void* context) {
-    auto plan = std::const_pointer_cast<core::PlanNode>(
-        ISerializable::deserialize<core::PlanNode>(obj["plan"], context));
-    return std::make_shared<Query>(plan);
-  }
+      void* context);
 
-  static void registerSerDe() {
-    auto& registry = DeserializationWithContextRegistryForSharedPtr();
-    registry.Register("Velox4jQuery", create);
-  }
+  static void registerSerDe();
 
  private:
   std::shared_ptr<core::PlanNode> plan_;

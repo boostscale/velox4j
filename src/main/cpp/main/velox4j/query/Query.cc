@@ -16,3 +16,29 @@
  */
 
 #include "Query.h"
+
+namespace velox4j {
+using namespace facebook::velox;
+
+Query::Query(std::shared_ptr<core::PlanNode> plan) : plan_(std::move(plan)) {}
+
+const std::shared_ptr<core::PlanNode>& Query::plan() const {
+  return plan_;
+}
+
+folly::dynamic Query::serialize() const {
+  folly::dynamic obj = folly::dynamic::object;
+  obj["plan"] = plan_->serialize();
+  return obj;
+}
+
+std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
+  auto plan = std::const_pointer_cast<core::PlanNode>(
+      ISerializable::deserialize<core::PlanNode>(obj["plan"], context));
+  return std::make_shared<Query>(plan);
+}
+void Query::registerSerDe() {
+  auto& registry = DeserializationWithContextRegistryForSharedPtr();
+  registry.Register("Velox4jQuery", create);
+}
+} // namespace velox4j

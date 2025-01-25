@@ -22,12 +22,13 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
-#include "velox/core/PlanNode.h"
-#include "velox/type/Filter.h"
-#include "velox/connectors/hive/TableHandle.h"
-#include "velox/connectors/hive/HiveDataSink.h"
-#include "velox/connectors/hive/HiveConnector.h"
-#include "velox/exec/PartitionFunction.h"
+#include <velox/core/PlanNode.h>
+#include <velox/type/Filter.h>
+#include <velox/connectors/hive/TableHandle.h>
+#include <velox/connectors/hive/HiveDataSink.h>
+#include <velox/connectors/hive/HiveConnector.h>
+#include <velox/exec/PartitionFunction.h>
+#include <velox4j/query/Query.h>
 
 namespace velox4j {
 
@@ -62,6 +63,7 @@ void initForSpark() {
     window::prestosql::registerAllWindowFunctions();
     functions::window::sparksql::registerWindowFunctions("");
 
+    Query::registerSerDe();
     Type::registerSerDe();
     common::Filter::registerSerDe();
     connector::hive::HiveTableHandle::registerSerDe();
