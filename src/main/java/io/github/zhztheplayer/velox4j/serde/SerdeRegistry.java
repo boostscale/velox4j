@@ -34,7 +34,7 @@ public class SerdeRegistry {
     return out;
   }
 
-  public SerdeRegistryFactory factory(String value) {
+  public SerdeRegistryFactory registerFactory(String value) {
     synchronized (this) {
       checkDup(value);
       final SerdeRegistryFactory factory = new SerdeRegistryFactory(withNewKv(new KvPair(key, value)));
@@ -43,7 +43,7 @@ public class SerdeRegistry {
     }
   }
 
-  public void register(String value, Class<?> clazz) {
+  public void registerClass(String value, Class<?> clazz) {
     synchronized (this) {
       checkDup(value);
       classes.put(value, clazz);

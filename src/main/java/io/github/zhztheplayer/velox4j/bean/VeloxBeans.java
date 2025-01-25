@@ -11,9 +11,9 @@ public final class VeloxBeans {
 
   public static void registerAll() {
     final SerdeRegistry typeRegistry = SerdeRegistryFactory.get().key("name")
-        .factory("Type")
+        .registerFactory("Type")
         .key("type");
 
-    typeRegistry.register("TINYINT", TinyIntType.class);
+    typeRegistry.registerClass("TINYINT", TinyIntType.class);
   }
 }

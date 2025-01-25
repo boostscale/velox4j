@@ -30,7 +30,7 @@ public class VeloxBeanDeserializer extends JsonDeserializer<Object> {
     final String value = objectNode.remove(key).asText();
     Preconditions.checkArgument(registry.contains(value), "Value %s not registered in registry: %s", value, registry.prefixAndKey());
     if (registry.isFactory(value)) {
-      final SerdeRegistryFactory rf = registry.factory(value);
+      final SerdeRegistryFactory rf = registry.getFactory(value);
       final Set<String> keys = rf.keys();
       final List<String> keysInObj = Streams.fromIterator(objectNode.fieldNames()).filter(keys::contains).collect(Collectors.toList());
       if (keysInObj.isEmpty()) {
