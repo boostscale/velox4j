@@ -12,7 +12,8 @@ public class CallTypedExpr extends TypedExpr {
   private final List<TypedExpr> inputs;
 
   @JsonCreator
-  public CallTypedExpr(Type returnType, @JsonProperty("functionName") String functionName, @JsonProperty("inputs") List<TypedExpr> inputs) {
+  public CallTypedExpr(Type returnType, @JsonProperty("functionName") String functionName,
+      @JsonProperty("inputs") List<TypedExpr> inputs) {
     super(returnType);
     this.functionName = functionName;
     this.inputs = inputs;
