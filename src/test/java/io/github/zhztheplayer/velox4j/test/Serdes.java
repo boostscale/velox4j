@@ -10,15 +10,15 @@ public final class Serdes {
       final String beforeNative = JsonSerde.toPrettyJson(object);
       final String afterNative = jniApi.deserializeAndSerialize(beforeNative);
       final Object deserialized = JsonSerde.fromJson(object.getClass(), afterNative);
-      final String reserialized = JsonSerde.toJson(deserialized);
-      Assert.assertEquals(beforeNative, reserialized);
+      final String serialized = JsonSerde.toPrettyJson(deserialized);
+      Assert.assertEquals(serialized, beforeNative);
     }
   }
 
   public static void testRoundTrip(String json) {
     try(final JniApi jniApi = JniApi.create()) {
       final String afterNative = jniApi.deserializeAndSerialize(json);
-      Assert.assertEquals(json, afterNative);
+      Assert.assertEquals(afterNative, json);
     }
   }
 }
