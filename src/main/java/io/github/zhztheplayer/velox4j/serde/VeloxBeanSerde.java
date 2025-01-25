@@ -1,16 +1,22 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
 
-public final class JsonSerde {
+public final class VeloxBeanSerde {
   private static final ObjectMapper JSON = newVeloxJsonMapper();
 
   private static ObjectMapper newVeloxJsonMapper() {
     final ObjectMapper jsonMapper = new ObjectMapper();
+    jsonMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+    jsonMapper.enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION);
+    jsonMapper.registerModule(new SimpleModule().setSerializerModifier(new VeloxBeanSerializer.Modifier()));
     return jsonMapper;
   }
 

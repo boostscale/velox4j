@@ -20,12 +20,9 @@ import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.serde.VeloxBean;
 
 public class Query extends VeloxBean {
-  public static final String SERDE_KEY = "Velox4jQuery";
-
   private final PlanNode plan;
 
   public Query(PlanNode plan) {
-    super(SERDE_KEY);
     this.plan = plan;
   }
 }

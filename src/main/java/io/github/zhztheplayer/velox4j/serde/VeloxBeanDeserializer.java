@@ -23,7 +23,7 @@ public class VeloxBeanDeserializer extends StdDeserializer<VeloxBean> {
           node));
     }
     final String key = ((TextNode) node.get("name")).asText();
-    final Class<? extends VeloxBean> clazz = VeloxBeanRegistry.find(key);
+    final Class<? extends VeloxBean> clazz = VeloxBeanRegistry.findClassByKey(key);
     return p.getCodec().treeToValue(node, clazz);
   }
 }
