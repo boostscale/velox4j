@@ -82,6 +82,20 @@ void rowVectorExportToArrow(
       reinterpret_cast<struct ArrowArray*>(cArray));
   JNI_METHOD_END()
 }
+
+jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  auto serdePool =
+      memory::memoryManager()->addLeafPool(fmt::format("Serde Memory Pool"));
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized =
+      ISerializable::deserialize<ISerializable>(dynamic, serdePool.get());
+  auto serializedDynamic = deserialized->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
 } // namespace
 
 void JniWrapper::mapFields() {}
@@ -120,6 +134,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeLong,
       kTypeLong,
+      NULL);
+  addNativeMethod(
+      "deserializeAndSerialize",
+      (void*)deserializeAndSerialize,
+      kTypeString,
+      kTypeString,
       NULL);
 
   registerNativeMethods(env);

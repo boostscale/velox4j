@@ -40,6 +40,10 @@ public final class JniApi implements CppObject {
     jni.rowVectorExportToArrow(rowVector.id(), schema.memoryAddress(), array.memoryAddress());
   }
 
+  public String deserializeAndSerialize(String json) {
+    return jni.deserializeAndSerialize(json);
+  }
+
   @Override
   public JniApi jniApi() {
     return this;

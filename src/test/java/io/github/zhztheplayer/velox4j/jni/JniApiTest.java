@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package io.github.zhztheplayer.velox4j;
+package io.github.zhztheplayer.velox4j.jni;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.Resources;
 import org.apache.arrow.memory.RootAllocator;

@@ -48,5 +48,5 @@ public final class JniWrapper {
   native void rowVectorExportToArrow(long rvAddress, long cSchema, long cArray);
 
   // For tests.
-  native String testDeserializeAndSerializeQuery(String jsonQuery);
+  native String deserializeAndSerialize(String json);
 }
