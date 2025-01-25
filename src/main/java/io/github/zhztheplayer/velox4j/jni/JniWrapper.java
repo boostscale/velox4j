@@ -44,8 +44,10 @@ public final class JniWrapper {
   native boolean upIteratorHasNext(long address);
   native long upIteratorNext(long address);
 
-  // For RowVector.
+  // For BaseVector / RowVector.
+  native long arrowImportToBaseVector(long cSchema, long cArray);
   native void baseVectorExportToArrow(long rvAddress, long cSchema, long cArray);
+  native String baseVectorSerialize(long id);
 
   // For tests.
   native String deserializeAndSerialize(String json);

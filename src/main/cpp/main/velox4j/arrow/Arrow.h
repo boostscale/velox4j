@@ -27,4 +27,6 @@ void exportBaseVectorAsArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
+
+VectorPtr importArrowAsBaseVector(memory::MemoryPool* pool, ArrowSchema* cSchema, ArrowArray* cArray);
 } // namespace velox4j

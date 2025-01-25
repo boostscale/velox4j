@@ -38,17 +38,27 @@ void slice(VectorPtr& in) {
 void flatten(VectorPtr& in) {
   facebook::velox::BaseVector::flattenVector(in);
 }
+
+ArrowOptions makeOptions() {
+  ArrowOptions options;
+  options.timestampUnit = static_cast<TimestampUnit>(6);
+  return options;
+}
 } // namespace
 
 void exportBaseVectorAsArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
-  ArrowOptions options;
-  options.timestampUnit = static_cast<TimestampUnit>(6);
   flatten(vector);
   slice(vector);
+  auto options = makeOptions();
   exportToArrow(vector, *cSchema, options);
   exportToArrow(vector, *cArray, vector->pool(), options);
+}
+
+VectorPtr importArrowAsBaseVector(memory::MemoryPool* pool, ArrowSchema* cSchema, ArrowArray* cArray) {
+  auto options = makeOptions();
+  return importFromArrowAsOwner(*cSchema, *cArray, pool);
 }
 } // namespace velox4j

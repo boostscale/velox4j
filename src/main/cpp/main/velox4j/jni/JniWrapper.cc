@@ -16,7 +16,9 @@
  */
 
 #include "JniWrapper.h"
+#include <velox/common/encode/Base64.h>
 #include <velox/common/memory/Memory.h>
+#include <velox/vector/VectorSaver.h>
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
@@ -68,6 +70,27 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
+jlong arrowImportToBaseVector(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong cSchema,
+    jlong cArray) {
+  JNI_METHOD_START
+  // TODO Session memory pool.
+  auto session = sessionOf(env, javaThis);
+  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
+  const uint32_t id = nextId++;
+  auto pool = memory::memoryManager()->addLeafPool(
+      fmt::format("Arrow Import Memory Pool - ID {}", id));
+  session->objectStore()->save(pool);
+  auto vector = importArrowAsBaseVector(
+      pool.get(),
+      reinterpret_cast<struct ArrowSchema*>(cSchema),
+      reinterpret_cast<struct ArrowArray*>(cArray));
+  return session->objectStore()->save(vector);
+  JNI_METHOD_END(-1L)
+}
+
 void baseVectorExportToArrow(
     JNIEnv* env,
     jobject javaThis,
@@ -81,6 +104,18 @@ void baseVectorExportToArrow(
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
   JNI_METHOD_END()
+}
+
+jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  std::ostringstream out;
+  saveVector(*vector, out);
+  auto serializedValue = out.str();
+  auto serialized =
+      encoding::Base64::encode(serializedValue.data(), serializedValue.size());
+  return env->NewStringUTF(serialized.data());
+  JNI_METHOD_END(nullptr)
 }
 
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
@@ -128,11 +163,24 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, NULL);
   addNativeMethod(
+      "arrowImportToBaseVector",
+      (void*)arrowImportToBaseVector,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      NULL);
+  addNativeMethod(
       "baseVectorExportToArrow",
       (void*)baseVectorExportToArrow,
       kTypeVoid,
       kTypeLong,
       kTypeLong,
+      kTypeLong,
+      NULL);
+  addNativeMethod(
+      "baseVectorSerialize",
+      (void*)baseVectorSerialize,
+      kTypeString,
       kTypeLong,
       NULL);
   addNativeMethod(
