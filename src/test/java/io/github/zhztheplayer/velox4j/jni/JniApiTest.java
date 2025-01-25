@@ -25,7 +25,14 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.stream.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+import org.apache.arrow.c.Data;
+import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.table.Table;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -108,6 +115,29 @@ public class JniApiTest {
     final BaseVector deserialized = jniApi.baseVectorDeserialize(serialized);
     final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
+    jniApi.close();
+  }
+
+  @Test
+  public void testArrowRoundTrip() {
+    final JniApi jniApi = JniApi.create();
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
+    final RowVector vector = collectSingleVector(itr);
+    final String serialized = jniApi.baseVectorSerialize(vector);
+    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
+    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
+      jniApi.baseVectorExportToArrow(vector, cSchema, cArray);
+      final FieldVector arrowVector = Data.importVector(alloc, cArray, cSchema, null);
+      try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
+          final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
+        Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
+        final BaseVector imported = jniApi.arrowImportToBaseVector(cSchema1, cArray1);
+        final String serializedImported = jniApi.baseVectorSerialize(imported);
+        Assert.assertEquals(serialized, serializedImported);
+      }
+    }
     jniApi.close();
   }
 
