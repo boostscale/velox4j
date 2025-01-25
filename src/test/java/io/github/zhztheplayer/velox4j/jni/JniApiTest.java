@@ -137,6 +137,7 @@ public class JniApiTest {
         final String serializedImported = jniApi.baseVectorSerialize(imported);
         Assert.assertEquals(serialized, serializedImported);
       }
+      arrowVector.close();
     }
     jniApi.close();
   }
