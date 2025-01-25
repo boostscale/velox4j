@@ -9,7 +9,7 @@ public final class Serdes {
     try(final JniApi jniApi = JniApi.create()) {
       final String beforeNative = JsonSerde.toPrettyJson(object);
       final String afterNative = jniApi.deserializeAndSerialize(beforeNative);
-      final Object deserialized = JsonSerde.fromJson(object.getClass(), afterNative);
+      final Object deserialized = JsonSerde.fromJson(afterNative, object.getClass());
       final String serialized = JsonSerde.toPrettyJson(deserialized);
       Assert.assertEquals(serialized, beforeNative);
     }

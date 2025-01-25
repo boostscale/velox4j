@@ -25,7 +25,7 @@ public final class JsonSerde {
     }
   }
 
-  public static <T> T fromJson(Class<T> clazz, String json) {
+  public static <T> T fromJson(String json, Class<T> clazz) {
     try {
       return JSON.reader().readValue(json, clazz);
     } catch (IOException e) {
