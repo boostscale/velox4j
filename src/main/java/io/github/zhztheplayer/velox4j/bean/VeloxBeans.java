@@ -1,17 +1,24 @@
 package io.github.zhztheplayer.velox4j.bean;
 
+import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.type.*;
 
 public final class VeloxBeans {
+  private static final SerdeRegistry ROOT_REGISTRY = SerdeRegistryFactory.get().key("name");
+
   private VeloxBeans() {
 
   }
 
   public static void registerAll() {
-    final SerdeRegistry rootRegistry = SerdeRegistryFactory.get().key("name");
-    final SerdeRegistry typeRegistry = rootRegistry
+    registerTypes();
+    registerExprs();
+  }
+
+  private static void registerTypes() {
+    final SerdeRegistry typeRegistry = ROOT_REGISTRY
         .registerFactory("Type")
         .key("type");
 
@@ -33,17 +40,18 @@ public final class VeloxBeans {
     typeRegistry.registerClass("UNKNOWN", UnknownType.class);
     typeRegistry.registerClass("OPAQUE", OpaqueType.class);
     typeRegistry.registerClass("DECIMAL", DecimalType.class);
-
-    rootRegistry.registerFactory("IntervalDayTimeType")
+    ROOT_REGISTRY.registerFactory("IntervalDayTimeType")
         .key("type")
         .registerClass("INTERVAL DAY TO SECOND", IntervalDayTimeType.class);
-
-    rootRegistry.registerFactory("IntervalYearMonthType")
+    ROOT_REGISTRY.registerFactory("IntervalYearMonthType")
         .key("type")
         .registerClass("INTERVAL YEAR TO MONTH", IntervalYearMonthType.class);
-
-    rootRegistry.registerFactory("DateType")
+    ROOT_REGISTRY.registerFactory("DateType")
         .key("type")
         .registerClass("DATE", DateType.class);
+  }
+
+  private static void registerExprs() {
+    ROOT_REGISTRY.registerClass("CallTypedExpr", CallTypedExpr.class);
   }
 }
