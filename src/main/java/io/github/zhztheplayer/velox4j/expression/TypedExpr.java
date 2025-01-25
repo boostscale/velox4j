@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.expression;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.zhztheplayer.velox4j.bean.VeloxBean;

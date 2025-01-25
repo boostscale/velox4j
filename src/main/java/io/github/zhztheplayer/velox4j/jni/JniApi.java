@@ -4,6 +4,8 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
+import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.type.Type;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -35,6 +37,11 @@ public final class JniApi implements CppObject {
 
   public RowVector upIteratorNext(UpIterator itr) {
     return new RowVector(this, jni.upIteratorNext(itr.id()));
+  }
+
+  public Type baseVectorGetType(BaseVector vector) {
+    String typeJson = jni.baseVectorGetType(vector.id());
+    return (Type) Serde.fromJson(typeJson);
   }
 
   public BaseVector arrowImportToBaseVector(ArrowSchema schema, ArrowArray array) {

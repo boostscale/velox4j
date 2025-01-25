@@ -70,6 +70,15 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
+jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto serializedDynamic = vector->type()->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jlong arrowImportToBaseVector(
     JNIEnv* env,
     jobject javaThis,
@@ -137,8 +146,10 @@ jlong baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
 
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
-  auto serdePool =
-      memory::memoryManager()->addLeafPool(fmt::format("Serde Memory Pool"));
+  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
+  const uint32_t id = nextId++;
+  auto serdePool = memory::memoryManager()->addLeafPool(
+      fmt::format("Serde Memory Pool - ID {}", id));
   spotify::jni::JavaString jJson{env, json};
   auto dynamic = folly::parseJson(jJson.get());
   auto deserialized =
@@ -179,6 +190,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       NULL);
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, NULL);
+  addNativeMethod(
+      "baseVectorGetType",
+      (void*)baseVectorGetType,
+      kTypeString,
+      kTypeLong,
+      NULL);
   addNativeMethod(
       "arrowImportToBaseVector",
       (void*)arrowImportToBaseVector,

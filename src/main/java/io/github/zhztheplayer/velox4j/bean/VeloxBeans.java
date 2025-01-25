@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.bean;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.type.*;
@@ -57,5 +58,6 @@ public final class VeloxBeans {
     ROOT_REGISTRY.registerClass("CallTypedExpr", CallTypedExpr.class);
     ROOT_REGISTRY.registerClass("CastTypedExpr", CastTypedExpr.class);
     ROOT_REGISTRY.registerClass("ConcatTypedExpr", ConcatTypedExpr.class);
+    ROOT_REGISTRY.registerClass("ConstantTypedExpr", ConstantTypedExpr.class);
   }
 }
