@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.query;
+package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.test.Resources;
