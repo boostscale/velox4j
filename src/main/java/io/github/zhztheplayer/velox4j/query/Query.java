@@ -17,7 +17,7 @@
 package io.github.zhztheplayer.velox4j.query;
 
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
-import io.github.zhztheplayer.velox4j.serde.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 
 public class Query extends VeloxBean {
   private final PlanNode plan;

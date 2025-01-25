@@ -2,7 +2,7 @@ package io.github.zhztheplayer.velox4j;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
-import io.github.zhztheplayer.velox4j.serde.VeloxBeans;
+import io.github.zhztheplayer.velox4j.bean.VeloxBeans;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

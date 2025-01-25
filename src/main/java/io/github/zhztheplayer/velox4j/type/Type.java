@@ -3,7 +3,7 @@ package io.github.zhztheplayer.velox4j.type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.zhztheplayer.velox4j.serde.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 
 public abstract class Type extends VeloxBean {
   private final String type;

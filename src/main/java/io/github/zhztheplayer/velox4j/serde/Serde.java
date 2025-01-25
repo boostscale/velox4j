@@ -5,11 +5,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import io.github.zhztheplayer.velox4j.bean.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxBeanDeserializer;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
 
-public final class VeloxBeanSerde {
+public final class Serde {
   private static final ObjectMapper JSON = newVeloxJsonMapper();
 
   private static ObjectMapper newVeloxJsonMapper() {

@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.serde;
+package io.github.zhztheplayer.velox4j.bean;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -6,14 +6,9 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 public class VeloxBeanDeserializer extends JsonDeserializer<Object> {
   private final JsonDeserializer<?> base;
@@ -29,7 +24,7 @@ public class VeloxBeanDeserializer extends JsonDeserializer<Object> {
       return base.deserialize(p, ctxt);
     }
     final String key = node.get("name").asText();
-    final Class<? extends VeloxBean> clazz = VeloxBeanRegistry.findClassByKey(key);
+    final Class<? extends VeloxBean> clazz = VeloxBeanRegistry.get().findClassByKey(key);
     return p.getCodec().treeToValue(node.without("name"), clazz);
   }
 

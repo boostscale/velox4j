@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.serde;
+package io.github.zhztheplayer.velox4j.bean;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 
@@ -6,7 +6,7 @@ public abstract class VeloxBean {
   private final String key;
 
   protected VeloxBean() {
-    key = VeloxBeanRegistry.findKeyByClass(this.getClass());
+    key = VeloxBeanRegistry.get().findKeyByClass(this.getClass());
   }
 
   @JsonGetter("name")
