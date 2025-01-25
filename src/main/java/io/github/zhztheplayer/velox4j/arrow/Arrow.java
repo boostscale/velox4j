@@ -17,7 +17,7 @@ public class Arrow {
     final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
     final ArrowArray array = ArrowArray.allocateNew(alloc);
     try {
-      vector.jniApi().rowVectorExportToArrow(vector, schema, array);
+      vector.jniApi().baseVectorExportToArrow(vector, schema, array);
       final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, array, schema, null);
       return new Table(vsr);
     } finally {

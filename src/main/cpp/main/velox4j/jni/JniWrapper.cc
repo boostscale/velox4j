@@ -68,7 +68,7 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-void rowVectorExportToArrow(
+void baseVectorExportToArrow(
     JNIEnv* env,
     jobject javaThis,
     jlong rvId,
@@ -128,8 +128,8 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, NULL);
   addNativeMethod(
-      "rowVectorExportToArrow",
-      (void*)rowVectorExportToArrow,
+      "baseVectorExportToArrow",
+      (void*)baseVectorExportToArrow,
       kTypeVoid,
       kTypeLong,
       kTypeLong,

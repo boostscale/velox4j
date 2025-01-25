@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
@@ -36,8 +37,8 @@ public final class JniApi implements CppObject {
     return new RowVector(this, jni.upIteratorNext(itr.id()));
   }
 
-  public void rowVectorExportToArrow(RowVector rowVector, ArrowSchema schema, ArrowArray array) {
-    jni.rowVectorExportToArrow(rowVector.id(), schema.memoryAddress(), array.memoryAddress());
+  public void baseVectorExportToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
+    jni.baseVectorExportToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
   }
 
   public String deserializeAndSerialize(String json) {
