@@ -29,6 +29,12 @@ public class ConstantTypedExpr extends TypedExpr {
     return new ConstantTypedExpr(type, serialized);
   }
 
+  public static ConstantTypedExpr create(JniApi jniApi, String serialized) {
+    final BaseVector baseVector = jniApi.baseVectorDeserialize(serialized);
+    final Type type = jniApi.baseVectorGetType(baseVector);
+    return new ConstantTypedExpr(type, serialized);
+  }
+
   @JsonGetter("valueVector")
   public String getSerializedVector() {
     return serializedVector;
