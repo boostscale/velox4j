@@ -10,7 +10,8 @@ public final class VeloxBeans {
   }
 
   public static void registerAll() {
-    final SerdeRegistry typeRegistry = SerdeRegistryFactory.get().key("name")
+    final SerdeRegistry rootRegistry = SerdeRegistryFactory.get().key("name");
+    final SerdeRegistry typeRegistry = rootRegistry
         .registerFactory("Type")
         .key("type");
 
@@ -32,5 +33,17 @@ public final class VeloxBeans {
     typeRegistry.registerClass("UNKNOWN", UnknownType.class);
     typeRegistry.registerClass("OPAQUE", OpaqueType.class);
     typeRegistry.registerClass("DECIMAL", DecimalType.class);
+
+    rootRegistry.registerFactory("IntervalDayTimeType")
+        .key("type")
+        .registerClass("INTERVAL DAY TO SECOND", IntervalDayTimeType.class);
+
+    rootRegistry.registerFactory("IntervalYearMonthType")
+        .key("type")
+        .registerClass("INTERVAL YEAR TO MONTH", IntervalYearMonthType.class);
+
+    rootRegistry.registerFactory("DateType")
+        .key("type")
+        .registerClass("DATE", DateType.class);
   }
 }

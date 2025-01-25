@@ -108,4 +108,19 @@ public class TypeSerdeTest {
   public void testDecimalType() {
     Serdes.testRoundTrip(new DecimalType(10, 5));
   }
+
+  @Test
+  public void testIntervalDayTimeType() {
+    Serdes.testRoundTrip(new IntervalDayTimeType());
+  }
+
+  @Test
+  public void testIntervalYearMonthType() {
+    Serdes.testRoundTrip(new IntervalYearMonthType());
+  }
+
+  @Test
+  public void testDateType() {
+    Serdes.testRoundTrip(new DateType());
+  }
 }
