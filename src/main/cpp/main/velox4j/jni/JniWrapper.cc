@@ -71,13 +71,13 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
 void baseVectorExportToArrow(
     JNIEnv* env,
     jobject javaThis,
-    jlong rvId,
+    jlong vid,
     jlong cSchema,
     jlong cArray) {
   JNI_METHOD_START
-  auto rv = ObjectStore::retrieve<RowVector>(rvId);
-  exportRowVectorAsArrow(
-      rv,
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  exportBaseVectorAsArrow(
+      vector,
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
   JNI_METHOD_END()

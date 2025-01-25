@@ -22,30 +22,33 @@ namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-void flatten(const RowVectorPtr& in) {
-  for (auto& child : in->children()) {
-    facebook::velox::BaseVector::flattenVector(child);
-    if (child->isLazy()) {
-      child = child->as<facebook::velox::LazyVector>()->loadedVectorShared();
-      VELOX_DCHECK_NOT_NULL(child);
-    }
-    // In case of output from Limit, RowVector size can be smaller than its
-    // children size.
-    if (child->size() > in->size()) {
-      child = child->slice(0, in->size());
+
+void slice(VectorPtr& in) {
+  auto* rowBase = in->as<RowVector>();
+  if (!rowBase) {
+    return;
+  }
+  for (auto& child : rowBase->children()) {
+    if (child->size() > rowBase->size()) {
+      child = child->slice(0, rowBase->size());
     }
   }
 }
+
+void flatten(VectorPtr& in) {
+  facebook::velox::BaseVector::flattenVector(in);
+}
 } // namespace
 
-void exportRowVectorAsArrow(
-    const RowVectorPtr& rv,
+void exportBaseVectorAsArrow(
+    VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
   ArrowOptions options;
   options.timestampUnit = static_cast<TimestampUnit>(6);
-  flatten(rv);
-  exportToArrow(rv, *cSchema, options);
-  exportToArrow(rv, *cArray, rv->pool(), options);
+  flatten(vector);
+  slice(vector);
+  exportToArrow(vector, *cSchema, options);
+  exportToArrow(vector, *cArray, vector->pool(), options);
 }
 } // namespace velox4j

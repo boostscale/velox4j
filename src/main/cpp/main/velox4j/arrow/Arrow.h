@@ -23,8 +23,8 @@
 
 namespace velox4j {
 using namespace facebook::velox;
-void exportRowVectorAsArrow(
-    const RowVectorPtr& rv,
+void exportBaseVectorAsArrow(
+    VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
 } // namespace velox4j
