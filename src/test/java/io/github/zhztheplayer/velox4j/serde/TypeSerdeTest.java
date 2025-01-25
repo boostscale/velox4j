@@ -1,8 +1,10 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.test.Serdes;
 import io.github.zhztheplayer.velox4j.type.*;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -95,5 +97,10 @@ public class TypeSerdeTest {
   @Test
   public void testUnknownType() {
     Serdes.testRoundTrip(new UnknownType());
+  }
+
+  @Test
+  public void testOpaqueType() {
+    Assert.assertThrows(VeloxException.class, () -> Serdes.testRoundTrip(new OpaqueType("foo")));
   }
 }

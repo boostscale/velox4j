@@ -30,7 +30,6 @@ public final class VeloxBeans {
     typeRegistry.registerClass("ROW", RowType.class);
     typeRegistry.registerClass("FUNCTION", FunctionType.class);
     typeRegistry.registerClass("UNKNOWN", UnknownType.class);
-//    typeRegistry.registerClass("OPAQUE", OpaqueType.class);
-//    typeRegistry.registerClass("INVALID", InvalidType.class);
+    typeRegistry.registerClass("OPAQUE", OpaqueType.class);
   }
 }
