@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.data;
 
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 import org.apache.arrow.c.Data;
@@ -12,21 +13,8 @@ public final class RowVectors {
 
   }
 
-  public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
-    final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
-    final ArrowArray array = ArrowArray.allocateNew(alloc);
-    try {
-      vector.jniApi().rowVectorExportToArrow(vector, schema, array);
-      final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, array, schema, null);
-      return new Table(vsr);
-    } finally {
-      schema.close();
-      array.close();
-    }
-  }
-
   public static String toString(BufferAllocator alloc, RowVector rv) {
-    try (final Table t = toArrowTable(alloc, rv); final VectorSchemaRoot vsr = t.toVectorSchemaRoot()) {
+    try (final Table t = Arrow.toArrowTable(alloc, rv); final VectorSchemaRoot vsr = t.toVectorSchemaRoot()) {
       return vsr.contentToTSVString();
     }
   }
