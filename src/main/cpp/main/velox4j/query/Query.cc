@@ -28,6 +28,7 @@ const std::shared_ptr<core::PlanNode>& Query::plan() const {
 
 folly::dynamic Query::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
+  obj["name"] = "Velox4jQuery";
   obj["plan"] = plan_->serialize();
   return obj;
 }

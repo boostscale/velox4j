@@ -1,12 +1,18 @@
 package io.github.zhztheplayer.velox4j.query;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.test.Resources;
 import io.github.zhztheplayer.velox4j.test.Serdes;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class QuerySerdeTest {
   public static final String QUERY_PATH = "query/example-1.json";
-  public static final String QUERY_OUTPUT_PATH = "query-output/example-1.tsv";
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    Velox4j.initialize();
+  }
 
   @Test
   public void testQuery() {
