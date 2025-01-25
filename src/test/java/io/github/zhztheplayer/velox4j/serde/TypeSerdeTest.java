@@ -103,4 +103,9 @@ public class TypeSerdeTest {
   public void testOpaqueType() {
     Assert.assertThrows(VeloxException.class, () -> Serdes.testRoundTrip(new OpaqueType("foo")));
   }
+
+  @Test
+  public void testDecimalType() {
+    Serdes.testRoundTrip(new DecimalType(10, 5));
+  }
 }

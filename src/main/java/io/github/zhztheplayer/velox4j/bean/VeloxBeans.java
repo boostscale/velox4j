@@ -31,5 +31,6 @@ public final class VeloxBeans {
     typeRegistry.registerClass("FUNCTION", FunctionType.class);
     typeRegistry.registerClass("UNKNOWN", UnknownType.class);
     typeRegistry.registerClass("OPAQUE", OpaqueType.class);
+    typeRegistry.registerClass("DECIMAL", DecimalType.class);
   }
 }
