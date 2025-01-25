@@ -1,28 +1,33 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SerdeRegistryFactory {
-  private static final SerdeRegistryFactory INSTANCE = new SerdeRegistryFactory("ROOT");
+  private static final SerdeRegistryFactory INSTANCE = new SerdeRegistryFactory(Collections.emptyList());
 
   public static SerdeRegistryFactory get() {
     return INSTANCE;
   }
 
   private final Map<String, SerdeRegistry> registries = new HashMap<>();
-  private final String prefix;
+  private final List<SerdeRegistry.KvPair> kvs;
 
-  SerdeRegistryFactory(String prefix) {
-    this.prefix = prefix;
+  SerdeRegistryFactory(List<SerdeRegistry.KvPair> kvs) {
+    this.kvs = kvs;
   }
 
   public SerdeRegistry key(String key) {
     synchronized (this) {
       if (!registries.containsKey(key)) {
-        registries.put(key, new SerdeRegistry(String.format("%s.%s", prefix, key)));
+        registries.put(key, new SerdeRegistry(kvs, key));
       }
       return registries.get(key);
+    }
+  }
+
+  public Set<String> keys() {
+    synchronized (this) {
+      return registries.keySet();
     }
   }
 }

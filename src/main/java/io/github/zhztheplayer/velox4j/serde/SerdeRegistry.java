@@ -2,23 +2,42 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SerdeRegistry {
-  private final String prefix;
+  private static final Map<Class<?>, List<KvPair>> CLASS_TO_KVS = new ConcurrentHashMap<>();
 
   private final Map<String, SerdeRegistryFactory> subFactories = new HashMap<>();
   private final Map<String, Class<?>> classes = new HashMap<>();
+  private final List<KvPair> kvs;
+  private final String key;
+  private final String prefixAndKey;
 
-  public SerdeRegistry(String prefix) {
-    this.prefix = prefix;
+  public SerdeRegistry(List<KvPair> kvs, String key) {
+    this.kvs = Collections.unmodifiableList(kvs);
+    this.key = key;
+    this.prefixAndKey = String.format("%s.%s", kvs.toString(), key);
+  }
+
+  public String key() {
+    return key;
+  }
+
+  public String prefixAndKey() {
+    return prefixAndKey;
+  }
+
+  private List<KvPair> withNewKv(KvPair kv) {
+    final List<KvPair> out = new ArrayList<>(kvs);
+    out.add(kv);
+    return out;
   }
 
   public SerdeRegistryFactory factory(String value) {
     synchronized (this) {
       checkDup(value);
-      final SerdeRegistryFactory factory = new SerdeRegistryFactory(String.format("%s.%s", prefix, value));
+      final SerdeRegistryFactory factory = new SerdeRegistryFactory(withNewKv(new KvPair(key, value)));
       subFactories.put(value, factory);
       return factory;
     }
@@ -28,6 +47,9 @@ public class SerdeRegistry {
     synchronized (this) {
       checkDup(value);
       classes.put(value, clazz);
+    }
+    if (CLASS_TO_KVS.put(clazz, withNewKv(new KvPair(key, value))) != null) {
+      throw new VeloxException("Class SerDe already registered: " + clazz);
     }
   }
 
@@ -52,7 +74,7 @@ public class SerdeRegistry {
   public SerdeRegistryFactory getFactory(String value) {
     synchronized (this) {
       if (!subFactories.containsKey(value)) {
-        throw new VeloxException(String.format("Value %s.%s is not added as a sub-factory: ", prefix, value));
+        throw new VeloxException(String.format("Value %s.%s is not added as a sub-factory: ", prefixAndKey, value));
       }
       return subFactories.get(value);
     }
@@ -61,18 +83,47 @@ public class SerdeRegistry {
   public Class<?> getClass(String value) {
     synchronized (this) {
       if (!classes.containsKey(value)) {
-        throw new VeloxException(String.format("Value %s.%s is not added as a class: ", prefix, value));
+        throw new VeloxException(String.format("Value %s.%s is not added as a class: ", prefixAndKey, value));
       }
       return classes.get(value);
     }
   }
 
+  public static boolean isRegistered(Class<?> clazz) {
+    return CLASS_TO_KVS.containsKey(clazz);
+  }
+
+  public static List<KvPair> findKvPairs(Class<?> clazz) {
+    if (!isRegistered(clazz)) {
+      throw new VeloxException("Class SerDe not registered: " + clazz);
+    }
+    return CLASS_TO_KVS.get(clazz);
+  }
+
   private void checkDup(String value) {
     if (subFactories.containsKey(value)) {
-      throw new VeloxException(String.format("Value %s.%s already added as a sub-factory: ", prefix, value));
+      throw new VeloxException(String.format("Value %s.%s already added as a sub-factory: ", prefixAndKey, value));
     }
     if (classes.containsKey(value)) {
-      throw new VeloxException(String.format("Value %s.%s already added as a class: ", prefix, value));
+      throw new VeloxException(String.format("Value %s.%s already added as a class: ", prefixAndKey, value));
+    }
+  }
+
+  public static class KvPair {
+    private final String key;
+    private final String value;
+
+    public KvPair(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    public String getKey() {
+      return key;
+    }
+
+    public String getValue() {
+      return value;
     }
   }
 }

@@ -22,7 +22,7 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.test.Iterators;
+import io.github.zhztheplayer.velox4j.stream.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
@@ -102,7 +102,7 @@ public class JniApiTest {
   }
 
   private void assertIterator(UpIterator itr) {
-    final List<RowVector> vectors = Iterators.asStream(itr).collect(Collectors.toList());
+    final List<RowVector> vectors = Streams.fromIterator(itr).collect(Collectors.toList());
     Assert.assertEquals(1, vectors.size());
     Assert.assertEquals(Resources.readResourceAsString(QUERY_OUTPUT_PATH),
         RowVectors.toString(new RootAllocator(), vectors.get(0)));
