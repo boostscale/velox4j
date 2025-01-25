@@ -18,6 +18,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
@@ -97,16 +98,39 @@ public class JniApiTest {
     jniApi.close();
   }
 
+  @Test
+  public void testVectorSerde() {
+    final JniApi jniApi = JniApi.create();
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
+    final RowVector vector = collectSingleVector(itr);
+    final String serialized = jniApi.baseVectorSerialize(vector);
+    final BaseVector deserialized = jniApi.baseVectorDeserialize(serialized);
+    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    Assert.assertEquals(serialized, serializedSecond);
+    jniApi.close();
+  }
+
   private static String readQueryJson() {
     return Resources.readResourceAsString(QUERY_PATH);
   }
 
   private void assertIterator(UpIterator itr) {
-    final List<RowVector> vectors = Streams.fromIterator(itr).collect(Collectors.toList());
-    Assert.assertEquals(1, vectors.size());
+    final RowVector vector = collectSingleVector(itr);
     Assert.assertEquals(Resources.readResourceAsString(QUERY_OUTPUT_PATH),
-        RowVectors.toString(new RootAllocator(), vectors.get(0)));
-    vectors.forEach(RowVector::close);
+        RowVectors.toString(new RootAllocator(), vector));
+    vector.close();
     itr.close();
+  }
+
+  private static RowVector collectSingleVector(UpIterator itr) {
+    final List<RowVector> vectors = collect(itr);
+    Assert.assertEquals(1, vectors.size());
+    return vectors.get(0);
+  }
+
+  private static List<RowVector> collect(UpIterator itr) {
+    final List<RowVector> vectors = Streams.fromIterator(itr).collect(Collectors.toList());
+    return vectors;
   }
 }

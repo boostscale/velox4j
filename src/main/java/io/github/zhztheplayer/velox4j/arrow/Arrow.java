@@ -27,8 +27,4 @@ public class Arrow {
       array.close();
     }
   }
-
-  public static BaseVector fromArrowVector(ValueVector arrowVector) {
-
-  }
 }
