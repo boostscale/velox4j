@@ -46,7 +46,7 @@ public final class JniApi implements CppObject {
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return new RowVector(this, jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    return new BaseVector(this, jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
   }
 
   public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
@@ -75,7 +75,7 @@ public final class JniApi implements CppObject {
   }
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
-    return new RowVector(this, jni.baseVectorWrapInConstant(vector.id(), length, index));
+    return new BaseVector(this, jni.baseVectorWrapInConstant(vector.id(), length, index));
   }
 
   public VectorEncoding baseVectorGetEncoding(BaseVector vector) {
