@@ -37,7 +37,7 @@ import java.util.OptionalLong;
 
 public final class SerdeTests {
   public static String testVeloxBeanRoundTrip(VeloxBean inObj) {
-    try(final JniApi jniApi = JniApi.create()) {
+    try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
       final VeloxBean outObj = Serde.fromJson(outJson);
@@ -48,11 +48,8 @@ public final class SerdeTests {
   }
 
   public static String testVeloxBeanRoundTrip(String inJson) {
-    try(final JniApi jniApi = JniApi.create()) {
-      final String outJson = jniApi.deserializeAndSerialize(inJson);
-      Assert.assertEquals(inJson, outJson);
-      return outJson;
-    }
+    final VeloxBean inObj = Serde.fromJson(inJson);
+    return testVeloxBeanRoundTrip(inObj);
   }
 
   public static String testJavaBeanRoundTrip(Object inObj) {

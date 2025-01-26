@@ -37,9 +37,7 @@ folly::dynamic Query::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
   obj["name"] = "Velox4jQuery";
   obj["plan"] = plan_->serialize();
-  if (!boundSplits_.empty()) {
-    obj["boundSplits"] = folly::dynamic::array;
-  }
+  obj["boundSplits"] = folly::dynamic::array;
   for (const auto& boundSplit : boundSplits_) {
     folly::dynamic boundSplitObj = folly::dynamic::object;
     boundSplitObj["planNodeId"] = boundSplit->planNodeId();

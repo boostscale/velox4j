@@ -13,7 +13,7 @@ public class QuerySerdeTest {
   }
 
   @Test
-  public void testJsonQuery() {
+  public void testReadPlanJsonFromFile() {
     final String queryJson = Resources.readResourceAsString("query/example-1.json");
     SerdeTests.testVeloxBeanRoundTrip(queryJson);
   }
