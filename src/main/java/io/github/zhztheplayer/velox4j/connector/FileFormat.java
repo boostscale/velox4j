@@ -3,26 +3,26 @@ package io.github.zhztheplayer.velox4j.connector;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FileFormat {
-  UNKNOWN(0),
-  DWRF(1),
-  RC(2),
-  RC_TEXT(3),
-  RC_BINARY(4),
-  TEXT(5),
-  JSON(6),
-  PARQUET(7),
-  NIMBLE(8),
-  ORC(9),
-  SST(10);
+  UNKNOWN("unknown"),
+  DWRF("dwrf"),
+  RC("rc"),
+  RC_TEXT("rc:text"),
+  RC_BINARY("rc:binary"),
+  TEXT("text"),
+  JSON("json"),
+  PARQUET("parquet"),
+  NIMBLE("nimble"),
+  ORC("orc"),
+  SST("sst");
 
-  private final int id;
+  private final String value;
 
-  FileFormat(int id) {
-    this.id = id;
+  FileFormat(String value) {
+    this.value = value;
   }
 
   @JsonValue
-  public int toValue() {
-    return id;
+  public String toValue() {
+    return value;
   }
 }
