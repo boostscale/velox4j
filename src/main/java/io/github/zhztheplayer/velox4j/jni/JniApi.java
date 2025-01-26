@@ -10,6 +10,10 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * The higher-level JNI-based API than {@link JniWrapper}. The API hides C++ pointers from
  * developers with providing objective representations in Java to caller.
@@ -48,12 +52,14 @@ public final class JniApi implements CppObject {
     jni.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
   }
 
-  public String baseVectorSerialize(BaseVector vector) {
-    return jni.baseVectorSerialize(vector.id());
+  public String baseVectorSerialize(List<? extends BaseVector> vector) {
+    return jni.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
   }
 
-  public BaseVector baseVectorDeserialize(String serialized) {
-    return new RowVector(this, jni.baseVectorDeserialize(serialized));
+  public List<BaseVector> baseVectorDeserialize(String serialized) {
+    return Arrays.stream(jni.baseVectorDeserialize(serialized))
+        .mapToObj(id -> new RowVector(this, id))
+        .collect(Collectors.toList());
   }
 
   public Type baseVectorGetType(BaseVector vector) {

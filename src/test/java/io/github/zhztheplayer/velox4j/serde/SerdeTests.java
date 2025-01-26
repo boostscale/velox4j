@@ -18,6 +18,7 @@ import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
+import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
@@ -36,7 +37,9 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.BigIntVector;
 import org.apache.arrow.vector.IntVector;
+import org.apache.arrow.vector.complex.StructVector;
 import org.junit.Assert;
 
 import java.util.Arrays;
@@ -187,7 +190,7 @@ public final class SerdeTests {
     return baseVector;
   }
 
-  public static BaseVector newSampleRowVector(JniApi jniApi) {
-    throw new UnsupportedOperationException("UYI");
+  public static RowVector newSampleRowVector(JniApi jniApi) {
+    throw new UnsupportedOperationException("NYI");
   }
 }

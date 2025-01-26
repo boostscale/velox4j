@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,13 +103,40 @@ public class JniApiTest {
   }
 
   @Test
-  public void testVectorSerde() {
+  public void testVectorSerdeEmpty() {
+    final JniApi jniApi = JniApi.create();
+    final String serialized = jniApi.baseVectorSerialize(Collections.emptyList());
+    final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
+    Assert.assertTrue(deserialized.isEmpty());
+    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    Assert.assertEquals(serialized, serializedSecond);
+    jniApi.close();
+  }
+
+  @Test
+  public void testVectorSerdeSingle() {
     final JniApi jniApi = JniApi.create();
     final String json = readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = collectSingleVector(itr);
-    final String serialized = jniApi.baseVectorSerialize(vector);
-    final BaseVector deserialized = jniApi.baseVectorDeserialize(serialized);
+    final String serialized = jniApi.baseVectorSerialize(List.of(vector));
+    final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
+    Assert.assertEquals(1, deserialized.size());
+    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    Assert.assertEquals(serialized, serializedSecond);
+    jniApi.close();
+  }
+
+
+  @Test
+  public void testVectorSerdeMultiple() {
+    final JniApi jniApi = JniApi.create();
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
+    final RowVector vector = collectSingleVector(itr);
+    final String serialized = jniApi.baseVectorSerialize(List.of(vector, vector));
+    final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
+    Assert.assertEquals(2, deserialized.size());
     final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
     jniApi.close();
@@ -120,11 +148,11 @@ public class JniApiTest {
     final String json = readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = collectSingleVector(itr);
-    final String serialized = jniApi.baseVectorSerialize(vector);
+    final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
     final BaseVector imported = Arrow.fromArrowVector(jniApi, alloc, arrowVector);
-    final String serializedImported = jniApi.baseVectorSerialize(imported);
+    final String serializedImported = jniApi.baseVectorSerialize(List.of(imported));
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
     jniApi.close();

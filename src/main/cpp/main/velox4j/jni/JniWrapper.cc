@@ -106,11 +106,15 @@ void baseVectorToArrow(
   JNI_METHOD_END()
 }
 
-jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlong vid) {
+jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlongArray vids) {
   JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
   std::ostringstream out;
-  saveVector(*vector, out);
+  auto safeArray = getLongArrayElementsSafe(env, vids);
+  for (int i = 0; i < safeArray.length(); ++i) {
+    const jlong& vid = safeArray.elems()[i];
+    auto vector = ObjectStore::retrieve<BaseVector>(vid);
+    saveVector(*vector, out);
+  }
   auto serializedData = out.str();
   auto encoded =
       encoding::Base64::encode(serializedData.data(), serializedData.size());
@@ -118,7 +122,8 @@ jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(nullptr)
 }
 
-jlong baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
+jlongArray
+baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jSerialized{env, serialized};
@@ -130,9 +135,17 @@ jlong baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   auto pool = memory::memoryManager()->addLeafPool(
       fmt::format("Decoding Memory Pool - ID {}", id));
   session->objectStore()->save(pool);
-  auto vector = restoreVector(dataStream, pool.get());
-  return session->objectStore()->save(vector);
-  JNI_METHOD_END(-1L)
+  std::vector<ObjectHandle> vids{};
+  while (dataStream.tellg() < decoded.size()) {
+    const VectorPtr& vector = restoreVector(dataStream, pool.get());
+    const ObjectHandle vid = session->objectStore()->save(vector);
+    vids.push_back(vid);
+  }
+  const jsize& len = static_cast<jsize>(vids.size());
+  const jlongArray& out = env->NewLongArray(len);
+  env->SetLongArrayRegion(out, 0, len, vids.data());
+  return out;
+  JNI_METHOD_END(nullptr)
 }
 
 jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
@@ -230,12 +243,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       "baseVectorSerialize",
       (void*)baseVectorSerialize,
       kTypeString,
-      kTypeLong,
+      kTypeArray(kTypeLong),
       NULL);
   addNativeMethod(
       "baseVectorDeserialize",
       (void*)baseVectorDeserialize,
-      kTypeLong,
+      kTypeArray(kTypeLong),
       kTypeString,
       NULL);
   addNativeMethod(

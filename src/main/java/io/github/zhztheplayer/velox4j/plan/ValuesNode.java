@@ -4,28 +4,37 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.BaseVectors;
+import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 
 import java.util.List;
 
 public class ValuesNode extends PlanNode {
-  private final String serializedVectors;
+  private final String serializedRowVectors;
   private final boolean parallelizable;
   private final int repeatTimes;
 
   @JsonCreator
-  public ValuesNode(@JsonProperty("id") String id,
-      @JsonProperty("data") String serializedVectors,
+  private ValuesNode(@JsonProperty("id") String id,
+      @JsonProperty("data") String serializedRowVectors,
       @JsonProperty("parallelizable") boolean parallelizable,
       @JsonProperty("repeatTimes") int repeatTimes) {
     super(id);
-    this.serializedVectors = Preconditions.checkNotNull(serializedVectors);
+    this.serializedRowVectors = Preconditions.checkNotNull(serializedRowVectors);
     this.parallelizable = parallelizable;
     this.repeatTimes = repeatTimes;
   }
 
+  public static ValuesNode create(JniApi jniApi, String id, List<RowVector> vectors, boolean parallelizable,
+      int repeatTimes) {
+    return new ValuesNode(id, BaseVectors.serialize(jniApi, vectors), parallelizable, repeatTimes);
+  }
+
   @JsonGetter("data")
-  public String getSerializedVectors() {
-    return serializedVectors;
+  public String getSerializedRowVectors() {
+    return serializedRowVectors;
   }
 
   @JsonGetter("parallelizable")

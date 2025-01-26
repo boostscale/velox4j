@@ -42,8 +42,8 @@ public class PlanNodeSerdeTest {
   @Test
   public void testValuesNode() {
     final JniApi jniApi = JniApi.create();
-    final PlanNode values = new ValuesNode("id-1",
-        BaseVectors.serialize(SerdeTests.newSampleRowVector(jniApi)), true, 1);
+    final PlanNode values = ValuesNode.create(jniApi, "id-1",
+        List.of(SerdeTests.newSampleRowVector(jniApi)), true, 1);
     SerdeTests.testVeloxBeanRoundTrip(values);
     jniApi.close();
   }
