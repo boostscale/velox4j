@@ -19,9 +19,9 @@ include(UseJava)
 
 # Import Velox.
 set(VELOX_REPO zhztheplayer/velox)
-set(VELOX_REF 4638ba3916fbd9fc41a0ccb8b9cd45796051ede8)
+set(VELOX_REF 7eecf69495b8e6c9ff56aabf5657f9d654fb1bc8)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-set(VELOX_SOURCE_URL_MD5 2fbce0fc077077c2a73767337737da6b)
+set(VELOX_SOURCE_URL_MD5 0a5c0c1355551b54305fbef57a57ce25)
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
         OPTIONS
         "VELOX_ENABLE_CCACHE ON"
