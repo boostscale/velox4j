@@ -19,8 +19,9 @@ public class FieldAccessTypedExpr extends TypedExpr {
       @JsonProperty("fieldName") String fieldName) {
     super(returnType, inputs);
     this.fieldName = fieldName;
-    Preconditions.checkArgument(inputs.size() <= 1,
-        "FieldAccessTypedExpr should have 0 or 1 input, but has %s", inputs.size());
+    Preconditions.checkArgument(getInputs().size() <= 1,
+        "FieldAccessTypedExpr should have 0 or 1 input, but has %s",
+        getInputs().size());
   }
 
   public static FieldAccessTypedExpr create(Type returnType, String fieldName) {
