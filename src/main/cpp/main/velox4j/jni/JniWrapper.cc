@@ -70,15 +70,6 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  auto serializedDynamic = vector->type()->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
 jlong arrowToBaseVector(
     JNIEnv* env,
     jobject javaThis,
@@ -144,6 +135,36 @@ jlong baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   JNI_METHOD_END(-1L)
 }
 
+jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto serializedDynamic = vector->type()->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jlong baseVectorWrapInConstant(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jint length,
+    jint index) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto constVector = BaseVector::wrapInConstant(length, index, vector);
+  return sessionOf(env, javaThis)->objectStore()->save(constVector);
+  JNI_METHOD_END(-1)
+}
+
+jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto name = VectorEncoding::mapSimpleToName(vector->encoding());
+  return env->NewStringUTF(name.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
@@ -191,12 +212,6 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, NULL);
   addNativeMethod(
-      "baseVectorGetType",
-      (void*)baseVectorGetType,
-      kTypeString,
-      kTypeLong,
-      NULL);
-  addNativeMethod(
       "arrowToBaseVector",
       (void*)arrowToBaseVector,
       kTypeLong,
@@ -222,6 +237,26 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)baseVectorDeserialize,
       kTypeLong,
       kTypeString,
+      NULL);
+  addNativeMethod(
+      "baseVectorGetType",
+      (void*)baseVectorGetType,
+      kTypeString,
+      kTypeLong,
+      NULL);
+  addNativeMethod(
+      "baseVectorWrapInConstant",
+      (void*)baseVectorWrapInConstant,
+      kTypeLong,
+      kTypeLong,
+      kTypeInt,
+      kTypeInt,
+      NULL);
+  addNativeMethod(
+      "baseVectorGetEncoding",
+      (void*)baseVectorGetEncoding,
+      kTypeString,
+      kTypeLong,
       NULL);
   addNativeMethod(
       "deserializeAndSerialize",

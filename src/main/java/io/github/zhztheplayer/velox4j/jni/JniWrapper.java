@@ -17,6 +17,8 @@
 
 package io.github.zhztheplayer.velox4j.jni;
 
+import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+
 public final class JniWrapper {
   public static JniWrapper create() {
     return new JniWrapper();
@@ -45,11 +47,13 @@ public final class JniWrapper {
   native long upIteratorNext(long address);
 
   // For BaseVector / RowVector.
-  native String baseVectorGetType(long id);
   native long arrowToBaseVector(long cSchema, long cArray);
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
   native String baseVectorSerialize(long id);
   native long baseVectorDeserialize(String serialized);
+  native String baseVectorGetType(long id);
+  native long baseVectorWrapInConstant(long id, int length, int index);
+  native String baseVectorGetEncoding(long id);
 
   // For tests.
   native String deserializeAndSerialize(String json);

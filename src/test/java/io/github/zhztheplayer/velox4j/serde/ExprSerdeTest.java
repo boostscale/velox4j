@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
@@ -15,12 +16,8 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
-import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.IntVector;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -54,23 +51,10 @@ public class ExprSerdeTest {
   @Test
   public void testConstantTypedExpr() {
     final JniApi jniApi = JniApi.create();
-    final BufferAllocator alloc = new RootAllocator();
-    final IntVector arrowVector = new IntVector("foo", alloc);
-    arrowVector.setValueCount(1);
-    arrowVector.set(0, 15);
-    final ConstantTypedExpr expr = ConstantTypedExpr.create(jniApi, alloc, arrowVector);
-    // FIXME: The serialized string of the constant doesn't match after round-tripping.
-    Assert.assertThrows(ComparisonFailure.class, () -> SerdeTests.testVeloxBeanRoundTrip(expr));
-    arrowVector.close();
-    jniApi.close();
-  }
-
-  @Test
-  public void testConstantTypedExprCreatedByString() {
-    final JniApi jniApi = JniApi.create();
-    final ConstantTypedExpr expr = ConstantTypedExpr.create(jniApi,
-        "AQAAACAAAAB7InR5cGUiOiJJTlRFR0VSIiwibmFtZSI6IlR5cGUifQEAAAAAAQ8AAAA=");
+    final BaseVector intVector = SerdeTests.newSampleIntVector(jniApi);
+    final ConstantTypedExpr expr = ConstantTypedExpr.create(intVector);
     SerdeTests.testVeloxBeanRoundTrip(expr);
+    jniApi.close();
   }
 
   @Test

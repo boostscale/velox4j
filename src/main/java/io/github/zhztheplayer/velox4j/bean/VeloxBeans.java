@@ -13,6 +13,7 @@ import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
@@ -90,6 +91,7 @@ public final class VeloxBeans {
   }
 
   private static void registerPlanNodes() {
+    ROOT_REGISTRY.registerClass("ValuesNode", ValuesNode.class);
     ROOT_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
     ROOT_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
   }

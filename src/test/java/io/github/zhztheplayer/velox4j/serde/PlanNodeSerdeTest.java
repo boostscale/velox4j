@@ -3,9 +3,12 @@ package io.github.zhztheplayer.velox4j.serde;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
+import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
+import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import org.junit.BeforeClass;
@@ -34,6 +37,15 @@ public class PlanNodeSerdeTest {
   public void testAggregate() {
     final Aggregate aggregate = SerdeTests.newSampleAggregate();
     SerdeTests.testJavaBeanRoundTrip(aggregate);
+  }
+
+  @Test
+  public void testValuesNode() {
+    final JniApi jniApi = JniApi.create();
+    final PlanNode values = new ValuesNode("id-1",
+        BaseVectors.serialize(SerdeTests.newSampleRowVector(jniApi)), true, 1);
+    SerdeTests.testVeloxBeanRoundTrip(values);
+    jniApi.close();
   }
 
   @Test

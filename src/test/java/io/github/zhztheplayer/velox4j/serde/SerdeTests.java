@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -15,6 +16,8 @@ import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
@@ -31,12 +34,16 @@ import io.github.zhztheplayer.velox4j.type.MapType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.IntVector;
 import org.junit.Assert;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -168,5 +175,19 @@ public final class SerdeTests {
     final PlanNode scan = new TableScanNode("id-1", new RowType(List.of("foo", "bar"),
         List.of(new IntegerType(), new IntegerType())), handle, Collections.emptyList());
     return scan;
+  }
+
+  public static BaseVector newSampleIntVector(JniApi jniApi) {
+    final BufferAllocator alloc = new RootAllocator();
+    final IntVector arrowVector = new IntVector("foo", alloc);
+    arrowVector.setValueCount(1);
+    arrowVector.set(0, 15);
+    final BaseVector baseVector = Arrow.fromArrowVector(jniApi, alloc, arrowVector);
+    arrowVector.close();
+    return baseVector;
+  }
+
+  public static BaseVector newSampleRowVector(JniApi jniApi) {
+    throw new UnsupportedOperationException("UYI");
   }
 }
