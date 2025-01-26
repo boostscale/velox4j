@@ -65,7 +65,7 @@ public class HiveTableHandle extends ConnectorTableHandle {
   }
 
   // FIXME: This field doesn't involve the serialization in Velox for now.
-  //  https://github.com/facebookincubator/velox/pull/12177
+  //  https://github.com/facebookincubator/velox/pull/12177.
   @JsonIgnore
   @JsonGetter("tableParameters")
   public Map<String, String> getTableParameters() {

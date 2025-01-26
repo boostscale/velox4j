@@ -101,6 +101,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
   }
 
   // FIXME: This field doesn't involve the serialization in Velox for now.
+  //  https://github.com/facebookincubator/velox/pull/12178.
   @JsonIgnore
   @JsonGetter("bucketConversion")
   public Optional<HiveBucketConversion> getBucketConversion() {
