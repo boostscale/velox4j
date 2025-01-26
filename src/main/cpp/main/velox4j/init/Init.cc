@@ -27,6 +27,7 @@
 #include <velox/connectors/hive/TableHandle.h>
 #include <velox/connectors/hive/HiveDataSink.h>
 #include <velox/connectors/hive/HiveConnector.h>
+#include <velox/connectors/hive/HiveConnectorSplit.h>
 #include <velox/exec/PartitionFunction.h>
 #include <velox4j/query/Query.h>
 
@@ -70,6 +71,7 @@ void initForSpark() {
     connector::hive::LocationHandle::registerSerDe();
     connector::hive::HiveColumnHandle::registerSerDe();
     connector::hive::HiveInsertTableHandle::registerSerDe();
+    connector::hive::HiveConnectorSplit::registerSerDe();
     connector::hive::registerHivePartitionFunctionSerDe();
     core::PlanNode::registerSerDe();
     core::ITypedExpr::registerSerDe();

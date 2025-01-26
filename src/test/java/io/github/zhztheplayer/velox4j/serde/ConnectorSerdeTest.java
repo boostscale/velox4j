@@ -1,14 +1,19 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
+import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
+import io.github.zhztheplayer.velox4j.connector.HiveBucketConversion;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
+import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
+import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.MapType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
@@ -18,6 +23,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public class ConnectorSerdeTest {
@@ -67,5 +75,29 @@ public class ConnectorSerdeTest {
         "complex_type[1][\"foo\"].id",
         "complex_type[2][\"foo\"].id"));
     SerdeTests.testVeloxBeanRoundTrip(handle);
+  }
+
+  @Test
+  public void testHiveConnectorSplit() {
+    final ConnectorSplit split = new HiveConnectorSplit(
+        "path/to/file",
+        FileFormat.ORC,
+        0,
+        100,
+        ImmutableMap.of("key", Optional.of("value")),
+        OptionalInt.of(1),
+        Optional.of(new HiveBucketConversion(
+            1, 1,
+            Arrays.asList(
+                new HiveColumnHandle(
+                    "t", ColumnType.REGULAR,
+                    new IntegerType(), new IntegerType(), Collections.emptyList())))),
+        ImmutableMap.of("sk", "sv"),
+        Optional.of("extra"),
+        ImmutableMap.of("serde_key", "serde_value"),
+        ImmutableMap.of("info_key", "info_value"),
+        Optional.of(new FileProperties(OptionalLong.of(100), OptionalLong.of(50))),
+        Optional.of(new RowIdProperties(5, 10, "UUID-100")));
+    SerdeTests.testVeloxBeanRoundTrip(split);
   }
 }

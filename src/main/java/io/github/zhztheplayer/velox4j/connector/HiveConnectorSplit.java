@@ -1,19 +1,22 @@
 package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 
+// TODO: Add a builder for this class.
 public class HiveConnectorSplit extends ConnectorSplit {
   private final String filePath;
   private final FileFormat fileFormat;
   private final long start;
   private final long length;
   private final Map<String, Optional<String>> partitionKeys;
-  private final Optional<Integer> tableBucketNumber;
+  private final OptionalInt tableBucketNumber;
   private final Optional<HiveBucketConversion> bucketConversion;
   private final Map<String, String> customSplitInfo;
   private final Optional<String> extraFileInfo;
@@ -29,7 +32,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
       @JsonProperty("start") long start,
       @JsonProperty("length") long length,
       @JsonProperty("partitionKeys") Map<String, Optional<String>> partitionKeys,
-      @JsonProperty("tableBucketNumber") Optional<Integer> tableBucketNumber,
+      @JsonProperty("tableBucketNumber") OptionalInt tableBucketNumber,
       @JsonProperty("bucketConversion") Optional<HiveBucketConversion> bucketConversion,
       @JsonProperty("customSplitInfo") Map<String, String> customSplitInfo,
       @JsonProperty("extraFileInfo") Optional<String> extraFileInfo,
@@ -50,5 +53,70 @@ public class HiveConnectorSplit extends ConnectorSplit {
     this.infoColumns = Preconditions.checkNotNull(infoColumns);
     this.properties = properties;
     this.rowIdProperties = rowIdProperties;
+  }
+
+  @JsonGetter("filePath")
+  public String getFilePath() {
+    return filePath;
+  }
+
+  @JsonGetter("fileFormat")
+  public FileFormat getFileFormat() {
+    return fileFormat;
+  }
+
+  @JsonGetter("start")
+  public long getStart() {
+    return start;
+  }
+
+  @JsonGetter("length")
+  public long getLength() {
+    return length;
+  }
+
+  @JsonGetter("partitionKeys")
+  public Map<String, Optional<String>> getPartitionKeys() {
+    return partitionKeys;
+  }
+
+  @JsonGetter("tableBucketNumber")
+  public OptionalInt getTableBucketNumber() {
+    return tableBucketNumber;
+  }
+
+  @JsonGetter("bucketConversion")
+  public Optional<HiveBucketConversion> getBucketConversion() {
+    return bucketConversion;
+  }
+
+  @JsonGetter("customSplitInfo")
+  public Map<String, String> getCustomSplitInfo() {
+    return customSplitInfo;
+  }
+
+  @JsonGetter("extraFileInfo")
+  public Optional<String> getExtraFileInfo() {
+    return extraFileInfo;
+  }
+
+  @JsonGetter("serdeParameters")
+  public Map<String, String> getSerdeParameters() {
+    return serdeParameters;
+  }
+
+  @JsonGetter("infoColumns")
+  public Map<String, String> getInfoColumns() {
+    return infoColumns;
+  }
+
+  @JsonGetter("properties")
+  public Optional<FileProperties> getProperties() {
+    return properties;
+  }
+
+  @JsonGetter("rowIdProperties")
+  public Optional<RowIdProperties> getRowIdProperties() {
+    return rowIdProperties;
   }
 }
