@@ -14,7 +14,7 @@ public class TypeSerdeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.initialize();
+    Velox4j.ensureInitialized();
   }
 
   @Test

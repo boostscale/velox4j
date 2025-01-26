@@ -43,7 +43,7 @@ public class JniApiTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.initialize();
+    Velox4j.ensureInitialized();
   }
 
   @Test

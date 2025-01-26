@@ -16,6 +16,13 @@ public class Velox4j {
     initialize0();
   }
 
+  public static void ensureInitialized() {
+    if (!initialized.compareAndSet(false, true)) {
+      return;
+    }
+    initialize0();
+  }
+
   private static void initialize0() {
     JniWorkspace.getDefault().libLoader().load("lib/libvelox4j.so");
     VeloxBeans.registerAll();
