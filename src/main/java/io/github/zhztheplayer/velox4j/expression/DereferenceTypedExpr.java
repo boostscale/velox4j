@@ -26,9 +26,10 @@ public class DereferenceTypedExpr extends TypedExpr {
   }
 
   public static DereferenceTypedExpr create(TypedExpr input, int index) {
-    Preconditions.checkArgument(input.getReturnType() instanceof RowType,
+    final Type inputType = input.getReturnType();
+    Preconditions.checkArgument(inputType instanceof RowType,
         "DereferenceTypedExpr input should be RowType");
-    final Type returnType = ((RowType) input.getReturnType()).getChildren().get(index);
+    final Type returnType = ((RowType) inputType).getChildren().get(index);
     return new DereferenceTypedExpr(returnType, Collections.singletonList(input), index);
   }
 

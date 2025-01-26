@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.util.List;
 
@@ -27,5 +28,13 @@ public class RowType extends Type {
   @JsonProperty("cTypes")
   public List<Type> getChildren() {
     return children;
+  }
+
+  public Type findChild(String name) {
+    int index = names.indexOf(name);
+    if (index == -1) {
+      throw new VeloxException("Field " + name + " not found in RowType");
+    }
+    return children.get(index);
   }
 }

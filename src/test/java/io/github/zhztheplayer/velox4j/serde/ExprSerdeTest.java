@@ -6,6 +6,7 @@ import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Serdes;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
@@ -78,5 +79,15 @@ public class ExprSerdeTest {
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
     Serdes.testRoundTrip(dereference);
+  }
+
+  @Test
+  public void testFieldAccessTypedExpr() {
+    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
+    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "randomReal");
+    final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
+    final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
+    Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
+    Serdes.testRoundTrip(fieldAccess);
   }
 }
