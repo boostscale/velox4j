@@ -19,7 +19,7 @@ public class Arrow {
   public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
     try (final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
         final ArrowArray array = ArrowArray.allocateNew(alloc)) {
-      vector.jniApi().baseVectorExportToArrow(vector, schema, array);
+      vector.jniApi().baseVectorToArrow(vector, schema, array);
       final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, array, schema, null);
       return new Table(vsr);
     }
@@ -28,7 +28,7 @@ public class Arrow {
   public static FieldVector toArrowVector(BufferAllocator alloc, RowVector vector) {
     try (final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
         final ArrowArray array = ArrowArray.allocateNew(alloc)) {
-      vector.jniApi().baseVectorExportToArrow(vector, schema, array);
+      vector.jniApi().baseVectorToArrow(vector, schema, array);
       final FieldVector fv = Data.importVector(alloc, array, schema, null);
       return fv;
     }
@@ -38,7 +38,7 @@ public class Arrow {
     try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
       Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
-      final BaseVector imported = jniApi.arrowImportToBaseVector(cSchema1, cArray1);
+      final BaseVector imported = jniApi.arrowToBaseVector(cSchema1, cArray1);
       return imported;
     }
   }

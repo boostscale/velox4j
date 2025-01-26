@@ -46,8 +46,8 @@ public final class JniWrapper {
 
   // For BaseVector / RowVector.
   native String baseVectorGetType(long id);
-  native long arrowImportToBaseVector(long cSchema, long cArray);
-  native void baseVectorExportToArrow(long rvAddress, long cSchema, long cArray);
+  native long arrowToBaseVector(long cSchema, long cArray);
+  native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
   native String baseVectorSerialize(long id);
   native long baseVectorDeserialize(String serialized);
 

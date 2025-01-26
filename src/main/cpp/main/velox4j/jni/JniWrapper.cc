@@ -79,7 +79,7 @@ jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(nullptr)
 }
 
-jlong arrowImportToBaseVector(
+jlong arrowToBaseVector(
     JNIEnv* env,
     jobject javaThis,
     jlong cSchema,
@@ -100,7 +100,7 @@ jlong arrowImportToBaseVector(
   JNI_METHOD_END(-1L)
 }
 
-void baseVectorExportToArrow(
+void baseVectorToArrow(
     JNIEnv* env,
     jobject javaThis,
     jlong vid,
@@ -197,15 +197,15 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       NULL);
   addNativeMethod(
-      "arrowImportToBaseVector",
-      (void*)arrowImportToBaseVector,
+      "arrowToBaseVector",
+      (void*)arrowToBaseVector,
       kTypeLong,
       kTypeLong,
       kTypeLong,
       NULL);
   addNativeMethod(
-      "baseVectorExportToArrow",
-      (void*)baseVectorExportToArrow,
+      "baseVectorToArrow",
+      (void*)baseVectorToArrow,
       kTypeVoid,
       kTypeLong,
       kTypeLong,

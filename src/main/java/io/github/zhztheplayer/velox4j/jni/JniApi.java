@@ -44,12 +44,12 @@ public final class JniApi implements CppObject {
     return (Type) Serde.fromJson(typeJson);
   }
 
-  public BaseVector arrowImportToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return new RowVector(this, jni.arrowImportToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+  public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
+    return new RowVector(this, jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
   }
 
-  public void baseVectorExportToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
-    jni.baseVectorExportToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
+  public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
+    jni.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
   }
 
   public String baseVectorSerialize(BaseVector vector) {
