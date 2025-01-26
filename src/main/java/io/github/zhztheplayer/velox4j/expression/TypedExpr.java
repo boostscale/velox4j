@@ -14,7 +14,7 @@ public abstract class TypedExpr extends VeloxBean {
 
   protected TypedExpr(Type returnType, List<TypedExpr> inputs) {
     this.returnType = returnType;
-    this.inputs = Collections.unmodifiableList(inputs);
+    this.inputs = inputs == null ? Collections.emptyList() : Collections.unmodifiableList(inputs);
   }
 
   @JsonGetter("type")

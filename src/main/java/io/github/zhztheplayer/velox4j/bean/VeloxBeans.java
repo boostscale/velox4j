@@ -65,6 +65,7 @@ public final class VeloxBeans {
     ROOT_REGISTRY.registerClass("ConstantTypedExpr", ConstantTypedExpr.class);
     ROOT_REGISTRY.registerClass("DereferenceTypedExpr", DereferenceTypedExpr.class);
     ROOT_REGISTRY.registerClass("FieldAccessTypedExpr", FieldAccessTypedExpr.class);
+    ROOT_REGISTRY.registerClass("InputTypedExpr", InputTypedExpr.class);
     ROOT_REGISTRY.registerClass("LambdaTypedExpr", LambdaTypedExpr.class);
   }
 }
