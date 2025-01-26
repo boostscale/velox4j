@@ -90,8 +90,8 @@ public class TypeSerdeTest {
 
   @Test
   public void testFunctionType() {
-    Serdes.testRoundTrip(new FunctionType(Arrays.asList(
-        new IntegerType(), new VarcharType(), new VarbinaryType())));
+    Serdes.testRoundTrip(FunctionType.create(Arrays.asList(
+        new IntegerType(), new VarcharType()), new VarbinaryType()));
   }
 
   @Test

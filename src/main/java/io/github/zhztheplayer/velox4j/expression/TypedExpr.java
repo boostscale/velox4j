@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.type.Type;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class TypedExpr extends VeloxBean {
@@ -13,7 +14,7 @@ public abstract class TypedExpr extends VeloxBean {
 
   protected TypedExpr(Type returnType, List<TypedExpr> inputs) {
     this.returnType = returnType;
-    this.inputs = inputs;
+    this.inputs = Collections.unmodifiableList(inputs);
   }
 
   @JsonGetter("type")

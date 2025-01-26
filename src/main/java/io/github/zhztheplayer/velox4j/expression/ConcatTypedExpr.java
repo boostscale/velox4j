@@ -13,10 +13,11 @@ import java.util.stream.Collectors;
 
 public class ConcatTypedExpr extends TypedExpr {
   @JsonCreator
-  private ConcatTypedExpr(@JsonProperty("type") RowType returnType,
+  private ConcatTypedExpr(@JsonProperty("type") Type returnType,
       @JsonProperty("inputs") List<TypedExpr> inputs) {
     super(returnType, inputs);
-    ;
+    Preconditions.checkArgument(returnType instanceof RowType,
+        "ConcatTypedExpr returnType should be RowType");
   }
 
   public static ConcatTypedExpr create(List<String> names, List<TypedExpr> inputs) {

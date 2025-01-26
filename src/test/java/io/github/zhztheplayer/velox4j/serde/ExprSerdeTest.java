@@ -7,8 +7,12 @@ import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.test.Serdes;
+import io.github.zhztheplayer.velox4j.type.BooleanType;
+import io.github.zhztheplayer.velox4j.type.DoubleType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
@@ -89,5 +93,19 @@ public class ExprSerdeTest {
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
     Serdes.testRoundTrip(fieldAccess);
+  }
+
+  @Test
+  public void testInputTypedExpr() {
+    Serdes.testRoundTrip(new InputTypedExpr(new BooleanType()));
+  }
+
+  @Test
+  public void testLambdaTypedExpr() {
+    final RowType signature = new RowType(Arrays.asList("foo", "bar"),
+        Arrays.asList(new IntegerType(), new VarcharType()));
+    final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
+        FieldAccessTypedExpr.create(new IntegerType(), "foo"));
+    Serdes.testRoundTrip(lambdaTypedExpr);
   }
 }

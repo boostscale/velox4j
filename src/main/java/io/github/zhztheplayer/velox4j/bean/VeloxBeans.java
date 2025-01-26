@@ -6,6 +6,8 @@ import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.type.*;
@@ -63,5 +65,6 @@ public final class VeloxBeans {
     ROOT_REGISTRY.registerClass("ConstantTypedExpr", ConstantTypedExpr.class);
     ROOT_REGISTRY.registerClass("DereferenceTypedExpr", DereferenceTypedExpr.class);
     ROOT_REGISTRY.registerClass("FieldAccessTypedExpr", FieldAccessTypedExpr.class);
+    ROOT_REGISTRY.registerClass("LambdaTypedExpr", LambdaTypedExpr.class);
   }
 }
