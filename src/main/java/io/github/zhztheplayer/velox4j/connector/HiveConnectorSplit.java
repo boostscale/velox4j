@@ -2,6 +2,7 @@ package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
@@ -100,6 +101,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
   }
 
   @JsonGetter("bucketConversion")
+  @JsonIgnore() // FIXME: This field doesn't involve the serialization in Velox for now.
   public Optional<HiveBucketConversion> getBucketConversion() {
     return bucketConversion;
   }
