@@ -37,14 +37,15 @@ folly::dynamic Query::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
   obj["name"] = "Velox4jQuery";
   obj["plan"] = plan_->serialize();
-  obj["boundSplits"] = folly::dynamic::array;
+  folly::dynamic boundSplits = folly::dynamic::array;
   for (const auto& boundSplit : boundSplits_) {
     folly::dynamic boundSplitObj = folly::dynamic::object;
     boundSplitObj["planNodeId"] = boundSplit->planNodeId();
     boundSplitObj["groupId"] = boundSplit->split().groupId;
     boundSplitObj["split"] = boundSplit->split().connectorSplit->serialize();
-    obj["boundSplits"].push_back(boundSplitObj);
+    boundSplits.push_back(boundSplitObj);
   }
+  obj["boundSplits"] = boundSplits;
   return obj;
 }
 
