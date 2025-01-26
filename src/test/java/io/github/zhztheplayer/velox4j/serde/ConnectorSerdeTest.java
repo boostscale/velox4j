@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
@@ -30,6 +29,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -111,7 +111,7 @@ public class ConnectorSerdeTest {
         Arrays.asList(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
         new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
         new RowType(Arrays.asList("foo", "bar"), Arrays.asList(new VarcharType(), new VarcharType())),
-        ImmutableMap.of("tk", "tv")
+        Map.of("tk", "tv")
     );
     SerdeTests.testVeloxBeanRoundTrip(handle);
   }
@@ -125,7 +125,7 @@ public class ConnectorSerdeTest {
         FileFormat.ORC,
         1,
         100,
-        ImmutableMap.of("key", Optional.of("value")),
+        Map.of("key", Optional.of("value")),
         OptionalInt.of(1),
         Optional.of(new HiveBucketConversion(
             1, 1,
@@ -133,10 +133,10 @@ public class ConnectorSerdeTest {
                 new HiveColumnHandle(
                     "t", ColumnType.REGULAR,
                     new IntegerType(), new IntegerType(), Collections.emptyList())))),
-        ImmutableMap.of("sk", "sv"),
+        Map.of("sk", "sv"),
         Optional.of("extra"),
-        ImmutableMap.of("serde_key", "serde_value"),
-        ImmutableMap.of("info_key", "info_value"),
+        Map.of("serde_key", "serde_value"),
+        Map.of("info_key", "info_value"),
         Optional.of(new FileProperties(OptionalLong.of(100), OptionalLong.of(50))),
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
   }
@@ -150,7 +150,7 @@ public class ConnectorSerdeTest {
         FileFormat.ORC,
         1,
         100,
-        ImmutableMap.of("key", Optional.of("value")),
+        Map.of("key", Optional.of("value")),
         OptionalInt.of(1),
         Optional.of(new HiveBucketConversion(
             1, 1,
@@ -158,10 +158,10 @@ public class ConnectorSerdeTest {
                 new HiveColumnHandle(
                     "t", ColumnType.REGULAR,
                     new IntegerType(), new IntegerType(), Collections.emptyList())))),
-        ImmutableMap.of("sk", "sv"),
+        Map.of("sk", "sv"),
         Optional.empty(),
-        ImmutableMap.of("serde_key", "serde_value"),
-        ImmutableMap.of("info_key", "info_value"),
+        Map.of("serde_key", "serde_value"),
+        Map.of("info_key", "info_value"),
         Optional.of(new FileProperties(OptionalLong.empty(), OptionalLong.of(50))),
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
   }

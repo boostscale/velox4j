@@ -100,8 +100,8 @@ public class HiveConnectorSplit extends ConnectorSplit {
     return tableBucketNumber;
   }
 
+  @JsonIgnore // FIXME: This field doesn't involve the serialization in Velox for now.
   @JsonGetter("bucketConversion")
-  @JsonIgnore() // FIXME: This field doesn't involve the serialization in Velox for now.
   public Optional<HiveBucketConversion> getBucketConversion() {
     return bucketConversion;
   }

@@ -2,6 +2,7 @@ package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.filter.Filter;
@@ -61,6 +62,7 @@ public class HiveTableHandle extends ConnectorTableHandle {
     return dataColumns;
   }
 
+  @JsonIgnore // FIXME: This field doesn't involve the serialization in Velox for now.
   @JsonGetter("tableParameters")
   public Map<String, String> getTableParameters() {
     return tableParameters;
