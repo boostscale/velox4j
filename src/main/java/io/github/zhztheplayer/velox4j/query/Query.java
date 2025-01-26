@@ -16,13 +16,33 @@
  */
 package io.github.zhztheplayer.velox4j.query;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 
+import java.util.List;
+
 public class Query extends VeloxBean {
   private final PlanNode plan;
+  private final List<BoundSplit> boundSplits;
 
-  public Query(PlanNode plan) {
+  @JsonCreator
+  public Query(
+      @JsonProperty("plan") PlanNode plan,
+      @JsonProperty("boundSplits") List<BoundSplit> boundSplits) {
     this.plan = plan;
+    this.boundSplits = boundSplits;
+  }
+
+  @JsonGetter("plan")
+  public PlanNode getPlan() {
+    return plan;
+  }
+
+  @JsonGetter("boundSplits")
+  public List<BoundSplit> getSplits() {
+    return boundSplits;
   }
 }

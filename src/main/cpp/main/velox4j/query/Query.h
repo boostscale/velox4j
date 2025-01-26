@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <velox/core/PlanNode.h>
 
+#include <velox/core/PlanNode.h>
 #include <utility>
+#include "BoundSplit.h"
 
 #pragma once
 
@@ -24,9 +25,12 @@ namespace velox4j {
 using namespace facebook::velox;
 class Query : public ISerializable {
  public:
-  explicit Query(std::shared_ptr<core::PlanNode> plan);
+  explicit Query(
+      std::shared_ptr<core::PlanNode>& plan,
+      std::vector<std::shared_ptr<BoundSplit>>& boundSplits);
 
   const std::shared_ptr<core::PlanNode>& plan() const;
+  const std::vector<std::shared_ptr<BoundSplit>>& boundSplits() const;
 
   folly::dynamic serialize() const override;
 
@@ -38,5 +42,6 @@ class Query : public ISerializable {
 
  private:
   std::shared_ptr<core::PlanNode> plan_;
+  std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
 };
 } // namespace velox4j

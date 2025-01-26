@@ -1,5 +1,4 @@
 add_library(velox4j SHARED
-        velox4j/dummy/Dummy.cc
         velox4j/init/Init.cc
         velox4j/jni/JniCommon.cc
         velox4j/jni/JniError.cc
@@ -11,6 +10,7 @@ add_library(velox4j SHARED
         velox4j/lifecycle/Session.cc
         velox4j/arrow/Arrow.cc
         velox4j/query/Query.cc
+        velox4j/query/BoundSplit.cc
 )
 
 target_include_directories(velox4j PUBLIC

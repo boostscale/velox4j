@@ -17,7 +17,28 @@
 
 #pragma once
 
+#include <velox/core/PlanNode.h>
+#include <velox/exec/Split.h>
+
 namespace velox4j {
-void foo();
-void foo1();
-}
+using namespace facebook::velox;
+
+class BoundSplit {
+ public:
+  BoundSplit(core::PlanNodeId& planNodeId, std::shared_ptr<exec::Split>& split)
+      : planNodeId_(planNodeId), split_(std::move(split)) {}
+  virtual ~BoundSplit() = default;
+
+  const core::PlanNodeId& planNodeId() const {
+    return planNodeId_;
+  }
+
+  const exec::Split& split() const {
+    return *split_;
+  }
+
+ private:
+  core::PlanNodeId planNodeId_;
+  std::shared_ptr<exec::Split> split_;
+};
+} // namespace velox4j

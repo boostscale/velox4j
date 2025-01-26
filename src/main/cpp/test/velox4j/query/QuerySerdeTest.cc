@@ -13,15 +13,4 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/
-
-#include "velox4j/dummy/Dummy.h"
-#include "velox/common/memory/Memory.h"
-
-
-using namespace facebook::velox;
-
-int main() {
-  velox4j::foo1();
-  return 0;
-}
+ */
