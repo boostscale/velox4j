@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.bean;
 
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
@@ -74,5 +75,6 @@ public final class VeloxBeans {
   private static void registerConnectors() {
     ROOT_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
     ROOT_REGISTRY.registerClass("HiveConnectorSplit", HiveConnectorSplit.class);
+    ROOT_REGISTRY.registerClass("HiveTableHandle", HiveTableHandle.class);
   }
 }
