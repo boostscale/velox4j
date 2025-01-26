@@ -18,7 +18,7 @@ import java.io.IOException;
 public final class Serde {
   private static final ObjectMapper JSON = newVeloxJsonMapper();
 
-  private static ObjectMapper newVeloxJsonMapper() {
+  static ObjectMapper newVeloxJsonMapper() {
     final JsonMapper.Builder jsonMapper = JsonMapper.builder();
     jsonMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     jsonMapper.enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION);
