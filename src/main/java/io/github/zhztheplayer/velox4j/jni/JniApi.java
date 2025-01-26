@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
+import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
@@ -58,7 +59,13 @@ public final class JniApi implements CppObject {
 
   public List<BaseVector> baseVectorDeserialize(String serialized) {
     return Arrays.stream(jni.baseVectorDeserialize(serialized))
-        .mapToObj(id -> new RowVector(this, id))
+        .mapToObj(id -> {
+          final VectorEncoding encoding = VectorEncoding.valueOf(jni.baseVectorGetEncoding(id));
+          if (encoding == VectorEncoding.ROW) {
+            return new RowVector(this, id);
+          }
+          return new BaseVector(this, id);
+        })
         .collect(Collectors.toList());
   }
 
@@ -75,6 +82,13 @@ public final class JniApi implements CppObject {
     return VectorEncoding.valueOf(jni.baseVectorGetEncoding(vector.id()));
   }
 
+  public RowVector baseVectorAsRowVector(BaseVector vector) {
+    Preconditions.checkArgument(baseVectorGetEncoding(vector) == VectorEncoding.ROW,
+        "Not a row vector");
+    return new RowVector(this, jni.baseVectorNewRef(vector.id()));
+  }
+
+  // For tests.
   public String deserializeAndSerialize(String json) {
     return jni.deserializeAndSerialize(json);
   }

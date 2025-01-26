@@ -170,6 +170,16 @@ jlong baseVectorWrapInConstant(
   JNI_METHOD_END(-1)
 }
 
+jlong baseVectorNewRef(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  return sessionOf(env, javaThis)->objectStore()->save(vector);
+  JNI_METHOD_END(-1)
+}
+
 jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
@@ -269,6 +279,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       "baseVectorGetEncoding",
       (void*)baseVectorGetEncoding,
       kTypeString,
+      kTypeLong,
+      NULL);
+  addNativeMethod(
+      "baseVectorNewRef",
+      (void*)baseVectorNewRef,
+      kTypeLong,
       kTypeLong,
       NULL);
   addNativeMethod(

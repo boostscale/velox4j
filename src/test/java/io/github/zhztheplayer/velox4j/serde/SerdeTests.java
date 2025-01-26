@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -23,10 +24,10 @@ import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
+import io.github.zhztheplayer.velox4j.test.Resources;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
@@ -37,16 +38,12 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.BigIntVector;
 import org.apache.arrow.vector.IntVector;
-import org.apache.arrow.vector.complex.StructVector;
 import org.junit.Assert;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -191,6 +188,8 @@ public final class SerdeTests {
   }
 
   public static RowVector newSampleRowVector(JniApi jniApi) {
-    throw new UnsupportedOperationException("NYI");
+    final String serialized = Resources.readResourceAsString("vector/rowvector-1.b64");
+    final BaseVector deserialized = BaseVectors.deserialize(jniApi, serialized);
+    return ((RowVector) deserialized);
   }
 }

@@ -36,4 +36,8 @@ public class BaseVectors {
   public static VectorEncoding getEncoding(BaseVector vector) {
     return vector.jniApi().baseVectorGetEncoding(vector);
   }
+
+  public static RowVector asRowVector(BaseVector vector) {
+    return vector.jniApi().baseVectorAsRowVector(vector);
+  }
 }

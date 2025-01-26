@@ -54,6 +54,7 @@ public final class JniWrapper {
   native String baseVectorGetType(long id);
   native long baseVectorWrapInConstant(long id, int length, int index);
   native String baseVectorGetEncoding(long id);
+  native long baseVectorNewRef(long id);
 
   // For tests.
   native String deserializeAndSerialize(String json);
