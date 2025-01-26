@@ -11,10 +11,14 @@ public class MapType extends Type {
   private final List<Type> children;
 
   @JsonCreator
-  public MapType(@JsonProperty("cTypes") List<Type> children) {
+  private MapType(@JsonProperty("cTypes") List<Type> children) {
     Preconditions.checkArgument(children.size() == 2,
         "MapType should have 2 children, but has %s", children.size());
     this.children = children;
+  }
+
+  public static MapType create(Type keyType, Type valueType) {
+    return new MapType(List.of(keyType, valueType));
   }
 
   @JsonGetter("cTypes")

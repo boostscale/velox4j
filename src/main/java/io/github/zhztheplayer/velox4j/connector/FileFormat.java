@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.split;
+package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

@@ -10,6 +10,7 @@ import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
+import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.type.*;
 
 public final class VeloxBeans {
@@ -22,13 +23,13 @@ public final class VeloxBeans {
   public static void registerAll() {
     registerTypes();
     registerExprs();
+    registerConnectors();
   }
 
   private static void registerTypes() {
     final SerdeRegistry typeRegistry = ROOT_REGISTRY
         .registerFactory("Type")
         .key("type");
-
     typeRegistry.registerClass("BOOLEAN", BooleanType.class);
     typeRegistry.registerClass("TINYINT", TinyIntType.class);
     typeRegistry.registerClass("SMALLINT", SmallIntType.class);
@@ -67,5 +68,9 @@ public final class VeloxBeans {
     ROOT_REGISTRY.registerClass("FieldAccessTypedExpr", FieldAccessTypedExpr.class);
     ROOT_REGISTRY.registerClass("InputTypedExpr", InputTypedExpr.class);
     ROOT_REGISTRY.registerClass("LambdaTypedExpr", LambdaTypedExpr.class);
+  }
+
+  private static void registerConnectors() {
+    ROOT_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
   }
 }

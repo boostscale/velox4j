@@ -73,12 +73,12 @@ public class TypeSerdeTest {
 
   @Test
   public void testArrayType() {
-    SerdeTests.testVeloxBeanRoundTrip(new ArrayType(Arrays.asList(new IntegerType())));
+    SerdeTests.testVeloxBeanRoundTrip(ArrayType.create(new IntegerType()));
   }
 
   @Test
   public void testMapType() {
-    SerdeTests.testVeloxBeanRoundTrip(new MapType(Arrays.asList(new IntegerType(), new VarcharType())));
+    SerdeTests.testVeloxBeanRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
   }
 
   @Test
