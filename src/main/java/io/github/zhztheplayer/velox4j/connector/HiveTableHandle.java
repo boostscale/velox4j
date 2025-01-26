@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class HiveTableHandle extends ConnectorTableHandle {
   private final String tableName;
@@ -33,7 +35,8 @@ public class HiveTableHandle extends ConnectorTableHandle {
     this.subfieldFilters = subfieldFilters;
     this.remainingFilter = remainingFilter;
     this.dataColumns = dataColumns;
-    this.tableParameters = tableParameters;
+    // Use of tree map guarantees the key serialization order.
+    this.tableParameters = Collections.unmodifiableSortedMap(new TreeMap<>(tableParameters));
   }
 
   @JsonGetter("tableName")
