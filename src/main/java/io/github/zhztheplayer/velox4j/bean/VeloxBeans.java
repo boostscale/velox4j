@@ -10,6 +10,7 @@ import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
+import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
@@ -26,6 +27,7 @@ public final class VeloxBeans {
     registerTypes();
     registerExprs();
     registerConnectors();
+    registerFilters();
   }
 
   private static void registerTypes() {
@@ -76,5 +78,9 @@ public final class VeloxBeans {
     ROOT_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
     ROOT_REGISTRY.registerClass("HiveConnectorSplit", HiveConnectorSplit.class);
     ROOT_REGISTRY.registerClass("HiveTableHandle", HiveTableHandle.class);
+  }
+
+  private static void registerFilters() {
+    ROOT_REGISTRY.registerClass("AlwaysTrue", AlwaysTrue.class);
   }
 }
