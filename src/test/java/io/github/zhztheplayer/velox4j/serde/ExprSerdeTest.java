@@ -35,7 +35,7 @@ public class ExprSerdeTest {
   @Test
   public void testCastTypedExpr() {
     final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
-    Serdes.testRoundTrip(new CastTypedExpr(new IntegerType(), Collections.singletonList(input), true));
+    Serdes.testRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
   }
 
   @Test
