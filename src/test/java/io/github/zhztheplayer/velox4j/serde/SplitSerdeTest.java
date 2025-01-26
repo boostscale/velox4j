@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.split.FileFormat;
 import io.github.zhztheplayer.velox4j.split.FileProperties;
+import io.github.zhztheplayer.velox4j.split.RowIdProperties;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,6 +34,13 @@ public class SplitSerdeTest {
   public void testPropertiesWithMissingFields() {
     final FileProperties in = new FileProperties(OptionalLong.of(100),
         OptionalLong.empty());
+    SerdeTests.testJavaBeanRoundTrip(in);
+  }
+
+  @Test
+  public void testRowIdProperties() {
+    final RowIdProperties in = new RowIdProperties(
+        5, 10, "UUID-100");
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 }
