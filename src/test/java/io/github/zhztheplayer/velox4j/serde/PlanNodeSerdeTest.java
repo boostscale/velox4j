@@ -59,7 +59,6 @@ public class PlanNodeSerdeTest {
         List.of(aggregate),
         true,
         List.of(scan),
-        new RowType(List.of("foo"), List.of(new IntegerType())),
         FieldAccessTypedExpr.create(new IntegerType(), "foo"),
         List.of(0)
     );

@@ -7,6 +7,7 @@ import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
 import io.github.zhztheplayer.velox4j.type.Type;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TableScanNode extends PlanNode {
@@ -40,4 +41,8 @@ public class TableScanNode extends PlanNode {
     return assignments;
   }
 
+  @Override
+  protected List<PlanNode> getSources() {
+    return Collections.emptyList();
+  }
 }
