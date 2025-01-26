@@ -103,4 +103,31 @@ public class ConnectorSerdeTest {
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
     SerdeTests.testVeloxBeanRoundTrip(split);
   }
+
+  @Test
+  public void testHiveConnectorSplitWithMissingFields() {
+    final ConnectorSplit split = new HiveConnectorSplit(
+        "id-1",
+        5,
+        true,
+        "path/to/file",
+        FileFormat.ORC,
+        1,
+        100,
+        ImmutableMap.of("key", Optional.of("value")),
+        OptionalInt.of(1),
+        Optional.of(new HiveBucketConversion(
+            1, 1,
+            Arrays.asList(
+                new HiveColumnHandle(
+                    "t", ColumnType.REGULAR,
+                    new IntegerType(), new IntegerType(), Collections.emptyList())))),
+        ImmutableMap.of("sk", "sv"),
+        Optional.empty(),
+        ImmutableMap.of("serde_key", "serde_value"),
+        ImmutableMap.of("info_key", "info_value"),
+        Optional.of(new FileProperties(OptionalLong.empty(), OptionalLong.of(50))),
+        Optional.of(new RowIdProperties(5, 10, "UUID-100")));
+    SerdeTests.testVeloxBeanRoundTrip(split);
+  }
 }
