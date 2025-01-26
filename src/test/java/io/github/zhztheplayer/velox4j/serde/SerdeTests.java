@@ -30,6 +30,7 @@ import org.junit.Assert;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -72,11 +73,11 @@ public final class SerdeTests {
     final Type dataType = ArrayType.create(
         MapType.create(
             new VarcharType(),
-            new RowType(Arrays.asList("id", "description"),
-                Arrays.asList(new BigIntType(),
+            new RowType(List.of("id", "description"),
+                List.of(new BigIntType(),
                     new VarcharType()))));
     final ColumnHandle handle = new HiveColumnHandle("complex_type",
-        ColumnType.REGULAR, dataType, dataType, Arrays.asList(
+        ColumnType.REGULAR, dataType, dataType, List.of(
         "complex_type[1][\"foo\"].id",
         "complex_type[2][\"foo\"].id"));
     return handle;
@@ -95,7 +96,7 @@ public final class SerdeTests {
         OptionalInt.of(1),
         Optional.of(new HiveBucketConversion(
             1, 1,
-            Arrays.asList(
+            List.of(
                 new HiveColumnHandle(
                     "t", ColumnType.REGULAR,
                     new IntegerType(), new IntegerType(), Collections.emptyList())))),
@@ -120,7 +121,7 @@ public final class SerdeTests {
         OptionalInt.of(1),
         Optional.of(new HiveBucketConversion(
             1, 1,
-            Arrays.asList(
+            List.of(
                 new HiveColumnHandle(
                     "t", ColumnType.REGULAR,
                     new IntegerType(), new IntegerType(), Collections.emptyList())))),
@@ -137,9 +138,9 @@ public final class SerdeTests {
         "id-1",
         "tab-1",
         true,
-        Arrays.asList(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
+        List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
         new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
-        new RowType(Arrays.asList("foo", "bar"), Arrays.asList(new VarcharType(), new VarcharType())),
+        new RowType(List.of("foo", "bar"), List.of(new VarcharType(), new VarcharType())),
         Map.of("tk", "tv")
     );
     return handle;

@@ -9,8 +9,8 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class PlanNodeSerdeTest {
   @BeforeClass
@@ -21,8 +21,8 @@ public class PlanNodeSerdeTest {
   @Test
   public void testTableScanNode() {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
-    final PlanNode scan = new TableScanNode("id-1", new RowType(Arrays.asList("foo", "bar"),
-        Arrays.asList(new IntegerType(), new IntegerType())), handle, Collections.emptyList());
+    final PlanNode scan = new TableScanNode("id-1", new RowType(List.of("foo", "bar"),
+        List.of(new IntegerType(), new IntegerType())), handle, Collections.emptyList());
     SerdeTests.testVeloxBeanRoundTrip(scan);
   }
 }

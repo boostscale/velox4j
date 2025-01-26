@@ -23,8 +23,8 @@ import org.junit.BeforeClass;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class ExprSerdeTest {
 
@@ -48,7 +48,7 @@ public class ExprSerdeTest {
   public void testConcatTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
-    SerdeTests.testVeloxBeanRoundTrip(ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2)));
+    SerdeTests.testVeloxBeanRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
   }
 
   @Test
@@ -77,7 +77,7 @@ public class ExprSerdeTest {
   public void testDereferenceTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
-    final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
+    final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
     SerdeTests.testVeloxBeanRoundTrip(dereference);
@@ -87,7 +87,7 @@ public class ExprSerdeTest {
   public void testFieldAccessTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
-    final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
+    final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
     SerdeTests.testVeloxBeanRoundTrip(fieldAccess);
@@ -100,8 +100,8 @@ public class ExprSerdeTest {
 
   @Test
   public void testLambdaTypedExpr() {
-    final RowType signature = new RowType(Arrays.asList("foo", "bar"),
-        Arrays.asList(new IntegerType(), new VarcharType()));
+    final RowType signature = new RowType(List.of("foo", "bar"),
+        List.of(new IntegerType(), new VarcharType()));
     final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
         FieldAccessTypedExpr.create(new IntegerType(), "foo"));
     SerdeTests.testVeloxBeanRoundTrip(lambdaTypedExpr);

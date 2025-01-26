@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class TypeSerdeTest {
 
@@ -83,13 +84,13 @@ public class TypeSerdeTest {
 
   @Test
   public void testRowType() {
-    SerdeTests.testVeloxBeanRoundTrip(new RowType(Arrays.asList("foo", "bar"),
-        Arrays.asList(new IntegerType(), new VarcharType())));
+    SerdeTests.testVeloxBeanRoundTrip(new RowType(List.of("foo", "bar"),
+        List.of(new IntegerType(), new VarcharType())));
   }
 
   @Test
   public void testFunctionType() {
-    SerdeTests.testVeloxBeanRoundTrip(FunctionType.create(Arrays.asList(
+    SerdeTests.testVeloxBeanRoundTrip(FunctionType.create(List.of(
         new IntegerType(), new VarcharType()), new VarbinaryType()));
   }
 
