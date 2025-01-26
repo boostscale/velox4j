@@ -11,6 +11,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
@@ -90,6 +91,7 @@ public final class VeloxBeans {
 
   private static void registerPlanNodes() {
     ROOT_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
+    ROOT_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
   }
 
   private static void registerQuery() {

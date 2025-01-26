@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -15,9 +16,13 @@ import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.bean.VeloxBean;
+import io.github.zhztheplayer.velox4j.plan.PlanNode;
+import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
@@ -144,5 +149,24 @@ public final class SerdeTests {
         Map.of("tk", "tv")
     );
     return handle;
+  }
+
+  public static Aggregate newSampleAggregate() {
+    final Aggregate aggregate = new Aggregate(
+        new CallTypedExpr(new IntegerType(),
+            Collections.singletonList(FieldAccessTypedExpr.create(
+                new IntegerType(), "foo")), "sum"),
+        List.of(new IntegerType()),
+        FieldAccessTypedExpr.create(new IntegerType(), "foo"),
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        List.of(new SortOrder(true, true)), true);
+    return aggregate;
+  }
+
+  public static PlanNode newSampleTableScanNode() {
+    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
+    final PlanNode scan = new TableScanNode("id-1", new RowType(List.of("foo", "bar"),
+        List.of(new IntegerType(), new IntegerType())), handle, Collections.emptyList());
+    return scan;
   }
 }

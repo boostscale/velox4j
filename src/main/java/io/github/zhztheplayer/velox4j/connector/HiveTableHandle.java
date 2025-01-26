@@ -36,7 +36,8 @@ public class HiveTableHandle extends ConnectorTableHandle {
     this.remainingFilter = remainingFilter;
     this.dataColumns = dataColumns;
     // Use of tree map guarantees the key serialization order.
-    this.tableParameters = Collections.unmodifiableSortedMap(new TreeMap<>(tableParameters));
+    this.tableParameters = tableParameters == null ?
+        Collections.emptyMap() : Collections.unmodifiableSortedMap(new TreeMap<>(tableParameters));
   }
 
   @JsonGetter("tableName")

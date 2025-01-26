@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.aggregate;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.Type;
@@ -10,7 +11,7 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import java.util.List;
 
 public class Aggregate {
-  public final String functionName;
+  public final CallTypedExpr call;
   public final List<Type> rawInputTypes;
   public final FieldAccessTypedExpr mask;
   public final List<FieldAccessTypedExpr> sortingKeys;
@@ -18,13 +19,13 @@ public class Aggregate {
   public final boolean distinct;
 
   @JsonCreator
-  public Aggregate(@JsonProperty("functionName") String functionName,
+  public Aggregate(@JsonProperty("call") CallTypedExpr call,
       @JsonProperty("rawInputTypes") List<Type> rawInputTypes,
       @JsonProperty("mask") FieldAccessTypedExpr mask,
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
       @JsonProperty("sortingOrders") List<SortOrder> sortingOrders,
       @JsonProperty("distinct") boolean distinct) {
-    this.functionName = functionName;
+    this.call = call;
     this.rawInputTypes = rawInputTypes;
     this.mask = mask;
     this.sortingKeys = sortingKeys;
@@ -33,9 +34,9 @@ public class Aggregate {
   }
 
 
-  @JsonGetter("functionName")
-  public String getFunctionName() {
-    return functionName;
+  @JsonGetter("call")
+  public CallTypedExpr getCall() {
+    return call;
   }
 
   @JsonGetter("rawInputTypes")
