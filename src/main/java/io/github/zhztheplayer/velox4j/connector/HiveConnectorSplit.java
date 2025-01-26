@@ -27,6 +27,9 @@ public class HiveConnectorSplit extends ConnectorSplit {
 
   @JsonCreator
   public HiveConnectorSplit(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("splitWeight") long splitWeight,
+      @JsonProperty("cacheable") boolean cacheable,
       @JsonProperty("filePath") String filePath,
       @JsonProperty("fileFormat") FileFormat fileFormat,
       @JsonProperty("start") long start,
@@ -40,6 +43,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
       @JsonProperty("infoColumns") Map<String, String> infoColumns,
       @JsonProperty("properties") Optional<FileProperties> properties,
       @JsonProperty("rowIdProperties") Optional<RowIdProperties> rowIdProperties) {
+    super(connectorId, splitWeight, cacheable);
     this.filePath = Preconditions.checkNotNull(filePath);
     this.fileFormat = Preconditions.checkNotNull(fileFormat);
     this.start = start;
@@ -53,6 +57,16 @@ public class HiveConnectorSplit extends ConnectorSplit {
     this.infoColumns = Preconditions.checkNotNull(infoColumns);
     this.properties = properties;
     this.rowIdProperties = rowIdProperties;
+  }
+
+  @JsonGetter("splitWeight")
+  public long getSplitWeight() {
+    return super.getSplitWeight();
+  }
+
+  @JsonGetter("cacheable")
+  public boolean isCacheable() {
+    return super.isCacheable();
   }
 
   @JsonGetter("filePath")

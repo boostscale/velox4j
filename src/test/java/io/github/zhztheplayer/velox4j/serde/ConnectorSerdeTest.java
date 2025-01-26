@@ -80,9 +80,12 @@ public class ConnectorSerdeTest {
   @Test
   public void testHiveConnectorSplit() {
     final ConnectorSplit split = new HiveConnectorSplit(
+        "id-1",
+        5,
+        true,
         "path/to/file",
         FileFormat.ORC,
-        0,
+        1,
         100,
         ImmutableMap.of("key", Optional.of("value")),
         OptionalInt.of(1),
