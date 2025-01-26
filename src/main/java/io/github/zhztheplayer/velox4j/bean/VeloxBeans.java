@@ -11,6 +11,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
@@ -28,6 +29,7 @@ public final class VeloxBeans {
     registerExprs();
     registerConnectors();
     registerFilters();
+    registerPlanNodes();
   }
 
   private static void registerTypes() {
@@ -82,5 +84,9 @@ public final class VeloxBeans {
 
   private static void registerFilters() {
     ROOT_REGISTRY.registerClass("AlwaysTrue", AlwaysTrue.class);
+  }
+
+  private static void registerPlanNodes() {
+    ROOT_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
   }
 }
