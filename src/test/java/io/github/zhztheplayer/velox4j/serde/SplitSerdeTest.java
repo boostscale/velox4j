@@ -1,26 +1,38 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.split.FileFormat;
+import io.github.zhztheplayer.velox4j.split.FileProperties;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.OptionalLong;
+
 public class SplitSerdeTest {
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     Velox4j.ensureInitialized();
   }
 
   @Test
-  public void testFileFormat() throws JsonProcessingException {
-    final ObjectMapper jsonMapper = Serde.newVeloxJsonMapper();
+  public void testFileFormat() {
     final FileFormat in = FileFormat.DWRF;
-    final String json = jsonMapper.writeValueAsString(in);
-    final FileFormat out = jsonMapper.readValue(json, FileFormat.class);
+    final String json = SerdeTests.testJavaBeanRoundTrip(in);
     Assert.assertEquals("1", json);
-    Assert.assertEquals(in, out);
+  }
+
+  @Test
+  public void testProperties() {
+    final FileProperties in = new FileProperties(OptionalLong.of(100),
+        OptionalLong.of(50));
+    SerdeTests.testJavaBeanRoundTrip(in);
+  }
+
+  @Test
+  public void testPropertiesWithMissingFields() {
+    final FileProperties in = new FileProperties(OptionalLong.of(100),
+        OptionalLong.empty());
+    SerdeTests.testJavaBeanRoundTrip(in);
   }
 }

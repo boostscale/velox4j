@@ -10,7 +10,6 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
-import io.github.zhztheplayer.velox4j.test.Serdes;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
@@ -36,20 +35,20 @@ public class ExprSerdeTest {
 
   @Test
   public void testCallTypedExpr() {
-    Serdes.testRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt"));
+    SerdeTests.testVeloxBeanRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt"));
   }
 
   @Test
   public void testCastTypedExpr() {
     final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
-    Serdes.testRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
+    SerdeTests.testVeloxBeanRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
   }
 
   @Test
   public void testConcatTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "randomReal");
-    Serdes.testRoundTrip(ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2)));
+    SerdeTests.testVeloxBeanRoundTrip(ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2)));
   }
 
   @Test
@@ -61,7 +60,7 @@ public class ExprSerdeTest {
     arrowVector.set(0, 15);
     final ConstantTypedExpr expr = ConstantTypedExpr.create(jniApi, alloc, arrowVector);
     // FIXME: The serialized string of the constant doesn't match after round-tripping.
-    Assert.assertThrows(ComparisonFailure.class, () -> Serdes.testRoundTrip(expr));
+    Assert.assertThrows(ComparisonFailure.class, () -> SerdeTests.testVeloxBeanRoundTrip(expr));
     arrowVector.close();
     jniApi.close();
   }
@@ -71,7 +70,7 @@ public class ExprSerdeTest {
     final JniApi jniApi = JniApi.create();
     final ConstantTypedExpr expr = ConstantTypedExpr.create(jniApi,
         "AQAAACAAAAB7InR5cGUiOiJJTlRFR0VSIiwibmFtZSI6IlR5cGUifQEAAAAAAQ8AAAA=");
-    Serdes.testRoundTrip(expr);
+    SerdeTests.testVeloxBeanRoundTrip(expr);
   }
 
   @Test
@@ -81,7 +80,7 @@ public class ExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
-    Serdes.testRoundTrip(dereference);
+    SerdeTests.testVeloxBeanRoundTrip(dereference);
   }
 
   @Test
@@ -91,12 +90,12 @@ public class ExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
-    Serdes.testRoundTrip(fieldAccess);
+    SerdeTests.testVeloxBeanRoundTrip(fieldAccess);
   }
 
   @Test
   public void testInputTypedExpr() {
-    Serdes.testRoundTrip(new InputTypedExpr(new BooleanType()));
+    SerdeTests.testVeloxBeanRoundTrip(new InputTypedExpr(new BooleanType()));
   }
 
   @Test
@@ -105,6 +104,6 @@ public class ExprSerdeTest {
         Arrays.asList(new IntegerType(), new VarcharType()));
     final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
         FieldAccessTypedExpr.create(new IntegerType(), "foo"));
-    Serdes.testRoundTrip(lambdaTypedExpr);
+    SerdeTests.testVeloxBeanRoundTrip(lambdaTypedExpr);
   }
 }

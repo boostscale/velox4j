@@ -2,7 +2,6 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.test.Resources;
-import io.github.zhztheplayer.velox4j.test.Serdes;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,6 +15,6 @@ public class QuerySerdeTest {
   @Test
   public void testJsonQuery() {
     final String queryJson = Resources.readResourceAsString("query/example-1.json");
-    Serdes.testRoundTrip(queryJson);
+    SerdeTests.testVeloxBeanRoundTrip(queryJson);
   }
 }
