@@ -5,14 +5,20 @@ import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
 import io.github.zhztheplayer.velox4j.connector.HiveBucketConversion;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
+import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
+import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
+import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
+import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.MapType;
 import io.github.zhztheplayer.velox4j.type.RowType;
@@ -49,6 +55,13 @@ public class ConnectorSerdeTest {
   }
 
   @Test
+  public void testSubfieldFilter() {
+    final SubfieldFilter in = new SubfieldFilter(
+        "complex_type[1][\"foo\"].id", new AlwaysTrue());
+    SerdeTests.testJavaBeanRoundTrip(in);
+  }
+
+  @Test
   public void testPropertiesWithMissingFields() {
     final FileProperties in = new FileProperties(OptionalLong.of(100),
         OptionalLong.empty());
@@ -79,7 +92,32 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testHiveConnectorSplit() {
-    final ConnectorSplit split = new HiveConnectorSplit(
+    final ConnectorSplit split = newSampleHiveSplit();
+    SerdeTests.testVeloxBeanRoundTrip(split);
+  }
+
+  @Test
+  public void testHiveConnectorSplitWithMissingFields() {
+    final ConnectorSplit split = newSampleHiveSplitWithMissingFields();
+    SerdeTests.testVeloxBeanRoundTrip(split);
+  }
+
+  @Test
+  public void testHiveTableHandle() {
+    final ConnectorTableHandle handle = new HiveTableHandle(
+        "id-1",
+        "tab-1",
+        true,
+        Arrays.asList(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
+        new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
+        new RowType(Arrays.asList("foo", "bar"), Arrays.asList(new VarcharType(), new VarcharType())),
+        ImmutableMap.of("tk", "tv")
+    );
+    SerdeTests.testVeloxBeanRoundTrip(handle);
+  }
+
+  private static HiveConnectorSplit newSampleHiveSplit() {
+    return new HiveConnectorSplit(
         "id-1",
         5,
         true,
@@ -101,12 +139,10 @@ public class ConnectorSerdeTest {
         ImmutableMap.of("info_key", "info_value"),
         Optional.of(new FileProperties(OptionalLong.of(100), OptionalLong.of(50))),
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
-    SerdeTests.testVeloxBeanRoundTrip(split);
   }
 
-  @Test
-  public void testHiveConnectorSplitWithMissingFields() {
-    final ConnectorSplit split = new HiveConnectorSplit(
+  private static HiveConnectorSplit newSampleHiveSplitWithMissingFields() {
+    return new HiveConnectorSplit(
         "id-1",
         5,
         true,
@@ -128,6 +164,5 @@ public class ConnectorSerdeTest {
         ImmutableMap.of("info_key", "info_value"),
         Optional.of(new FileProperties(OptionalLong.empty(), OptionalLong.of(50))),
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
-    SerdeTests.testVeloxBeanRoundTrip(split);
   }
 }

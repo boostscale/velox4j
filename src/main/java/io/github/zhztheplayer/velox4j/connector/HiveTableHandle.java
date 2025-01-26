@@ -7,12 +7,13 @@ import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.filter.Filter;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
+import java.util.List;
 import java.util.Map;
 
 public class HiveTableHandle extends ConnectorTableHandle {
   private final String tableName;
   private final boolean filterPushdownEnabled;
-  private final Map<String, Filter> subfieldFilters;
+  private final List<SubfieldFilter> subfieldFilters;
   private final TypedExpr remainingFilter;
   private final RowType dataColumns;
   private final Map<String, String> tableParameters;
@@ -22,7 +23,7 @@ public class HiveTableHandle extends ConnectorTableHandle {
       @JsonProperty("connectorId") String connectorId,
       @JsonProperty("tableName") String tableName,
       @JsonProperty("filterPushdownEnabled") boolean filterPushdownEnabled,
-      @JsonProperty("subfieldFilters") Map<String, Filter> subfieldFilters,
+      @JsonProperty("subfieldFilters") List<SubfieldFilter> subfieldFilters,
       @JsonProperty("remainingFilter") TypedExpr remainingFilter,
       @JsonProperty("dataColumns") RowType dataColumns,
       @JsonProperty("tableParameters") Map<String, String> tableParameters) {
@@ -46,7 +47,7 @@ public class HiveTableHandle extends ConnectorTableHandle {
   }
 
   @JsonGetter("subfieldFilters")
-  public Map<String, Filter> getSubfieldFilters() {
+  public List<SubfieldFilter> getSubfieldFilters() {
     return subfieldFilters;
   }
 

@@ -35,19 +35,19 @@ public class ExprSerdeTest {
 
   @Test
   public void testCallTypedExpr() {
-    SerdeTests.testVeloxBeanRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt"));
+    SerdeTests.testVeloxBeanRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int"));
   }
 
   @Test
   public void testCastTypedExpr() {
-    final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
+    final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     SerdeTests.testVeloxBeanRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
   }
 
   @Test
   public void testConcatTypedExpr() {
-    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
-    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "randomReal");
+    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
+    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     SerdeTests.testVeloxBeanRoundTrip(ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2)));
   }
 
@@ -75,8 +75,8 @@ public class ExprSerdeTest {
 
   @Test
   public void testDereferenceTypedExpr() {
-    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
-    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "randomReal");
+    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
+    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
@@ -85,8 +85,8 @@ public class ExprSerdeTest {
 
   @Test
   public void testFieldAccessTypedExpr() {
-    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "randomInt");
-    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "randomReal");
+    final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
+    final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     final ConcatTypedExpr concat = ConcatTypedExpr.create(Arrays.asList("foo", "bar"), Arrays.asList(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
