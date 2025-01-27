@@ -2,7 +2,7 @@ package io.github.zhztheplayer.velox4j;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
-import io.github.zhztheplayer.velox4j.bean.VeloxBeans;
+import io.github.zhztheplayer.velox4j.bean.VeloxSerializables;
 import io.github.zhztheplayer.velox4j.variant.Variants;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,6 +27,6 @@ public class Velox4j {
   private static void initialize0() {
     JniWorkspace.getDefault().libLoader().load("lib/libvelox4j.so");
     Variants.registerAll();
-    VeloxBeans.registerAll();
+    VeloxSerializables.registerAll();
   }
 }

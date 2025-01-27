@@ -73,9 +73,9 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
   }
 
   public static class Modifier extends BeanDeserializerModifier {
-    private final Class<?> baseClass;
+    private final Class<? extends NativeBean> baseClass;
 
-    public Modifier(Class<?> baseClass) {
+    public Modifier(Class<? extends NativeBean> baseClass) {
       this.baseClass = baseClass;
     }
 

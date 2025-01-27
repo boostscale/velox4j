@@ -13,6 +13,6 @@ public class VariantSerdeTest {
 
   @Test
   public void testBooleanValue() {
-    SerdeTests.testNativeObjectRoundTrip(new BooleanValue(true));
+    SerdeTests.testNativeBeanRoundTrip(new BooleanValue(true));
   }
 }

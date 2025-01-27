@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class TypeSerdeTest {
@@ -19,108 +18,108 @@ public class TypeSerdeTest {
 
   @Test
   public void testBoolean() {
-    SerdeTests.testNativeObjectRoundTrip(new BooleanType());
+    SerdeTests.testNativeBeanRoundTrip(new BooleanType());
   }
 
   @Test
   public void testTinyInt() {
-    SerdeTests.testNativeObjectRoundTrip(new TinyIntType());
+    SerdeTests.testNativeBeanRoundTrip(new TinyIntType());
   }
 
   @Test
   public void testSmallInt() {
-    SerdeTests.testNativeObjectRoundTrip(new SmallIntType());
+    SerdeTests.testNativeBeanRoundTrip(new SmallIntType());
   }
 
   @Test
   public void testInteger() {
-    SerdeTests.testNativeObjectRoundTrip(new IntegerType());
+    SerdeTests.testNativeBeanRoundTrip(new IntegerType());
   }
 
   @Test
   public void testBigInt() {
-    SerdeTests.testNativeObjectRoundTrip(new BigIntType());
+    SerdeTests.testNativeBeanRoundTrip(new BigIntType());
   }
 
   @Test
   public void testHugeInt() {
-    SerdeTests.testNativeObjectRoundTrip(new HugeIntType());
+    SerdeTests.testNativeBeanRoundTrip(new HugeIntType());
   }
 
   @Test
   public void testRealType() {
-    SerdeTests.testNativeObjectRoundTrip(new RealType());
+    SerdeTests.testNativeBeanRoundTrip(new RealType());
   }
 
   @Test
   public void testDoubleType() {
-    SerdeTests.testNativeObjectRoundTrip(new DoubleType());
+    SerdeTests.testNativeBeanRoundTrip(new DoubleType());
   }
 
   @Test
   public void testVarcharType() {
-    SerdeTests.testNativeObjectRoundTrip(new VarcharType());
+    SerdeTests.testNativeBeanRoundTrip(new VarcharType());
   }
 
   @Test
   public void testVarbinaryType() {
-    SerdeTests.testNativeObjectRoundTrip(new VarbinaryType());
+    SerdeTests.testNativeBeanRoundTrip(new VarbinaryType());
   }
 
   @Test
   public void testTimestampType() {
-    SerdeTests.testNativeObjectRoundTrip(new TimestampType());
+    SerdeTests.testNativeBeanRoundTrip(new TimestampType());
   }
 
   @Test
   public void testArrayType() {
-    SerdeTests.testNativeObjectRoundTrip(ArrayType.create(new IntegerType()));
+    SerdeTests.testNativeBeanRoundTrip(ArrayType.create(new IntegerType()));
   }
 
   @Test
   public void testMapType() {
-    SerdeTests.testNativeObjectRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
+    SerdeTests.testNativeBeanRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
   }
 
   @Test
   public void testRowType() {
-    SerdeTests.testNativeObjectRoundTrip(new RowType(List.of("foo", "bar"),
+    SerdeTests.testNativeBeanRoundTrip(new RowType(List.of("foo", "bar"),
         List.of(new IntegerType(), new VarcharType())));
   }
 
   @Test
   public void testFunctionType() {
-    SerdeTests.testNativeObjectRoundTrip(FunctionType.create(List.of(
+    SerdeTests.testNativeBeanRoundTrip(FunctionType.create(List.of(
         new IntegerType(), new VarcharType()), new VarbinaryType()));
   }
 
   @Test
   public void testUnknownType() {
-    SerdeTests.testNativeObjectRoundTrip(new UnknownType());
+    SerdeTests.testNativeBeanRoundTrip(new UnknownType());
   }
 
   @Test
   public void testOpaqueType() {
-    Assert.assertThrows(VeloxException.class, () -> SerdeTests.testNativeObjectRoundTrip(new OpaqueType("foo")));
+    Assert.assertThrows(VeloxException.class, () -> SerdeTests.testNativeBeanRoundTrip(new OpaqueType("foo")));
   }
 
   @Test
   public void testDecimalType() {
-    SerdeTests.testNativeObjectRoundTrip(new DecimalType(10, 5));
+    SerdeTests.testNativeBeanRoundTrip(new DecimalType(10, 5));
   }
 
   @Test
   public void testIntervalDayTimeType() {
-    SerdeTests.testNativeObjectRoundTrip(new IntervalDayTimeType());
+    SerdeTests.testNativeBeanRoundTrip(new IntervalDayTimeType());
   }
 
   @Test
   public void testIntervalYearMonthType() {
-    SerdeTests.testNativeObjectRoundTrip(new IntervalYearMonthType());
+    SerdeTests.testNativeBeanRoundTrip(new IntervalYearMonthType());
   }
 
   @Test
   public void testDateType() {
-    SerdeTests.testNativeObjectRoundTrip(new DateType());
+    SerdeTests.testNativeBeanRoundTrip(new DateType());
   }
 }

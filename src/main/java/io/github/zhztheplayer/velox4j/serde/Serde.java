@@ -30,7 +30,7 @@ public final class Serde {
     return jsonMapper.build();
   }
 
-  public static void registerBaseClass(Class<?> baseClass) {
+  public static void registerBaseClass(Class<? extends NativeBean> baseClass) {
     JSON.registerModule(new SimpleModule().setDeserializerModifier(new PolymorphicDeserializer.Modifier(baseClass)));
     JSON.registerModule(new SimpleModule().setSerializerModifier(new PolymorphicSerializer.Modifier(baseClass)));
   }
@@ -39,7 +39,7 @@ public final class Serde {
     return JSON;
   }
 
-  public static String toJson(Object bean) {
+  public static String toJson(NativeBean bean) {
     try {
       return JSON.writer().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -47,7 +47,7 @@ public final class Serde {
     }
   }
 
-  public static String toPrettyJson(Object bean) {
+  public static String toPrettyJson(NativeBean bean) {
     try {
       return JSON.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -55,7 +55,7 @@ public final class Serde {
     }
   }
 
-  public static <T> T fromJson(String json, Class<T> valueType) {
+  public static <T extends NativeBean> T fromJson(String json, Class<T> valueType) {
     try {
       return JSON.reader().readValue(json, valueType);
     } catch (IOException e) {

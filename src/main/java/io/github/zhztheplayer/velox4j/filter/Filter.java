@@ -1,9 +1,9 @@
 package io.github.zhztheplayer.velox4j.filter;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 
-public abstract class Filter extends VeloxBean {
+public abstract class Filter extends VeloxSerializable {
   private final boolean nullAllowed;
   private final String kind;
 

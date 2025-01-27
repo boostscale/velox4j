@@ -1,16 +1,15 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SerdeRegistry {
-  private static final Map<Class<? extends VeloxBean>, List<KvPair>> CLASS_TO_KVS = new ConcurrentHashMap<>();
+  private static final Map<Class<? extends NativeBean>, List<KvPair>> CLASS_TO_KVS = new ConcurrentHashMap<>();
 
   private final Map<String, SerdeRegistryFactory> subFactories = new HashMap<>();
-  private final Map<String, Class<? extends VeloxBean>> classes = new HashMap<>();
+  private final Map<String, Class<? extends NativeBean>> classes = new HashMap<>();
   private final List<KvPair> kvs;
   private final String key;
   private final String prefixAndKey;
@@ -44,7 +43,7 @@ public class SerdeRegistry {
     }
   }
 
-  public void registerClass(String value, Class<? extends VeloxBean> clazz) {
+  public void registerClass(String value, Class<? extends NativeBean> clazz) {
     synchronized (this) {
       checkDup(value);
       classes.put(value, clazz);

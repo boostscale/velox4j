@@ -24,18 +24,18 @@ public class PlanNodeSerdeTest {
   @Test
   public void testSortOrder() {
     final SortOrder order = new SortOrder(true, true);
-    SerdeTests.testJavaObjectRoundTrip(order);
+    SerdeTests.testJavaBeanRoundTrip(order);
   }
 
   @Test
   public void testAggregateStep() {
-    SerdeTests.testJavaObjectRoundTrip(AggregateStep.INTERMEDIATE);
+    SerdeTests.testJavaBeanRoundTrip(AggregateStep.INTERMEDIATE);
   }
 
   @Test
   public void testAggregate() {
     final Aggregate aggregate = SerdeTests.newSampleAggregate();
-    SerdeTests.testJavaObjectRoundTrip(aggregate);
+    SerdeTests.testJavaBeanRoundTrip(aggregate);
   }
 
   @Test
@@ -43,14 +43,14 @@ public class PlanNodeSerdeTest {
     final JniApi jniApi = JniApi.create();
     final PlanNode values = ValuesNode.create(jniApi, "id-1",
         List.of(SerdeTests.newSampleRowVector(jniApi)), true, 1);
-    SerdeTests.testNativeObjectRoundTrip(values);
+    SerdeTests.testNativeBeanRoundTrip(values);
     jniApi.close();
   }
 
   @Test
   public void testTableScanNode() {
     final PlanNode scan = SerdeTests.newSampleTableScanNode();
-    SerdeTests.testNativeObjectRoundTrip(scan);
+    SerdeTests.testNativeBeanRoundTrip(scan);
   }
 
   @Test
@@ -69,6 +69,6 @@ public class PlanNodeSerdeTest {
         FieldAccessTypedExpr.create(new IntegerType(), "foo"),
         List.of(0)
     );
-    SerdeTests.testNativeObjectRoundTrip(aggregationNode);
+    SerdeTests.testNativeBeanRoundTrip(aggregationNode);
   }
 }

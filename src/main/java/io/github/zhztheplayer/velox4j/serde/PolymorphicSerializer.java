@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import com.fasterxml.jackson.databind.ser.std.ToEmptyObjectSerializer;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,9 +47,9 @@ public final class PolymorphicSerializer {
   }
 
   public static class Modifier extends BeanSerializerModifier {
-    private final Class<?> baseClass;
+    private final Class<? extends NativeBean> baseClass;
 
-    public Modifier(Class<?> baseClass) {
+    public Modifier(Class<? extends NativeBean> baseClass) {
       this.baseClass = baseClass;
     }
 

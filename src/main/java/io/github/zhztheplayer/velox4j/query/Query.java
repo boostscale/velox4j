@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 
 import java.util.List;
 
-public class Query extends VeloxBean {
+public class Query extends VeloxSerializable {
   private final PlanNode plan;
   private final List<BoundSplit> boundSplits;
 

@@ -41,16 +41,16 @@ import io.github.zhztheplayer.velox4j.type.UnknownType;
 import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
 
-public final class VeloxBeans {
+public final class VeloxSerializables {
   private static final SerdeRegistry ROOT_REGISTRY = SerdeRegistryFactory
-      .createForBaseClass(VeloxBean.class).key("name");
+      .createForBaseClass(VeloxSerializable.class).key("name");
 
-  private VeloxBeans() {
+  private VeloxSerializables() {
 
   }
 
   public static void registerAll() {
-    Serde.registerBaseClass(VeloxBean.class);
+    Serde.registerBaseClass(VeloxSerializable.class);
     registerTypes();
     registerExprs();
     registerConnectors();

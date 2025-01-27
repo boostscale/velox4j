@@ -14,6 +14,6 @@ public class FilterSerdeTest {
 
   @Test
   public void testAlwaysTrue() {
-    SerdeTests.testNativeObjectRoundTrip(new AlwaysTrue());
+    SerdeTests.testNativeBeanRoundTrip(new AlwaysTrue());
   }
 }

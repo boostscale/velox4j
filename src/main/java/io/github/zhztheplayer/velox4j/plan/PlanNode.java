@@ -2,11 +2,11 @@ package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
+import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 
 import java.util.List;
 
-public abstract class PlanNode extends VeloxBean {
+public abstract class PlanNode extends VeloxSerializable {
   private final String id;
 
   protected PlanNode(String id) {

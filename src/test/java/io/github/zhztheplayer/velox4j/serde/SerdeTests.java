@@ -2,7 +2,6 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
@@ -19,6 +18,7 @@ import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
@@ -48,24 +48,27 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public final class SerdeTests {
-  public static String testNativeObjectRoundTrip(Object inObj) {
+  public static String testNativeBeanRoundTrip(NativeBean inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
-      final Object outObj = Serde.fromJson(outJson, inObj.getClass());
+      final NativeBean outObj = Serde.fromJson(outJson, inObj.getClass());
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);
       return outJson2;
     }
   }
 
-  public static String testNativeObjectRoundTrip(String inJson, Class<?> valueType) {
-    final Object inObj = Serde.fromJson(inJson, valueType);
-    return testNativeObjectRoundTrip(inObj);
+  public static String testNativeBeanRoundTrip(String inJson, Class<? extends NativeBean> valueType) {
+    final NativeBean inObj = Serde.fromJson(inJson, valueType);
+    return testNativeBeanRoundTrip(inObj);
   }
 
-  public static String testJavaObjectRoundTrip(Object inObj) {
+  public static String testJavaBeanRoundTrip(Object inObj) {
     try {
+      if (inObj instanceof NativeBean) {
+        throw new VeloxException("Cannot round trip NativeBean");
+      }
       final Class<?> clazz = inObj.getClass();
       final ObjectMapper jsonMapper = Serde.jsonMapper();
       final String inJson = jsonMapper.writeValueAsString(inObj);
