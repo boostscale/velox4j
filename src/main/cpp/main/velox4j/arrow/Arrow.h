@@ -23,12 +23,12 @@
 
 namespace velox4j {
 using namespace facebook::velox;
-void exportBaseVectorAsArrow(
+void fromBaseVectorToArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
 
-VectorPtr importArrowAsBaseVector(
+VectorPtr fromArrowToBaseVector(
     memory::MemoryPool* pool,
     ArrowSchema* cSchema,
     ArrowArray* cArray);

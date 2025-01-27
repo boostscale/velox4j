@@ -95,7 +95,7 @@ jlong arrowToBaseVector(
   auto pool = memory::memoryManager()->addLeafPool(
       fmt::format("Arrow Import Memory Pool - ID {}", id));
   session->objectStore()->save(pool);
-  auto vector = importArrowAsBaseVector(
+  auto vector = fromArrowToBaseVector(
       pool.get(),
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
@@ -111,7 +111,7 @@ void baseVectorToArrow(
     jlong cArray) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  exportBaseVectorAsArrow(
+  fromBaseVectorToArrow(
       vector,
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
@@ -262,14 +262,14 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       NULL);
   addNativeMethod(
-      "arrowToBaseVector",
+      "fromArrowToBaseVector",
       (void*)arrowToBaseVector,
       kTypeLong,
       kTypeLong,
       kTypeLong,
       NULL);
   addNativeMethod(
-      "baseVectorToArrow",
+      "fromBaseVectorToArrow",
       (void*)baseVectorToArrow,
       kTypeVoid,
       kTypeLong,

@@ -46,7 +46,7 @@ ArrowOptions makeOptions() {
 }
 } // namespace
 
-void exportBaseVectorAsArrow(
+void fromBaseVectorToArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
@@ -57,7 +57,7 @@ void exportBaseVectorAsArrow(
   exportToArrow(vector, *cArray, vector->pool(), options);
 }
 
-VectorPtr importArrowAsBaseVector(
+VectorPtr fromArrowToBaseVector(
     memory::MemoryPool* pool,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
