@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 
 import java.util.List;
@@ -19,6 +18,5 @@ public abstract class PlanNode extends VeloxSerializable {
   }
 
   @JsonGetter("sources")
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   protected abstract List<PlanNode> getSources();
 }

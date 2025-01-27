@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.expression;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 import io.github.zhztheplayer.velox4j.type.Type;
 
@@ -23,7 +22,6 @@ public abstract class TypedExpr extends VeloxSerializable {
   }
 
   @JsonGetter("inputs")
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public List<TypedExpr> getInputs() {
     return inputs;
   }
