@@ -15,5 +15,12 @@ public class Variants {
   public static void registerAll() {
     Serde.registerBaseClass(Variant.class);
     ROOT_REGISTRY.registerClass("BOOLEAN", BooleanValue.class);
+    ROOT_REGISTRY.registerClass("TINYINT", TinyIntValue.class);
+    ROOT_REGISTRY.registerClass("SMALLINT", SmallIntValue.class);
+    ROOT_REGISTRY.registerClass("INTEGER", IntegerValue.class);
+    ROOT_REGISTRY.registerClass("BIGINT", BigIntValue.class);
+    ROOT_REGISTRY.registerClass("HUGEINT", HugeIntValue.class);
+    ROOT_REGISTRY.registerClass("REAL", RealValue.class);
+    ROOT_REGISTRY.registerClass("DOUBLE", DoubleValue.class);
   }
 }
