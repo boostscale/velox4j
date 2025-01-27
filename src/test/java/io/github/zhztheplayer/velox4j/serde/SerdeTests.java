@@ -70,7 +70,7 @@ public final class SerdeTests {
   public static String testVariantRoundTrip(Variant inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = jniApi.deserializeAndSerialize(inJson);
+      final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);

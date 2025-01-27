@@ -13,6 +13,6 @@ public class VariantSerdeTest {
 
   @Test
   public void testBooleanValue() {
-//    SerdeTests.testVariantRoundTrip(new BooleanValue(true));
+    SerdeTests.testVariantRoundTrip(new BooleanValue(true));
   }
 }
