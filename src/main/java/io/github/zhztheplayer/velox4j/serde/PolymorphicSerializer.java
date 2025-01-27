@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.bean;
+package io.github.zhztheplayer.velox4j.serde;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -9,13 +9,13 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import com.fasterxml.jackson.databind.ser.std.ToEmptyObjectSerializer;
-import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
+import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 
 import java.io.IOException;
 import java.util.List;
 
-public final class VeloxBeanSerializer {
-  private VeloxBeanSerializer() {
+public final class PolymorphicSerializer {
+  private PolymorphicSerializer() {
   }
 
   private static class EmptyBeanSerializer extends JsonSerializer<Object> {
@@ -48,9 +48,15 @@ public final class VeloxBeanSerializer {
   }
 
   public static class Modifier extends BeanSerializerModifier {
+    private final Class<?> baseClass;
+
+    public Modifier(Class<?> baseClass) {
+      this.baseClass = baseClass;
+    }
+
     @Override
     public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-      if (VeloxBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
+      if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
         if (serializer instanceof ToEmptyObjectSerializer) {
           return new EmptyBeanSerializer();
         }

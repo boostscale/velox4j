@@ -1,12 +1,24 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SerdeRegistryFactory {
-  private static final SerdeRegistryFactory INSTANCE = new SerdeRegistryFactory(Collections.emptyList());
+  private static final Map<Class<?>, SerdeRegistryFactory> INSTANCES = new ConcurrentHashMap<>();
 
-  public static SerdeRegistryFactory get() {
-    return INSTANCE;
+  public static SerdeRegistryFactory createForBaseClass(Class<?> clazz) {
+    return INSTANCES.compute(clazz, (k, v) -> {
+      if (v != null) {
+        throw new VeloxException("SerdeRegistryFactory already exists for " + clazz);
+      }
+      return new SerdeRegistryFactory(Collections.emptyList());
+    });
+  }
+
+  public static SerdeRegistryFactory getForBaseClass(Class<?> clazz) {
+    return INSTANCES.get(clazz);
   }
 
   private final Map<String, SerdeRegistry> registries = new HashMap<>();

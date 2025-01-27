@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.bean;
 
+import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
@@ -17,11 +18,31 @@ import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
-import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
-import io.github.zhztheplayer.velox4j.type.*;
+import io.github.zhztheplayer.velox4j.type.ArrayType;
+import io.github.zhztheplayer.velox4j.type.BigIntType;
+import io.github.zhztheplayer.velox4j.type.BooleanType;
+import io.github.zhztheplayer.velox4j.type.DateType;
+import io.github.zhztheplayer.velox4j.type.DecimalType;
+import io.github.zhztheplayer.velox4j.type.DoubleType;
+import io.github.zhztheplayer.velox4j.type.FunctionType;
+import io.github.zhztheplayer.velox4j.type.HugeIntType;
+import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.type.IntervalDayTimeType;
+import io.github.zhztheplayer.velox4j.type.IntervalYearMonthType;
+import io.github.zhztheplayer.velox4j.type.MapType;
+import io.github.zhztheplayer.velox4j.type.OpaqueType;
+import io.github.zhztheplayer.velox4j.type.RealType;
+import io.github.zhztheplayer.velox4j.type.RowType;
+import io.github.zhztheplayer.velox4j.type.SmallIntType;
+import io.github.zhztheplayer.velox4j.type.TimestampType;
+import io.github.zhztheplayer.velox4j.type.TinyIntType;
+import io.github.zhztheplayer.velox4j.type.UnknownType;
+import io.github.zhztheplayer.velox4j.type.VarbinaryType;
+import io.github.zhztheplayer.velox4j.type.VarcharType;
 
 public final class VeloxBeans {
-  private static final SerdeRegistry ROOT_REGISTRY = SerdeRegistryFactory.get().key("name");
+  private static final SerdeRegistry ROOT_REGISTRY = SerdeRegistryFactory
+      .createForBaseClass(VeloxBean.class).key("name");
 
   private VeloxBeans() {
 
