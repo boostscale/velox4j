@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /*
- * The classes marked by this annotation can be accessed from native code.
+ * The methods marked by this annotation can be accessed from native code.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
