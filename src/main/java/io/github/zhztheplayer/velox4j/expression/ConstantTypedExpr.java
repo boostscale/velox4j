@@ -43,13 +43,11 @@ public class ConstantTypedExpr extends TypedExpr {
   }
 
   @JsonGetter("value")
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public Variant getValue() {
     return value;
   }
 
   @JsonGetter("valueVector")
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String getSerializedVector() {
     return serializedVector;
   }
