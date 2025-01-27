@@ -66,24 +66,24 @@ public class ConnectorSerdeTest {
   @Test
   public void testHiveColumnHandle() {
     final ColumnHandle handle = SerdeTests.newSampleHiveColumnHandle();
-    SerdeTests.testNativeBeanRoundTrip(handle);
+    SerdeTests.testVeloxSerializableRoundTrip(handle);
   }
 
   @Test
   public void testHiveConnectorSplit() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplit();
-    SerdeTests.testNativeBeanRoundTrip(split);
+    SerdeTests.testVeloxSerializableRoundTrip(split);
   }
 
   @Test
   public void testHiveConnectorSplitWithMissingFields() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplitWithMissingFields();
-    SerdeTests.testNativeBeanRoundTrip(split);
+    SerdeTests.testVeloxSerializableRoundTrip(split);
   }
 
   @Test
   public void testHiveTableHandle() {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
-    SerdeTests.testNativeBeanRoundTrip(handle);
+    SerdeTests.testVeloxSerializableRoundTrip(handle);
   }
 }

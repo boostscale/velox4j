@@ -14,5 +14,6 @@ public class Variants {
 
   public static void registerAll() {
     Serde.registerBaseClass(Variant.class);
+    ROOT_REGISTRY.registerClass("BOOLEAN", BooleanValue.class);
   }
 }

@@ -18,108 +18,108 @@ public class TypeSerdeTest {
 
   @Test
   public void testBoolean() {
-    SerdeTests.testNativeBeanRoundTrip(new BooleanType());
+    SerdeTests.testVeloxSerializableRoundTrip(new BooleanType());
   }
 
   @Test
   public void testTinyInt() {
-    SerdeTests.testNativeBeanRoundTrip(new TinyIntType());
+    SerdeTests.testVeloxSerializableRoundTrip(new TinyIntType());
   }
 
   @Test
   public void testSmallInt() {
-    SerdeTests.testNativeBeanRoundTrip(new SmallIntType());
+    SerdeTests.testVeloxSerializableRoundTrip(new SmallIntType());
   }
 
   @Test
   public void testInteger() {
-    SerdeTests.testNativeBeanRoundTrip(new IntegerType());
+    SerdeTests.testVeloxSerializableRoundTrip(new IntegerType());
   }
 
   @Test
   public void testBigInt() {
-    SerdeTests.testNativeBeanRoundTrip(new BigIntType());
+    SerdeTests.testVeloxSerializableRoundTrip(new BigIntType());
   }
 
   @Test
   public void testHugeInt() {
-    SerdeTests.testNativeBeanRoundTrip(new HugeIntType());
+    SerdeTests.testVeloxSerializableRoundTrip(new HugeIntType());
   }
 
   @Test
   public void testRealType() {
-    SerdeTests.testNativeBeanRoundTrip(new RealType());
+    SerdeTests.testVeloxSerializableRoundTrip(new RealType());
   }
 
   @Test
   public void testDoubleType() {
-    SerdeTests.testNativeBeanRoundTrip(new DoubleType());
+    SerdeTests.testVeloxSerializableRoundTrip(new DoubleType());
   }
 
   @Test
   public void testVarcharType() {
-    SerdeTests.testNativeBeanRoundTrip(new VarcharType());
+    SerdeTests.testVeloxSerializableRoundTrip(new VarcharType());
   }
 
   @Test
   public void testVarbinaryType() {
-    SerdeTests.testNativeBeanRoundTrip(new VarbinaryType());
+    SerdeTests.testVeloxSerializableRoundTrip(new VarbinaryType());
   }
 
   @Test
   public void testTimestampType() {
-    SerdeTests.testNativeBeanRoundTrip(new TimestampType());
+    SerdeTests.testVeloxSerializableRoundTrip(new TimestampType());
   }
 
   @Test
   public void testArrayType() {
-    SerdeTests.testNativeBeanRoundTrip(ArrayType.create(new IntegerType()));
+    SerdeTests.testVeloxSerializableRoundTrip(ArrayType.create(new IntegerType()));
   }
 
   @Test
   public void testMapType() {
-    SerdeTests.testNativeBeanRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
+    SerdeTests.testVeloxSerializableRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
   }
 
   @Test
   public void testRowType() {
-    SerdeTests.testNativeBeanRoundTrip(new RowType(List.of("foo", "bar"),
+    SerdeTests.testVeloxSerializableRoundTrip(new RowType(List.of("foo", "bar"),
         List.of(new IntegerType(), new VarcharType())));
   }
 
   @Test
   public void testFunctionType() {
-    SerdeTests.testNativeBeanRoundTrip(FunctionType.create(List.of(
+    SerdeTests.testVeloxSerializableRoundTrip(FunctionType.create(List.of(
         new IntegerType(), new VarcharType()), new VarbinaryType()));
   }
 
   @Test
   public void testUnknownType() {
-    SerdeTests.testNativeBeanRoundTrip(new UnknownType());
+    SerdeTests.testVeloxSerializableRoundTrip(new UnknownType());
   }
 
   @Test
   public void testOpaqueType() {
-    Assert.assertThrows(VeloxException.class, () -> SerdeTests.testNativeBeanRoundTrip(new OpaqueType("foo")));
+    Assert.assertThrows(VeloxException.class, () -> SerdeTests.testVeloxSerializableRoundTrip(new OpaqueType("foo")));
   }
 
   @Test
   public void testDecimalType() {
-    SerdeTests.testNativeBeanRoundTrip(new DecimalType(10, 5));
+    SerdeTests.testVeloxSerializableRoundTrip(new DecimalType(10, 5));
   }
 
   @Test
   public void testIntervalDayTimeType() {
-    SerdeTests.testNativeBeanRoundTrip(new IntervalDayTimeType());
+    SerdeTests.testVeloxSerializableRoundTrip(new IntervalDayTimeType());
   }
 
   @Test
   public void testIntervalYearMonthType() {
-    SerdeTests.testNativeBeanRoundTrip(new IntervalYearMonthType());
+    SerdeTests.testVeloxSerializableRoundTrip(new IntervalYearMonthType());
   }
 
   @Test
   public void testDateType() {
-    SerdeTests.testNativeBeanRoundTrip(new DateType());
+    SerdeTests.testVeloxSerializableRoundTrip(new DateType());
   }
 }

@@ -43,14 +43,14 @@ public class PlanNodeSerdeTest {
     final JniApi jniApi = JniApi.create();
     final PlanNode values = ValuesNode.create(jniApi, "id-1",
         List.of(SerdeTests.newSampleRowVector(jniApi)), true, 1);
-    SerdeTests.testNativeBeanRoundTrip(values);
+    SerdeTests.testVeloxSerializableRoundTrip(values);
     jniApi.close();
   }
 
   @Test
   public void testTableScanNode() {
     final PlanNode scan = SerdeTests.newSampleTableScanNode();
-    SerdeTests.testNativeBeanRoundTrip(scan);
+    SerdeTests.testVeloxSerializableRoundTrip(scan);
   }
 
   @Test
@@ -69,6 +69,6 @@ public class PlanNodeSerdeTest {
         FieldAccessTypedExpr.create(new IntegerType(), "foo"),
         List.of(0)
     );
-    SerdeTests.testNativeBeanRoundTrip(aggregationNode);
+    SerdeTests.testVeloxSerializableRoundTrip(aggregationNode);
   }
 }

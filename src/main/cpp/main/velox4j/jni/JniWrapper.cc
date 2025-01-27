@@ -170,10 +170,7 @@ jlong baseVectorWrapInConstant(
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorNewRef(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong vid) {
+jlong baseVectorNewRef(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   return sessionOf(env, javaThis)->objectStore()->save(vector);
@@ -199,6 +196,22 @@ jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   auto deserialized =
       ISerializable::deserialize<ISerializable>(dynamic, serdePool.get());
   auto serializedDynamic = deserialized->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring
+deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
+  const uint32_t id = nextId++;
+  auto serdePool = memory::memoryManager()->addLeafPool(
+      fmt::format("Serde Memory Pool - ID {}", id));
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized = variant::create(dynamic);
+  auto serializedDynamic = deserialized.serialize();
   auto serializeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(serializeJson.data());
   JNI_METHOD_END(nullptr)
@@ -282,14 +295,16 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       NULL);
   addNativeMethod(
-      "baseVectorNewRef",
-      (void*)baseVectorNewRef,
-      kTypeLong,
-      kTypeLong,
-      NULL);
+      "baseVectorNewRef", (void*)baseVectorNewRef, kTypeLong, kTypeLong, NULL);
   addNativeMethod(
       "deserializeAndSerialize",
       (void*)deserializeAndSerialize,
+      kTypeString,
+      kTypeString,
+      NULL);
+  addNativeMethod(
+      "deserializeAndSerializeVariant",
+      (void*)deserializeAndSerializeVariant,
       kTypeString,
       kTypeString,
       NULL);

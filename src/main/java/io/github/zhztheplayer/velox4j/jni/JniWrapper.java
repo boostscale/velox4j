@@ -56,4 +56,5 @@ public final class JniWrapper {
 
   // For tests.
   native String deserializeAndSerialize(String json);
+  native String deserializeAndSerializeVariant(String json);
 }

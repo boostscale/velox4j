@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -35,6 +36,7 @@ import io.github.zhztheplayer.velox4j.type.MapType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
+import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.IntVector;
@@ -48,20 +50,32 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public final class SerdeTests {
-  public static String testNativeBeanRoundTrip(NativeBean inObj) {
+  public static String testVeloxSerializableRoundTrip(VeloxSerializable inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
-      final NativeBean outObj = Serde.fromJson(outJson, inObj.getClass());
+      final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);
       return outJson2;
     }
   }
 
-  public static String testNativeBeanRoundTrip(String inJson, Class<? extends NativeBean> valueType) {
-    final NativeBean inObj = Serde.fromJson(inJson, valueType);
-    return testNativeBeanRoundTrip(inObj);
+  public static String testVeloxSerializableRoundTrip(String inJson,
+      Class<? extends VeloxSerializable> valueType) {
+    final VeloxSerializable inObj = Serde.fromJson(inJson, valueType);
+    return testVeloxSerializableRoundTrip(inObj);
+  }
+
+  public static String testVariantRoundTrip(Variant inObj) {
+    try (final JniApi jniApi = JniApi.create()) {
+      final String inJson = Serde.toPrettyJson(inObj);
+      final String outJson = jniApi.deserializeAndSerialize(inJson);
+      final Variant outObj = Serde.fromJson(outJson, Variant.class);
+      final String outJson2 = Serde.toPrettyJson(outObj);
+      Assert.assertEquals(inJson, outJson2);
+      return outJson2;
+    }
   }
 
   public static String testJavaBeanRoundTrip(Object inObj) {

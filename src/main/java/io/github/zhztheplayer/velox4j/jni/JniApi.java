@@ -107,6 +107,10 @@ public final class JniApi implements CppObject {
     return jni.deserializeAndSerialize(json);
   }
 
+  public String deserializeAndSerializeVariant(String json) {
+    return jni.deserializeAndSerializeVariant(json);
+  }
+
   @Override
   public JniApi jniApi() {
     return this;
