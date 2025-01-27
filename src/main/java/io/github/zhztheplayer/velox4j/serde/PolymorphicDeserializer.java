@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.stream.Streams;
 
@@ -82,7 +81,7 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
 
     @Override
     public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-      if (VeloxBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
+      if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
         if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
           return new PolymorphicDeserializer(baseClass);
