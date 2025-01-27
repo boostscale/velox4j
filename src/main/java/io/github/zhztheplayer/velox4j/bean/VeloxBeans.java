@@ -16,6 +16,7 @@ import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.query.Query;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
@@ -49,6 +50,7 @@ public final class VeloxBeans {
   }
 
   public static void registerAll() {
+    Serde.registerBaseClass(VeloxBean.class);
     registerTypes();
     registerExprs();
     registerConnectors();

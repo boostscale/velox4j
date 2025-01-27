@@ -17,7 +17,7 @@ import java.io.IOException;
 public final class Serde {
   private static final ObjectMapper JSON = newVeloxJsonMapper();
 
-  static ObjectMapper newVeloxJsonMapper() {
+  private static ObjectMapper newVeloxJsonMapper() {
     final JsonMapper.Builder jsonMapper = JsonMapper.builder();
     jsonMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     jsonMapper.enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION);
@@ -28,9 +28,16 @@ public final class Serde {
     jsonMapper.disable(MapperFeature.AUTO_DETECT_CREATORS);
     jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     jsonMapper.addModule(new Jdk8Module());
-    jsonMapper.addModule(new SimpleModule().setDeserializerModifier(new PolymorphicDeserializer.Modifier(VeloxBean.class)));
-    jsonMapper.addModule(new SimpleModule().setSerializerModifier(new PolymorphicSerializer.Modifier(VeloxBean.class)));
     return jsonMapper.build();
+  }
+
+  public static void registerBaseClass(Class<?> baseClass) {
+    JSON.registerModule(new SimpleModule().setDeserializerModifier(new PolymorphicDeserializer.Modifier(baseClass)));
+    JSON.registerModule(new SimpleModule().setSerializerModifier(new PolymorphicSerializer.Modifier(baseClass)));
+  }
+
+  public static ObjectMapper jsonMapper() {
+    return JSON;
   }
 
   public static String toJson(VeloxBean bean) {

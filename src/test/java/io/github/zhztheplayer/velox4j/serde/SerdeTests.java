@@ -70,7 +70,7 @@ public final class SerdeTests {
         "inObj should not be VeloxBean");
     try {
       final Class<?> clazz = inObj.getClass();
-      final ObjectMapper jsonMapper = Serde.newVeloxJsonMapper();
+      final ObjectMapper jsonMapper = Serde.jsonMapper();
       final String inJson = jsonMapper.writeValueAsString(inObj);
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
