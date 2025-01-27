@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.variant;
 
+import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
 
@@ -11,7 +12,7 @@ public class Variants {
 
   }
 
-  public void registerAll() {
-
+  public static void registerAll() {
+    Serde.registerBaseClass(Variant.class);
   }
 }
