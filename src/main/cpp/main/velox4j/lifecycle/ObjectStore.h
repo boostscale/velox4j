@@ -47,7 +47,7 @@ public:
  static std::unique_ptr<ObjectStore> create() {
    static std::mutex mtx;
    std::lock_guard<std::mutex> lock(mtx);
-   StoreHandle nextId = stores().nextId();
+   StoreHandle nextId = safeCast<StoreHandle>(stores().nextId());
    auto store = std::unique_ptr<ObjectStore>(new ObjectStore(nextId));
    StoreHandle storeId = safeCast<StoreHandle>(stores().insert(store.get()));
    VELOX_CHECK(storeId == nextId, "Store ID mismatched, this should not happen");

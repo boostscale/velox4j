@@ -17,8 +17,6 @@
 
 package io.github.zhztheplayer.velox4j.jni;
 
-import io.github.zhztheplayer.velox4j.data.VectorEncoding;
-
 public final class JniWrapper {
   public static JniWrapper create() {
     return new JniWrapper();

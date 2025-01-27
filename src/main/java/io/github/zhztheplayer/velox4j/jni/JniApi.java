@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 import io.github.zhztheplayer.velox4j.serde.Serde;
@@ -13,6 +14,9 @@ import org.apache.arrow.c.ArrowSchema;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
  * developers with providing objective representations in Java to caller.
  */
 public final class JniApi implements CppObject {
+
   public static JniApi create() {
     return new JniApi();
   }
@@ -42,11 +47,28 @@ public final class JniApi implements CppObject {
   }
 
   public RowVector upIteratorNext(UpIterator itr) {
-    return new RowVector(this, jni.upIteratorNext(itr.id()));
+    return rowVectorWrap(jni.upIteratorNext(itr.id()));
+  }
+
+  private BaseVector baseVectorWrap(long id) {
+    // TODO Add JNI API `isRowVector` for performance.
+    final VectorEncoding encoding = VectorEncoding.valueOf(jni.baseVectorGetEncoding(id));
+    if (encoding == VectorEncoding.ROW) {
+      return new RowVector(this, id);
+    }
+    return new BaseVector(this, id);
+  }
+
+  private RowVector rowVectorWrap(long id) {
+    final BaseVector vector = baseVectorWrap(id);
+    if (vector instanceof RowVector) {
+      return ((RowVector) vector);
+    }
+    throw new VeloxException("Expected RowVector, got " + vector.getClass().getName());
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return new BaseVector(this, jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
   }
 
   public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
@@ -59,13 +81,7 @@ public final class JniApi implements CppObject {
 
   public List<BaseVector> baseVectorDeserialize(String serialized) {
     return Arrays.stream(jni.baseVectorDeserialize(serialized))
-        .mapToObj(id -> {
-          final VectorEncoding encoding = VectorEncoding.valueOf(jni.baseVectorGetEncoding(id));
-          if (encoding == VectorEncoding.ROW) {
-            return new RowVector(this, id);
-          }
-          return new BaseVector(this, id);
-        })
+        .mapToObj(this::baseVectorWrap)
         .collect(Collectors.toList());
   }
 
@@ -75,7 +91,7 @@ public final class JniApi implements CppObject {
   }
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
-    return new BaseVector(this, jni.baseVectorWrapInConstant(vector.id(), length, index));
+    return baseVectorWrap(jni.baseVectorWrapInConstant(vector.id(), length, index));
   }
 
   public VectorEncoding baseVectorGetEncoding(BaseVector vector) {
@@ -83,9 +99,7 @@ public final class JniApi implements CppObject {
   }
 
   public RowVector baseVectorAsRowVector(BaseVector vector) {
-    Preconditions.checkArgument(baseVectorGetEncoding(vector) == VectorEncoding.ROW,
-        "Not a row vector");
-    return new RowVector(this, jni.baseVectorNewRef(vector.id()));
+    return rowVectorWrap(jni.baseVectorNewRef(vector.id()));
   }
 
   // For tests.
