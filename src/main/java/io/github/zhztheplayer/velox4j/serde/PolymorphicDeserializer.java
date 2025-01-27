@@ -43,7 +43,7 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
 
   private Object deserializeWithRegistry(JsonParser p, DeserializationContext ctxt, SerdeRegistry registry, ObjectNode objectNode) {
     final String key = registry.key();
-    final String value = objectNode.remove(key).asText();
+    final String value = objectNode.get(key).asText();
     Preconditions.checkArgument(registry.contains(value), "Value %s not registered in registry: %s", value, registry.prefixAndKey());
     if (registry.isFactory(value)) {
       final SerdeRegistryFactory rf = registry.getFactory(value);
