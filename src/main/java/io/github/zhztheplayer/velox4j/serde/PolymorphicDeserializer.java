@@ -21,9 +21,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PolymorphicDeserializer extends JsonDeserializer<Object> {
-  private final Class<?> baseClass;
+  private final Class<? extends NativeBean> baseClass;
 
-  private PolymorphicDeserializer(Class<?> baseClass) {
+  private PolymorphicDeserializer(Class<? extends NativeBean> baseClass) {
     this.baseClass = baseClass;
   }
 

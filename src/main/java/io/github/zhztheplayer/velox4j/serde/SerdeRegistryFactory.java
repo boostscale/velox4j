@@ -6,9 +6,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SerdeRegistryFactory {
-  private static final Map<Class<?>, SerdeRegistryFactory> INSTANCES = new ConcurrentHashMap<>();
+  private static final Map<Class<? extends NativeBean>, SerdeRegistryFactory> INSTANCES = new ConcurrentHashMap<>();
 
-  public static SerdeRegistryFactory createForBaseClass(Class<?> clazz) {
+  public static SerdeRegistryFactory createForBaseClass(Class<? extends NativeBean> clazz) {
     return INSTANCES.compute(clazz, (k, v) -> {
       if (v != null) {
         throw new VeloxException("SerdeRegistryFactory already exists for " + clazz);
@@ -17,7 +17,7 @@ public class SerdeRegistryFactory {
     });
   }
 
-  public static SerdeRegistryFactory getForBaseClass(Class<?> clazz) {
+  public static SerdeRegistryFactory getForBaseClass(Class<? extends NativeBean> clazz) {
     return INSTANCES.get(clazz);
   }
 
