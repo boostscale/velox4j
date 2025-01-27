@@ -262,14 +262,14 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       NULL);
   addNativeMethod(
-      "fromArrowToBaseVector",
+      "arrowToBaseVector",
       (void*)arrowToBaseVector,
       kTypeLong,
       kTypeLong,
       kTypeLong,
       NULL);
   addNativeMethod(
-      "fromBaseVectorToArrow",
+      "baseVectorToArrow",
       (void*)baseVectorToArrow,
       kTypeVoid,
       kTypeLong,
