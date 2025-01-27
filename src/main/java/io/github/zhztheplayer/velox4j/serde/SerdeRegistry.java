@@ -1,7 +1,9 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,6 +46,8 @@ public class SerdeRegistry {
   }
 
   public void registerClass(String value, Class<? extends NativeBean> clazz) {
+    Preconditions.checkArgument(!Modifier.isAbstract(clazz.getModifiers()),
+        "Cannot register abstract class: " + clazz);
     synchronized (this) {
       checkDup(value);
       classes.put(value, clazz);
