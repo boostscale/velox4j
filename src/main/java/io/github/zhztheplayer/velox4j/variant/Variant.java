@@ -5,4 +5,5 @@ package io.github.zhztheplayer.velox4j.variant;
  * deserialized from JSON.
  */
 public abstract class Variant {
+
 }

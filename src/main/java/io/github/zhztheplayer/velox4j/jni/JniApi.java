@@ -87,7 +87,7 @@ public final class JniApi implements CppObject {
 
   public Type baseVectorGetType(BaseVector vector) {
     String typeJson = jni.baseVectorGetType(vector.id());
-    return (Type) Serde.fromJson(typeJson);
+    return (Type) Serde.fromJson(typeJson, Type.class);
   }
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {

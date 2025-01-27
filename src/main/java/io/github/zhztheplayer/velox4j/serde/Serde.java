@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
@@ -40,7 +39,7 @@ public final class Serde {
     return JSON;
   }
 
-  public static String toJson(VeloxBean bean) {
+  public static String toJson(Object bean) {
     try {
       return JSON.writer().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -48,7 +47,7 @@ public final class Serde {
     }
   }
 
-  public static String toPrettyJson(VeloxBean bean) {
+  public static String toPrettyJson(Object bean) {
     try {
       return JSON.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -56,9 +55,9 @@ public final class Serde {
     }
   }
 
-  public static VeloxBean fromJson(String json) {
+  public static <T> T fromJson(String json, Class<T> valueType) {
     try {
-      return JSON.reader().readValue(json, VeloxBean.class);
+      return JSON.reader().readValue(json, valueType);
     } catch (IOException e) {
       throw new VeloxException(e);
     }

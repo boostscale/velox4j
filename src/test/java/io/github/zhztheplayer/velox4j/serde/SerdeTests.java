@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
-import io.github.zhztheplayer.velox4j.bean.VeloxBean;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -49,25 +48,23 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public final class SerdeTests {
-  public static String testVeloxBeanRoundTrip(VeloxBean inObj) {
+  public static String testNativeObjectRoundTrip(Object inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
-      final VeloxBean outObj = Serde.fromJson(outJson);
+      final Object outObj = Serde.fromJson(outJson, inObj.getClass());
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);
       return outJson2;
     }
   }
 
-  public static String testVeloxBeanRoundTrip(String inJson) {
-    final VeloxBean inObj = Serde.fromJson(inJson);
-    return testVeloxBeanRoundTrip(inObj);
+  public static String testNativeObjectRoundTrip(String inJson, Class<?> valueType) {
+    final Object inObj = Serde.fromJson(inJson, valueType);
+    return testNativeObjectRoundTrip(inObj);
   }
 
-  public static String testJavaBeanRoundTrip(Object inObj) {
-    Preconditions.checkArgument(!(inObj instanceof VeloxBean),
-        "inObj should not be VeloxBean");
+  public static String testJavaObjectRoundTrip(Object inObj) {
     try {
       final Class<?> clazz = inObj.getClass();
       final ObjectMapper jsonMapper = Serde.jsonMapper();

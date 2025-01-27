@@ -25,7 +25,7 @@ public class ConnectorSerdeTest {
   @Test
   public void testFileFormat() {
     final FileFormat in = FileFormat.DWRF;
-    final String json = SerdeTests.testJavaBeanRoundTrip(in);
+    final String json = SerdeTests.testJavaObjectRoundTrip(in);
     Assert.assertEquals("\"dwrf\"", json);
   }
 
@@ -33,57 +33,57 @@ public class ConnectorSerdeTest {
   public void testProperties() {
     final FileProperties in = new FileProperties(OptionalLong.of(100),
         OptionalLong.of(50));
-    SerdeTests.testJavaBeanRoundTrip(in);
+    SerdeTests.testJavaObjectRoundTrip(in);
   }
 
   @Test
   public void testPropertiesWithMissingFields() {
     final FileProperties in = new FileProperties(OptionalLong.of(100),
         OptionalLong.empty());
-    SerdeTests.testJavaBeanRoundTrip(in);
+    SerdeTests.testJavaObjectRoundTrip(in);
   }
 
   @Test
   public void testSubfieldFilter() {
     final SubfieldFilter in = new SubfieldFilter(
         "complex_type[1][\"foo\"].id", new AlwaysTrue());
-    SerdeTests.testJavaBeanRoundTrip(in);
+    SerdeTests.testJavaObjectRoundTrip(in);
   }
 
   @Test
   public void testAssignment() {
     final Assignment assignment = new Assignment("foo", SerdeTests.newSampleHiveColumnHandle());
-    SerdeTests.testJavaBeanRoundTrip(assignment);
+    SerdeTests.testJavaObjectRoundTrip(assignment);
   }
 
   @Test
   public void testRowIdProperties() {
     final RowIdProperties in = new RowIdProperties(
         5, 10, "UUID-100");
-    SerdeTests.testJavaBeanRoundTrip(in);
+    SerdeTests.testJavaObjectRoundTrip(in);
   }
 
   @Test
   public void testHiveColumnHandle() {
     final ColumnHandle handle = SerdeTests.newSampleHiveColumnHandle();
-    SerdeTests.testVeloxBeanRoundTrip(handle);
+    SerdeTests.testNativeObjectRoundTrip(handle);
   }
 
   @Test
   public void testHiveConnectorSplit() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplit();
-    SerdeTests.testVeloxBeanRoundTrip(split);
+    SerdeTests.testNativeObjectRoundTrip(split);
   }
 
   @Test
   public void testHiveConnectorSplitWithMissingFields() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplitWithMissingFields();
-    SerdeTests.testVeloxBeanRoundTrip(split);
+    SerdeTests.testNativeObjectRoundTrip(split);
   }
 
   @Test
   public void testHiveTableHandle() {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
-    SerdeTests.testVeloxBeanRoundTrip(handle);
+    SerdeTests.testNativeObjectRoundTrip(handle);
   }
 }

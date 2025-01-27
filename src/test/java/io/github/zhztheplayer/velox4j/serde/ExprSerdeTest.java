@@ -32,20 +32,20 @@ public class ExprSerdeTest {
 
   @Test
   public void testCallTypedExpr() {
-    SerdeTests.testVeloxBeanRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int"));
+    SerdeTests.testNativeObjectRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int"));
   }
 
   @Test
   public void testCastTypedExpr() {
     final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
-    SerdeTests.testVeloxBeanRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
+    SerdeTests.testNativeObjectRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
   }
 
   @Test
   public void testConcatTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
-    SerdeTests.testVeloxBeanRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
+    SerdeTests.testNativeObjectRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
   }
 
   @Test
@@ -53,7 +53,7 @@ public class ExprSerdeTest {
     final JniApi jniApi = JniApi.create();
     final BaseVector intVector = SerdeTests.newSampleIntVector(jniApi);
     final ConstantTypedExpr expr = ConstantTypedExpr.create(intVector);
-    SerdeTests.testVeloxBeanRoundTrip(expr);
+    SerdeTests.testNativeObjectRoundTrip(expr);
     jniApi.close();
   }
 
@@ -64,7 +64,7 @@ public class ExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
-    SerdeTests.testVeloxBeanRoundTrip(dereference);
+    SerdeTests.testNativeObjectRoundTrip(dereference);
   }
 
   @Test
@@ -74,12 +74,12 @@ public class ExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
-    SerdeTests.testVeloxBeanRoundTrip(fieldAccess);
+    SerdeTests.testNativeObjectRoundTrip(fieldAccess);
   }
 
   @Test
   public void testInputTypedExpr() {
-    SerdeTests.testVeloxBeanRoundTrip(new InputTypedExpr(new BooleanType()));
+    SerdeTests.testNativeObjectRoundTrip(new InputTypedExpr(new BooleanType()));
   }
 
   @Test
@@ -88,6 +88,6 @@ public class ExprSerdeTest {
         List.of(new IntegerType(), new VarcharType()));
     final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
         FieldAccessTypedExpr.create(new IntegerType(), "foo"));
-    SerdeTests.testVeloxBeanRoundTrip(lambdaTypedExpr);
+    SerdeTests.testNativeObjectRoundTrip(lambdaTypedExpr);
   }
 }
