@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The higher-level JNI-based API than {@link JniWrapper}. The API hides C++ pointers from
- * developers with providing objective representations in Java to caller.
+ * The higher-level JNI-based API ovdr {@link JniWrapper}. The API hides
+ * details like native pointers and serialized data from developers, instead
+ * provides objective form of the required functionalities.
  */
 public final class JniApi implements CppObject {
 
