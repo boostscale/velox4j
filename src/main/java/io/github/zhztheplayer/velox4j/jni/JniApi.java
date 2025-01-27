@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
@@ -9,14 +8,12 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.type.Type;
+import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +45,12 @@ public final class JniApi implements CppObject {
 
   public RowVector upIteratorNext(UpIterator itr) {
     return rowVectorWrap(jni.upIteratorNext(itr.id()));
+  }
+
+  public Type variantInferType(Variant variant) {
+    final String variantJson = Serde.toJson(variant);
+    final String typeJson = jni.variantInferType(variantJson);
+    return Serde.fromJson(typeJson, Type.class);
   }
 
   private BaseVector baseVectorWrap(long id) {
@@ -87,7 +90,7 @@ public final class JniApi implements CppObject {
 
   public Type baseVectorGetType(BaseVector vector) {
     String typeJson = jni.baseVectorGetType(vector.id());
-    return (Type) Serde.fromJson(typeJson, Type.class);
+    return Serde.fromJson(typeJson, Type.class);
   }
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {

@@ -26,6 +26,13 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.stream.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
+import io.github.zhztheplayer.velox4j.type.DoubleType;
+import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.type.RealType;
+import io.github.zhztheplayer.velox4j.variant.DoubleValue;
+import io.github.zhztheplayer.velox4j.variant.IntegerValue;
+import io.github.zhztheplayer.velox4j.variant.RealValue;
+import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
@@ -155,6 +162,15 @@ public class JniApiTest {
     final String serializedImported = jniApi.baseVectorSerialize(List.of(imported));
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
+    jniApi.close();
+  }
+
+  @Test
+  public void testVariantInferType() {
+    final JniApi jniApi = JniApi.create();
+    Assert.assertTrue(jniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(jniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
+    Assert.assertTrue(jniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
     jniApi.close();
   }
 

@@ -2,19 +2,28 @@ package io.github.zhztheplayer.velox4j.expression;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 
 import java.util.Collections;
 
-public abstract class ConstantTypedExpr extends TypedExpr {
+public class ConstantTypedExpr extends TypedExpr {
+  private final Variant value;
+  private final String serializedVector;
 
-  private ConstantTypedExpr(Type returnType) {
+  @JsonCreator
+  private ConstantTypedExpr(@JsonProperty("type") Type returnType,
+      @JsonProperty("value") Variant value,
+      @JsonProperty("valueVector") String serializedVector) {
     super(returnType, Collections.emptyList());
+    this.value = value;
+    this.serializedVector = serializedVector;
   }
 
   public static ConstantTypedExpr create(BaseVector vector) {
@@ -26,37 +35,22 @@ public abstract class ConstantTypedExpr extends TypedExpr {
     }
     final String serialized = BaseVectors.serialize(constVector);
     final Type type = BaseVectors.getType(vector);
-    return new WithVector(type, serialized);
+    return new ConstantTypedExpr(type, null, serialized);
   }
 
-  public static class WithVector extends ConstantTypedExpr {
-    private final String serializedVector;
-
-    @JsonCreator
-    private WithVector(@JsonProperty("type") Type returnType,
-        @JsonProperty("valueVector") String serializedVector) {
-      super(returnType);
-      this.serializedVector = serializedVector;
-    }
-
-    @JsonGetter("valueVector")
-    public String getSerializedVector() {
-      return serializedVector;
-    }
+  public static ConstantTypedExpr create(JniApi jniApi, Variant value) {
+    return new ConstantTypedExpr(jniApi.variantInferType(value), value, null);
   }
 
-  public static class WithValue extends ConstantTypedExpr {
-    private final Variant value;
+  @JsonGetter("value")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Variant getValue() {
+    return value;
+  }
 
-    private WithValue(@JsonProperty("type") Type returnType,
-        @JsonProperty("value") Variant value) {
-      super(returnType);
-      this.value = value;
-    }
-
-    @JsonGetter("value")
-    public Variant getValue() {
-      return value;
-    }
+  @JsonGetter("valueVector")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String getSerializedVector() {
+    return serializedVector;
   }
 }

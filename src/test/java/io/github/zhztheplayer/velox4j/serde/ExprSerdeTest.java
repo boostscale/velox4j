@@ -16,6 +16,7 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
+import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,8 +53,10 @@ public class ExprSerdeTest {
   public void testConstantTypedExpr() {
     final JniApi jniApi = JniApi.create();
     final BaseVector intVector = SerdeTests.newSampleIntVector(jniApi);
-    final ConstantTypedExpr expr = ConstantTypedExpr.create(intVector);
-    SerdeTests.testVeloxSerializableRoundTrip(expr);
+    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
+    SerdeTests.testVeloxSerializableRoundTrip(expr1);
+    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(jniApi, new IntegerValue(15));
+    SerdeTests.testVeloxSerializableRoundTrip(expr2);
     jniApi.close();
   }
 

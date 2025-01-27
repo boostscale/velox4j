@@ -44,6 +44,9 @@ public final class JniWrapper {
   native boolean upIteratorHasNext(long address);
   native long upIteratorNext(long address);
 
+  // For Variant.
+  native String variantInferType(String json);
+
   // For BaseVector / RowVector.
   native long arrowToBaseVector(long cSchema, long cArray);
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
