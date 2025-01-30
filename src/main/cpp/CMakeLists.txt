@@ -18,10 +18,10 @@ endif ()
 include(UseJava)
 
 # Import Velox.
-set(VELOX_REPO zhztheplayer/velox)
-set(VELOX_REF 7eecf69495b8e6c9ff56aabf5657f9d654fb1bc8)
+set(VELOX_REPO facebookincubator/velox)
+set(VELOX_REF 5f8e7f125b78552cdc9377bd8e5110eb055b59ce)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-set(VELOX_SOURCE_URL_MD5 0a5c0c1355551b54305fbef57a57ce25)
+set(VELOX_SOURCE_URL_MD5 82db99131e7b1d50940be6de10a04091)
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
         OPTIONS
         "VELOX_ENABLE_CCACHE ON"
