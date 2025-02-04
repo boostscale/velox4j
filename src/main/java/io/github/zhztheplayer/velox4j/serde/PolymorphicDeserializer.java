@@ -53,6 +53,12 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
     if (registry.isClass(value)) {
       Class<?> clazz = registry.getClass(value);
       try {
+        final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
+        for (SerdeRegistry.KvPair kv : kvs) {
+          if (objectNode.remove(kv.getKey()) == null) {
+            throw new VeloxException(String.format("Required key %s not found in JSON: %s", kv.getKey(), objectNode));
+          }
+        }
         return p.getCodec().treeToValue(objectNode, clazz);
       } catch (JsonProcessingException e) {
         throw new VeloxException(e);
