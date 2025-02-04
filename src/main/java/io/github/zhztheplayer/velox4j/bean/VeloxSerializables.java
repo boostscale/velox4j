@@ -42,7 +42,7 @@ import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 import io.github.zhztheplayer.velox4j.type.VarcharType;
 
 public final class VeloxSerializables {
-  private static final SerdeRegistry ROOT_REGISTRY = SerdeRegistryFactory
+  private static final SerdeRegistry NAME_REGISTRY = SerdeRegistryFactory
       .createForBaseClass(VeloxSerializable.class).key("name");
 
   private VeloxSerializables() {
@@ -60,7 +60,7 @@ public final class VeloxSerializables {
   }
 
   private static void registerTypes() {
-    final SerdeRegistry typeRegistry = ROOT_REGISTRY
+    final SerdeRegistry typeRegistry = NAME_REGISTRY
         .registerFactory("Type")
         .key("type");
     typeRegistry.registerClass("BOOLEAN", BooleanType.class);
@@ -81,45 +81,45 @@ public final class VeloxSerializables {
     typeRegistry.registerClass("UNKNOWN", UnknownType.class);
     typeRegistry.registerClass("OPAQUE", OpaqueType.class);
     typeRegistry.registerClass("DECIMAL", DecimalType.class);
-    ROOT_REGISTRY.registerFactory("IntervalDayTimeType")
+    NAME_REGISTRY.registerFactory("IntervalDayTimeType")
         .key("type")
         .registerClass("INTERVAL DAY TO SECOND", IntervalDayTimeType.class);
-    ROOT_REGISTRY.registerFactory("IntervalYearMonthType")
+    NAME_REGISTRY.registerFactory("IntervalYearMonthType")
         .key("type")
         .registerClass("INTERVAL YEAR TO MONTH", IntervalYearMonthType.class);
-    ROOT_REGISTRY.registerFactory("DateType")
+    NAME_REGISTRY.registerFactory("DateType")
         .key("type")
         .registerClass("DATE", DateType.class);
   }
 
   private static void registerExprs() {
-    ROOT_REGISTRY.registerClass("CallTypedExpr", CallTypedExpr.class);
-    ROOT_REGISTRY.registerClass("CastTypedExpr", CastTypedExpr.class);
-    ROOT_REGISTRY.registerClass("ConcatTypedExpr", ConcatTypedExpr.class);
-    ROOT_REGISTRY.registerClass("ConstantTypedExpr", ConstantTypedExpr.class);
-    ROOT_REGISTRY.registerClass("DereferenceTypedExpr", DereferenceTypedExpr.class);
-    ROOT_REGISTRY.registerClass("FieldAccessTypedExpr", FieldAccessTypedExpr.class);
-    ROOT_REGISTRY.registerClass("InputTypedExpr", InputTypedExpr.class);
-    ROOT_REGISTRY.registerClass("LambdaTypedExpr", LambdaTypedExpr.class);
+    NAME_REGISTRY.registerClass("CallTypedExpr", CallTypedExpr.class);
+    NAME_REGISTRY.registerClass("CastTypedExpr", CastTypedExpr.class);
+    NAME_REGISTRY.registerClass("ConcatTypedExpr", ConcatTypedExpr.class);
+    NAME_REGISTRY.registerClass("ConstantTypedExpr", ConstantTypedExpr.class);
+    NAME_REGISTRY.registerClass("DereferenceTypedExpr", DereferenceTypedExpr.class);
+    NAME_REGISTRY.registerClass("FieldAccessTypedExpr", FieldAccessTypedExpr.class);
+    NAME_REGISTRY.registerClass("InputTypedExpr", InputTypedExpr.class);
+    NAME_REGISTRY.registerClass("LambdaTypedExpr", LambdaTypedExpr.class);
   }
 
   private static void registerConnectors() {
-    ROOT_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
-    ROOT_REGISTRY.registerClass("HiveConnectorSplit", HiveConnectorSplit.class);
-    ROOT_REGISTRY.registerClass("HiveTableHandle", HiveTableHandle.class);
+    NAME_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
+    NAME_REGISTRY.registerClass("HiveConnectorSplit", HiveConnectorSplit.class);
+    NAME_REGISTRY.registerClass("HiveTableHandle", HiveTableHandle.class);
   }
 
   private static void registerFilters() {
-    ROOT_REGISTRY.registerClass("AlwaysTrue", AlwaysTrue.class);
+    NAME_REGISTRY.registerClass("AlwaysTrue", AlwaysTrue.class);
   }
 
   private static void registerPlanNodes() {
-    ROOT_REGISTRY.registerClass("ValuesNode", ValuesNode.class);
-    ROOT_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
-    ROOT_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
+    NAME_REGISTRY.registerClass("ValuesNode", ValuesNode.class);
+    NAME_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
+    NAME_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
   }
 
   private static void registerQuery() {
-    ROOT_REGISTRY.registerClass("Velox4jQuery", Query.class);
+    NAME_REGISTRY.registerClass("Velox4jQuery", Query.class);
   }
 }
