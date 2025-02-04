@@ -19,9 +19,9 @@ include(UseJava)
 
 # Import Velox.
 set(VELOX_REPO facebookincubator/velox)
-set(VELOX_REF 5f8e7f125b78552cdc9377bd8e5110eb055b59ce)
+set(VELOX_REF b2cb03e4df9912b61794f54ceb4b7fec56db65e8)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-set(VELOX_SOURCE_URL_MD5 82db99131e7b1d50940be6de10a04091)
+set(VELOX_SOURCE_URL_MD5 8574bc693179ccf621ada75d1715aa86)
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
         OPTIONS
         "VELOX_ENABLE_CCACHE ON"
