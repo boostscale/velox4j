@@ -17,18 +17,18 @@
 
 #include "Init.h"
 #include <velox/common/memory/Memory.h>
+#include <velox/connectors/hive/HiveConnector.h>
+#include <velox/connectors/hive/HiveConnectorSplit.h>
+#include <velox/connectors/hive/HiveDataSink.h>
+#include <velox/connectors/hive/TableHandle.h>
+#include <velox/core/PlanNode.h>
+#include <velox/exec/PartitionFunction.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
-#include <velox/core/PlanNode.h>
 #include <velox/type/Filter.h>
-#include <velox/connectors/hive/TableHandle.h>
-#include <velox/connectors/hive/HiveDataSink.h>
-#include <velox/connectors/hive/HiveConnector.h>
-#include <velox/connectors/hive/HiveConnectorSplit.h>
-#include <velox/exec/PartitionFunction.h>
 #include <velox4j/query/Query.h>
 
 namespace velox4j {
@@ -48,10 +48,10 @@ void init(const std::function<void()>& f) {
 
 void initForSpark() {
   init([]() -> void {
-    config::globalConfig.memoryLeakCheckEnabled = true;
-    config::globalConfig.memoryPoolCapacityTransferAcrossTasks = true;
-    config::globalConfig.exceptionSystemStacktraceEnabled = true;
-    config::globalConfig.exceptionUserStacktraceEnabled = true;
+    config::globalConfig().memoryLeakCheckEnabled = true;
+    config::globalConfig().memoryPoolCapacityTransferAcrossTasks = true;
+    config::globalConfig().exceptionSystemStacktraceEnabled = true;
+    config::globalConfig().exceptionUserStacktraceEnabled = true;
     memory::MemoryManager::initialize({});
     functions::sparksql::registerFunctions();
     aggregate::prestosql::registerAllAggregateFunctions(
