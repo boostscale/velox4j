@@ -22,12 +22,9 @@ import java.util.stream.Collectors;
 
 public class PolymorphicDeserializer {
   private static class AbstractDeserializer extends JsonDeserializer<Object> {
-    private final JsonDeserializer<?> baseDeserializer;
     private final Class<? extends NativeBean> baseClass;
 
-    private AbstractDeserializer(JsonDeserializer<?> baseDeserializer,
-        Class<? extends NativeBean> baseClass) {
-      this.baseDeserializer = baseDeserializer;
+    private AbstractDeserializer(Class<? extends NativeBean> baseClass) {
       this.baseClass = baseClass;
     }
 
@@ -89,7 +86,7 @@ public class PolymorphicDeserializer {
       if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
         if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
-          return new AbstractDeserializer(deserializer, baseClass);
+          return new AbstractDeserializer(baseClass);
         }
       }
       return deserializer;

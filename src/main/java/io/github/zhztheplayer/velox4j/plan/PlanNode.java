@@ -1,7 +1,7 @@
 package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import io.github.zhztheplayer.velox4j.bean.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 
 import java.util.List;
 

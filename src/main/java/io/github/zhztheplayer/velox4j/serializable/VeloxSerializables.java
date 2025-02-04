@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.bean;
+package io.github.zhztheplayer.velox4j.serializable;
 
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
