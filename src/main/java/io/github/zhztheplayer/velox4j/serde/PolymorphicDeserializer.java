@@ -22,9 +22,12 @@ import java.util.stream.Collectors;
 
 public class PolymorphicDeserializer {
   private static class AbstractDeserializer extends JsonDeserializer<Object> {
+    private final JsonDeserializer<?> baseDeserializer;
     private final Class<? extends NativeBean> baseClass;
 
-    private AbstractDeserializer(Class<? extends NativeBean> baseClass) {
+    private AbstractDeserializer(JsonDeserializer<?> baseDeserializer,
+        Class<? extends NativeBean> baseClass) {
+      this.baseDeserializer = baseDeserializer;
       this.baseClass = baseClass;
     }
 
@@ -34,7 +37,6 @@ public class PolymorphicDeserializer {
       if (keysInObj.isEmpty()) {
         throw new UnsupportedOperationException("Required keys not found in JSON: " + obj);
       }
-
       if (keysInObj.size() > 1) {
         throw new UnsupportedOperationException("Ambiguous key annotations in JSON: " + obj);
       }
@@ -87,7 +89,7 @@ public class PolymorphicDeserializer {
       if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
         if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
-          return new AbstractDeserializer(baseClass);
+          return new AbstractDeserializer(deserializer, baseClass);
         }
       }
       return deserializer;
