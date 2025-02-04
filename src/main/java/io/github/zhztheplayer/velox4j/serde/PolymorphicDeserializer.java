@@ -54,6 +54,7 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
       Class<?> clazz = registry.getClass(value);
       try {
         final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
+        // Remove the polymorphic fields we no longer need as we have the concrete type.
         for (SerdeRegistry.KvPair kv : kvs) {
           if (objectNode.remove(kv.getKey()) == null) {
             throw new VeloxException(String.format("Required key %s not found in JSON: %s", kv.getKey(), objectNode));
