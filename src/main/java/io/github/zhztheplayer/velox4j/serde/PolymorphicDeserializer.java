@@ -20,64 +20,60 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PolymorphicDeserializer extends JsonDeserializer<Object> {
-  private final Class<? extends NativeBean> baseClass;
+public class PolymorphicDeserializer {
+  private static class AbstractDeserializer extends JsonDeserializer<Object> {
+    private final Class<? extends NativeBean> baseClass;
 
-  private PolymorphicDeserializer(Class<? extends NativeBean> baseClass) {
-    this.baseClass = baseClass;
-  }
-
-  private SerdeRegistry findRegistry(SerdeRegistryFactory rf, ObjectNode obj) {
-    final Set<String> keys = rf.keys();
-    final List<String> keysInObj = Streams.fromIterator(obj.fieldNames()).filter(keys::contains).collect(Collectors.toList());
-    if (keysInObj.isEmpty()) {
-      throw new UnsupportedOperationException("Required keys not found in JSON: " + obj);
+    private AbstractDeserializer(Class<? extends NativeBean> baseClass) {
+      this.baseClass = baseClass;
     }
 
-    if (keysInObj.size() > 1) {
-      throw new UnsupportedOperationException("Ambiguous key annotations in JSON: " + obj);
-    }
-    final SerdeRegistry registry = rf.key(keysInObj.get(0));
-    return registry;
-  }
-
-  private Object deserializeWithRegistry(JsonParser p, DeserializationContext ctxt, SerdeRegistry registry, ObjectNode objectNode) {
-    final String key = registry.key();
-    final String value = objectNode.get(key).asText();
-    Preconditions.checkArgument(registry.contains(value), "Value %s not registered in registry: %s", value, registry.prefixAndKey());
-    if (registry.isFactory(value)) {
-      final SerdeRegistryFactory rf = registry.getFactory(value);
-      final SerdeRegistry nextRegistry = findRegistry(rf, objectNode);
-      return deserializeWithRegistry(p, ctxt, nextRegistry, objectNode);
-    }
-    if (registry.isClass(value)) {
-      Class<?> clazz = registry.getClass(value);
-      try {
-        final List<SerdeRegistry.KvPair> kvs = SerdeRegistry.findKvPairs(clazz);
-        // Remove the polymorphic fields we no longer need as we have the concrete type.
-        for (SerdeRegistry.KvPair kv : kvs) {
-          if (objectNode.remove(kv.getKey()) == null) {
-            throw new VeloxException(String.format("Required key %s not found in JSON: %s", kv.getKey(), objectNode));
-          }
-        }
-        return p.getCodec().treeToValue(objectNode, clazz);
-      } catch (JsonProcessingException e) {
-        throw new VeloxException(e);
+    private SerdeRegistry findRegistry(SerdeRegistryFactory rf, ObjectNode obj) {
+      final Set<String> keys = rf.keys();
+      final List<String> keysInObj = Streams.fromIterator(obj.fieldNames()).filter(keys::contains).collect(Collectors.toList());
+      if (keysInObj.isEmpty()) {
+        throw new UnsupportedOperationException("Required keys not found in JSON: " + obj);
       }
+
+      if (keysInObj.size() > 1) {
+        throw new UnsupportedOperationException("Ambiguous key annotations in JSON: " + obj);
+      }
+      final SerdeRegistry registry = rf.key(keysInObj.get(0));
+      return registry;
     }
-    throw new IllegalStateException();
+
+    private Object deserializeWithRegistry(JsonParser p, DeserializationContext ctxt, SerdeRegistry registry, ObjectNode objectNode) {
+      final String key = registry.key();
+      final String value = objectNode.get(key).asText();
+      Preconditions.checkArgument(registry.contains(value), "Value %s not registered in registry: %s", value, registry.prefixAndKey());
+      if (registry.isFactory(value)) {
+        final SerdeRegistryFactory rf = registry.getFactory(value);
+        final SerdeRegistry nextRegistry = findRegistry(rf, objectNode);
+        return deserializeWithRegistry(p, ctxt, nextRegistry, objectNode);
+      }
+      if (registry.isClass(value)) {
+        Class<?> clazz = registry.getClass(value);
+        try {
+          return p.getCodec().treeToValue(objectNode, clazz);
+        } catch (JsonProcessingException e) {
+          throw new VeloxException(e);
+        }
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+      final TreeNode treeNode = p.readValueAsTree();
+      if (!treeNode.isObject()) {
+        throw new UnsupportedOperationException("Not a JSON object: " + treeNode);
+      }
+      final ObjectNode objNode = (ObjectNode) treeNode;
+      final SerdeRegistry registry = findRegistry(SerdeRegistryFactory.getForBaseClass(baseClass), objNode);
+      return deserializeWithRegistry(p, ctxt, registry, objNode);
+    }
   }
 
-  @Override
-  public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-    final TreeNode treeNode = p.readValueAsTree();
-    if (!treeNode.isObject()) {
-      throw new UnsupportedOperationException("Not a JSON object: " + treeNode);
-    }
-    final ObjectNode objNode = (ObjectNode) treeNode;
-    final SerdeRegistry registry = findRegistry(SerdeRegistryFactory.getForBaseClass(baseClass), objNode);
-    return deserializeWithRegistry(p, ctxt, registry, objNode);
-  }
 
   public static class Modifier extends BeanDeserializerModifier {
     private final Class<? extends NativeBean> baseClass;
@@ -91,7 +87,7 @@ public class PolymorphicDeserializer extends JsonDeserializer<Object> {
       if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
         if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
-          return new PolymorphicDeserializer(baseClass);
+          return new AbstractDeserializer(baseClass);
         }
       }
       return deserializer;

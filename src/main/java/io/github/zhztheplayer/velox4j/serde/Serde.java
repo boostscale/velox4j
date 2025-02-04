@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -28,7 +27,7 @@ public final class Serde {
     jsonMapper.disable(MapperFeature.AUTO_DETECT_GETTERS);
     jsonMapper.disable(MapperFeature.AUTO_DETECT_SETTERS);
     jsonMapper.disable(MapperFeature.AUTO_DETECT_CREATORS);
-    jsonMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     jsonMapper.disable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
     jsonMapper.addModule(new Jdk8Module());
     return jsonMapper.build();
