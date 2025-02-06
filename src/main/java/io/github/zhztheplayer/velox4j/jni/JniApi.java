@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * The higher-level JNI-based API over {@link JniWrapper}. The API hides
  * details like native pointers and serialized data from developers, instead
- * provides objective form of the required functionalities.
+ * provides objective forms of the required functionalities.
  */
 public final class JniApi implements CppObject {
 
