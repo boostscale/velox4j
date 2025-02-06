@@ -35,7 +35,7 @@ public final class Resources {
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
     try (final InputStream is = classloader.getResourceAsStream(path)) {
       Preconditions.checkArgument(is != null, "Resource %s not found", path);
-      final File tmp = File.createTempFile("velox4j-test-", ".r");
+      final File tmp = File.createTempFile("velox4j-test-", ".tmp");
       final BufferedOutputStream o = new BufferedOutputStream(new FileOutputStream(tmp));
       while (true) {
         int b = is.read();

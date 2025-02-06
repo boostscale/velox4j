@@ -30,6 +30,10 @@ public class RowType extends Type {
     return children;
   }
 
+  public int size() {
+    return names.size();
+  }
+
   public Type findChild(String name) {
     int index = names.indexOf(name);
     if (index == -1) {

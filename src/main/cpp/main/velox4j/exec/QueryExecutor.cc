@@ -57,6 +57,17 @@ class Out : public UpIterator {
         0,
         std::move(queryCtx),
         exec::Task::ExecutionMode::kSerial);
+
+    std::unordered_set<core::PlanNodeId> planNodesWithSplits{};
+    for (const auto& boundSplit : query->boundSplits()) {
+      exec::Split& split = boundSplit->split();
+      planNodesWithSplits.emplace(boundSplit->planNodeId());
+      task->addSplit(boundSplit->planNodeId(), std::move(split));
+    }
+    for (const auto& nodeWithSplits : planNodesWithSplits) {
+      task->noMoreSplits(nodeWithSplits);
+    }
+    
     task_ = task;
 
     if (!task_->supportSerialExecutionMode()) {

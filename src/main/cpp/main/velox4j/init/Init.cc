@@ -73,6 +73,12 @@ void initForSpark() {
     connector::hive::HiveInsertTableHandle::registerSerDe();
     connector::hive::HiveConnectorSplit::registerSerDe();
     connector::hive::registerHivePartitionFunctionSerDe();
+    connector::registerConnector(
+        std::make_shared<connector::hive::HiveConnector>(
+            "connector-hive",
+            std::make_shared<facebook::velox::config::ConfigBase>(
+                std::unordered_map<std::string, std::string>()),
+            nullptr));
     core::PlanNode::registerSerDe();
     core::ITypedExpr::registerSerDe();
     exec::registerPartitionFunctionSerDe();

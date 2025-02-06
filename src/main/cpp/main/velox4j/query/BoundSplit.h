@@ -33,7 +33,7 @@ class BoundSplit {
     return planNodeId_;
   }
 
-  const exec::Split& split() const {
+  exec::Split& split() const {
     return *split_;
   }
 
