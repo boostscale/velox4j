@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
-import io.github.zhztheplayer.velox4j.stream.Streams;
+import io.github.zhztheplayer.velox4j.collection.Streams;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.stream;
+package io.github.zhztheplayer.velox4j.collection;
 
 import java.util.Iterator;
 import java.util.Spliterator;
