@@ -18,6 +18,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 
 public final class JniWrapper {
   private static final JniWrapper STATIC_INSTANCE = new JniWrapper(null);
@@ -52,6 +53,9 @@ public final class JniWrapper {
   native boolean upIteratorHasNext(long address);
   native long upIteratorNext(long address);
 
+  // For DownIterator.
+  native long downIteratorBind(DownIterator itr);
+
   // For Variant.
   native String variantInferType(String json);
 
@@ -68,4 +72,5 @@ public final class JniWrapper {
   // For tests.
   native String deserializeAndSerialize(String json);
   native String deserializeAndSerializeVariant(String json);
+  native long createUpIteratorWithDownIterator(long id);
 }

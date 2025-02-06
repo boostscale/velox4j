@@ -23,6 +23,7 @@
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/exec/QueryExecutor.h"
+#include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 
 namespace velox4j {
@@ -70,6 +71,13 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->next());
+  JNI_METHOD_END(-1L)
+}
+
+jlong downIteratorBind(JNIEnv* env, jobject javaThis, jobject itrRef) {
+  JNI_METHOD_START
+  auto bound = std::make_shared<DownIterator>(env, itrRef);
+  return sessionOf(env, javaThis)->objectStore()->save(bound);
   JNI_METHOD_END(-1L)
 }
 
@@ -227,6 +235,32 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
   return env->NewStringUTF(serializeJson.data());
   JNI_METHOD_END(nullptr)
 }
+
+class DownIteratorAsUpIterator : public UpIterator {
+ public:
+  explicit DownIteratorAsUpIterator(std::shared_ptr<DownIterator> itr)
+      : itr_(itr) {}
+
+  bool hasNext() override {
+    return itr_->hasNext();
+  }
+
+  RowVectorPtr next() override {
+    return itr_->next();
+  }
+
+ private:
+  std::shared_ptr<DownIterator> itr_;
+};
+
+jlong createUpIteratorWithDownIterator(JNIEnv* env, jobject javaThis, jlong id) {
+  JNI_METHOD_START
+  auto downItr = ObjectStore::retrieve<DownIterator>(id);
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save(std::make_shared<DownIteratorAsUpIterator>(downItr));
+  JNI_METHOD_END(-1L)
+}
 } // namespace
 
 void JniWrapper::mapFields() {}
@@ -242,7 +276,11 @@ void JniWrapper::initialize(JNIEnv* env) {
 
   addNativeMethod("createSession", (void*)createSession, kTypeLong, nullptr);
   addNativeMethod(
-      "releaseCppObject", (void*)releaseCppObject, kTypeVoid, kTypeLong, nullptr);
+      "releaseCppObject",
+      (void*)releaseCppObject,
+      kTypeVoid,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
@@ -253,6 +291,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, nullptr);
+  addNativeMethod(
+      "downIteratorBind",
+      (void*)downIteratorBind,
+      kTypeLong,
+      "io/github/zhztheplayer/velox4j/iterator/DownIterator",
+      nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,
@@ -307,7 +351,11 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "baseVectorNewRef", (void*)baseVectorNewRef, kTypeLong, kTypeLong, nullptr);
+      "baseVectorNewRef",
+      (void*)baseVectorNewRef,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "deserializeAndSerialize",
       (void*)deserializeAndSerialize,
@@ -319,6 +367,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)deserializeAndSerializeVariant,
       kTypeString,
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "createUpIteratorWithDownIterator",
+      (void*)createUpIteratorWithDownIterator,
+      kTypeLong,
+      kTypeLong,
       nullptr);
 
   registerNativeMethods(env);

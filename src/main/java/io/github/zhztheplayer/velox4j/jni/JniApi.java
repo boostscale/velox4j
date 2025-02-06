@@ -4,6 +4,7 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 import io.github.zhztheplayer.velox4j.serde.Serde;
@@ -49,6 +50,10 @@ public final class JniApi implements AutoCloseable {
 
   public RowVector upIteratorNext(UpIterator itr) {
     return rowVectorWrap(jni.upIteratorNext(itr.id()));
+  }
+
+  public DownIterator.Ref downIteratorBind(DownIterator itr) {
+    return new DownIterator.Ref(this, jni.downIteratorBind(itr));
   }
 
   public Type variantInferType(Variant variant) {
@@ -117,6 +122,11 @@ public final class JniApi implements AutoCloseable {
   // For tests.
   public String deserializeAndSerializeVariant(String json) {
     return jni.deserializeAndSerializeVariant(json);
+  }
+
+  // For tests.
+  public UpIterator createUpIteratorWithDownIterator(DownIterator.Ref ref) {
+    return new UpIterator(this, jni.createUpIteratorWithDownIterator(ref.id()));
   }
 
   @Override

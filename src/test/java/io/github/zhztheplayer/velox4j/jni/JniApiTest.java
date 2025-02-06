@@ -23,6 +23,7 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
@@ -170,6 +171,37 @@ public class JniApiTest {
     Assert.assertTrue(jniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
     Assert.assertTrue(jniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
     Assert.assertTrue(jniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
+    jniApi.close();
+  }
+
+  @Test
+  public void testIteratorRoundTrip() {
+    final JniApi jniApi = JniApi.create();
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
+    final DownIterator down = new DownIterator(itr);
+    final DownIterator.Ref downRef = jniApi.downIteratorBind(down);
+    final UpIterator up = jniApi.createUpIteratorWithDownIterator(downRef);
+    assertIterator(up);
+    jniApi.close();
+  }
+
+  @Test
+  public void testIteratorRoundTripInDifferentThread() throws InterruptedException {
+    final JniApi jniApi = JniApi.create();
+    final String json = readQueryJson();
+    final UpIterator itr = jniApi.executeQuery(json);
+    final DownIterator down = new DownIterator(itr);
+    final DownIterator.Ref downRef = jniApi.downIteratorBind(down);
+    final UpIterator up = jniApi.createUpIteratorWithDownIterator(downRef);
+    final Thread thread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        assertIterator(up);
+      }
+    });
+    thread.start();
+    thread.join();
     jniApi.close();
   }
 
