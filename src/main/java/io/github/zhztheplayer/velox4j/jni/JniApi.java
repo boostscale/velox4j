@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The higher-level JNI-based API ovdr {@link JniWrapper}. The API hides
+ * The higher-level JNI-based API over {@link JniWrapper}. The API hides
  * details like native pointers and serialized data from developers, instead
  * provides objective form of the required functionalities.
  */
