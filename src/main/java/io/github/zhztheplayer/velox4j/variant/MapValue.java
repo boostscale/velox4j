@@ -26,6 +26,8 @@ public class MapValue extends Variant {
     for (int i = 0; i < size; i++) {
       builder.put(entries.getKeys().get(i), entries.getValues().get(i));
     }
+    Preconditions.checkArgument(builder.size() == size,
+        "Duplicated keys found in entries while creating MapValue");
     return new MapValue(builder);
   }
 

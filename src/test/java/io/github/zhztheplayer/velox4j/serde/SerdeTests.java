@@ -77,6 +77,7 @@ public final class SerdeTests {
       final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
+      Assert.assertEquals(inObj, outObj);
       assertJsonEquals(inJson, outJson2);
       return new ObjectAndJson<>((T) outObj, outJson2);
     }
