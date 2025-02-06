@@ -4,18 +4,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigInteger;
-
-public class HugeIntValue extends Variant {
-  private final BigInteger value;
+public class VarCharValue extends Variant {
+  private final String value;
 
   @JsonCreator
-  public HugeIntValue(@JsonProperty("value") BigInteger value) {
+  public VarCharValue(@JsonProperty("value") String value) {
     this.value = value;
   }
 
   @JsonGetter("value")
-  public BigInteger getValue() {
+  public String getValue() {
     return value;
   }
 }

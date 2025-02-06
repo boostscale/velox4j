@@ -58,7 +58,7 @@ public final class Serde {
     }
   }
 
-  public static <T extends NativeBean> T fromJson(String json, Class<T> valueType) {
+  public static <T extends NativeBean> T fromJson(String json, Class<? extends T> valueType) {
     try {
       return JSON.reader().readValue(json, valueType);
     } catch (IOException e) {

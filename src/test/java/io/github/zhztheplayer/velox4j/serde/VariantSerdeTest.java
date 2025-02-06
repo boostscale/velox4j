@@ -10,6 +10,9 @@ import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
 import io.github.zhztheplayer.velox4j.variant.SmallIntValue;
 import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
+import io.github.zhztheplayer.velox4j.variant.VarBinaryValue;
+import io.github.zhztheplayer.velox4j.variant.VarCharValue;
+import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,5 +80,17 @@ public class VariantSerdeTest {
   public void testDoubleValue() {
     SerdeTests.testVariantRoundTrip(new DoubleValue(-5.5d));
     SerdeTests.testVariantRoundTrip(new DoubleValue(5.5d));
+  }
+
+  @Test
+  public void testVarCharValue() {
+    SerdeTests.testVariantRoundTrip(new VarCharValue("foo"));
+  }
+
+  @Test
+  public void testVarBinaryValue() {
+    final VarBinaryValue in = VarBinaryValue.create("foo".getBytes());
+    final VarBinaryValue out = SerdeTests.testVariantRoundTrip(in).getObj();
+    Assert.assertEquals(in.getValue(), out.getValue());
   }
 }

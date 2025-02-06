@@ -50,35 +50,35 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public final class SerdeTests {
-  public static String testVeloxSerializableRoundTrip(VeloxSerializable inObj) {
+  public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);
-      return outJson2;
+      return new ObjectAndJson<>((T) outObj, outJson2);
     }
   }
 
-  public static String testVeloxSerializableRoundTrip(String inJson,
-      Class<? extends VeloxSerializable> valueType) {
-    final VeloxSerializable inObj = Serde.fromJson(inJson, valueType);
-    return testVeloxSerializableRoundTrip(inObj);
+  public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(String inJson,
+      Class<? extends T> valueType) {
+    final T inObj = Serde.fromJson(inJson, valueType);
+    return SerdeTests.testVeloxSerializableRoundTrip(inObj);
   }
 
-  public static String testVariantRoundTrip(Variant inObj) {
+  public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inJson, outJson2);
-      return outJson2;
+      return new ObjectAndJson<>((T) outObj, outJson2);
     }
   }
 
-  public static String testJavaBeanRoundTrip(Object inObj) {
+  public static <T extends Object> ObjectAndJson<T> testJavaBeanRoundTrip(T inObj) {
     try {
       if (inObj instanceof NativeBean) {
         throw new VeloxException("Cannot round trip NativeBean");
@@ -89,7 +89,7 @@ public final class SerdeTests {
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
       Assert.assertEquals(inJson, outJson);
-      return outJson;
+      return new ObjectAndJson<>((T) outObj, outJson);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -205,5 +205,23 @@ public final class SerdeTests {
     final String serialized = Resources.readResourceAsString("vector/rowvector-1.b64");
     final BaseVector deserialized = BaseVectors.deserialize(jniApi, serialized);
     return ((RowVector) deserialized);
+  }
+
+  public static class ObjectAndJson<T> {
+    private final T obj;
+    private final String json;
+
+    private ObjectAndJson(T obj, String json) {
+      this.obj = obj;
+      this.json = json;
+    }
+
+    public T getObj() {
+      return obj;
+    }
+
+    public String getJson() {
+      return json;
+    }
   }
 }

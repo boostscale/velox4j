@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DoubleValue extends Variant {
-    private final double value;
+  private final double value;
 
-    @JsonCreator
-    public DoubleValue(@JsonProperty("value") double value) {
-        this.value = value;
-    }
+  @JsonCreator
+  public DoubleValue(@JsonProperty("value") double value) {
+    this.value = value;
+  }
 
-    @JsonGetter("value")
-    public double isValue() {
-        return value;
-    }
+  @JsonGetter("value")
+  public double isValue() {
+    return value;
+  }
 }

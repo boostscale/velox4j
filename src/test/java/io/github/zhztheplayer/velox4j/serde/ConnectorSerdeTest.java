@@ -25,7 +25,7 @@ public class ConnectorSerdeTest {
   @Test
   public void testFileFormat() {
     final FileFormat in = FileFormat.DWRF;
-    final String json = SerdeTests.testJavaBeanRoundTrip(in);
+    final String json = SerdeTests.testJavaBeanRoundTrip(in).getJson();
     Assert.assertEquals("\"dwrf\"", json);
   }
 
