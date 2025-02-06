@@ -9,6 +9,7 @@ import io.github.zhztheplayer.velox4j.variant.HugeIntValue;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
 import io.github.zhztheplayer.velox4j.variant.SmallIntValue;
+import io.github.zhztheplayer.velox4j.variant.TimestampValue;
 import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
 import io.github.zhztheplayer.velox4j.variant.VarBinaryValue;
 import io.github.zhztheplayer.velox4j.variant.VarCharValue;
@@ -92,5 +93,15 @@ public class VariantSerdeTest {
     final VarBinaryValue in = VarBinaryValue.create("foo".getBytes());
     final VarBinaryValue out = SerdeTests.testVariantRoundTrip(in).getObj();
     Assert.assertEquals(in.getValue(), out.getValue());
+  }
+
+  @Test
+  public void testTimestampValue() {
+    long seconds = System.currentTimeMillis() / 1000;
+    long nanos = System.nanoTime() % 1_000_000_000L;
+    final TimestampValue in = TimestampValue.create(seconds, nanos);
+    final TimestampValue out = SerdeTests.testVariantRoundTrip(in).getObj();
+    Assert.assertEquals(in.getSeconds(), out.getSeconds());
+    Assert.assertEquals(in.getNanos(), out.getNanos());
   }
 }

@@ -24,5 +24,6 @@ public class Variants {
     TYPE_REGISTRY.registerClass("DOUBLE", DoubleValue.class);
     TYPE_REGISTRY.registerClass("VARCHAR", VarCharValue.class);
     TYPE_REGISTRY.registerClass("VARBINARY", VarBinaryValue.class);
+    TYPE_REGISTRY.registerClass("TIMESTAMP", TimestampValue.class);
   }
 }
