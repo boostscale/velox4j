@@ -50,13 +50,17 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 public final class SerdeTests {
+  private static void assertJsonEquals(String expected, String actual) {
+    Assert.assertEquals(expected, actual);
+  }
+
   public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final JniApi jniApi = JniApi.create()) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
-      Assert.assertEquals(inJson, outJson2);
+      assertJsonEquals(inJson, outJson2);
       return new ObjectAndJson<>((T) outObj, outJson2);
     }
   }
@@ -73,7 +77,7 @@ public final class SerdeTests {
       final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
-      Assert.assertEquals(inJson, outJson2);
+      assertJsonEquals(inJson, outJson2);
       return new ObjectAndJson<>((T) outObj, outJson2);
     }
   }
@@ -88,7 +92,7 @@ public final class SerdeTests {
       final String inJson = jsonMapper.writeValueAsString(inObj);
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
-      Assert.assertEquals(inJson, outJson);
+      assertJsonEquals(inJson, outJson);
       return new ObjectAndJson<>((T) outObj, outJson);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);

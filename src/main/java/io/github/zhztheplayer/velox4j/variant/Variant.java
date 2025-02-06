@@ -7,5 +7,9 @@ import io.github.zhztheplayer.velox4j.serde.NativeBean;
  * deserialized from JSON.
  */
 public abstract class Variant implements NativeBean {
+  @Override
+  public abstract boolean equals(Object obj);
 
+  @Override
+  public abstract int hashCode();
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Base64;
+import java.util.Objects;
 
 public class VarBinaryValue extends Variant {
   private final String value;
@@ -21,5 +22,18 @@ public class VarBinaryValue extends Variant {
   @JsonGetter("value")
   public String getValue() {
     return value;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    VarBinaryValue that = (VarBinaryValue) o;
+    return Objects.equals(value, that.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(value);
   }
 }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
+import java.util.Objects;
+
 public class TimestampValue extends Variant {
   private static final int DUMMY_VALUE = -1;
   private final int value;
@@ -40,5 +42,18 @@ public class TimestampValue extends Variant {
   @JsonGetter("nanos")
   public long getNanos() {
     return nanos;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TimestampValue that = (TimestampValue) o;
+    return value == that.value && seconds == that.seconds && nanos == that.nanos;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value, seconds, nanos);
   }
 }

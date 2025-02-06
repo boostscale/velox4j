@@ -120,8 +120,12 @@ public class VariantSerdeTest {
 
   @Test
   public void testMapValue() {
-    SerdeTests.testVariantRoundTrip(MapValue.create(Map.of(
+    SerdeTests.testVariantRoundTrip(new MapValue(Map.of(
         new IntegerValue(100), new BooleanValue(false),
+        new IntegerValue(1000), new BooleanValue(true),
+        new IntegerValue(400), new BooleanValue(false),
+        new IntegerValue(800), new BooleanValue(false),
+        new IntegerValue(200), new BooleanValue(true),
         new IntegerValue(500), new BooleanValue(true))));
   }
 

@@ -7,30 +7,50 @@ import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MapValue extends Variant {
-  private final Entries entries;
+  private final Map<Variant, Variant> map;
 
-  @JsonCreator
-  private MapValue(@JsonProperty("value") Entries entries) {
-    this.entries = entries;
+  public MapValue(Map<Variant, Variant> map) {
+    this.map = Collections.unmodifiableMap(map);
   }
 
-  public static MapValue create(Map<Variant, Variant> map) {
+  @JsonCreator
+  public static MapValue create(@JsonProperty("value") Entries entries) {
+    final int size = entries.size();
+    final Map<Variant, Variant> builder = new HashMap<>(size);
+    for (int i = 0; i < size; i++) {
+      builder.put(entries.getKeys().get(i), entries.getValues().get(i));
+    }
+    return new MapValue(builder);
+  }
+
+  @JsonGetter("value")
+  public Entries getEntries() {
     final List<Variant> keys = new ArrayList<>(map.size());
     final List<Variant> values = new ArrayList<>(map.size());
     for (Map.Entry<Variant, Variant> entry : map.entrySet()) {
       keys.add(entry.getKey());
       values.add(entry.getValue());
     }
-    return new MapValue(new Entries(keys, values));
+    return new Entries(keys, values);
   }
 
-  @JsonGetter("value")
-  public Entries getEntries() {
-    return entries;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    MapValue mapValue = (MapValue) o;
+    return Objects.equals(map, mapValue.map);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(map);
   }
 
   public static class Entries {
