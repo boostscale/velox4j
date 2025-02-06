@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,11 +41,9 @@ public class MapValue extends Variant {
     final List<Variant> values = new ArrayList<>(size);
     // The following is basically for test code, to write the map values into JSON with a
     //  comparatively stable order.
-    // TODO: Comparison on hash codes is not a good idea, because the order is not guaranteed when
-    //  there is hash collisions. A better way is to write reliable #compareTo implementations
-    //  for all variants.
+    // TODO: A better way is to write reliable #compareTo implementations for all variants.
     final List<Map.Entry<Variant, Variant>> orderedEntries =
-        map.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::hashCode))
+        map.entrySet().stream().sorted(Comparator.comparing(o -> Serde.toJson(o.getKey())))
             .collect(Collectors.toList());
     for (Map.Entry<Variant, Variant> entry : orderedEntries) {
       keys.add(entry.getKey());
