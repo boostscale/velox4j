@@ -38,8 +38,8 @@ public class MapValue extends Variant {
     final int size = map.size();
     final List<Variant> keys = new ArrayList<>(size);
     final List<Variant> values = new ArrayList<>(size);
-    // This is basically for test code, to write the map values into JSON with a comparatively
-    //  stable order.
+    // The following is basically for test code, to write the map values into JSON with a
+    //  comparatively stable order.
     // TODO: Comparison on hash codes is not a good idea, because the order is not guaranteed when
     //  there is hash collisions. A better way is to write reliable #compareTo implementations
     //  for all variants.
