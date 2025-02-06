@@ -34,7 +34,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   velox4j::getJniErrorState()->ensureInitialized(env);
   velox4j::initForSpark();
   velox4j::jniClassRegistry()->add(env, new velox4j::JniWrapper(env));
-  velox4j::jniClassRegistry()->add(env, new velox4j::DownIterator(env));
+  velox4j::jniClassRegistry()->add(env, new velox4j::DownIteratorJniWrapper(env));
 
   LOG(INFO) << "Velox4j initialized.";
   return JAVA_VERSION;

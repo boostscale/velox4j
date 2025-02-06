@@ -22,13 +22,13 @@ namespace velox4j {
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";
 }
-void DownIterator::mapFields() {}
+void DownIteratorJniWrapper::mapFields() {}
 
-const char* DownIterator::getCanonicalName() const {
+const char* DownIteratorJniWrapper::getCanonicalName() const {
   return kClassName;
 }
 
-void DownIterator::initialize(JNIEnv* env) {
+void DownIteratorJniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "hasNext", kTypeBool, NULL);

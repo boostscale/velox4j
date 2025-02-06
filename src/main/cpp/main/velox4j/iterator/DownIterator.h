@@ -20,10 +20,10 @@
 #pragma once
 
 namespace velox4j {
-class DownIterator final : public spotify::jni::JavaClass {
+class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
  public:
-  explicit DownIterator(JNIEnv* env) : JavaClass(env) {
-    DownIterator::initialize(env);
+  explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
+    DownIteratorJniWrapper::initialize(env);
   }
 
   const char* getCanonicalName() const override;
