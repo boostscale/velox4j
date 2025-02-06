@@ -96,7 +96,7 @@ class Out : public UpIterator {
 
  private:
   void advance() {
-    VELOX_CHECK_NULL(pending_);
+    VELOX_CHECK_nullptr(pending_);
     RowVectorPtr vector;
     while (true) {
       auto future = ContinueFuture::makeEmpty();
@@ -108,7 +108,7 @@ class Out : public UpIterator {
       }
       // Velox suggested to wait. This might be because another thread (e.g.,
       // background io thread) is spilling the task.
-      VELOX_CHECK_NOT_NULL(
+      VELOX_CHECK_NOT_nullptr(
           out,
           "Expected to wait but still got non-null output from Velox task");
       VLOG(2)

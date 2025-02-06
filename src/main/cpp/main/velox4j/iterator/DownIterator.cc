@@ -16,12 +16,28 @@
  */
 
 #include "DownIterator.h"
+#include "velox4j/jni/JniCommon.h"
+#include "velox4j/lifecycle/ObjectStore.h"
 
 namespace velox4j {
 
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";
+
+JNIEnv* getLocalJNIEnv() {
+  static std::atomic<uint32_t> nextThreadId{0};
+  if (spotify::jni::JavaThreadUtils::getEnvForCurrentThread() == nullptr) {
+    const std::string name =
+        fmt::format("Velox4j Native Thread {}", nextThreadId++);
+    spotify::jni::JavaThreadUtils::attachCurrentThreadAsDaemonToJVM(
+        name.c_str());
+  }
+  JNIEnv* env = spotify::jni::JavaThreadUtils::getEnvForCurrentThread();
+  VELOX_CHECK(env != nullptr);
+  return env;
 }
+} // namespace
+
 void DownIteratorJniWrapper::mapFields() {}
 
 const char* DownIteratorJniWrapper::getCanonicalName() const {
@@ -31,9 +47,35 @@ const char* DownIteratorJniWrapper::getCanonicalName() const {
 void DownIteratorJniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
-  cacheMethod(env, "hasNext", kTypeBool, NULL);
-  cacheMethod(env, "next", kTypeLong, NULL);
+  cacheMethod(env, "hasNext", kTypeBool, nullptr);
+  cacheMethod(env, "next", kTypeLong, nullptr);
 
   registerNativeMethods(env);
+}
+
+DownIterator::DownIterator(JNIEnv* env, jobject ref) {
+  ref_ = env->NewGlobalRef(ref);
+}
+
+DownIterator::~DownIterator() {
+  getLocalJNIEnv()->DeleteGlobalRef(ref_);
+}
+
+bool DownIterator::hasNext() {
+  auto* env = getLocalJNIEnv();
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("hasNext");
+  const jboolean hasNext = env->CallBooleanMethod(ref_, methodId);
+  checkException(env);
+  return hasNext;
+}
+
+RowVectorPtr DownIterator::next() {
+  auto* env = getLocalJNIEnv();
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("next");
+  const jlong rvId = env->CallLongMethod(ref_, methodId);
+  checkException(env);
+  return ObjectStore::retrieve<RowVector>(rvId);
 }
 } // namespace velox4j

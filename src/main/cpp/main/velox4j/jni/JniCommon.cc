@@ -40,7 +40,7 @@ void checkException(JNIEnv* env) {
     jthrowable t = env->ExceptionOccurred();
     env->ExceptionClear();
     jclass describerClass =
-        env->FindClass("org/apache/gluten/exception/JniExceptionDescriber");
+        env->FindClass("io/github/zhztheplayer/velox4j/exception/ExceptionDescriber");
     jmethodID describeMethod = env->GetStaticMethodID(
         describerClass,
         "describe",
@@ -123,7 +123,7 @@ void attachCurrentThreadAsDaemonOrThrow(JavaVM* vm, JNIEnv** out) {
     DLOG(INFO) << "JNIEnv was not attached to current thread.";
     // Reattach current thread to JVM
     getEnvStat =
-        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(out), NULL);
+        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(out), nullptr);
     if (getEnvStat != JNI_OK) {
       VELOX_FAIL("Failed to reattach current thread to JVM");
     }

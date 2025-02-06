@@ -1,30 +1,34 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <JniHelpers.h>
+#include <velox/vector/ComplexVector.h>
 
 #pragma once
 
 namespace velox4j {
+using namespace facebook::velox;
 class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
  public:
   explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
     DownIteratorJniWrapper::initialize(env);
   }
+
+  DownIteratorJniWrapper() : JavaClass() {};
 
   const char* getCanonicalName() const override;
 
@@ -32,4 +36,27 @@ class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
 
   void mapFields() override;
 };
-}
+
+class DownIterator {
+ public:
+  // CTOR.
+  DownIterator(JNIEnv* env, jobject ref);
+
+  // Delete copy/move CTORs.
+  DownIterator(DownIterator&&) = delete;
+  DownIterator(const DownIterator&) = delete;
+  DownIterator& operator=(const DownIterator&) = delete;
+  DownIterator& operator=(DownIterator&&) = delete;
+
+  // DTOR.
+  virtual ~DownIterator();;
+
+  bool hasNext();
+
+  RowVectorPtr next();
+
+ private:
+  jobject ref_;
+};
+
+} // namespace velox4j

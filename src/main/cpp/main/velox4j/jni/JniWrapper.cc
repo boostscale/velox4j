@@ -41,6 +41,7 @@ Session* sessionOf(JNIEnv* env, jobject javaThis) {
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("sessionId");
   const jlong sessionId = env->CallLongMethod(javaThis, methodId);
+  checkException(env);
   return ObjectStore::retrieve<Session>(sessionId).get();
 }
 
@@ -237,34 +238,34 @@ const char* JniWrapper::getCanonicalName() const {
 void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
-  cacheMethod(env, "sessionId", kTypeLong, NULL);
+  cacheMethod(env, "sessionId", kTypeLong, nullptr);
 
-  addNativeMethod("createSession", (void*)createSession, kTypeLong, NULL);
+  addNativeMethod("createSession", (void*)createSession, kTypeLong, nullptr);
   addNativeMethod(
-      "releaseCppObject", (void*)releaseCppObject, kTypeVoid, kTypeLong, NULL);
+      "releaseCppObject", (void*)releaseCppObject, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
-      "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, NULL);
+      "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
       "upIteratorHasNext",
       (void*)upIteratorHasNext,
       kTypeBool,
       kTypeLong,
-      NULL);
+      nullptr);
   addNativeMethod(
-      "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, NULL);
+      "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,
       kTypeString,
       kTypeString,
-      NULL);
+      nullptr);
   addNativeMethod(
       "arrowToBaseVector",
       (void*)arrowToBaseVector,
       kTypeLong,
       kTypeLong,
       kTypeLong,
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorToArrow",
       (void*)baseVectorToArrow,
@@ -272,25 +273,25 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeLong,
       kTypeLong,
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorSerialize",
       (void*)baseVectorSerialize,
       kTypeString,
       kTypeArray(kTypeLong),
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorDeserialize",
       (void*)baseVectorDeserialize,
       kTypeArray(kTypeLong),
       kTypeString,
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorGetType",
       (void*)baseVectorGetType,
       kTypeString,
       kTypeLong,
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorWrapInConstant",
       (void*)baseVectorWrapInConstant,
@@ -298,27 +299,27 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeInt,
       kTypeInt,
-      NULL);
+      nullptr);
   addNativeMethod(
       "baseVectorGetEncoding",
       (void*)baseVectorGetEncoding,
       kTypeString,
       kTypeLong,
-      NULL);
+      nullptr);
   addNativeMethod(
-      "baseVectorNewRef", (void*)baseVectorNewRef, kTypeLong, kTypeLong, NULL);
+      "baseVectorNewRef", (void*)baseVectorNewRef, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "deserializeAndSerialize",
       (void*)deserializeAndSerialize,
       kTypeString,
       kTypeString,
-      NULL);
+      nullptr);
   addNativeMethod(
       "deserializeAndSerializeVariant",
       (void*)deserializeAndSerializeVariant,
       kTypeString,
       kTypeString,
-      NULL);
+      nullptr);
 
   registerNativeMethods(env);
 }
