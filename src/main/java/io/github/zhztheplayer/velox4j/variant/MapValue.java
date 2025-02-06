@@ -7,10 +7,12 @@ import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MapValue extends Variant {
   private final Map<Variant, Variant> map;
@@ -33,9 +35,18 @@ public class MapValue extends Variant {
 
   @JsonGetter("value")
   public Entries getEntries() {
-    final List<Variant> keys = new ArrayList<>(map.size());
-    final List<Variant> values = new ArrayList<>(map.size());
-    for (Map.Entry<Variant, Variant> entry : map.entrySet()) {
+    final int size = map.size();
+    final List<Variant> keys = new ArrayList<>(size);
+    final List<Variant> values = new ArrayList<>(size);
+    // This is basically for test code, to write the map values into JSON with a comparatively
+    //  stable order.
+    // TODO: Comparison on hash codes is not a good idea, because the order is not guaranteed when
+    //  there is hash collisions. A better way is to write reliable #compareTo implementations
+    //  for all variants.
+    final List<Map.Entry<Variant, Variant>> orderedEntries =
+        map.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::hashCode))
+            .collect(Collectors.toList());
+    for (Map.Entry<Variant, Variant> entry : orderedEntries) {
       keys.add(entry.getKey());
       values.add(entry.getValue());
     }
