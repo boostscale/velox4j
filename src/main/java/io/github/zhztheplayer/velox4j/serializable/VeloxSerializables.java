@@ -39,7 +39,7 @@ import io.github.zhztheplayer.velox4j.type.TimestampType;
 import io.github.zhztheplayer.velox4j.type.TinyIntType;
 import io.github.zhztheplayer.velox4j.type.UnknownType;
 import io.github.zhztheplayer.velox4j.type.VarbinaryType;
-import io.github.zhztheplayer.velox4j.type.VarcharType;
+import io.github.zhztheplayer.velox4j.type.VarCharType;
 
 public final class VeloxSerializables {
   private static final SerdeRegistry NAME_REGISTRY = SerdeRegistryFactory
@@ -71,7 +71,7 @@ public final class VeloxSerializables {
     typeRegistry.registerClass("HUGEINT", HugeIntType.class);
     typeRegistry.registerClass("REAL", RealType.class);
     typeRegistry.registerClass("DOUBLE", DoubleType.class);
-    typeRegistry.registerClass("VARCHAR", VarcharType.class);
+    typeRegistry.registerClass("VARCHAR", VarCharType.class);
     typeRegistry.registerClass("VARBINARY", VarbinaryType.class);
     typeRegistry.registerClass("TIMESTAMP", TimestampType.class);
     typeRegistry.registerClass("ARRAY", ArrayType.class);

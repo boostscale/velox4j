@@ -58,7 +58,7 @@ public class TypeSerdeTest {
 
   @Test
   public void testVarcharType() {
-    SerdeTests.testVeloxSerializableRoundTrip(new VarcharType());
+    SerdeTests.testVeloxSerializableRoundTrip(new VarCharType());
   }
 
   @Test
@@ -78,19 +78,19 @@ public class TypeSerdeTest {
 
   @Test
   public void testMapType() {
-    SerdeTests.testVeloxSerializableRoundTrip(MapType.create(new IntegerType(), new VarcharType()));
+    SerdeTests.testVeloxSerializableRoundTrip(MapType.create(new IntegerType(), new VarCharType()));
   }
 
   @Test
   public void testRowType() {
     SerdeTests.testVeloxSerializableRoundTrip(new RowType(List.of("foo", "bar"),
-        List.of(new IntegerType(), new VarcharType())));
+        List.of(new IntegerType(), new VarCharType())));
   }
 
   @Test
   public void testFunctionType() {
     SerdeTests.testVeloxSerializableRoundTrip(FunctionType.create(List.of(
-        new IntegerType(), new VarcharType()), new VarbinaryType()));
+        new IntegerType(), new VarCharType()), new VarbinaryType()));
   }
 
   @Test

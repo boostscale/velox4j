@@ -35,7 +35,7 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.MapType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
-import io.github.zhztheplayer.velox4j.type.VarcharType;
+import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
@@ -104,10 +104,10 @@ public final class SerdeTests {
   public static ColumnHandle newSampleHiveColumnHandle() {
     final Type dataType = ArrayType.create(
         MapType.create(
-            new VarcharType(),
+            new VarCharType(),
             new RowType(List.of("id", "description"),
                 List.of(new BigIntType(),
-                    new VarcharType()))));
+                    new VarCharType()))));
     final ColumnHandle handle = new HiveColumnHandle("complex_type",
         ColumnType.REGULAR, dataType, dataType, List.of(
         "complex_type[1][\"foo\"].id",
@@ -172,7 +172,7 @@ public final class SerdeTests {
         true,
         List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
         new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
-        new RowType(List.of("foo", "bar"), List.of(new VarcharType(), new VarcharType())),
+        new RowType(List.of("foo", "bar"), List.of(new VarCharType(), new VarCharType())),
         Map.of("tk", "tv")
     );
     return handle;

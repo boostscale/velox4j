@@ -15,7 +15,7 @@ import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import io.github.zhztheplayer.velox4j.type.VarcharType;
+import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -88,7 +88,7 @@ public class ExprSerdeTest {
   @Test
   public void testLambdaTypedExpr() {
     final RowType signature = new RowType(List.of("foo", "bar"),
-        List.of(new IntegerType(), new VarcharType()));
+        List.of(new IntegerType(), new VarCharType()));
     final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
         FieldAccessTypedExpr.create(new IntegerType(), "foo"));
     SerdeTests.testVeloxSerializableRoundTrip(lambdaTypedExpr);
