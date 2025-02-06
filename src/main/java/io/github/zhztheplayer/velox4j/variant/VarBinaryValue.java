@@ -36,4 +36,11 @@ public class VarBinaryValue extends Variant {
   public int hashCode() {
     return Objects.hashCode(value);
   }
+
+  @Override
+  public String toString() {
+    return "VarBinaryValue{" +
+        "value='" + value + '\'' +
+        '}';
+  }
 }

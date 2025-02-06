@@ -56,4 +56,13 @@ public class TimestampValue extends Variant {
   public int hashCode() {
     return Objects.hash(value, seconds, nanos);
   }
+
+  @Override
+  public String toString() {
+    return "TimestampValue{" +
+        "value=" + value +
+        ", seconds=" + seconds +
+        ", nanos=" + nanos +
+        '}';
+  }
 }

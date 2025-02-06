@@ -33,4 +33,11 @@ public class RowValue extends Variant {
   public int hashCode() {
     return Objects.hashCode(row);
   }
+
+  @Override
+  public String toString() {
+    return "RowValue{" +
+        "row=" + row +
+        '}';
+  }
 }

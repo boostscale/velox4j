@@ -31,4 +31,11 @@ public class BigIntValue extends Variant {
   public int hashCode() {
     return Objects.hashCode(value);
   }
+
+  @Override
+  public String toString() {
+    return "BigIntValue{" +
+        "value=" + value +
+        '}';
+  }
 }

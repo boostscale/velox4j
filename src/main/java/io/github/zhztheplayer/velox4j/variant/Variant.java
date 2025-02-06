@@ -12,4 +12,7 @@ public abstract class Variant implements NativeBean {
 
   @Override
   public abstract int hashCode();
+
+  @Override
+  public abstract String toString();
 }

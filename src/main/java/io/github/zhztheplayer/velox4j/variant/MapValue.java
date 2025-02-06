@@ -13,13 +13,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class MapValue extends Variant {
   private final Map<Variant, Variant> map;
 
   public MapValue(Map<Variant, Variant> map) {
-    this.map = Collections.unmodifiableMap(map);
+    // The following is basically for test code, to write the map values into JSON with a
+    //  comparatively stable order.
+    // TODO: This may cause slow serialization as Variant#toString may be slow.
+    //  A better way is to write reliable Variant#compareTo implementations for all variants.
+    final TreeMap<Variant, Variant> builder = new TreeMap<>(Comparator.comparing(Variant::toString));
+    builder.putAll(map);
+    this.map = Collections.unmodifiableSortedMap(builder);
   }
 
   @JsonCreator
@@ -39,14 +46,7 @@ public class MapValue extends Variant {
     final int size = map.size();
     final List<Variant> keys = new ArrayList<>(size);
     final List<Variant> values = new ArrayList<>(size);
-    // The following is basically for test code, to write the map values into JSON with a
-    //  comparatively stable order.
-    // TODO: This may cause slow serialization as Serde#toJson is called recursively.
-    //  A better way is to write reliable #compareTo implementations for all variants.
-    final List<Map.Entry<Variant, Variant>> orderedEntries =
-        map.entrySet().stream().sorted(Comparator.comparing(o -> Serde.toJson(o.getKey())))
-            .collect(Collectors.toList());
-    for (Map.Entry<Variant, Variant> entry : orderedEntries) {
+    for (Map.Entry<Variant, Variant> entry : map.entrySet()) {
       keys.add(entry.getKey());
       values.add(entry.getValue());
     }
@@ -64,6 +64,13 @@ public class MapValue extends Variant {
   @Override
   public int hashCode() {
     return Objects.hashCode(map);
+  }
+
+  @Override
+  public String toString() {
+    return "MapValue{" +
+        "map=" + map +
+        '}';
   }
 
   public static class Entries {

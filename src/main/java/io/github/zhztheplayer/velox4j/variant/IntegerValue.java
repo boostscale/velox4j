@@ -31,4 +31,11 @@ public class IntegerValue extends Variant {
   public int hashCode() {
     return Objects.hashCode(value);
   }
+
+  @Override
+  public String toString() {
+    return "IntegerValue{" +
+        "value=" + value +
+        '}';
+  }
 }

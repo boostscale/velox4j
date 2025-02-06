@@ -34,4 +34,11 @@ public class ArrayValue extends Variant {
   public int hashCode() {
     return Objects.hashCode(array);
   }
+
+  @Override
+  public String toString() {
+    return "ArrayValue{" +
+        "array=" + array +
+        '}';
+  }
 }
