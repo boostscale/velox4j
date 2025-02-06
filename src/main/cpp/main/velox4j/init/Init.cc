@@ -29,7 +29,9 @@
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 #include <velox/type/Filter.h>
-#include <velox4j/query/Query.h>
+#include <velox/dwio/parquet/RegisterParquetReader.h>
+#include <velox/dwio/parquet/RegisterParquetWriter.h>
+#include "velox4j/query/Query.h"
 
 namespace velox4j {
 
@@ -54,6 +56,9 @@ void initForSpark() {
     config::globalConfig().exceptionUserStacktraceEnabled = true;
     filesystems::registerLocalFileSystem();
     memory::MemoryManager::initialize({});
+    dwio::common::registerFileSinks();
+    parquet::registerParquetReaderFactory();
+    parquet::registerParquetWriterFactory();
     functions::sparksql::registerFunctions();
     aggregate::prestosql::registerAllAggregateFunctions(
         "",
