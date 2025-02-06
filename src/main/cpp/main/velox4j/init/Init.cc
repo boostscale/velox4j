@@ -52,6 +52,7 @@ void initForSpark() {
     config::globalConfig().memoryPoolCapacityTransferAcrossTasks = true;
     config::globalConfig().exceptionSystemStacktraceEnabled = true;
     config::globalConfig().exceptionUserStacktraceEnabled = true;
+    filesystems::registerLocalFileSystem();
     memory::MemoryManager::initialize({});
     functions::sparksql::registerFunctions();
     aggregate::prestosql::registerAllAggregateFunctions(
