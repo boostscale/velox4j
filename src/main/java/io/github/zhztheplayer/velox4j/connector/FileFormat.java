@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.connector;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FileFormat {
@@ -17,6 +18,7 @@ public enum FileFormat {
 
   private final String value;
 
+  @JsonCreator
   FileFormat(String value) {
     this.value = value;
   }
