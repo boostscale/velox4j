@@ -6,6 +6,7 @@ add_library(velox4j SHARED
         velox4j/jni/JniWrapper.cc
         velox4j/exec/QueryExecutor.cc
         velox4j/iterator/UpIterator.cc
+        velox4j/iterator/DownIterator.cc
         velox4j/lifecycle/ObjectStore.cc
         velox4j/lifecycle/Session.cc
         velox4j/arrow/Arrow.cc

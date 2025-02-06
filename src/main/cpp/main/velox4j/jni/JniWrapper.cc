@@ -29,7 +29,7 @@ namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-jmethodID mSessionId = nullptr;
+const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
 long createSession(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
@@ -38,7 +38,9 @@ long createSession(JNIEnv* env, jobject javaThis) {
 }
 
 Session* sessionOf(JNIEnv* env, jobject javaThis) {
-  jlong sessionId = env->CallLongMethod(javaThis, mSessionId);
+  const auto* clazz = jniClassRegistry()->get(kClassName);
+  const jlong sessionId =
+      env->CallLongMethod(javaThis, clazz->getMethod("sessionId"));
   return ObjectStore::retrieve<Session>(sessionId).get();
 }
 
@@ -229,18 +231,13 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
 void JniWrapper::mapFields() {}
 
 const char* JniWrapper::getCanonicalName() const {
-  return "io/github/zhztheplayer/velox4j/jni/JniWrapper";
+  return kClassName;
 }
 
 void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
-  {
-    VELOX_CHECK_NULL(mSessionId);
-    std::string signature;
-    spotify::jni::JavaClassUtils::makeSignature(signature, kTypeLong, NULL);
-    mSessionId = env->GetMethodID(_clazz, "sessionId", signature.c_str());
-  }
+  cacheMethod(env, "sessionId", kTypeLong, NULL);
 
   addNativeMethod("createSession", (void*)createSession, kTypeLong, NULL);
   addNativeMethod(

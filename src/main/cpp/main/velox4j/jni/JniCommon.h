@@ -19,6 +19,7 @@
 #include <string>
 #include <mutex>
 #include <cmath>
+#include <JniHelpers.h>
 
 #pragma once
 
@@ -49,25 +50,22 @@ jmethodID getMethodIdOrError(
     jclass thisClass,
     const char* name,
     const char* sig);
-
 jmethodID getStaticMethodId(
     JNIEnv* env,
     jclass thisClass,
     const char* name,
     const char* sig);
-
 jmethodID getStaticMethodIdOrError(
     JNIEnv* env,
     jclass thisClass,
     const char* name,
     const char* sig);
-
 void attachCurrentThreadAsDaemonOrThrow(
     JavaVM* vm,
     JNIEnv** out);
-
 template <typename T>
-static T* jniCastOrThrow(jlong handle);
+T* jniCastOrThrow(jlong handle);
+spotify::jni::ClassRegistry* jniClassRegistry();
 
 #define CONCATENATE(t1, t2, t3) t1##t2##t3
 

@@ -142,4 +142,9 @@ T* jniCastOrThrow(jlong handle) {
       instance != nullptr, "FATAL: resource instance should not be null.");
   return instance;
 }
+
+spotify::jni::ClassRegistry* jniClassRegistry() {
+  static spotify::jni::ClassRegistry gClasses;
+  return &gClasses;
+}
 } // namespace velox4j

@@ -15,27 +15,25 @@
  * limitations under the License.
  */
 
-#include <JniHelpers.h>
-#include <glog/logging.h>
-#include <jni.h>
-#include "JniWrapper.h"
-#include "velox4j/init/Init.h"
-#include "velox4j/jni/JniError.h"
-#include "velox4j/jni/JniCommon.h"
-#include "velox4j/iterator/DownIterator.h"
+#include "DownIterator.h"
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
-  LOG(INFO) << "Initializing Velox4j...";
-  JNIEnv* env = jniHelpersInitialize(jvm);
-  if (env == nullptr) {
-    return -1;
-  }
+namespace velox4j {
 
-  velox4j::getJniErrorState()->ensureInitialized(env);
-  velox4j::initForSpark();
-  velox4j::jniClassRegistry()->add(env, new velox4j::JniWrapper(env));
-  velox4j::jniClassRegistry()->add(env, new velox4j::DownIterator(env));
-
-  LOG(INFO) << "Velox4j initialized.";
-  return JAVA_VERSION;
+namespace {
+const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";
 }
+void DownIterator::mapFields() {}
+
+const char* DownIterator::getCanonicalName() const {
+  return kClassName;
+}
+
+void DownIterator::initialize(JNIEnv* env) {
+  JavaClass::setClass(env);
+
+  cacheMethod(env, "hasNext", kTypeBool, NULL);
+  cacheMethod(env, "next", kTypeLong, NULL);
+
+  registerNativeMethods(env);
+}
+} // namespace velox4j
