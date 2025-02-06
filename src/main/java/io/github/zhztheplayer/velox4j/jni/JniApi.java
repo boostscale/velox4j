@@ -21,15 +21,18 @@ import java.util.stream.Collectors;
  * details like native pointers and serialized data from developers, instead
  * provides objective forms of the required functionalities.
  */
-public final class JniApi implements CppObject {
+public final class JniApi implements AutoCloseable {
 
   public static JniApi create() {
     return new JniApi();
   }
 
-  private final JniWrapper jni = JniWrapper.create();
+  private final Session session;
+  private final JniWrapper jni;
 
   private JniApi() {
+    this.session = new Session(JniWrapper.getStaticInstance().createSession());
+    this.jni = new JniWrapper(session);
   }
 
   public UpIterator executeQuery(String jsonQuery) {
@@ -117,12 +120,7 @@ public final class JniApi implements CppObject {
   }
 
   @Override
-  public JniApi jniApi() {
-    return this;
-  }
-
-  @Override
-  public long id() {
-    return jni.sessionId();
+  public void close() {
+    jni.releaseCppObject(session.getId());
   }
 }

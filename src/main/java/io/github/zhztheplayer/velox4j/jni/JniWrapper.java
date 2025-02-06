@@ -17,20 +17,28 @@
 
 package io.github.zhztheplayer.velox4j.jni;
 
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
+
 public final class JniWrapper {
-  public static JniWrapper create() {
-    return new JniWrapper();
+  private static final JniWrapper STATIC_INSTANCE = new JniWrapper(null);
+
+  static JniWrapper getStaticInstance() {
+    return STATIC_INSTANCE;
   }
 
-  private final long sessionId;
+  private final Session session;
 
-  private JniWrapper() {
-    this.sessionId = createSession();
+  JniWrapper(Session session) {
+    this.session = session;
   }
 
   @CalledFromNative
   public long sessionId() {
-    return sessionId;
+    if (session == null) {
+      // This is the static instance.
+      throw new VeloxException("Static instance of JniWrapper does not have a session assigned.");
+    }
+    return session.getId();
   }
 
   // Lifecycle.
