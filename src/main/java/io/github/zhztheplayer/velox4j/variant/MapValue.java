@@ -41,7 +41,8 @@ public class MapValue extends Variant {
     final List<Variant> values = new ArrayList<>(size);
     // The following is basically for test code, to write the map values into JSON with a
     //  comparatively stable order.
-    // TODO: A better way is to write reliable #compareTo implementations for all variants.
+    // TODO: This may cause slow serialization as Serde#toJson is called recursively.
+    //  A better way is to write reliable #compareTo implementations for all variants.
     final List<Map.Entry<Variant, Variant>> orderedEntries =
         map.entrySet().stream().sorted(Comparator.comparing(o -> Serde.toJson(o.getKey())))
             .collect(Collectors.toList());
