@@ -42,6 +42,7 @@ public class PlanNodeTest {
   @Test
   public void testTableScanNode() {
     // TODO: Cleanup the code.
+    // TODO: Add assertions.
     final JniApi jniApi = JniApi.create();
     final File file = Resources.copyResourceToTmp("data/tpch-sf0.1/nation/nation.parquet");
     final RowType outputType = new RowType(List.of("n_nationkey", "n_name", "n_regionkey", "n_comment"),
