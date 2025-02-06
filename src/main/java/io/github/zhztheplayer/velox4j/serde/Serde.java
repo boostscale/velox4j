@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -54,6 +55,14 @@ public final class Serde {
     try {
       return JSON.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
+      throw new VeloxException(e);
+    }
+  }
+
+  public static JsonNode parseTree(String json) {
+    try {
+      return JSON.reader().readTree(json);
+    } catch (IOException e) {
       throw new VeloxException(e);
     }
   }

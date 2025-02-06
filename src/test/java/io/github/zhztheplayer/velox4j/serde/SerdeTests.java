@@ -51,6 +51,7 @@ import java.util.OptionalLong;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {
+    Assert.assertEquals(Serde.parseTree(expected), Serde.parseTree(actual));
     Assert.assertEquals(expected, actual);
   }
 
