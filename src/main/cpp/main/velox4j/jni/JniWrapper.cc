@@ -38,9 +38,9 @@ long createSession(JNIEnv* env, jobject javaThis) {
 }
 
 Session* sessionOf(JNIEnv* env, jobject javaThis) {
-  const auto* clazz = jniClassRegistry()->get(kClassName);
-  const jlong sessionId =
-      env->CallLongMethod(javaThis, clazz->getMethod("sessionId"));
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("sessionId");
+  const jlong sessionId = env->CallLongMethod(javaThis, methodId);
   return ObjectStore::retrieve<Session>(sessionId).get();
 }
 
