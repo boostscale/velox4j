@@ -31,7 +31,7 @@ public final class JniApi implements AutoCloseable {
   private final JniWrapper jni;
 
   private JniApi() {
-    this.session = new Session(JniWrapper.getStaticInstance().createSession());
+    this.session = Session.create();
     this.jni = new JniWrapper(session);
   }
 
