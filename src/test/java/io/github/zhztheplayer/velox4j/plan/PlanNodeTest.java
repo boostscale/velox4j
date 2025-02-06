@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.plan;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
-import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
@@ -10,6 +9,7 @@ import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
+import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.query.BoundSplit;
 import io.github.zhztheplayer.velox4j.query.Query;
@@ -87,9 +87,10 @@ public class PlanNodeTest {
     );
     final Query query = new Query(node, splits);
     final String queryJson = Serde.toPrettyJson(query);
-    final List<RowVector> vectors = Streams.fromIterator(jniApi.executeQuery(queryJson)).collect(Collectors.toList());
+    final UpIterator itr = jniApi.executeQuery(queryJson);
     final BufferAllocator alloc = new RootAllocator();
-    for (RowVector vector : vectors) {
+    while (itr.hasNext()) {
+      final RowVector vector = itr.next();
       System.out.println(RowVectors.toString(alloc, vector));
     }
     jniApi.close();
