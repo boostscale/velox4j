@@ -2,12 +2,15 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.variant.ArrayValue;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import io.github.zhztheplayer.velox4j.variant.DoubleValue;
 import io.github.zhztheplayer.velox4j.variant.HugeIntValue;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
+import io.github.zhztheplayer.velox4j.variant.MapValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
+import io.github.zhztheplayer.velox4j.variant.RowValue;
 import io.github.zhztheplayer.velox4j.variant.SmallIntValue;
 import io.github.zhztheplayer.velox4j.variant.TimestampValue;
 import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
@@ -19,6 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 
 public class VariantSerdeTest {
   @BeforeClass
@@ -103,5 +108,28 @@ public class VariantSerdeTest {
     final TimestampValue out = SerdeTests.testVariantRoundTrip(in).getObj();
     Assert.assertEquals(in.getSeconds(), out.getSeconds());
     Assert.assertEquals(in.getNanos(), out.getNanos());
+  }
+
+  @Test
+  public void testArrayValue() {
+    SerdeTests.testVariantRoundTrip(new ArrayValue(
+        List.of(new IntegerValue(100), new IntegerValue(500))));
+    SerdeTests.testVariantRoundTrip(new ArrayValue(
+        List.of(new BooleanValue(false), new BooleanValue(true))));
+  }
+
+  @Test
+  public void testMapValue() {
+    SerdeTests.testVariantRoundTrip(MapValue.create(Map.of(
+        new IntegerValue(100), new BooleanValue(false),
+        new IntegerValue(500), new BooleanValue(true))));
+  }
+
+  @Test
+  public void testRowValue() {
+    SerdeTests.testVariantRoundTrip(new RowValue(
+        List.of(new IntegerValue(100), new BooleanValue(true))));
+    SerdeTests.testVariantRoundTrip(new RowValue(
+        List.of(new IntegerValue(500), new BooleanValue(false))));
   }
 }
