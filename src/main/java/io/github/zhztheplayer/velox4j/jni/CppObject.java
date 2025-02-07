@@ -5,6 +5,6 @@ public interface CppObject extends AutoCloseable {
 
   @Override
   default void close() {
-    JniWrapper.getStaticInstance().releaseCppObject(id());
+    JniApi.getStatic().releaseCppObject(this);
   };
 }

@@ -22,17 +22,20 @@ import java.util.stream.Collectors;
  * provides objective forms of the required functionalities.
  */
 public final class JniApi implements AutoCloseable {
+  private static final JniApi STATIC_INSTANCE = new JniApi(JniWrapper.staticInstance());
 
   public static JniApi create() {
-    return new JniApi();
+    return new JniApi(JniWrapper.create());
   }
 
-  private final Session session;
+  public static JniApi getStatic() {
+    return STATIC_INSTANCE;
+  }
+
   private final JniWrapper jni;
 
-  private JniApi() {
-    this.session = Session.create();
-    this.jni = new JniWrapper(session);
+  private JniApi(JniWrapper jni) {
+    this.jni = jni;
   }
 
   public UpIterator executeQuery(String jsonQuery) {
@@ -130,6 +133,6 @@ public final class JniApi implements AutoCloseable {
 
   @Override
   public void close() {
-    session.close();
+    jni.close();
   }
 }
