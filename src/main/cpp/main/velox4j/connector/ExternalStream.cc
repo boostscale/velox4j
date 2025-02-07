@@ -16,3 +16,7 @@
  */
 
 #include "ExternalStream.h"
+
+namespace velox4j {
+
+}
