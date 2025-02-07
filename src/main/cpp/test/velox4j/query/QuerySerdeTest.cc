@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 #include <velox/exec/tests/utils/HiveConnectorTestBase.h>
 #include <velox/exec/tests/utils/PlanBuilder.h>
-#include "velox4j/test/Init.h"
 #include "velox4j/query/Query.h"
+#include "velox4j/test/Init.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -39,6 +39,12 @@ class QuerySerdeTest : public testing::Test, public test::VectorTestBase {
     })};
   }
 
+  void testSerde(const Query* query) {
+    auto serialized = query->serialize();
+    auto copy = ISerializable::deserialize<Query>(serialized, pool());
+    ASSERT_EQ(query->toString(), copy->toString());
+  }
+
   std::vector<RowVectorPtr> data_;
 };
 
@@ -50,5 +56,6 @@ TEST_F(QuerySerdeTest, sanity) {
                   .planNode();
   std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
   auto query = std::make_shared<Query>(plan, std::move(boundSplits));
+  testSerde(query.get());
 }
 } // namespace velox4j
