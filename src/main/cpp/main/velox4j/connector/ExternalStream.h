@@ -72,7 +72,9 @@ class ExternalStream {
 
 class ExternalStreamConnectorSplit : public connector::ConnectorSplit {
  public:
-  ExternalStreamConnectorSplit(const std::string& connectorId, ObjectHandle esId)
+  ExternalStreamConnectorSplit(
+      const std::string& connectorId,
+      ObjectHandle esId)
       : ConnectorSplit(connectorId), esId_(esId) {}
 
   const ObjectHandle esId() const {
@@ -131,7 +133,7 @@ class ExternalStreamTableHandle : public connector::ConnectorTableHandle {
 class ExternalStreamDataSource : public connector::DataSource {
  public:
   explicit ExternalStreamDataSource(
-      std::shared_ptr<connector::ConnectorTableHandle> tableHandle)
+      const std::shared_ptr<connector::ConnectorTableHandle>& tableHandle)
       : DataSource() {
     tableHandle_ =
         std::dynamic_pointer_cast<ExternalStreamTableHandle>(tableHandle);
@@ -141,7 +143,8 @@ class ExternalStreamDataSource : public connector::DataSource {
     VELOX_CHECK(
         split->connectorId == tableHandle_->connectorId(),
         "Split's connector ID doesn't match table handle's connector ID");
-    auto esSplit = std::dynamic_pointer_cast<ExternalStreamConnectorSplit>(split);
+    auto esSplit =
+        std::dynamic_pointer_cast<ExternalStreamConnectorSplit>(split);
     auto es = ObjectStore::retrieve<ExternalStream>(esSplit->esId());
     streams_.push(es);
   }
@@ -245,7 +248,7 @@ class ExternalStreamConnector : public connector::Connector {
     VELOX_CHECK(
         columnHandles.empty(),
         "ExternalStreamConnector doesn't accept column handles");
-    return std::unique_ptr<ExternalStreamDataSource>();
+    return std::make_unique<ExternalStreamDataSource>(tableHandle);
   }
 
   std::unique_ptr<connector::DataSink> createDataSink(
