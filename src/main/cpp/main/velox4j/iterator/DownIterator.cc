@@ -27,10 +27,22 @@ const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";
 JNIEnv* getLocalJNIEnv() {
   static std::atomic<uint32_t> nextThreadId{0};
   if (spotify::jni::JavaThreadUtils::getEnvForCurrentThread() == nullptr) {
-    const std::string name =
+    const std::string threadName =
         fmt::format("Velox4j Native Thread {}", nextThreadId++);
-    spotify::jni::JavaThreadUtils::attachCurrentThreadAsDaemonToJVM(
-        name.c_str());
+    std::vector<char> threadNameCStr(threadName.length() + 1);
+    std::strcpy(threadNameCStr.data(), threadName.data());
+    JavaVM* vm = spotify::jni::JavaThreadUtils::getJavaVM();
+    JNIEnv* env{nullptr};
+    JavaVMAttachArgs args;
+    args.version = JAVA_VERSION;
+    args.name = threadNameCStr.data();
+    args.group = nullptr;
+    const int result =
+        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args);
+    if (result != JNI_OK) {
+      VELOX_FAIL("Failed to reattach current thread to JVM.");
+    }
+    return env;
   }
   JNIEnv* env = spotify::jni::JavaThreadUtils::getEnvForCurrentThread();
   VELOX_CHECK(env != nullptr);
@@ -58,7 +70,13 @@ DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
 }
 
 DownIterator::~DownIterator() {
-  getLocalJNIEnv()->DeleteGlobalRef(ref_);
+  try {
+    getLocalJNIEnv()->DeleteGlobalRef(ref_);
+  } catch (const std::exception& ex) {
+    LOG(WARNING)
+        << "Unable to destroy the global reference to the Java side down iterator: "
+        << ex.what();
+  }
 }
 
 bool DownIterator::hasNext() {
