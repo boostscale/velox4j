@@ -119,7 +119,7 @@ class Out : public UpIterator {
       }
       // Velox suggested to wait. This might be because another thread (e.g.,
       // background io thread) is spilling the task.
-      VELOX_CHECK_NOT_NULL(
+      VELOX_CHECK_NULL(
           out,
           "Expected to wait but still got non-null output from Velox task");
       VLOG(2)
