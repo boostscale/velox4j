@@ -6,7 +6,6 @@ import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
@@ -131,6 +130,6 @@ public final class JniApi implements AutoCloseable {
 
   @Override
   public void close() {
-    jni.releaseCppObject(session.getId());
+    session.close();
   }
 }

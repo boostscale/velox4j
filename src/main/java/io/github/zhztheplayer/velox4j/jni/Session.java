@@ -1,6 +1,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-public class Session {
+public class Session implements CppObject {
   private final long id;
 
   private Session(long id) {
@@ -11,7 +11,8 @@ public class Session {
     return new Session(JniWrapper.getStaticInstance().createSession());
   }
 
-  public long getId() {
+  @Override
+  public long id() {
     return id;
   }
 }

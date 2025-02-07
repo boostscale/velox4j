@@ -39,7 +39,7 @@ public final class JniWrapper {
       // This is the static instance.
       throw new VeloxException("Static instance of JniWrapper does not have a session assigned.");
     }
-    return session.getId();
+    return session.id();
   }
 
   // Lifecycle.

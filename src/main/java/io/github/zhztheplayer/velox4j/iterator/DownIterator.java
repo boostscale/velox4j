@@ -3,7 +3,7 @@ package io.github.zhztheplayer.velox4j.iterator;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.jni.CalledFromNative;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
-import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
+import io.github.zhztheplayer.velox4j.jni.CppObject;
 
 import java.util.Iterator;
 
@@ -31,11 +31,6 @@ public class DownIterator {
     public Ref(JniApi jniApi, long id) {
       this.jniApi = jniApi;
       this.id = id;
-    }
-
-    @Override
-    public JniApi jniApi() {
-      return jniApi;
     }
 
     @Override

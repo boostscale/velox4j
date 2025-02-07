@@ -1,7 +1,7 @@
 package io.github.zhztheplayer.velox4j.data;
 
 import io.github.zhztheplayer.velox4j.jni.JniApi;
-import io.github.zhztheplayer.velox4j.lifecycle.CppObject;
+import io.github.zhztheplayer.velox4j.jni.CppObject;
 
 public class BaseVector implements CppObject {
   private final JniApi jniApi;
@@ -12,7 +12,6 @@ public class BaseVector implements CppObject {
     this.id = id;
   }
 
-  @Override
   public JniApi jniApi() {
     return jniApi;
   }
@@ -20,10 +19,5 @@ public class BaseVector implements CppObject {
   @Override
   public long id() {
     return id;
-  }
-
-  @Override
-  public void close() {
-    jniApi.releaseCppObject(this);
   }
 }
