@@ -28,6 +28,7 @@ import io.github.zhztheplayer.velox4j.iterator.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
+import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
@@ -44,12 +45,8 @@ import org.junit.function.ThrowingRunnable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class JniApiTest {
-  public static final String QUERY_PATH = "query/example-1.json";
-  public static final String QUERY_OUTPUT_PATH = "query-output/example-1.tsv";
-
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
@@ -83,7 +80,7 @@ public class JniApiTest {
 
   @Test
   public void testExecuteQueryTryRun() {
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final JniApi jniApi = JniApi.create();
     final UpIterator itr = jniApi.executeQuery(json);
     itr.close();
@@ -93,20 +90,20 @@ public class JniApiTest {
   @Test
   public void testExecuteQuery() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    assertIterator(itr);
+    SampleQueryTests.assertIterator(itr);
     jniApi.close();
   }
 
   @Test
   public void testExecuteQueryTwice() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr1 = jniApi.executeQuery(json);
     final UpIterator itr2 = jniApi.executeQuery(json);
-    assertIterator(itr1);
-    assertIterator(itr2);
+    SampleQueryTests.assertIterator(itr1);
+    SampleQueryTests.assertIterator(itr2);
     jniApi.close();
   }
 
@@ -124,9 +121,9 @@ public class JniApiTest {
   @Test
   public void testVectorSerdeSingle() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = collectSingleVector(itr);
+    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(1, deserialized.size());
@@ -139,9 +136,9 @@ public class JniApiTest {
   @Test
   public void testVectorSerdeMultiple() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = collectSingleVector(itr);
+    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector, vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(2, deserialized.size());
@@ -153,9 +150,9 @@ public class JniApiTest {
   @Test
   public void testArrowRoundTrip() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = collectSingleVector(itr);
+    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
@@ -178,19 +175,19 @@ public class JniApiTest {
   @Test
   public void testIteratorRoundTrip() {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
     final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
-    assertIterator(up);
+    SampleQueryTests.assertIterator(up);
     jniApi.close();
   }
 
   @Test
   public void testIteratorRoundTripInDifferentThread() throws InterruptedException {
     final JniApi jniApi = JniApi.create();
-    final String json = readQueryJson();
+    final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
     final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
@@ -198,34 +195,11 @@ public class JniApiTest {
     final Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {
-        assertIterator(up);
+        SampleQueryTests.assertIterator(up);
       }
     });
     thread.start();
     thread.join();
     jniApi.close();
-  }
-
-  private static String readQueryJson() {
-    return Resources.readResourceAsString(QUERY_PATH);
-  }
-
-  private void assertIterator(UpIterator itr) {
-    final RowVector vector = collectSingleVector(itr);
-    Assert.assertEquals(Resources.readResourceAsString(QUERY_OUTPUT_PATH),
-        RowVectors.toString(new RootAllocator(), vector));
-    vector.close();
-    itr.close();
-  }
-
-  private static RowVector collectSingleVector(UpIterator itr) {
-    final List<RowVector> vectors = collect(itr);
-    Assert.assertEquals(1, vectors.size());
-    return vectors.get(0);
-  }
-
-  private static List<RowVector> collect(UpIterator itr) {
-    final List<RowVector> vectors = Streams.fromIterator(itr).collect(Collectors.toList());
-    return vectors;
   }
 }

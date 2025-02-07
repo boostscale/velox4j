@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <velox/exec/Task.h>
 #include "QueryExecutor.h"
+#include <velox/exec/Task.h>
 #include "velox4j/query/Query.h"
 
 #include <utility>
@@ -37,8 +37,8 @@ class Out : public UpIterator {
     // Keep the pool alive until the task is finished.
     leafPools_.push_back(querySerdePool);
     auto queryDynamic = folly::parseJson(queryJson_);
-    auto query = ISerializable::deserialize<Query>(
-        queryDynamic, querySerdePool.get());
+    auto query =
+        ISerializable::deserialize<Query>(queryDynamic, querySerdePool.get());
     core::PlanFragment planFragment{
         query->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
@@ -67,7 +67,7 @@ class Out : public UpIterator {
     for (const auto& nodeWithSplits : planNodesWithSplits) {
       task->noMoreSplits(nodeWithSplits);
     }
-    
+
     task_ = task;
 
     if (!task_->supportSerialExecutionMode()) {
