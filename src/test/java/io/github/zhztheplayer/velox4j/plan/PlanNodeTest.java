@@ -126,7 +126,6 @@ public class PlanNodeTest {
   @Test
   public void testExternalStream() {
     // TODO: Cleanup the code.
-    // TODO: Add assertions.
     final JniApi jniApi = JniApi.create();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator sampleIn = jniApi.executeQuery(json);
