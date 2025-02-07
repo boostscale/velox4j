@@ -147,12 +147,8 @@ public class PlanNodeTest {
     );
     final Query query = new Query(scanNode, splits);
     final String queryJson = Serde.toPrettyJson(query);
-    final UpIterator itr = jniApi.executeQuery(queryJson);
-    final BufferAllocator alloc = new RootAllocator();
-    while (itr.hasNext()) {
-      final RowVector vector = itr.next();
-      System.out.println(RowVectors.toString(alloc, vector));
-    }
+    final UpIterator out = jniApi.executeQuery(queryJson);
+    SampleQueryTests.assertIterator(out);
     jniApi.close();
   }
 
