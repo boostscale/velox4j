@@ -28,7 +28,7 @@ public final class JniApi implements AutoCloseable {
     return new JniApi(JniWrapper.create());
   }
 
-  public static JniApi getStatic() {
+  public static JniApi staticInstance() {
     return STATIC_INSTANCE;
   }
 
