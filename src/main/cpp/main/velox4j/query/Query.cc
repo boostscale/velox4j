@@ -21,16 +21,34 @@ namespace velox4j {
 using namespace facebook::velox;
 
 Query::Query(
-    std::shared_ptr<core::PlanNode>& plan,
-    std::vector<std::shared_ptr<BoundSplit>>& boundSplits)
+    std::shared_ptr<const core::PlanNode>& plan,
+    std::vector<std::shared_ptr<BoundSplit>>&& boundSplits)
     : plan_(plan), boundSplits_(std::move(boundSplits)) {}
 
-const std::shared_ptr<core::PlanNode>& Query::plan() const {
+const std::shared_ptr<const core::PlanNode>& Query::plan() const {
   return plan_;
 }
 
 const std::vector<std::shared_ptr<BoundSplit>>& Query::boundSplits() const {
   return boundSplits_;
+}
+
+std::string Query::toString() const {
+  std::vector<std::string> boundSplitStrings{};
+  std::transform(
+      boundSplits_.begin(),
+      boundSplits_.end(),
+      boundSplitStrings.begin(),
+      [](std::shared_ptr<BoundSplit> s) -> std::string {
+        return fmt::format(
+            "[BoundSplit plan node ID {}, split {}]",
+            s->planNodeId(),
+            s->split().toString());
+      });
+  return fmt::format(
+      "[Query: plan {}, splits {}]",
+      plan_->toString(true, true),
+      folly::join(",", boundSplitStrings));
 }
 
 folly::dynamic Query::serialize() const {
@@ -50,7 +68,7 @@ folly::dynamic Query::serialize() const {
 }
 
 std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
-  auto plan = std::const_pointer_cast<core::PlanNode>(
+  auto plan = std::const_pointer_cast<const core::PlanNode>(
       ISerializable::deserialize<core::PlanNode>(obj["plan"], context));
   std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
   for (const auto& boundSplit : obj["boundSplits"]) {
@@ -63,7 +81,7 @@ std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
         std::move(connectorSplit), static_cast<int32_t>(groupId));
     boundSplits.push_back(std::make_shared<BoundSplit>(planNodeId, split));
   }
-  return std::make_shared<Query>(plan, boundSplits);
+  return std::make_shared<Query>(plan, std::move(boundSplits));
 }
 void Query::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();

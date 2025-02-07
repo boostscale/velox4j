@@ -26,13 +26,15 @@ using namespace facebook::velox;
 class Query : public ISerializable {
  public:
   explicit Query(
-      std::shared_ptr<core::PlanNode>& plan,
-      std::vector<std::shared_ptr<BoundSplit>>& boundSplits);
+      std::shared_ptr<const core::PlanNode>& plan,
+      std::vector<std::shared_ptr<BoundSplit>>&& boundSplits);
 
-  const std::shared_ptr<core::PlanNode>& plan() const;
+  const std::shared_ptr<const core::PlanNode>& plan() const;
   const std::vector<std::shared_ptr<BoundSplit>>& boundSplits() const;
 
   folly::dynamic serialize() const override;
+
+  std::string toString() const;
 
   static std::shared_ptr<Query> create(
       const folly::dynamic& obj,
@@ -41,7 +43,7 @@ class Query : public ISerializable {
   static void registerSerDe();
 
  private:
-  std::shared_ptr<core::PlanNode> plan_;
+  std::shared_ptr<const core::PlanNode> plan_;
   std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
 };
 } // namespace velox4j
