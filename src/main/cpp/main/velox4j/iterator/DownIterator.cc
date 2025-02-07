@@ -53,7 +53,7 @@ void DownIteratorJniWrapper::initialize(JNIEnv* env) {
   registerNativeMethods(env);
 }
 
-DownIterator::DownIterator(JNIEnv* env, jobject ref) {
+DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
   ref_ = env->NewGlobalRef(ref);
 }
 

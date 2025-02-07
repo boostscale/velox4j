@@ -23,19 +23,4 @@ public class DownIterator {
   public long next() {
     return delegated.next().id();
   }
-
-  public static class Ref implements CppObject {
-    private final JniApi jniApi;
-    private final long id;
-
-    public Ref(JniApi jniApi, long id) {
-      this.jniApi = jniApi;
-      this.id = id;
-    }
-
-    @Override
-    public long id() {
-      return id;
-    }
-  }
 }

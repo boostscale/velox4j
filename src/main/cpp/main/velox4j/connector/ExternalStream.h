@@ -15,49 +15,28 @@
  * limitations under the License.
  */
 
-#include <JniHelpers.h>
-#include <velox/vector/ComplexVector.h>
-#include "velox4j/connector/ExternalStream.h"
+#include <velox/connectors/Connector.h>
 
 #pragma once
 
 namespace velox4j {
 using namespace facebook::velox;
-class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
+
+class ExternalStream {
  public:
-  explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
-    DownIteratorJniWrapper::initialize(env);
-  }
-
-  DownIteratorJniWrapper() : JavaClass() {};
-
-  const char* getCanonicalName() const override;
-
-  void initialize(JNIEnv* env) override;
-
-  void mapFields() override;
-};
-
-class DownIterator : public ExternalStream {
- public:
-  // CTOR.
-  DownIterator(JNIEnv* env, jobject ref);
+  ExternalStream() = default;
 
   // Delete copy/move CTORs.
-  DownIterator(DownIterator&&) = delete;
-  DownIterator(const DownIterator&) = delete;
-  DownIterator& operator=(const DownIterator&) = delete;
-  DownIterator& operator=(DownIterator&&) = delete;
+  ExternalStream(ExternalStream&&) = delete;
+  ExternalStream(const ExternalStream&) = delete;
+  ExternalStream& operator=(const ExternalStream&) = delete;
+  ExternalStream& operator=(ExternalStream&&) = delete;
 
   // DTOR.
-  virtual ~DownIterator();
+  virtual ~ExternalStream() = default;
 
-  bool hasNext() override;
+  virtual bool hasNext() = 0;
 
-  RowVectorPtr next() override;
-
- private:
-  jobject ref_;
+  virtual RowVectorPtr next() = 0;
 };
-
 } // namespace velox4j

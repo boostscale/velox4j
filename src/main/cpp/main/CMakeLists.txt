@@ -12,6 +12,7 @@ add_library(velox4j SHARED
         velox4j/arrow/Arrow.cc
         velox4j/query/Query.cc
         velox4j/query/BoundSplit.cc
+        velox4j/connector/ExternalStream.cc
 )
 
 target_include_directories(velox4j PUBLIC

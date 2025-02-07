@@ -24,6 +24,7 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
+import io.github.zhztheplayer.velox4j.iterator.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.test.Resources;
@@ -180,8 +181,8 @@ public class JniApiTest {
     final String json = readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
-    final DownIterator.Ref downRef = jniApi.downIteratorBind(down);
-    final UpIterator up = jniApi.createUpIteratorWithDownIterator(downRef);
+    final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
+    final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     assertIterator(up);
     jniApi.close();
   }
@@ -192,8 +193,8 @@ public class JniApiTest {
     final String json = readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
-    final DownIterator.Ref downRef = jniApi.downIteratorBind(down);
-    final UpIterator up = jniApi.createUpIteratorWithDownIterator(downRef);
+    final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
+    final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     final Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {

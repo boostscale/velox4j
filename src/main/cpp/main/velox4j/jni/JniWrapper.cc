@@ -22,6 +22,7 @@
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
+#include "velox4j/connector/ExternalStream.h"
 #include "velox4j/exec/QueryExecutor.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
@@ -74,10 +75,13 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jlong downIteratorBind(JNIEnv* env, jobject javaThis, jobject itrRef) {
+jlong downIteratorAsExternalStream(
+    JNIEnv* env,
+    jobject javaThis,
+    jobject itrRef) {
   JNI_METHOD_START
-  auto bound = std::make_shared<DownIterator>(env, itrRef);
-  return sessionOf(env, javaThis)->objectStore()->save(bound);
+  auto es = std::make_shared<DownIterator>(env, itrRef);
+  return sessionOf(env, javaThis)->objectStore()->save(es);
   JNI_METHOD_END(-1L)
 }
 
@@ -236,29 +240,32 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(nullptr)
 }
 
-class DownIteratorAsUpIterator : public UpIterator {
+class ExternalStreamAsUpIterator : public UpIterator {
  public:
-  explicit DownIteratorAsUpIterator(std::shared_ptr<DownIterator> itr)
-      : itr_(itr) {}
+  explicit ExternalStreamAsUpIterator(const std::shared_ptr<ExternalStream>& es)
+      : es_(es) {}
 
   bool hasNext() override {
-    return itr_->hasNext();
+    return es_->hasNext();
   }
 
   RowVectorPtr next() override {
-    return itr_->next();
+    return es_->next();
   }
 
  private:
-  std::shared_ptr<DownIterator> itr_;
+  std::shared_ptr<ExternalStream> es_;
 };
 
-jlong createUpIteratorWithDownIterator(JNIEnv* env, jobject javaThis, jlong id) {
+jlong createUpIteratorWithExternalStream(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong id) {
   JNI_METHOD_START
-  auto downItr = ObjectStore::retrieve<DownIterator>(id);
+  auto es = ObjectStore::retrieve<ExternalStream>(id);
   return sessionOf(env, javaThis)
       ->objectStore()
-      ->save(std::make_shared<DownIteratorAsUpIterator>(downItr));
+      ->save(std::make_shared<ExternalStreamAsUpIterator>(es));
   JNI_METHOD_END(-1L)
 }
 } // namespace
@@ -292,8 +299,8 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
-      "downIteratorBind",
-      (void*)downIteratorBind,
+      "downIteratorAsExternalStream",
+      (void*)downIteratorAsExternalStream,
       kTypeLong,
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
       nullptr);
@@ -369,8 +376,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "createUpIteratorWithDownIterator",
-      (void*)createUpIteratorWithDownIterator,
+      "createUpIteratorWithExternalStream",
+      (void*)createUpIteratorWithExternalStream,
       kTypeLong,
       kTypeLong,
       nullptr);
