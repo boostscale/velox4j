@@ -46,7 +46,7 @@ std::string Query::toString() const {
             s->split().toString());
       });
   return fmt::format(
-      "[Query: plan {}, splits [{}]]",
+      "Query: plan {}, splits [{}]",
       plan_->toString(true, true),
       folly::join(",", boundSplitStrings));
 }
