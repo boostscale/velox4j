@@ -70,9 +70,9 @@ class ExternalStream {
   virtual RowVectorPtr next() = 0;
 };
 
-class ExternalStreamSplit : public connector::ConnectorSplit {
+class ExternalStreamConnectorSplit : public connector::ConnectorSplit {
  public:
-  ExternalStreamSplit(const std::string& connectorId, ObjectHandle esId)
+  ExternalStreamConnectorSplit(const std::string& connectorId, ObjectHandle esId)
       : ConnectorSplit(connectorId), esId_(esId) {}
 
   const ObjectHandle esId() const {
@@ -81,7 +81,7 @@ class ExternalStreamSplit : public connector::ConnectorSplit {
 
   folly::dynamic serialize() const override {
     folly::dynamic obj = folly::dynamic::object;
-    obj["name"] = "ExternalStreamSplit";
+    obj["name"] = "ExternalStreamConnectorSplit";
     obj["connectorId"] = connectorId;
     obj["esId"] = esId_;
     return obj;
@@ -89,15 +89,15 @@ class ExternalStreamSplit : public connector::ConnectorSplit {
 
   static void registerSerDe() {
     auto& registry = DeserializationWithContextRegistryForSharedPtr();
-    registry.Register("ExternalStreamSplit", create);
+    registry.Register("ExternalStreamConnectorSplit", create);
   }
 
-  static std::shared_ptr<ExternalStreamSplit> create(
+  static std::shared_ptr<ExternalStreamConnectorSplit> create(
       const folly::dynamic& obj,
       void* context) {
     const auto connectorId = obj["connectorId"].asString();
     const auto esId = obj["esId"].asInt();
-    return std::make_shared<ExternalStreamSplit>(connectorId, esId);
+    return std::make_shared<ExternalStreamConnectorSplit>(connectorId, esId);
   }
 
  private:
@@ -141,7 +141,7 @@ class ExternalStreamDataSource : public connector::DataSource {
     VELOX_CHECK(
         split->connectorId == tableHandle_->connectorId(),
         "Split's connector ID doesn't match table handle's connector ID");
-    auto esSplit = std::dynamic_pointer_cast<ExternalStreamSplit>(split);
+    auto esSplit = std::dynamic_pointer_cast<ExternalStreamConnectorSplit>(split);
     auto es = ObjectStore::retrieve<ExternalStream>(esSplit->esId());
     streams_.push(es);
   }

@@ -5,6 +5,8 @@ import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
@@ -84,6 +86,18 @@ public class ConnectorSerdeTest {
   @Test
   public void testHiveTableHandle() {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
+    SerdeTests.testVeloxSerializableRoundTrip(handle);
+  }
+
+  @Test
+  public void testExternalStreamConnectorSplit() {
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("id-1", 100);
+    SerdeTests.testVeloxSerializableRoundTrip(split);
+  }
+
+  @Test
+  public void testExternalStreamTableHandle() {
+    final ExternalStreamTableHandle handle = new ExternalStreamTableHandle("id-1");
     SerdeTests.testVeloxSerializableRoundTrip(handle);
   }
 }

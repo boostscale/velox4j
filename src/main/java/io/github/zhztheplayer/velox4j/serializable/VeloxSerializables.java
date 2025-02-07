@@ -1,5 +1,7 @@
 package io.github.zhztheplayer.velox4j.serializable;
 
+import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
@@ -107,6 +109,8 @@ public final class VeloxSerializables {
     NAME_REGISTRY.registerClass("HiveColumnHandle", HiveColumnHandle.class);
     NAME_REGISTRY.registerClass("HiveConnectorSplit", HiveConnectorSplit.class);
     NAME_REGISTRY.registerClass("HiveTableHandle", HiveTableHandle.class);
+    NAME_REGISTRY.registerClass("ExternalStreamConnectorSplit", ExternalStreamConnectorSplit.class);
+    NAME_REGISTRY.registerClass("ExternalStreamTableHandle", ExternalStreamTableHandle.class);
   }
 
   private static void registerFilters() {
