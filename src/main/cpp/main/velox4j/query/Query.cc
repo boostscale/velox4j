@@ -41,12 +41,12 @@ std::string Query::toString() const {
       boundSplitStrings.begin(),
       [](std::shared_ptr<BoundSplit> s) -> std::string {
         return fmt::format(
-            "[BoundSplit plan node ID {}, split {}]",
+            "BoundSplit plan node ID {}, split {}",
             s->planNodeId(),
             s->split().toString());
       });
   return fmt::format(
-      "[Query: plan {}, splits {}]",
+      "[Query: plan {}, splits [{}]]",
       plan_->toString(true, true),
       folly::join(",", boundSplitStrings));
 }
@@ -83,6 +83,7 @@ std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
   }
   return std::make_shared<Query>(plan, std::move(boundSplits));
 }
+
 void Query::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
   registry.Register("Velox4jQuery", create);
