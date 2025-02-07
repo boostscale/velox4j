@@ -151,6 +151,7 @@ class ExternalStreamDataSource : public connector::DataSource {
 
   std::optional<RowVectorPtr> next(uint64_t size, ContinueFuture& future)
       override {
+    // TODO obey batch size.
     while (true) {
       if (current_ == nullptr) {
         if (streams_.empty()) {
