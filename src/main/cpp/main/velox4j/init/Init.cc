@@ -86,6 +86,8 @@ void initForSpark() {
             std::make_shared<facebook::velox::config::ConfigBase>(
                 std::unordered_map<std::string, std::string>()),
             nullptr));
+    ExternalStreamSplit::registerSerDe();
+    ExternalStreamTableHandle::registerSerDe();
     connector::registerConnector(std::make_shared<ExternalStreamConnector>(
         "connector-external-stream",
         std::make_shared<facebook::velox::config::ConfigBase>(

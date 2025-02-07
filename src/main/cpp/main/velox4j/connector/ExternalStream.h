@@ -79,6 +79,27 @@ class ExternalStreamSplit : public connector::ConnectorSplit {
     return esId_;
   }
 
+  folly::dynamic serialize() const override {
+    folly::dynamic obj = folly::dynamic::object;
+    obj["name"] = "ExternalStreamSplit";
+    obj["connectorId"] = connectorId;
+    obj["esId"] = esId_;
+    return obj;
+  }
+
+  static void registerSerDe() {
+    auto& registry = DeserializationWithContextRegistryForSharedPtr();
+    registry.Register("ExternalStreamSplit", create);
+  }
+
+  static std::shared_ptr<ExternalStreamSplit> create(
+      const folly::dynamic& obj,
+      void* context) {
+    const auto connectorId = obj["connectorId"].asString();
+    const auto esId = obj["esId"].asInt();
+    return std::make_shared<ExternalStreamSplit>(connectorId, esId);
+  }
+
  private:
   const ObjectHandle esId_;
 };
@@ -87,6 +108,24 @@ class ExternalStreamTableHandle : public connector::ConnectorTableHandle {
  public:
   explicit ExternalStreamTableHandle(const std::string& connectorId)
       : ConnectorTableHandle(connectorId) {}
+
+  folly::dynamic serialize() const override {
+    folly::dynamic obj =
+        ConnectorTableHandle::serializeBase("ExternalStreamTableHandle");
+    return obj;
+  }
+
+  static void registerSerDe() {
+    auto& registry = DeserializationWithContextRegistryForSharedPtr();
+    registry.Register("ExternalStreamTableHandle", create);
+  }
+
+  static connector::ConnectorTableHandlePtr create(
+      const folly::dynamic& obj,
+      void* context) {
+    auto connectorId = obj["connectorId"].asString();
+    return std::make_shared<const ExternalStreamTableHandle>(connectorId);
+  }
 };
 
 class ExternalStreamDataSource : public connector::DataSource {
