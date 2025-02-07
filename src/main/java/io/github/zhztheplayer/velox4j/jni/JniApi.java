@@ -56,7 +56,7 @@ public final class JniApi implements AutoCloseable {
   }
 
   public ExternalStream downIteratorAsExternalStream(DownIterator itr) {
-    return new ExternalStream(this, jni.downIteratorAsExternalStream(itr));
+    return new ExternalStream(jni.downIteratorAsExternalStream(itr));
   }
 
   public Type variantInferType(Variant variant) {
