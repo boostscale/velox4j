@@ -51,7 +51,7 @@ final class JniWrapper {
   native void releaseCppObject(long objectId);
 
   // Plan execution.
-  native long executeQuery(String jsonQuery);
+  native long executeQuery(String queryJson);
 
   // For UpIterator.
   native boolean upIteratorHasNext(long address);

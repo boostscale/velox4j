@@ -1,14 +1,10 @@
 package io.github.zhztheplayer.velox4j.test;
 
-import io.github.zhztheplayer.velox4j.collection.Streams;
-import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import org.junit.Assert;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class SampleQueryTests {
   private static final String SAMPLE_QUERY_PATH = "query/example-1.json";

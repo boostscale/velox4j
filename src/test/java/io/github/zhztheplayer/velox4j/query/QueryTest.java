@@ -56,7 +56,7 @@ public class QueryTest {
 
   @Test
   public void testAggregate() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final QueryExecutor queryExecutor = new QueryExecutor(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = new TableScanNode(
@@ -117,8 +117,7 @@ public class QueryTest {
         List.of()
     );
     final Query query = new Query(aggregationNode, splits);
-    final String queryJson = Serde.toPrettyJson(query);
-    final UpIterator itr = jniApi.executeQuery(queryJson);
+    final UpIterator itr = queryExecutor.execute(query);
     Iterators.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0,
@@ -129,16 +128,16 @@ public class QueryTest {
                 "3\t77\n" +
                 "2\t68\n")
         .run();
-    jniApi.close();
+    queryExecutor.close();
   }
 
   @Test
   public void testExternalStream() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final QueryExecutor queryExecutor = new QueryExecutor(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = jniApi.executeQuery(json);
+    final UpIterator sampleIn = queryExecutor.execute(json);
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
+    final ExternalStream es = queryExecutor.bindDownIterator(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),
@@ -154,9 +153,9 @@ public class QueryTest {
     );
     final Query query = new Query(scanNode, splits);
     final String queryJson = Serde.toPrettyJson(query);
-    final UpIterator out = jniApi.executeQuery(queryJson);
+    final UpIterator out = queryExecutor.execute(queryJson);
     SampleQueryTests.assertIterator(out);
-    jniApi.close();
+    queryExecutor.close();
   }
 
   private static List<Assignment> toAssignments(RowType rowType) {

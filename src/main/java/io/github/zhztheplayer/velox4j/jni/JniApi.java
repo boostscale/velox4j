@@ -50,8 +50,8 @@ public final class JniApi implements AutoCloseable {
     return new MemoryManager(jni.createMemoryManager(listener));
   }
 
-  public UpIterator executeQuery(String jsonQuery) {
-    return new UpIterator(this, jni.executeQuery(jsonQuery));
+  public UpIterator executeQuery(String queryJson) {
+    return new UpIterator(this, jni.executeQuery(queryJson));
   }
 
   public void releaseCppObject(CppObject obj) {
