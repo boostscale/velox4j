@@ -2,11 +2,9 @@ package io.github.zhztheplayer.velox4j.test;
 
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
 
 import java.util.List;
@@ -26,11 +24,10 @@ public final class SampleQueryTests {
   }
 
   public static void assertIterator(UpIterator itr) {
-    final RowVector vector = collectSingleVector(itr);
-    Assert.assertEquals(Resources.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH),
-        RowVectors.toString(new RootAllocator(), vector));
-    vector.close();
-    itr.close();
+    Iterators.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, Resources.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH))
+        .run();
   }
 
   public static RowVector collectSingleVector(UpIterator itr) {

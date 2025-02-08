@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.plan;
+package io.github.zhztheplayer.velox4j.query;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
@@ -16,18 +16,17 @@ import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.iterator.ExternalStream;
+import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
-import io.github.zhztheplayer.velox4j.query.BoundSplit;
-import io.github.zhztheplayer.velox4j.query.Query;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
-import io.github.zhztheplayer.velox4j.test.Resources;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
+import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
-import io.github.zhztheplayer.velox4j.type.VarCharType;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.BeforeClass;
@@ -41,20 +40,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class PlanNodeTest {
+public class QueryTest {
   @BeforeClass
   public static void beforeClass() {
     Velox4j.ensureInitialized();
   }
 
   @Test
-  public void testSanity() {
-    // TODO: Cleanup the code.
-    // TODO: Add assertions.
+  public void testAggregateNode() {
     final JniApi jniApi = JniApi.create();
-    final File file = Resources.copyResourceToTmp("data/tpch-sf0.1/nation/nation.parquet");
-    final RowType outputType = new RowType(List.of("n_nationkey", "n_name", "n_regionkey", "n_comment"),
-        List.of(new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType()));
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         outputType,
@@ -125,7 +121,6 @@ public class PlanNodeTest {
 
   @Test
   public void testExternalStream() {
-    // TODO: Cleanup the code.
     final JniApi jniApi = JniApi.create();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator sampleIn = jniApi.executeQuery(json);

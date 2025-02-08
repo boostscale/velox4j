@@ -5,7 +5,7 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.iterator.ExternalStream;
+import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.type.Type;
