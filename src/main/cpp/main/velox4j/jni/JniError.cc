@@ -66,8 +66,7 @@ void velox4j::JniErrorState::close() {
   if (closed_) {
     return;
   }
-  JNIEnv* env = nullptr;
-  attachCurrentThreadAsDaemonOrThrow(vm_, &env);
+  JNIEnv* env = getLocalJNIEnv();
   env->DeleteGlobalRef(veloxExceptionClass_);
   env->DeleteGlobalRef(ioExceptionClass_);
   env->DeleteGlobalRef(runtimeExceptionClass_);
