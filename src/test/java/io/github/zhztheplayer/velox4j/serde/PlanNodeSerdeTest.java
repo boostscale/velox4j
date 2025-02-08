@@ -5,20 +5,30 @@ import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
 public class PlanNodeSerdeTest {
+  private static final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    memoryManager.close();
   }
 
   @Test
@@ -40,7 +50,7 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testValuesNode() {
-    final JniApi jniApi = JniApi.create();
+    final JniApi jniApi = JniApi.create(memoryManager);
     final PlanNode values = ValuesNode.create(jniApi, "id-1",
         List.of(SerdeTests.newSampleRowVector(jniApi)), true, 1);
     SerdeTests.testVeloxSerializableRoundTrip(values);

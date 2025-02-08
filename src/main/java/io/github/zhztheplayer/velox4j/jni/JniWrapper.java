@@ -27,8 +27,7 @@ final class JniWrapper {
     return STATIC_INSTANCE;
   }
 
-  static JniWrapper create(long memoryManagerId) {
-    final Session session = LocalSession.create(JniWrapper.staticInstance().createSession(memoryManagerId));
+  static JniWrapper create(Session session) {
     return new JniWrapper(session);
   }
 
@@ -36,10 +35,6 @@ final class JniWrapper {
 
   private JniWrapper(Session session) {
     this.session = session;
-  }
-
-  void close() {
-    session.close();
   }
 
   @CalledFromNative

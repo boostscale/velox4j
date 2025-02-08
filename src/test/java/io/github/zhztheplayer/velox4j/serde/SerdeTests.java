@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
@@ -56,7 +58,8 @@ public final class SerdeTests {
   }
 
   public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
-    try (final JniApi jniApi = JniApi.create()) {
+    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+        final JniApi jniApi = JniApi.create(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
@@ -73,7 +76,8 @@ public final class SerdeTests {
   }
 
   public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
-    try (final JniApi jniApi = JniApi.create()) {
+    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+        final JniApi jniApi = JniApi.create(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
       final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);

@@ -25,23 +25,24 @@ import java.util.stream.Collectors;
  * provides objective forms of the required functionalities.
  */
 public final class JniApi implements AutoCloseable {
-  private static final JniApi STATIC_INSTANCE = new JniApi(JniWrapper.staticInstance());
+  private static final JniApi STATIC_INSTANCE = new JniApi(
+      StaticSession.get(), JniWrapper.staticInstance());
 
-  static JniApi staticInstance() {
+  public static JniApi staticInstance() {
     return STATIC_INSTANCE;
   }
 
-  public static JniApi create() {
-    return create(STATIC_INSTANCE.createMemoryManager(AllocationListener.NOOP));
-  }
-
   public static JniApi create(MemoryManager memoryManager) {
-    return new JniApi(JniWrapper.create(memoryManager.id()));
+    final Session session = LocalSession.create(
+        JniWrapper.staticInstance().createSession(memoryManager.id()));
+    return new JniApi(session, JniWrapper.create(session));
   }
 
+  private final Session session;
   private final JniWrapper jni;
 
-  private JniApi(JniWrapper jni) {
+  private JniApi(Session session, JniWrapper jni) {
+    this.session = session;
     this.jni = jni;
   }
 
@@ -144,6 +145,6 @@ public final class JniApi implements AutoCloseable {
 
   @Override
   public void close() {
-    jni.close();
+    session.close();
   }
 }

@@ -11,12 +11,15 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,10 +28,16 @@ import java.util.Collections;
 import java.util.List;
 
 public class ExprSerdeTest {
+  private static final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    memoryManager.close();
   }
 
   @Test
@@ -51,7 +60,7 @@ public class ExprSerdeTest {
 
   @Test
   public void testConstantTypedExpr() {
-    final JniApi jniApi = JniApi.create();
+    final JniApi jniApi = JniApi.create(memoryManager);
     final BaseVector intVector = SerdeTests.newSampleIntVector(jniApi);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testVeloxSerializableRoundTrip(expr1);

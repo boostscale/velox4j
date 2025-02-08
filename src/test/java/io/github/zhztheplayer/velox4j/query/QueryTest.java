@@ -17,6 +17,8 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
@@ -26,6 +28,7 @@ import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,14 +41,21 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class QueryTest {
+  private static final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+
   @BeforeClass
-  public static void beforeClass() {
+  public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    memoryManager.close();
   }
 
   @Test
   public void testAggregate() {
-    final JniApi jniApi = JniApi.create();
+    final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = new TableScanNode(
@@ -123,7 +133,7 @@ public class QueryTest {
 
   @Test
   public void testExternalStream() {
-    final JniApi jniApi = JniApi.create();
+    final JniApi jniApi = JniApi.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator sampleIn = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(sampleIn);
