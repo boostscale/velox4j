@@ -36,7 +36,8 @@ const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
 long createMemoryManager(JNIEnv* env, jobject javaThis, jobject jListener) {
   JNI_METHOD_START
-  auto listener = std::make_unique<JavaAllocationListener>(env, jListener);
+  auto listener = std::make_unique<BlockAllocationListener>(
+      std::make_unique<JavaAllocationListener>(env, jListener), 8 << 10 << 10);
   auto mm = std::make_shared<MemoryManager>(std::move(listener));
   return ObjectStore::global()->save(mm);
   JNI_METHOD_END(-1L)
