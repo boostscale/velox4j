@@ -25,10 +25,10 @@ namespace {
 
 constexpr std::string_view kMemoryPoolInitialCapacity{
     "memory-pool-initial-capacity"};
-constexpr std::string_view kDefaultMemoryPoolInitialCapacity{"256m"};
+constexpr std::string_view kDefaultMemoryPoolInitialCapacity{"256MB"};
 constexpr std::string_view kMemoryPoolTransferCapacity{
     "memory-pool-transfer-capacity"};
-constexpr std::string_view kDefaultMemoryPoolTransferCapacity{"128m"};
+constexpr std::string_view kDefaultMemoryPoolTransferCapacity{"128MB"};
 constexpr std::string_view kMemoryReclaimMaxWaitMs{
     "memory-reclaim-max-wait-time"};
 constexpr std::string_view kDefaultMemoryReclaimMaxWaitMs{"3600000ms"};
