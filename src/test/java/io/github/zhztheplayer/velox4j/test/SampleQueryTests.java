@@ -14,8 +14,6 @@ public final class SampleQueryTests {
   private static final String SAMPLE_QUERY_PATH = "query/example-1.json";
   private static final String SAMPLE_QUERY_OUTPUT_PATH = "query-output/example-1.tsv";
 
-
-
   public static String readQueryJson() {
     return Resources.readResourceAsString(SAMPLE_QUERY_PATH);
   }
