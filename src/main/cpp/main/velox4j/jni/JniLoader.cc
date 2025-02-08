@@ -23,6 +23,7 @@
 #include "velox4j/jni/JniError.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/iterator/DownIterator.h"
+#include "velox4j/memory/JavaAllocationListener.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   LOG(INFO) << "Initializing Velox4j...";
@@ -35,6 +36,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   velox4j::initForSpark();
   velox4j::jniClassRegistry()->add(env, new velox4j::JniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::DownIteratorJniWrapper(env));
+  velox4j::jniClassRegistry()->add(env, new velox4j::JavaAllocationListenerJniWrapper(env));
 
   LOG(INFO) << "Velox4j initialized.";
   return JAVA_VERSION;
