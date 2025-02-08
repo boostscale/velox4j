@@ -26,6 +26,7 @@
 #include "velox4j/exec/QueryExecutor.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
+#include "velox4j/memory/JavaAllocationListener.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -33,9 +34,18 @@ using namespace facebook::velox;
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
-long createSession(JNIEnv* env, jobject javaThis) {
+long createMemoryManager(JNIEnv* env, jobject javaThis, jobject jListener) {
   JNI_METHOD_START
-  return ObjectStore::global()->save(std::make_unique<Session>());
+  auto listener = std::make_unique<JavaAllocationListener>(env, jListener);
+  auto mm = std::make_shared<MemoryManager>(std::move(listener));
+  return ObjectStore::global()->save(mm);
+  JNI_METHOD_END(-1L)
+}
+
+long createSession(JNIEnv* env, jobject javaThis, long memoryManagerId) {
+  JNI_METHOD_START
+  auto mm = ObjectStore::retrieve<MemoryManager>(memoryManagerId);
+  return ObjectStore::global()->save(std::make_unique<Session>(mm.get()));
   JNI_METHOD_END(-1L)
 }
 
@@ -55,8 +65,10 @@ void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
 
 jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
-  QueryExecutor exec{memory::memoryManager(), jQueryJson.get()};
+  QueryExecutor exec{
+      session->memoryManager()->getVeloxMemoryManager(), jQueryJson.get()};
   return sessionOf(env, javaThis)->objectStore()->save(exec.execute());
   JNI_METHOD_END(-1L)
 }
@@ -105,13 +117,10 @@ jlong arrowToBaseVector(
   JNI_METHOD_START
   // TODO Session memory pool.
   auto session = sessionOf(env, javaThis);
-  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
-  const uint32_t id = nextId++;
-  auto pool = memory::memoryManager()->addLeafPool(
-      fmt::format("Arrow Import Memory Pool - ID {}", id));
-  session->objectStore()->save(pool);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Arrow Import Memory Pool", memory::MemoryPool::Kind::kLeaf);
   auto vector = fromArrowToBaseVector(
-      pool.get(),
+      pool,
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
   return session->objectStore()->save(vector);
@@ -156,15 +165,11 @@ baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   spotify::jni::JavaString jSerialized{env, serialized};
   auto decoded = encoding::Base64::decode(jSerialized.get());
   std::istringstream dataStream(decoded);
-
-  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
-  const uint32_t id = nextId++;
-  auto pool = memory::memoryManager()->addLeafPool(
-      fmt::format("Decoding Memory Pool - ID {}", id));
-  session->objectStore()->save(pool);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Decoding Memory Pool", memory::MemoryPool::Kind::kLeaf);
   std::vector<ObjectHandle> vids{};
   while (dataStream.tellg() < decoded.size()) {
-    const VectorPtr& vector = restoreVector(dataStream, pool.get());
+    const VectorPtr& vector = restoreVector(dataStream, pool);
     const ObjectHandle vid = session->objectStore()->save(vector);
     vids.push_back(vid);
   }
@@ -214,14 +219,13 @@ jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
 
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
-  static std::atomic<uint32_t> nextId{0}; // Velox query ID, same with taskId.
-  const uint32_t id = nextId++;
-  auto serdePool = memory::memoryManager()->addLeafPool(
-      fmt::format("Serde Memory Pool - ID {}", id));
+  auto session = sessionOf(env, javaThis);
+  auto serdePool = session->memoryManager()->getVeloxPool(
+      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jJson{env, json};
   auto dynamic = folly::parseJson(jJson.get());
   auto deserialized =
-      ISerializable::deserialize<ISerializable>(dynamic, serdePool.get());
+      ISerializable::deserialize<ISerializable>(dynamic, serdePool);
   auto serializedDynamic = deserialized->serialize();
   auto serializeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(serializeJson.data());
@@ -280,8 +284,14 @@ void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "sessionId", kTypeLong, nullptr);
-
-  addNativeMethod("createSession", (void*)createSession, kTypeLong, nullptr);
+  addNativeMethod(
+      "createMemoryManager",
+      (void*)createMemoryManager,
+      kTypeLong,
+      "io/github/zhztheplayer/velox4j/memory/AllocationListener",
+      nullptr);
+  addNativeMethod(
+      "createSession", (void*)createSession, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "releaseCppObject",
       (void*)releaseCppObject,

@@ -29,6 +29,12 @@ class AllocationListener {
 
   virtual ~AllocationListener() = default;
 
+  // Delete copy/move CTORs.
+  AllocationListener(AllocationListener&&) = delete;
+  AllocationListener(const AllocationListener&) = delete;
+  AllocationListener& operator=(const AllocationListener&) = delete;
+  AllocationListener& operator=(AllocationListener&&) = delete;
+
   // Value of diff can be either positive or negative
   virtual void allocationChanged(int64_t diff) = 0;
 

@@ -14,6 +14,7 @@ add_library(velox4j SHARED
         velox4j/query/BoundSplit.cc
         velox4j/connector/ExternalStream.cc
         velox4j/memory/AllocationListener.cc
+        velox4j/memory/JavaAllocationListener.cc
         velox4j/memory/MemoryManager.cc
         velox4j/memory/ArrowMemoryPool.cc
 )

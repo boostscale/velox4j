@@ -23,31 +23,6 @@ namespace velox4j {
 
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";
-
-JNIEnv* getLocalJNIEnv() {
-  static std::atomic<uint32_t> nextThreadId{0};
-  if (spotify::jni::JavaThreadUtils::getEnvForCurrentThread() == nullptr) {
-    const std::string threadName =
-        fmt::format("Velox4j Native Thread {}", nextThreadId++);
-    std::vector<char> threadNameCStr(threadName.length() + 1);
-    std::strcpy(threadNameCStr.data(), threadName.data());
-    JavaVM* vm = spotify::jni::JavaThreadUtils::getJavaVM();
-    JNIEnv* env{nullptr};
-    JavaVMAttachArgs args;
-    args.version = JAVA_VERSION;
-    args.name = threadNameCStr.data();
-    args.group = nullptr;
-    const int result =
-        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args);
-    if (result != JNI_OK) {
-      VELOX_FAIL("Failed to reattach current thread to JVM.");
-    }
-    return env;
-  }
-  JNIEnv* env = spotify::jni::JavaThreadUtils::getEnvForCurrentThread();
-  VELOX_CHECK(env != nullptr);
-  return env;
-}
 } // namespace
 
 void DownIteratorJniWrapper::mapFields() {}

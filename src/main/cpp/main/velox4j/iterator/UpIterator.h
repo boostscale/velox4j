@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <velox/vector/ComplexVector.h>
-
 #pragma once
+
+#include <velox/vector/ComplexVector.h>
 
 namespace velox4j {
 

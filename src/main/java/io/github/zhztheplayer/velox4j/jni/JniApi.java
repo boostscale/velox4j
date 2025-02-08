@@ -7,6 +7,8 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
@@ -25,18 +27,26 @@ import java.util.stream.Collectors;
 public final class JniApi implements AutoCloseable {
   private static final JniApi STATIC_INSTANCE = new JniApi(JniWrapper.staticInstance());
 
-  public static JniApi create() {
-    return new JniApi(JniWrapper.create());
+  static JniApi staticInstance() {
+    return STATIC_INSTANCE;
   }
 
-  public static JniApi staticInstance() {
-    return STATIC_INSTANCE;
+  public static JniApi create() {
+    return create(STATIC_INSTANCE.createMemoryManager(AllocationListener.NOOP));
+  }
+
+  public static JniApi create(MemoryManager memoryManager) {
+    return new JniApi(JniWrapper.create(memoryManager.id()));
   }
 
   private final JniWrapper jni;
 
   private JniApi(JniWrapper jni) {
     this.jni = jni;
+  }
+
+  public MemoryManager createMemoryManager(AllocationListener listener) {
+    return new MemoryManager(jni.createMemoryManager(listener));
   }
 
   public UpIterator executeQuery(String jsonQuery) {

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <JniHelpers.h>
 #include <velox/vector/ComplexVector.h>
 #include "velox4j/connector/ExternalStream.h"
-
-#pragma once
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -50,7 +50,7 @@ class DownIterator : public ExternalStream {
   DownIterator& operator=(DownIterator&&) = delete;
 
   // DTOR.
-  virtual ~DownIterator();
+  ~DownIterator() override;
 
   bool hasNext() override;
 

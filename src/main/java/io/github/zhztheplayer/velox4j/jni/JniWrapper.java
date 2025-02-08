@@ -18,6 +18,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 
 final class JniWrapper {
   private static final JniWrapper STATIC_INSTANCE = new JniWrapper(StaticSession.get());
@@ -26,8 +27,8 @@ final class JniWrapper {
     return STATIC_INSTANCE;
   }
 
-  static JniWrapper create() {
-    final Session session = LocalSession.create(JniWrapper.staticInstance().createSession());
+  static JniWrapper create(long memoryManagerId) {
+    final Session session = LocalSession.create(JniWrapper.staticInstance().createSession(memoryManagerId));
     return new JniWrapper(session);
   }
 
@@ -46,8 +47,12 @@ final class JniWrapper {
     return session.id();
   }
 
+  // Memory.
+  native long createMemoryManager(AllocationListener listener);
+
   // Lifecycle.
-  native long createSession();
+  native long createSession(long memoryManagerId);
+
   native void releaseCppObject(long objectId);
 
   // Plan execution.
@@ -55,6 +60,7 @@ final class JniWrapper {
 
   // For UpIterator.
   native boolean upIteratorHasNext(long address);
+
   native long upIteratorNext(long address);
 
   // For DownIterator.
@@ -65,16 +71,25 @@ final class JniWrapper {
 
   // For BaseVector / RowVector.
   native long arrowToBaseVector(long cSchema, long cArray);
+
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
+
   native String baseVectorSerialize(long[] id);
+
   native long[] baseVectorDeserialize(String serialized);
+
   native String baseVectorGetType(long id);
+
   native long baseVectorWrapInConstant(long id, int length, int index);
+
   native String baseVectorGetEncoding(long id);
+
   native long baseVectorNewRef(long id);
 
   // For tests.
   native String deserializeAndSerialize(String json);
+
   native String deserializeAndSerializeVariant(String json);
+
   native long createUpIteratorWithExternalStream(long id);
 }

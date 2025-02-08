@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include <jni.h>
-#include <string>
-#include <mutex>
-#include <cmath>
-#include <JniHelpers.h>
-
 #pragma once
+
+#include <JniHelpers.h>
+#include <jni.h>
+#include <cmath>
+#include <mutex>
+#include <string>
 
 #ifndef JNI_METHOD_START
 #define JNI_METHOD_START try {
@@ -29,11 +29,12 @@
 #endif
 
 #ifndef JNI_METHOD_END
-#define JNI_METHOD_END(fallback_expr)                                            \
-  }                                                                              \
-  catch (std::exception & e) {                                                   \
-    env->ThrowNew(velox4j::getJniErrorState()->veloxExceptionClass(), e.what()); \
-    return fallback_expr;                                                        \
+#define JNI_METHOD_END(fallback_expr)                                  \
+  }                                                                    \
+  catch (std::exception & e) {                                         \
+    env->ThrowNew(                                                     \
+        velox4j::getJniErrorState()->veloxExceptionClass(), e.what()); \
+    return fallback_expr;                                              \
   }
 // macro ended
 #endif
@@ -60,9 +61,8 @@ jmethodID getStaticMethodIdOrError(
     jclass thisClass,
     const char* name,
     const char* sig);
-void attachCurrentThreadAsDaemonOrThrow(
-    JavaVM* vm,
-    JNIEnv** out);
+JNIEnv* getLocalJNIEnv();
+
 template <typename T>
 T* jniCastOrThrow(jlong handle);
 spotify::jni::ClassRegistry* jniClassRegistry();
@@ -89,7 +89,6 @@ spotify::jni::ClassRegistry* jniClassRegistry();
     }                                                                     \
   };
 
-
 // Safe version of JNI {Get|Release}<PrimitiveType>ArrayElements routines.
 // SafeNativeArray would release the managed array elements automatically
 // during destruction.
@@ -104,7 +103,6 @@ enum class JniPrimitiveArrayType {
   kFloat = 6,
   kDouble = 7
 };
-
 
 template <JniPrimitiveArrayType TYPE>
 struct JniPrimitiveArray {};

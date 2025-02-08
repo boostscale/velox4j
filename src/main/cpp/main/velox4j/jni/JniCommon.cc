@@ -19,8 +19,8 @@
 #include <arrow/ipc/reader.h>
 #include <arrow/ipc/writer.h>
 #include <execinfo.h>
-#include <jni.h>
 #include <glog/logging.h>
+#include <jni.h>
 #include <velox/common/base/Exceptions.h>
 
 namespace velox4j {
@@ -39,8 +39,8 @@ void checkException(JNIEnv* env) {
   if (env->ExceptionCheck()) {
     jthrowable t = env->ExceptionOccurred();
     env->ExceptionClear();
-    jclass describerClass =
-        env->FindClass("io/github/zhztheplayer/velox4j/exception/ExceptionDescriber");
+    jclass describerClass = env->FindClass(
+        "io/github/zhztheplayer/velox4j/exception/ExceptionDescriber");
     jmethodID describeMethod = env->GetStaticMethodID(
         describerClass,
         "describe",
@@ -90,7 +90,7 @@ jmethodID getMethodIdOrError(
   jmethodID ret = getMethodId(env, thisClass, name, sig);
   if (ret == nullptr) {
     std::string errorMessage = "Unable to find method " + std::string(name) +
-                               " within signature" + std::string(sig);
+        " within signature" + std::string(sig);
     VELOX_FAIL(errorMessage);
   }
   return ret;
@@ -111,28 +111,35 @@ jmethodID getStaticMethodIdOrError(
   jmethodID ret = getStaticMethodId(env, thisClass, name, sig);
   if (ret == nullptr) {
     std::string errorMessage = "Unable to find static method " +
-                               std::string(name) + " within signature" + std::string(sig);
+        std::string(name) + " within signature" + std::string(sig);
     VELOX_FAIL(errorMessage);
   }
   return ret;
 }
 
-void attachCurrentThreadAsDaemonOrThrow(JavaVM* vm, JNIEnv** out) {
-  int getEnvStat = vm->GetEnv(reinterpret_cast<void**>(out), kJniVersion);
-  if (getEnvStat == JNI_EDETACHED) {
-    DLOG(INFO) << "JNIEnv was not attached to current thread.";
-    // Reattach current thread to JVM
-    getEnvStat =
-        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(out), nullptr);
-    if (getEnvStat != JNI_OK) {
-      VELOX_FAIL("Failed to reattach current thread to JVM");
+JNIEnv* getLocalJNIEnv() {
+  static std::atomic<uint32_t> nextThreadId{0};
+  if (spotify::jni::JavaThreadUtils::getEnvForCurrentThread() == nullptr) {
+    const std::string threadName =
+        fmt::format("Velox4j Native Thread {}", nextThreadId++);
+    std::vector<char> threadNameCStr(threadName.length() + 1);
+    std::strcpy(threadNameCStr.data(), threadName.data());
+    JavaVM* vm = spotify::jni::JavaThreadUtils::getJavaVM();
+    JNIEnv* env{nullptr};
+    JavaVMAttachArgs args;
+    args.version = JAVA_VERSION;
+    args.name = threadNameCStr.data();
+    args.group = nullptr;
+    const int result =
+        vm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args);
+    if (result != JNI_OK) {
+      VELOX_FAIL("Failed to reattach current thread to JVM.");
     }
-    DLOG(INFO) << "Succeeded attaching current thread";
-    return;
+    return env;
   }
-  if (getEnvStat != JNI_OK) {
-    VELOX_FAIL("Failed to attach current thread to JVM.");
-  }
+  JNIEnv* env = spotify::jni::JavaThreadUtils::getEnvForCurrentThread();
+  VELOX_CHECK(env != nullptr);
+  return env;
 }
 
 template <typename T>

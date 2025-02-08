@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <velox/core/PlanNode.h>
 #include <utility>
 #include "BoundSplit.h"
-
-#pragma once
 
 namespace velox4j {
 using namespace facebook::velox;

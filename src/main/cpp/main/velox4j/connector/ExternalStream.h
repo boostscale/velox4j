@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <velox/connectors/Connector.h>
 #include <velox/exec/Driver.h>
 #include <velox/exec/Task.h>
 #include "velox4j/lifecycle/ObjectStore.h"
-
-#pragma once
 
 namespace velox4j {
 using namespace facebook::velox;

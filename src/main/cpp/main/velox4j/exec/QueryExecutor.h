@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <velox/common/memory/Memory.h>
 #include <string>
 #include "velox4j/iterator/UpIterator.h"
-
-#pragma once
 
 namespace velox4j {
 using namespace facebook::velox;
