@@ -67,8 +67,7 @@ jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
-  QueryExecutor exec{
-      session->memoryManager()->getVeloxMemoryManager(), jQueryJson.get()};
+  QueryExecutor exec{session->memoryManager(), jQueryJson.get()};
   return sessionOf(env, javaThis)->objectStore()->save(exec.execute());
   JNI_METHOD_END(-1L)
 }
