@@ -40,10 +40,6 @@ class MemoryManager {
   MemoryManager& operator=(const MemoryManager&) = delete;
   MemoryManager& operator=(MemoryManager&&) = delete;
 
-  velox::memory::MemoryManager* getVeloxMemoryManager() const {
-    return veloxMemoryManager_.get();
-  }
-
   velox::memory::MemoryPool* getVeloxPool(
       const std::string& name,
       const velox::memory::MemoryPool::Kind& kind);
@@ -60,6 +56,7 @@ class MemoryManager {
   std::unordered_map<std::string, std::unique_ptr<arrow::MemoryPool>>
       arrowPoolRefs_;
   std::unique_ptr<velox::memory::MemoryManager> veloxMemoryManager_;
+  std::shared_ptr<facebook::velox::memory::MemoryPool> veloxRootPool_;
   std::unordered_map<std::string, std::shared_ptr<velox::memory::MemoryPool>>
       veloxPoolRefs_;
   std::vector<std::shared_ptr<velox::memory::MemoryPool>> heldVeloxPoolRefs_;

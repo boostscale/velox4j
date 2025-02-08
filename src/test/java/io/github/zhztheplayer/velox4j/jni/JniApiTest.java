@@ -48,11 +48,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class JniApiTest {
-  private static final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+  private static MemoryManager memoryManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
+    memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 
   @AfterClass

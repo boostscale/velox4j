@@ -20,18 +20,19 @@
 #include <velox/common/memory/Memory.h>
 #include <string>
 #include "velox4j/iterator/UpIterator.h"
+#include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
 class QueryExecutor {
  public:
-  QueryExecutor(memory::MemoryManager* memoryManager, std::string queryJson);
+  QueryExecutor(MemoryManager* memoryManager, std::string queryJson);
 
   std::unique_ptr<UpIterator> execute() const;
 
  private:
-  memory::MemoryManager* const memoryManager_;
+  MemoryManager* const memoryManager_;
   const std::string queryJson_;
 };
 

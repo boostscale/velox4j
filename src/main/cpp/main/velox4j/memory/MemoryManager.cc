@@ -246,6 +246,10 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       .extraArbitratorConfigs = extraArbitratorConfigs};
   veloxMemoryManager_ =
       std::make_unique<velox::memory::MemoryManager>(mmOptions);
+  veloxRootPool_ = veloxMemoryManager_->addRootPool(
+      "root",
+      velox::memory::kMaxMemory, // the 3rd capacity
+      facebook::velox::memory::MemoryReclaimer::create());
 }
 
 MemoryManager::~MemoryManager() {
@@ -289,15 +293,12 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
   }
   switch (kind) {
     case velox::memory::MemoryPool::Kind::kLeaf: {
-      auto pool = veloxMemoryManager_->addLeafPool(name, true);
+      auto pool = veloxRootPool_->addLeafChild(name, true, velox::memory::MemoryReclaimer::create());
       veloxPoolRefs_[name] = pool;
       return pool.get();
     }
     case velox::memory::MemoryPool::Kind::kAggregate: {
-      auto pool = veloxMemoryManager_->addRootPool(
-          name,
-          velox::memory::kMaxMemory,
-          velox::memory::MemoryReclaimer::create());
+      auto pool = veloxRootPool_->addAggregateChild(name, velox::memory::MemoryReclaimer::create());
       veloxPoolRefs_[name] = pool;
       return pool.get();
     }
@@ -328,9 +329,7 @@ void hold0(
 } // namespace
 
 void MemoryManager::holdPools() {
-  for (const auto& pool : veloxPoolRefs_) {
-    hold0(heldVeloxPoolRefs_, pool.second.get());
-  }
+  hold0(heldVeloxPoolRefs_, veloxRootPool_.get());
 }
 
 bool MemoryManager::tryDestructSafe() {
@@ -346,8 +345,12 @@ bool MemoryManager::tryDestructSafe() {
       return false;
     }
   }
+  if (veloxRootPool_->usedBytes() != 0) {
+    return false;
+  }
   heldVeloxPoolRefs_.clear();
   veloxPoolRefs_.clear();
+  veloxRootPool_.reset();
 
   // Velox memory manager considered safe to destruct when no alive pools.
   if (veloxMemoryManager_) {

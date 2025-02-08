@@ -27,18 +27,18 @@ using namespace facebook::velox;
 
 class Out : public UpIterator {
  public:
-  Out(memory::MemoryManager* memoryManager, std::string queryJson)
+  Out(MemoryManager* memoryManager, std::string queryJson)
       : memoryManager_(memoryManager), queryJson_(std::move(queryJson)) {
     static std::atomic<uint32_t> executionId{
         0}; // Velox query ID, same with taskId.
     const uint32_t eid = executionId++;
-    auto querySerdePool = memoryManager_->addLeafPool(
-        fmt::format("Query Serde Memory Pool - EID {}", std::to_string(eid)));
+    auto querySerdePool = memoryManager_->getVeloxPool(
+        fmt::format("Query Serde Memory Pool - EID {}", std::to_string(eid)),
+        memory::MemoryPool::Kind::kLeaf);
     // Keep the pool alive until the task is finished.
-    leafPools_.push_back(querySerdePool);
     auto queryDynamic = folly::parseJson(queryJson_);
     auto query =
-        ISerializable::deserialize<Query>(queryDynamic, querySerdePool.get());
+        ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
     core::PlanFragment planFragment{
         query->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
@@ -46,8 +46,11 @@ class Out : public UpIterator {
         core::QueryConfig{{}},
         {},
         cache::AsyncDataCache::getInstance(),
-        memoryManager_->addRootPool(
-            fmt::format("Query Memory Pool - EID {}", std::to_string(eid))),
+        memoryManager_
+            ->getVeloxPool(
+                fmt::format("Query Memory Pool - EID {}", std::to_string(eid)),
+                memory::MemoryPool::Kind::kAggregate)
+            ->shared_from_this(),
         nullptr,
         fmt::format("Query Context - EID {}", std::to_string(eid)));
 
@@ -131,16 +134,13 @@ class Out : public UpIterator {
     pending_ = vector;
   }
 
-  memory::MemoryManager* const memoryManager_;
+  MemoryManager* const memoryManager_;
   const std::string queryJson_;
-  std::vector<std::shared_ptr<memory::MemoryPool>> leafPools_;
   std::shared_ptr<exec::Task> task_;
   RowVectorPtr pending_;
 };
 
-QueryExecutor::QueryExecutor(
-    memory::MemoryManager* memoryManager,
-    std::string planJson)
+QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::string planJson)
     : memoryManager_(memoryManager), queryJson_(std::move(planJson)) {}
 
 std::unique_ptr<UpIterator> QueryExecutor::execute() const {

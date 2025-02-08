@@ -41,11 +41,12 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public class QueryTest {
-  private static final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+  private static MemoryManager memoryManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4j.ensureInitialized();
+    memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 
   @AfterClass
