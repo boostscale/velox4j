@@ -19,12 +19,13 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
@@ -120,7 +121,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
+    final RowVector vector = Iterators.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(1, deserialized.size());
@@ -135,7 +136,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
+    final RowVector vector = Iterators.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector, vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(2, deserialized.size());
@@ -149,7 +150,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = SampleQueryTests.collectSingleVector(itr);
+    final RowVector vector = Iterators.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);

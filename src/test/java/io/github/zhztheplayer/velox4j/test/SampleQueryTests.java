@@ -29,15 +29,4 @@ public final class SampleQueryTests {
         .assertRowVectorToString(0, Resources.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH))
         .run();
   }
-
-  public static RowVector collectSingleVector(UpIterator itr) {
-    final List<RowVector> vectors = collect(itr);
-    Assert.assertEquals(1, vectors.size());
-    return vectors.get(0);
-  }
-
-  private static List<RowVector> collect(UpIterator itr) {
-    final List<RowVector> vectors = Streams.fromIterator(itr).collect(Collectors.toList());
-    return vectors;
-  }
 }

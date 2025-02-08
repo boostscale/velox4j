@@ -22,6 +22,7 @@ import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.test.Iterators;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
@@ -47,7 +48,7 @@ public class QueryTest {
   }
 
   @Test
-  public void testAggregateNode() {
+  public void testAggregate() {
     final JniApi jniApi = JniApi.create();
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
@@ -111,11 +112,16 @@ public class QueryTest {
     final Query query = new Query(aggregationNode, splits);
     final String queryJson = Serde.toPrettyJson(query);
     final UpIterator itr = jniApi.executeQuery(queryJson);
-    final BufferAllocator alloc = new RootAllocator();
-    while (itr.hasNext()) {
-      final RowVector vector = itr.next();
-      System.out.println(RowVectors.toString(alloc, vector));
-    }
+    Iterators.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0,
+            "n_regionkey\tcnt\n" +
+                "0\t50\n" +
+                "1\t47\n" +
+                "4\t58\n" +
+                "3\t77\n" +
+                "2\t68\n")
+        .run();
     jniApi.close();
   }
 
