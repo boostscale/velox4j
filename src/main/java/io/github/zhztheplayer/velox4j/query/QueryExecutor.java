@@ -15,7 +15,7 @@ public class QueryExecutor implements AutoCloseable {
   }
 
   public UpIterator execute(Query query) {
-    final String queryJson =Serde.toPrettyJson(query);
+    final String queryJson = Serde.toPrettyJson(query);
     return jniApi.executeQuery(queryJson);
   }
 
