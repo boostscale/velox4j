@@ -1,0 +1,65 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#pragma once
+
+#include <arrow/memory_pool.h>
+#include <velox/common/config/Config.h>
+#include <velox/common/memory/Memory.h>
+#include <memory>
+#include "AllocationListener.h"
+#include "ArrowMemoryPool.h"
+
+namespace velox4j {
+using namespace facebook;
+
+namespace {}
+
+class MemoryManager {
+ public:
+  explicit MemoryManager(std::unique_ptr<AllocationListener> listener);
+
+  virtual ~MemoryManager() = default;
+
+  MemoryManager(const MemoryManager&) = delete;
+  MemoryManager(MemoryManager&&) = delete;
+  MemoryManager& operator=(const MemoryManager&) = delete;
+  MemoryManager& operator=(MemoryManager&&) = delete;
+
+  velox::memory::MemoryManager* getVeloxMemoryManager() const {
+    return veloxMemoryManager_.get();
+  }
+
+  velox::memory::MemoryPool* getVeloxPool(
+      const std::string& name,
+      const velox::memory::MemoryPool::Kind& kind);
+
+  arrow::MemoryPool* getArrowPool(const std::string& name);
+
+  void holdPools();
+
+ private:
+  const std::unique_ptr<AllocationListener> listener_;
+  std::unique_ptr<MemoryAllocator> arrowAllocator_;
+  std::unordered_map<std::string, std::unique_ptr<arrow::MemoryPool>>
+      arrowPoolRefs_;
+  std::unique_ptr<velox::memory::MemoryManager> veloxMemoryManager_;
+  std::unordered_map<std::string, std::shared_ptr<velox::memory::MemoryPool>>
+      veloxPoolRefs_;
+  std::vector<std::shared_ptr<velox::memory::MemoryPool>> heldVeloxPoolRefs_;
+};
+} // namespace velox4j
