@@ -33,7 +33,7 @@ class MemoryManager {
  public:
   explicit MemoryManager(std::unique_ptr<AllocationListener> listener);
 
-  virtual ~MemoryManager() = default;
+  virtual ~MemoryManager();
 
   MemoryManager(const MemoryManager&) = delete;
   MemoryManager(MemoryManager&&) = delete;
@@ -53,6 +53,8 @@ class MemoryManager {
   void holdPools();
 
  private:
+  bool tryDestructSafe();
+
   const std::unique_ptr<AllocationListener> listener_;
   std::unique_ptr<MemoryAllocator> arrowAllocator_;
   std::unordered_map<std::string, std::unique_ptr<arrow::MemoryPool>>

@@ -248,6 +248,30 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       std::make_unique<velox::memory::MemoryManager>(mmOptions);
 }
 
+MemoryManager::~MemoryManager() {
+  static const uint32_t kWaitTimeoutMs = 30000; // 30s by default
+  uint32_t accumulatedWaitMs = 0UL;
+  bool destructed = false;
+  for (int32_t tryCount = 0; accumulatedWaitMs < kWaitTimeoutMs; tryCount++) {
+    destructed = tryDestructSafe();
+    if (destructed) {
+      if (tryCount > 0) {
+        LOG(INFO) << "All the outstanding memory resources successfully released. ";
+      }
+      break;
+    }
+    uint32_t waitMs = 50 * static_cast<uint32_t>(pow(1.5, tryCount)); // 50ms, 75ms, 112.5ms ...
+    LOG(INFO) << "There are still outstanding Velox memory allocations. Waiting for " << waitMs
+              << " ms to let possible async tasks done... ";
+    usleep(waitMs * 1000);
+    accumulatedWaitMs += waitMs;
+  }
+  if (!destructed) {
+    LOG(ERROR) << "Failed to release Velox memory manager after " << accumulatedWaitMs
+               << "ms as there are still outstanding memory resources. ";
+  }
+}
+
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
     const std::string& name,
     const velox::memory::MemoryPool::Kind& kind) {
@@ -274,6 +298,7 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
       return pool.get();
     }
   }
+  VELOX_FAIL("Unreachable code");
 }
 
 arrow::MemoryPool* MemoryManager::getArrowPool(const std::string& name) {
@@ -303,5 +328,70 @@ void MemoryManager::holdPools() {
   for (const auto& pool : veloxPoolRefs_) {
     hold0(heldVeloxPoolRefs_, pool.second.get());
   }
+}
+
+bool MemoryManager::tryDestructSafe() {
+  // Velox memory pools considered safe to destruct when no alive allocations.
+  for (const auto& pool : heldVeloxPoolRefs_) {
+    if (pool && pool->usedBytes() != 0) {
+      return false;
+    }
+  }
+  for (const auto& pair : veloxPoolRefs_) {
+    const auto& veloxPool = pair.second;
+    if (veloxPool && veloxPool->usedBytes() != 0) {
+      return false;
+    }
+  }
+  heldVeloxPoolRefs_.clear();
+  veloxPoolRefs_.clear();
+
+  // Velox memory manager considered safe to destruct when no alive pools.
+  if (veloxMemoryManager_) {
+    if (veloxMemoryManager_->numPools() > 3) {
+      VLOG(2) << "Attempt to destruct VeloxMemoryManager failed because there are " << veloxMemoryManager_->numPools()
+              << " outstanding memory pools.";
+      return false;
+    }
+    if (veloxMemoryManager_->numPools() == 3) {
+      // Assert the pool is spill pool
+      // See https://github.com/facebookincubator/velox/commit/e6f84e8ac9ef6721f527a2d552a13f7e79bdf72e
+      // https://github.com/facebookincubator/velox/commit/ac134400b5356c5ba3f19facee37884aa020afdc
+      int32_t spillPoolCount = 0;
+      int32_t cachePoolCount = 0;
+      int32_t tracePoolCount = 0;
+      veloxMemoryManager_->testingDefaultRoot().visitChildren([&](velox::memory::MemoryPool* child) -> bool {
+        if (child == veloxMemoryManager_->spillPool()) {
+          spillPoolCount++;
+        }
+        if (child == veloxMemoryManager_->cachePool()) {
+          cachePoolCount++;
+        }
+        if (child == veloxMemoryManager_->tracePool()) {
+          tracePoolCount++;
+        }
+        return true;
+      });
+      VELOX_CHECK(spillPoolCount == 1, "Illegal pool count state: spillPoolCount: " + std::to_string(spillPoolCount));
+      VELOX_CHECK(cachePoolCount == 1, "Illegal pool count state: cachePoolCount: " + std::to_string(cachePoolCount));
+      VELOX_CHECK(tracePoolCount == 1, "Illegal pool count state: tracePoolCount: " + std::to_string(tracePoolCount));
+    }
+    if (veloxMemoryManager_->numPools() < 3) {
+      VELOX_FAIL("Unreachable code");
+    }
+  }
+  veloxMemoryManager_.reset();
+
+  // Applies similar rule for Arrow memory pool.
+  for (const auto& pair : arrowPoolRefs_) {
+    const auto& arrowPool = pair.second;
+    if (arrowPool && arrowPool->bytes_allocated() != 0) {
+      return false;
+    }
+  }
+  arrowPoolRefs_.clear();
+
+  // Successfully destructed.
+  return true;
 }
 } // namespace velox4j
