@@ -133,7 +133,7 @@ public class PlanNodeTest {
     final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
-        new RowType(List.of(), List.of()),
+        SampleQueryTests.getSchema(),
         new ExternalStreamTableHandle("connector-external-stream"),
         List.of()
     );
