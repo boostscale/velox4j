@@ -19,6 +19,7 @@
 #include <glog/logging.h>
 #include <jni.h>
 #include "JniWrapper.h"
+#include "StaticJniWrapper.h"
 #include "velox4j/init/Init.h"
 #include "velox4j/jni/JniError.h"
 #include "velox4j/jni/JniCommon.h"
@@ -34,6 +35,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
 
   velox4j::getJniErrorState()->ensureInitialized(env);
   velox4j::initForSpark();
+  velox4j::jniClassRegistry()->add(env, new velox4j::StaticJniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::JniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::DownIteratorJniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::JavaAllocationListenerJniWrapper(env));

@@ -4,6 +4,7 @@ add_library(velox4j SHARED
         velox4j/jni/JniError.cc
         velox4j/jni/JniLoader.cc
         velox4j/jni/JniWrapper.cc
+        velox4j/jni/StaticJniWrapper.cc
         velox4j/iterator/UpIterator.cc
         velox4j/iterator/DownIterator.cc
         velox4j/lifecycle/ObjectStore.cc

@@ -18,14 +18,8 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 
 final class JniWrapper {
-  private static final JniWrapper STATIC_INSTANCE = new JniWrapper(StaticSession.get());
-
-  static JniWrapper staticInstance() {
-    return STATIC_INSTANCE;
-  }
 
   static JniWrapper create(Session session) {
     return new JniWrapper(session);
@@ -41,14 +35,6 @@ final class JniWrapper {
   public long sessionId() {
     return session.id();
   }
-
-  // Memory.
-  native long createMemoryManager(AllocationListener listener);
-
-  // Lifecycle.
-  native long createSession(long memoryManagerId);
-
-  native void releaseCppObject(long objectId);
 
   // Plan execution.
   native long executeQuery(String queryJson);

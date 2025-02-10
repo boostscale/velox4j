@@ -26,7 +26,6 @@
 #include "velox4j/query/QueryExecutor.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
-#include "velox4j/memory/JavaAllocationListener.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -34,34 +33,12 @@ using namespace facebook::velox;
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
-long createMemoryManager(JNIEnv* env, jobject javaThis, jobject jListener) {
-  JNI_METHOD_START
-  auto listener = std::make_unique<BlockAllocationListener>(
-      std::make_unique<JavaAllocationListener>(env, jListener), 8 << 10 << 10);
-  auto mm = std::make_shared<MemoryManager>(std::move(listener));
-  return ObjectStore::global()->save(mm);
-  JNI_METHOD_END(-1L)
-}
-
-long createSession(JNIEnv* env, jobject javaThis, long memoryManagerId) {
-  JNI_METHOD_START
-  auto mm = ObjectStore::retrieve<MemoryManager>(memoryManagerId);
-  return ObjectStore::global()->save(std::make_unique<Session>(mm.get()));
-  JNI_METHOD_END(-1L)
-}
-
 Session* sessionOf(JNIEnv* env, jobject javaThis) {
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("sessionId");
   const jlong sessionId = env->CallLongMethod(javaThis, methodId);
   checkException(env);
   return ObjectStore::retrieve<Session>(sessionId).get();
-}
-
-void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
-  JNI_METHOD_START
-  ObjectStore::release(objId);
-  JNI_METHOD_END()
 }
 
 jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
@@ -284,20 +261,6 @@ void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "sessionId", kTypeLong, nullptr);
-  addNativeMethod(
-      "createMemoryManager",
-      (void*)createMemoryManager,
-      kTypeLong,
-      "io/github/zhztheplayer/velox4j/memory/AllocationListener",
-      nullptr);
-  addNativeMethod(
-      "createSession", (void*)createSession, kTypeLong, kTypeLong, nullptr);
-  addNativeMethod(
-      "releaseCppObject",
-      (void*)releaseCppObject,
-      kTypeVoid,
-      kTypeLong,
-      nullptr);
   addNativeMethod(
       "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
