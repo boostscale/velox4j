@@ -40,7 +40,7 @@ set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j-shared LIBRA
 add_library(velox4j-static STATIC ${VELOX4j_SOURCES})
 target_include_directories(velox4j-static PRIVATE ${VELOX4j_INCLUDES})
 target_link_libraries(velox4j-static LINK_PRIVATE ${VELOX4j_DEPENDENCIES})
-set_target_properties(velox4j-static PROPERTIES OUTPUT_NAME velox4j ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set_target_properties(velox4j-static PROPERTIES OUTPUT_NAME velox4j LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Bundled shared library.
 add_library(velox4j-bundled SHARED velox4j/Empty.cc)
