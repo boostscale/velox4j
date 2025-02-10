@@ -55,7 +55,14 @@ TEST_F(QuerySerdeTest, sanity) {
                   .finalAggregation()
                   .planNode();
   std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
-  auto query = std::make_shared<Query>(plan, std::move(boundSplits));
+  auto query = std::make_shared<Query>(
+      plan,
+      std::move(boundSplits),
+      std::make_shared<const ConfigArray>(
+          std::vector<std::pair<std::string, std::string>>({})),
+      std::make_shared<const ConnectorConfigArray>(
+          std::vector<
+              std::pair<std::string, std::shared_ptr<const ConfigArray>>>({})));
   testSerde(query.get());
 }
 } // namespace velox4j
