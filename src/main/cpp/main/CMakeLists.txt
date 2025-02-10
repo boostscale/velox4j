@@ -44,6 +44,7 @@ set_target_properties(velox4j-static PROPERTIES OUTPUT_NAME velox4j ARCHIVE_OUTP
 
 # Bundled shared library.
 add_library(velox4j-static-imported STATIC IMPORTED)
+add_dependencies(velox4j-static-imported velox4j-static)
 set_target_properties(velox4j-static-imported PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libvelox4j.a)
 add_library(velox4j-bundled SHARED velox4j/Empty.cc)
 target_link_libraries(velox4j-bundled PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,velox4j-static-imported>")
