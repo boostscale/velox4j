@@ -44,5 +44,5 @@ set_target_properties(velox4j-static PROPERTIES OUTPUT_NAME velox4j ARCHIVE_OUTP
 
 # Bundled shared library.
 add_library(velox4j-bundled SHARED velox4j/Empty.cc)
-target_link_libraries(velox4j-bundled PRIVATE velox4j-static)
-set_target_properties(velox4j-bundled PROPERTIES OUTPUT_NAME velox4j LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib LINK_FLAGS "-Wl,--whole-archive")
+target_link_libraries(velox4j-bundled PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,velox4j-static>")
+set_target_properties(velox4j-bundled PROPERTIES OUTPUT_NAME velox4j LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
