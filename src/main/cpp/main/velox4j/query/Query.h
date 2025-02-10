@@ -25,7 +25,7 @@ namespace velox4j {
 using namespace facebook::velox;
 class Query : public ISerializable {
  public:
-  explicit Query(
+  Query(
       std::shared_ptr<const core::PlanNode>& plan,
       std::vector<std::shared_ptr<BoundSplit>>&& boundSplits);
 

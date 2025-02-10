@@ -31,6 +31,7 @@
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 #include <velox/type/Filter.h>
+#include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/query/Query.h"
 
@@ -71,6 +72,7 @@ void initForSpark() {
     window::prestosql::registerAllWindowFunctions();
     functions::window::sparksql::registerWindowFunctions("");
 
+    ConfigArray::registerSerDe();
     Query::registerSerDe();
     Type::registerSerDe();
     common::Filter::registerSerDe();

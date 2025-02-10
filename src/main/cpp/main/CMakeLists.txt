@@ -17,6 +17,7 @@ add_library(velox4j SHARED
         velox4j/memory/JavaAllocationListener.cc
         velox4j/memory/MemoryManager.cc
         velox4j/memory/ArrowMemoryPool.cc
+        velox4j/config/Config.cc
 )
 
 target_include_directories(velox4j PUBLIC
