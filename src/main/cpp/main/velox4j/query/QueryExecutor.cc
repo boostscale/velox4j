@@ -43,7 +43,7 @@ class Out : public UpIterator {
         query->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
         nullptr,
-        core::QueryConfig{{}},
+        core::QueryConfig{query->queryConfig()->toMap()},
         {},
         cache::AsyncDataCache::getInstance(),
         memoryManager_

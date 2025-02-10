@@ -10,6 +10,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Config extends VeloxSerializable {
+  private static final Config EMPTY = new Config(List.of());
+
+  public static Config empty() {
+    return EMPTY;
+  }
+
   private final List<Entry> values;
 
   @JsonCreator

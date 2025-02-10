@@ -4,7 +4,6 @@ add_library(velox4j SHARED
         velox4j/jni/JniError.cc
         velox4j/jni/JniLoader.cc
         velox4j/jni/JniWrapper.cc
-        velox4j/exec/QueryExecutor.cc
         velox4j/iterator/UpIterator.cc
         velox4j/iterator/DownIterator.cc
         velox4j/lifecycle/ObjectStore.cc
@@ -12,6 +11,7 @@ add_library(velox4j SHARED
         velox4j/arrow/Arrow.cc
         velox4j/query/Query.cc
         velox4j/query/BoundSplit.cc
+        velox4j/query/QueryExecutor.cc
         velox4j/connector/ExternalStream.cc
         velox4j/memory/AllocationListener.cc
         velox4j/memory/JavaAllocationListener.cc

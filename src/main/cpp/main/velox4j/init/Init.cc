@@ -73,6 +73,7 @@ void initForSpark() {
     functions::window::sparksql::registerWindowFunctions("");
 
     ConfigArray::registerSerDe();
+    ConnectorConfigArray::registerSerDe();
     Query::registerSerDe();
     Type::registerSerDe();
     common::Filter::registerSerDe();

@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.serializable;
 
 import io.github.zhztheplayer.velox4j.config.Config;
+import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
@@ -127,6 +128,7 @@ public final class VeloxSerializables {
 
   private static void retisterConfig() {
     NAME_REGISTRY.registerClass("Velox4jConfig", Config.class);
+    NAME_REGISTRY.registerClass("Velox4jConnectorConfig", ConnectorConfig.class);
   }
 
   private static void registerQuery() {

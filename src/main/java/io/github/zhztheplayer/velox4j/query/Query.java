@@ -19,6 +19,8 @@ package io.github.zhztheplayer.velox4j.query;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.zhztheplayer.velox4j.config.Config;
+import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 
@@ -27,13 +29,19 @@ import java.util.List;
 public class Query extends VeloxSerializable {
   private final PlanNode plan;
   private final List<BoundSplit> boundSplits;
+  private final Config queryConfig;
+  private final ConnectorConfig connectorConfig;
 
   @JsonCreator
   public Query(
       @JsonProperty("plan") PlanNode plan,
-      @JsonProperty("boundSplits") List<BoundSplit> boundSplits) {
+      @JsonProperty("boundSplits") List<BoundSplit> boundSplits,
+      @JsonProperty("queryConfig") Config queryConfig,
+      @JsonProperty("connectorConfig") ConnectorConfig connectorConfig) {
     this.plan = plan;
     this.boundSplits = boundSplits;
+    this.queryConfig = queryConfig;
+    this.connectorConfig = connectorConfig;
   }
 
   @JsonGetter("plan")
@@ -44,5 +52,15 @@ public class Query extends VeloxSerializable {
   @JsonGetter("boundSplits")
   public List<BoundSplit> getSplits() {
     return boundSplits;
+  }
+
+  @JsonGetter("queryConfig")
+  public Config getQueryConfig() {
+    return queryConfig;
+  }
+
+  @JsonGetter("connectorConfig")
+  public ConnectorConfig getConnectorConfig() {
+    return connectorConfig;
   }
 }

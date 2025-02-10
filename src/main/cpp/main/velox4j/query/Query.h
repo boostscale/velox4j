@@ -20,17 +20,22 @@
 #include <velox/core/PlanNode.h>
 #include <utility>
 #include "BoundSplit.h"
+#include "velox4j/config/Config.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 class Query : public ISerializable {
  public:
   Query(
-      std::shared_ptr<const core::PlanNode>& plan,
-      std::vector<std::shared_ptr<BoundSplit>>&& boundSplits);
+      const std::shared_ptr<const core::PlanNode>& plan,
+      std::vector<std::shared_ptr<BoundSplit>>&& boundSplits,
+      const std::shared_ptr<const ConfigArray>& queryConfig,
+      const std::shared_ptr<const ConnectorConfigArray>& connectorConfig);
 
   const std::shared_ptr<const core::PlanNode>& plan() const;
   const std::vector<std::shared_ptr<BoundSplit>>& boundSplits() const;
+  const std::shared_ptr<const ConfigArray>& queryConfig() const;
+  const std::shared_ptr<const ConnectorConfigArray>& connectorConfig() const;
 
   folly::dynamic serialize() const override;
 
@@ -43,7 +48,9 @@ class Query : public ISerializable {
   static void registerSerDe();
 
  private:
-  std::shared_ptr<const core::PlanNode> plan_;
-  std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
+  const std::shared_ptr<const core::PlanNode> plan_;
+  const std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
+  const std::shared_ptr<const ConfigArray> queryConfig_;
+  const std::shared_ptr<const ConnectorConfigArray> connectorConfig_;
 };
 } // namespace velox4j

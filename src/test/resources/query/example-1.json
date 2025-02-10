@@ -206,5 +206,63 @@
     ],
     "step": "FINAL"
   },
-  "boundSplits": []
+  "boundSplits": [],
+  "queryConfig": {
+    "name": "Velox4jConfig",
+    "values": [
+      {
+        "key": "max_output_batch_rows",
+        "value": "1000"
+      },
+      {
+        "key": "aggregation_spill_enabled",
+        "value": "false"
+      }
+    ]
+  },
+  "connectorConfig": {
+    "name": "Velox4jConnectorConfig",
+    "values": [
+      {
+        "connectorId": "conn-1",
+        "config": {
+          "name": "Velox4jConfig",
+          "values": [
+            {
+              "key": "k1",
+              "value": "v1"
+            },
+            {
+              "key": "k3",
+              "value": "v3"
+            },
+            {
+              "key": "k2",
+              "value": "v2"
+            }
+          ]
+        }
+      },
+      {
+        "connectorId": "conn-2",
+        "config": {
+          "name": "Velox4jConfig",
+          "values": [
+            {
+              "key": "k5",
+              "value": "v5"
+            },
+            {
+              "key": "k1",
+              "value": "v1"
+            },
+            {
+              "key": "k2",
+              "value": "v2"
+            }
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -23,7 +23,7 @@
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
-#include "velox4j/exec/QueryExecutor.h"
+#include "velox4j/query/QueryExecutor.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"

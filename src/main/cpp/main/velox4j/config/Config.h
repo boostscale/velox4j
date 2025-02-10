@@ -39,4 +39,24 @@ class ConfigArray : public ISerializable {
  private:
   const std::vector<std::pair<std::string, std::string>> values_;
 };
+
+class ConnectorConfigArray : public ISerializable {
+ public:
+  explicit ConnectorConfigArray(
+      std::vector<std::pair<std::string, std::shared_ptr<const ConfigArray>>>&& values)
+      : values_(std::move(values)) {}
+
+  std::unordered_map<std::string, std::shared_ptr<config::ConfigBase>> toMap() const;
+
+  folly::dynamic serialize() const override;
+
+  static std::shared_ptr<ConnectorConfigArray> create(
+      const folly::dynamic& obj,
+      void* context);
+
+  static void registerSerDe();
+
+ private:
+  const std::vector<std::pair<std::string, std::shared_ptr<const ConfigArray>>> values_;
+};
 }

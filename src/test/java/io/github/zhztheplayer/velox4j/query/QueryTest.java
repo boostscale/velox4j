@@ -3,6 +3,8 @@ package io.github.zhztheplayer.velox4j.query;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
+import io.github.zhztheplayer.velox4j.config.Config;
+import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
@@ -116,7 +118,7 @@ public class QueryTest {
         null,
         List.of()
     );
-    final Query query = new Query(aggregationNode, splits);
+    final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator itr = queryExecutor.execute(query);
     Iterators.assertIterator(itr)
         .assertNumRowVectors(1)
@@ -151,7 +153,7 @@ public class QueryTest {
             new ExternalStreamConnectorSplit("connector-external-stream", es.id())
         )
     );
-    final Query query = new Query(scanNode, splits);
+    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
     final String queryJson = Serde.toPrettyJson(query);
     final UpIterator out = queryExecutor.execute(queryJson);
     SampleQueryTests.assertIterator(out);
