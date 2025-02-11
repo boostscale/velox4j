@@ -1,3 +1,6 @@
+# Settings.
+set(CMAKE_INSTALL_RPATH $ORIGIN)
+
 # Variables.
 set(VELOX4J_SOURCES
         velox4j/init/Init.cc
@@ -30,6 +33,7 @@ set(VELOX4J_DEPENDENCIES
         JniHelpers
         ${JNI_LIBRARIES})
 
+# The output library.
 add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
 target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
