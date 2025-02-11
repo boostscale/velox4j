@@ -37,6 +37,6 @@ set(VELOX4J_DEPENDENCIES
 add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
 target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
-set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j-shared
+set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
         ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
