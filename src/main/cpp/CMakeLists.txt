@@ -3,6 +3,11 @@ project(velox4jcpp)
 
 include(cmake/CPM.cmake)
 
+# Preconditions.
+if (NOT UNIX)
+    message(FATAL_ERROR "The project velox4jcpp only supports UNIX-based systems at the moment.")
+endif ()
+
 # Compile options.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)

@@ -19,7 +19,8 @@ set(VELOX4J_SOURCES
         velox4j/memory/JavaAllocationListener.cc
         velox4j/memory/MemoryManager.cc
         velox4j/memory/ArrowMemoryPool.cc
-        velox4j/config/Config.cc)
+        velox4j/config/Config.cc
+)
 set(VELOX4J_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}
         ${velox_SOURCE_DIR}
@@ -43,4 +44,11 @@ set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
 
 # Install.
 install(IMPORTED_RUNTIME_ARTIFACTS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
-install(RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
+install(RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j PRE_EXCLUDE_REGEXES
+        "libc\\.so\\.[0-9]+"
+        "libstdc\\+\\+\\.so\\.[0-9]+"
+        "libgcc_s\\.so\\.[0-9]+"
+        "libm\\.so\\.[0-9]+"
+        "linux-vdso\\.so\\.[0-9]+"
+        "ld-linux-x86-64\\.so\\.[0-9]+"
+)
