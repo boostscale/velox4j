@@ -31,6 +31,9 @@ set(VELOX4J_DEPENDENCIES
         ${JNI_LIBRARIES})
 
 # The output library.
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH $ORIGIN)
 add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
 target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
@@ -39,12 +42,5 @@ set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
         ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Install.
-add_library(velox4j-imported SHARED IMPORTED)
-add_dependencies(velox4j-imported velox4j-shared)
-set_target_properties(velox4j-imported PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libvelox4j.so)
-
-# Install.
-set(CMAKE_SKIP_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH $ORIGIN)
-install(IMPORTED_RUNTIME_ARTIFACTS velox4j-imported RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
+install(IMPORTED_RUNTIME_ARTIFACTS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
 install(RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
