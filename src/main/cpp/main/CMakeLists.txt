@@ -30,22 +30,9 @@ set(VELOX4J_DEPENDENCIES
         JniHelpers
         ${JNI_LIBRARIES})
 
-# Shared library.
 add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
 target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
-set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j-shared LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-
-# Static library.
-add_library(velox4j-static STATIC ${VELOX4J_SOURCES})
-target_include_directories(velox4j-static PRIVATE ${VELOX4J_INCLUDES})
-target_link_libraries(velox4j-static PRIVATE ${VELOX4J_DEPENDENCIES})
-set_target_properties(velox4j-static PROPERTIES OUTPUT_NAME velox4j ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-
-# Bundled shared library.
-add_library(velox4j-static-imported STATIC IMPORTED)
-add_dependencies(velox4j-static-imported velox4j-static)
-set_target_properties(velox4j-static-imported PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libvelox4j.a)
-add_library(velox4j-bundled SHARED velox4j/Empty.cc)
-target_link_libraries(velox4j-bundled PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,velox4j-static-imported>")
-set_target_properties(velox4j-bundled PROPERTIES OUTPUT_NAME velox4j LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j-shared
+        LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+        ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
