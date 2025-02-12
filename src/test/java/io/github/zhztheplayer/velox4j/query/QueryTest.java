@@ -18,6 +18,7 @@ import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
@@ -57,7 +58,7 @@ public class QueryTest {
 
   @Test
   public void testAggregate() {
-    final QueryExecutor queryExecutor = new QueryExecutor(memoryManager);
+    final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = new TableScanNode(
@@ -118,7 +119,7 @@ public class QueryTest {
         List.of()
     );
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = queryExecutor.execute(query);
+    final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0,
@@ -129,16 +130,16 @@ public class QueryTest {
                 "3\t77\n" +
                 "2\t68\n")
         .run();
-    queryExecutor.close();
+    jniApi.close();
   }
 
   @Test
   public void testExternalStream() {
-    final QueryExecutor queryExecutor = new QueryExecutor(memoryManager);
+    final JniApi jniApi = JniApi.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = queryExecutor.execute(json);
+    final UpIterator sampleIn = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = queryExecutor.bindDownIterator(down);
+    final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),
@@ -154,9 +155,9 @@ public class QueryTest {
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
     final String queryJson = Serde.toPrettyJson(query);
-    final UpIterator out = queryExecutor.execute(queryJson);
+    final UpIterator out = jniApi.executeQuery(queryJson);
     SampleQueryTests.assertIterator(out);
-    queryExecutor.close();
+    jniApi.close();
   }
 
   private static List<Assignment> toAssignments(RowType rowType) {

@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
+import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 
 import java.util.List;
@@ -62,5 +65,9 @@ public class Query extends VeloxSerializable {
   @JsonGetter("connectorConfig")
   public ConnectorConfig getConnectorConfig() {
     return connectorConfig;
+  }
+
+  public UpIterator execute(JniApi jniApi) {
+    return jniApi.executeQuery(Serde.toPrettyJson(this));
   }
 }
