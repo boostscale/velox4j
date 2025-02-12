@@ -10,6 +10,7 @@ SOURCE_DIR=$BASE_DIR
 BUILD_DIR=$BASE_DIR/build
 INSTALL_DIR=$BUILD_DIR/dist
 INSTALL_LIB_DIR=$INSTALL_DIR/lib
+VELOX4J_LIB_NAME=libvelox4j.so
 
 cmake -DCMAKE_BUILD_TYPE=Release -S "$SOURCE_DIR" -B "$BUILD_DIR"
 cmake --build "$BUILD_DIR" --target velox4j-shared -j "$NUM_THREADS"
@@ -33,5 +34,11 @@ for file in "$INSTALL_LIB_DIR"/*
 do
   chrpath -r '$ORIGIN' "$file" || true
 done
+
+echo "Checking ldd result of libvelox4j.so: "
+ldd "$INSTALL_LIB_DIR/$VELOX4J_LIB_NAME"
+
+echo "Checking ld result of libvelox4j.so: "
+ld "$INSTALL_LIB_DIR/$VELOX4J_LIB_NAME"
 
 echo "Successfully built velox4j-cpp."
