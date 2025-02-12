@@ -26,6 +26,10 @@ do
       exit 1
     fi
     mv -v "$target" "$file"
-    chrpath -r '$ORIGIN' "$file"
   fi
+done
+
+for file in "$INSTALL_LIB_DIR"/*
+do
+  chrpath -r '$ORIGIN' "$file" || true
 done
