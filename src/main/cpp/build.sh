@@ -33,6 +33,7 @@ done
 for file in "$INSTALL_LIB_DIR"/*
 do
   chrpath -r '$ORIGIN' "$file" || true
+  readelf -d "$file"
 done
 
 echo "Checking ldd result of libvelox4j.so: "
