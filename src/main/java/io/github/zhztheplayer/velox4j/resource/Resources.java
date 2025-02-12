@@ -134,7 +134,6 @@ public class Resources {
     }
   }
 
-
   public static void copyResource(String fromPath, File toFile) {
     Preconditions.checkArgument(!toFile.exists(), "File %s already exists", toFile);
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -150,7 +149,6 @@ public class Resources {
       }
       o.flush();
       o.close();
-      System.out.println("FINISHED: " + fromPath);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

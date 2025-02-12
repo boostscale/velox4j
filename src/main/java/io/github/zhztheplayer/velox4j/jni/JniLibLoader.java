@@ -28,6 +28,7 @@ public class JniLibLoader {
     final ResourceFile velox4jLibFile = velox4jLibFiles.get(0);
     for (ResourceFile libFile : libFiles) {
       final File copied = workDir.toPath().resolve(libFile.name()).toFile();
+      System.out.printf("Copying library file %s to %s...", libFile, copied);
       libFile.copyTo(copied);
     }
     final File copiedVelox4jLib = workDir.toPath().resolve(velox4jLibFile.name()).toFile();
