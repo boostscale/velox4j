@@ -150,6 +150,7 @@ public class Resources {
       }
       o.flush();
       o.close();
+      System.out.println("FINISHED: " + fromPath);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
