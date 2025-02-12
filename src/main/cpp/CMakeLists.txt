@@ -5,7 +5,7 @@ include(cmake/CPM.cmake)
 
 # Preconditions.
 if (NOT UNIX)
-    message(FATAL_ERROR "The project velox4jcpp only supports UNIX-based systems at the moment.")
+    message(FATAL_ERROR "The project velox4j-cpp only supports UNIX-based systems at the moment.")
 endif ()
 
 # Compile options.

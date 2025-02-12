@@ -33,3 +33,5 @@ for file in "$INSTALL_LIB_DIR"/*
 do
   chrpath -r '$ORIGIN' "$file" || true
 done
+
+echo "Successfully built velox4j-cpp."
