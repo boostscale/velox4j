@@ -36,7 +36,5 @@ jobs:
         run: |
           bash .github/workflows/scripts/java-ut/setup-ubuntu20.sh
       - name: Build and run UTs
-        env:
-          LD_DEBUG: libs
         run: |
           mvn clean test
