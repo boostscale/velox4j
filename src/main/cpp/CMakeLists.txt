@@ -15,7 +15,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 # Velox4j option definitions.
-option(VELOX4J_BUILD_TESTING "Build Velox4j tests." OFF)
+option(VELOX4J_BUILD_TESTING "Build Velox4j tests." ON)
 
 # Setup JNI.
 find_package(Java REQUIRED)
@@ -32,8 +32,8 @@ set(VELOX_ENABLE_CCACHE ON)
 set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
 set(VELOX_ENABLE_ARROW ON)
-if (VELOX4J_BUILD_TESTING)
-    set(VELOX_BUILD_TESTING ON)
+if (NOT VELOX4J_BUILD_TESTING)
+    set(VELOX_BUILD_TESTING OFF)
 endif ()
 
 # Import Velox.
