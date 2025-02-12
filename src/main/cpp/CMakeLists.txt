@@ -14,6 +14,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
+# Velox4j option definitions.
+option(VELOX4J_BUILD_TESTING "Build Velox4j tests." OFF)
+
 # Setup JNI.
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
@@ -23,20 +26,22 @@ if (JNI_FOUND)
 endif ()
 include(UseJava)
 
+# Set Velox options.
+set(VELOX_DEPENDENCY_SOURCE AUTO)
+set(VELOX_ENABLE_CCACHE ON)
+set(VELOX_MONO_LIBRARY ON)
+set(VELOX_BUILD_SHARED ON)
+set(VELOX_ENABLE_ARROW ON)
+if (VELOX4J_BUILD_TESTING)
+    set(VELOX_BUILD_TESTING ON)
+endif ()
+
 # Import Velox.
 set(VELOX_REPO facebookincubator/velox)
 set(VELOX_REF 35711b7a7987be7c63f7a8bd8b56bc094e40e496)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
 set(VELOX_SOURCE_URL_MD5 daf8d7ae4be1fcfbbdf8054e3d98ad19)
-CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-        OPTIONS
-        "VELOX_DEPENDENCY_SOURCE AUTO"
-        "VELOX_ENABLE_CCACHE ON"
-        "VELOX_MONO_LIBRARY ON"
-        "VELOX_BUILD_SHARED ON"
-        "VELOX_ENABLE_ARROW ON"
-        "VELOX_BUILD_TESTING ON"
-)
+CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
 
 # Import JniHelpers.
 set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)
@@ -66,4 +71,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SCRIPT_CXX_FLAGS}")
 
 # Continue to build.
 add_subdirectory(main)
-add_subdirectory(test)
+if (VELOX4J_BUILD_TESTING)
+    add_subdirectory(test)
+endif ()
