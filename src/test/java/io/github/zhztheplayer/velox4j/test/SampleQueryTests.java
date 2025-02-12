@@ -16,13 +16,13 @@ public final class SampleQueryTests {
   }
 
   public static String readQueryJson() {
-    return Resources.readResourceAsString(SAMPLE_QUERY_PATH);
+    return ResourceTests.readResourceAsString(SAMPLE_QUERY_PATH);
   }
 
   public static void assertIterator(UpIterator itr) {
-    Iterators.assertIterator(itr)
+    UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, Resources.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH))
         .run();
   }
 }

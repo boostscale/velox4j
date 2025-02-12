@@ -27,7 +27,7 @@ import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.test.Iterators;
+import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
@@ -132,7 +132,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = Iterators.collectSingleVector(itr);
+    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(1, deserialized.size());
@@ -147,7 +147,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = Iterators.collectSingleVector(itr);
+    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector, vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(2, deserialized.size());
@@ -161,7 +161,7 @@ public class JniApiTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
-    final RowVector vector = Iterators.collectSingleVector(itr);
+    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);

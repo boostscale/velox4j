@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-public final class Resources {
+public final class ResourceTests {
 
   public static String readResourceAsString(String path) {
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();

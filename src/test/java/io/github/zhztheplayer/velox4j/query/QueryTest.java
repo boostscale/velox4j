@@ -18,13 +18,12 @@ import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
-import io.github.zhztheplayer.velox4j.test.Iterators;
+import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
@@ -120,7 +119,7 @@ public class QueryTest {
     );
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator itr = queryExecutor.execute(query);
-    Iterators.assertIterator(itr)
+    UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0,
             "n_regionkey\tcnt\n" +

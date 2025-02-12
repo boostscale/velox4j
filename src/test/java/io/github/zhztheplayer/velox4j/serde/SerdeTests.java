@@ -29,7 +29,7 @@ import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.test.Resources;
+import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
@@ -212,7 +212,7 @@ public final class SerdeTests {
   }
 
   public static RowVector newSampleRowVector(JniApi jniApi) {
-    final String serialized = Resources.readResourceAsString("vector/rowvector-1.b64");
+    final String serialized = ResourceTests.readResourceAsString("vector/rowvector-1.b64");
     final BaseVector deserialized = BaseVectors.deserialize(jniApi, serialized);
     return ((RowVector) deserialized);
   }

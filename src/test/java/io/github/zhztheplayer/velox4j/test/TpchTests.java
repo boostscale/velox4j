@@ -28,7 +28,7 @@ public final class TpchTests {
 
     Table(String fileName, RowType schema) {
       this.schema = schema;
-      this.file = Resources.copyResourceToTmp(String.format("%s/%s", DATA_DIRECTORY, fileName));
+      this.file = ResourceTests.copyResourceToTmp(String.format("%s/%s", DATA_DIRECTORY, fileName));
     }
 
     public RowType schema() {
