@@ -135,7 +135,7 @@ public class Resources {
   }
 
   public static void copyResource(String fromPath, File toFile) {
-    Preconditions.checkArgument(!toFile.exists(), "File %s already exists", toFile);
+    Preconditions.checkArgument(!toFile.isDirectory(), "File %s is not a file", toFile);
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
     try (final InputStream is = new BufferedInputStream(
         Preconditions.checkNotNull(classloader.getResourceAsStream(fromPath), "Resource %s not found", fromPath))) {
