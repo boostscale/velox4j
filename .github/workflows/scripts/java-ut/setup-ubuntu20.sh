@@ -9,7 +9,12 @@ sudo apt-get update
 
 # Install essentials
 sudo apt-get install -y sudo locales wget tar tzdata git ccache ninja-build build-essential
-sudo apt-get install -y llvm-11-dev clang-11 libiberty-dev libdwarf-dev libre2-dev libz-dev liblzo2-dev libzstd-dev libsnappy-dev libdouble-conversion-dev libssl-dev libboost-all-dev libcurl4-openssl-dev curl zip unzip tar pkg-config autoconf-archive bison flex
+sudo apt-get install -y llvm-11-dev clang-11 libiberty-dev libdwarf-dev libre2-dev libz-dev
+sudo apt-get install -y liblzo2-dev libzstd-dev libsnappy-dev libdouble-conversion-dev libssl-dev
+sudo apt-get install -y libboost-all-dev libcurl4-openssl-dev curl zip unzip tar pkg-config
+sudo apt-get install -y autoconf-archive bison flex libfl-dev libc-ares-dev libicu-dev
+sudo apt-get install -y libgoogle-glog-dev libbz2-dev libgflags-dev libgmock-dev libevent-dev
+sudo apt-get install -y liblz4-dev libsodium-dev libelf-dev
 sudo apt-get install -y autoconf automake g++ libnuma-dev libtool numactl unzip libdaxctl-dev
 sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
