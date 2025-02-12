@@ -13,6 +13,7 @@ sudo apt-get install -y llvm-11-dev clang-11 libiberty-dev libdwarf-dev libre2-d
 sudo apt-get install -y autoconf automake g++ libnuma-dev libtool numactl unzip libdaxctl-dev
 sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
+sudo apt-get install -y chrpath
 
 # Install CMake
 cd /opt
