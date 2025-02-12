@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.jni.JniLibLoader;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializables;
 import io.github.zhztheplayer.velox4j.variant.Variants;
@@ -25,7 +26,7 @@ public class Velox4j {
   }
 
   private static void initialize0() {
-    JniWorkspace.getDefault().libLoader().load("lib/libvelox4j.so");
+    JniLibLoader.loadAll(JniWorkspace.getDefault().getWorkDir());
     Variants.registerAll();
     VeloxSerializables.registerAll();
   }

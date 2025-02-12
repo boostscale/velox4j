@@ -27,8 +27,8 @@
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
             <resource>
-                <directory>${project.basedir}/src/main/cpp/build/lib</directory>
-                <targetPath>lib</targetPath>
+                <directory>${project.basedir}/src/main/cpp/build/dist/lib</directory>
+                <targetPath>velox4j-lib</targetPath>
             </resource>
         </resources>
         <plugins>

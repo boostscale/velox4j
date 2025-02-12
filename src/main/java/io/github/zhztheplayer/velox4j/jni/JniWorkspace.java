@@ -20,6 +20,7 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,16 +41,14 @@ public class JniWorkspace {
     }
   }
 
-  private final String workDir;
-  private final JniLibLoader jniLibLoader;
+  private final File workDir;
 
   private JniWorkspace(String rootDir) {
     try {
       LOG.info("Creating JNI workspace in root directory {}", rootDir);
       final Path root = Paths.get(rootDir);
       final Path work = Files.createTempDirectory(root, "work-").toAbsolutePath();
-      this.workDir = work.toString();
-      this.jniLibLoader = new JniLibLoader(this.workDir);
+      this.workDir = work.toFile();
       LOG.info("JNI workspace {} created in root directory {}", this.workDir, rootDir);
     } catch (Exception e) {
       throw new VeloxException(e);
@@ -64,11 +63,7 @@ public class JniWorkspace {
     return INSTANCES.computeIfAbsent(rootDir, JniWorkspace::new);
   }
 
-  public String getWorkDir() {
+  public File getWorkDir() {
     return workDir;
-  }
-
-  public JniLibLoader libLoader() {
-    return jniLibLoader;
   }
 }
