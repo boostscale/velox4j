@@ -19,7 +19,6 @@ for file in "$INSTALL_LIB_DIR"/*
 do
   if [ -L "$file" ]
   then
-    echo "Found symlink $file in installation directory, try resolving it."
     target=$(readlink -f "$file")
     if [ "$(dirname "$target")" != "$(readlink -f "$INSTALL_LIB_DIR")" ]
     then
