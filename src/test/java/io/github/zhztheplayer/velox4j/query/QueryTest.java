@@ -154,8 +154,7 @@ public class QueryTest {
         )
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final String queryJson = Serde.toPrettyJson(query);
-    final UpIterator out = jniApi.executeQuery(queryJson);
+    final UpIterator out = query.execute(jniApi);
     SampleQueryTests.assertIterator(out);
     jniApi.close();
   }
