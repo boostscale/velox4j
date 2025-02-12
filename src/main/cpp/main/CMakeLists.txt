@@ -26,26 +26,21 @@ set(VELOX4J_INCLUDES
         ${velox_SOURCE_DIR}
         ${jni-helpers_SOURCE_DIR}
         ${JNI_INCLUDE_DIRS})
-set(VELOX4J_RUNTIME_DEPENDENCIES
+set(VELOX4J_DEPENDENCIES
         velox
-        JniHelpers)
-set(VELOX4j_PROVIDED_DEPENDENCIES
+        JniHelpers
         ${JNI_LIBRARIES})
 
 # The output library.
 add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
-target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_RUNTIME_DEPENDENCIES} ${VELOX4j_PROVIDED_DEPENDENCIES})
+target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
 set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
         ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Install.
-set(VELOX_INSTALLED_TARGETS velox4j-shared ${VELOX4J_RUNTIME_DEPENDENCIES})
-foreach (INSTALLED_TARGET ${VELOX_INSTALLED_TARGETS})
-    set_target_properties(${INSTALLED_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
-endforeach ()
-install(TARGETS ${VELOX_INSTALLED_TARGETS} RUNTIME_DEPENDENCY_SET 3rd LIBRARY COMPONENT velox4j)
+install(IMPORTED_RUNTIME_ARTIFACTS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
 install(RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j PRE_EXCLUDE_REGEXES
         "libc\\.so\\.[0-9]+"
         "libstdc\\+\\+\\.so\\.[0-9]+"
