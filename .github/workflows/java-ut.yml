@@ -32,6 +32,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
+      - name: Run setup script
+        run: |
+          bash .github/workflows/scripts/java-ut/setup-ubuntu20.sh
       - name: Build and run UTs
         run: |
           mvn clean test
