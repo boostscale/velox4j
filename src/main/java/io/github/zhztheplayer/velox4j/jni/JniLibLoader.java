@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class JniLibLoader {
   private static final AtomicBoolean LOADED = new AtomicBoolean(false);
+
   private static final String LIB_CONTAINER = "velox4j-lib";
   private static final Pattern LIB_PATTERN = Pattern.compile("^.+$");
   private static final String VELOX4J_LIB_NAME = "libvelox4j.so";
