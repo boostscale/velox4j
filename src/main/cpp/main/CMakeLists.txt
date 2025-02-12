@@ -37,12 +37,12 @@ target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
 target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
 set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-        ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+        ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+        INSTALL_RPATH "$ORIGIN")
 
 # Install.
-set(CMAKE_INSTALL_RPATH $ORIGIN)
-install(TARGETS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd LIBRARY COMPONENT velox4j)
-install(RUNTIME_DEPENDENCY_SET 3rd LIBRARY COMPONENT velox4j PRE_EXCLUDE_REGEXES
+install(TARGETS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j)
+install(RUNTIME_DEPENDENCY_SET 3rd COMPONENT velox4j PRE_EXCLUDE_REGEXES
         "libc\\.so\\.[0-9]+"
         "libstdc\\+\\+\\.so\\.[0-9]+"
         "libgcc_s\\.so\\.[0-9]+"
