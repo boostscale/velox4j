@@ -139,7 +139,7 @@ public class QueryTest {
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator sampleIn = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = jniApi.downIteratorAsExternalStream(down);
+    final ExternalStream es = jniApi.newExternalStream(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),

@@ -23,9 +23,9 @@
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
-#include "velox4j/query/QueryExecutor.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
+#include "velox4j/query/QueryExecutor.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -64,10 +64,7 @@ jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jlong downIteratorAsExternalStream(
-    JNIEnv* env,
-    jobject javaThis,
-    jobject itrRef) {
+jlong newExternalStream(JNIEnv* env, jobject javaThis, jobject itrRef) {
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
@@ -272,8 +269,8 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
-      "downIteratorAsExternalStream",
-      (void*)downIteratorAsExternalStream,
+      "newExternalStream",
+      (void*)newExternalStream,
       kTypeLong,
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
       nullptr);

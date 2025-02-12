@@ -7,7 +7,6 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.type.Type;
@@ -50,8 +49,8 @@ public final class JniApi implements AutoCloseable {
     return rowVectorWrap(jni.upIteratorNext(itr.id()));
   }
 
-  public ExternalStream downIteratorAsExternalStream(DownIterator itr) {
-    return new ExternalStream(jni.downIteratorAsExternalStream(itr));
+  public ExternalStream newExternalStream(DownIterator itr) {
+    return new ExternalStream(jni.newExternalStream(itr));
   }
 
   public Type variantInferType(Variant variant) {

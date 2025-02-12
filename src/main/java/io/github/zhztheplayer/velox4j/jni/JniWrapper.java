@@ -45,7 +45,7 @@ final class JniWrapper {
   native long upIteratorNext(long address);
 
   // For DownIterator.
-  native long downIteratorAsExternalStream(DownIterator itr);
+  native long newExternalStream(DownIterator itr);
 
   // For Variant.
   native String variantInferType(String json);
