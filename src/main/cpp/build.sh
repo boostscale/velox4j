@@ -12,7 +12,7 @@ INSTALL_DIR=$BUILD_DIR/dist
 INSTALL_LIB_DIR=$INSTALL_DIR/lib
 VELOX4J_LIB_NAME=libvelox4j.so
 
-cmake -DCMAKE_BUILD_TYPE=Debug -S "$SOURCE_DIR" -B "$BUILD_DIR"
+cmake -DCMAKE_BUILD_TYPE=Release -S "$SOURCE_DIR" -B "$BUILD_DIR"
 cmake --build "$BUILD_DIR" --target velox4j-shared -j "$NUM_THREADS"
 cmake --install "$BUILD_DIR" --component velox4j --prefix "$INSTALL_DIR"
 
