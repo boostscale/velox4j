@@ -13,7 +13,6 @@ sudo apt-get install -y autoconf automake g++ libnuma-dev libtool numactl unzip 
 sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
 
-
 # Install CMake
 cd /opt
 wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh
