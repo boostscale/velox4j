@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.resource;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -96,9 +97,9 @@ public class Resources {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-    final Enumeration e = zf.entries();
+    final Enumeration<? extends ZipEntry> e = zf.entries();
     while (e.hasMoreElements()) {
-      final ZipEntry ze = (ZipEntry) e.nextElement();
+      final ZipEntry ze = e.nextElement();
       final String fileName = ze.getName();
       if (!fileName.startsWith(dir)) {
         continue;
@@ -137,8 +138,8 @@ public class Resources {
   public static void copyResource(String fromPath, File toFile) {
     Preconditions.checkArgument(!toFile.exists(), "File %s already exists", toFile);
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    try (final InputStream is = classloader.getResourceAsStream(fromPath)) {
-      Preconditions.checkArgument(is != null, "Resource %s not found", fromPath);
+    try (final InputStream is = new BufferedInputStream(
+        Preconditions.checkNotNull(classloader.getResourceAsStream(fromPath), "Resource %s not found", fromPath))) {
       final BufferedOutputStream o = new BufferedOutputStream(new FileOutputStream(toFile));
       while (true) {
         int b = is.read();
