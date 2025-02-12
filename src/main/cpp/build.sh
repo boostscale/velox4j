@@ -17,15 +17,14 @@ cmake --install "$BUILD_DIR" --component velox4j --prefix "$INSTALL_DIR"
 
 for file in "$INSTALL_LIB_DIR"/*
 do
-  from=$(readlink -f "$file")
-  if [ -L "$from" ]
+  if [ -L "$file" ]
   then
-    target=$(readlink -f "$from")
+    target=$(readlink -f "$file")
     if [ "$(dirname "$target")" != "$(readlink -f "$INSTALL_LIB_DIR")" ]
     then
-      echo "Target $target is not in the same directory as $from."
+      echo "Target $target is not in the same directory as $file."
       exit 1
     fi
-    mv -v "$target" "$from"
+    mv -v "$target" "$file"
   fi
 done
