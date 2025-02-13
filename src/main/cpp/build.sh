@@ -36,7 +36,7 @@ done
 for file in "$INSTALL_LIB_DIR"/*
 do
   patchelf --remove-rpath "$file" || true
-  patchelf --add-rpath '$ORIGIN' "$file"
+  patchelf --set-rpath '$ORIGIN' "$file"
   readelf -d "$file"
 done
 
