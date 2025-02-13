@@ -43,14 +43,14 @@ done
 # 2. Add new RUNPATH sections with '$ORIGIN'.
 for file in "$INSTALL_LIB_DIR"/*
 do
-  echo "Removing RUNPATH on file: $file ..."
+  echo "Adding RUNPATH on file: $file ..."
   patchelf --set-rpath '$ORIGIN' "$file"
 done
 
 # 3. Print new elf headers.
 for file in "$INSTALL_LIB_DIR"/*
 do
-  echo "Removing RUNPATH on file: $file ..."
+  echo "Checking ELF header on file: $file ..."
   readelf -d "$file"
 done
 
