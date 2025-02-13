@@ -20,6 +20,8 @@ on:
     paths:
       - '**/*'
   push:
+    branches:
+      - 'dev'
     paths:
       - '**/*'
 
