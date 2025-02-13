@@ -37,7 +37,7 @@ done
 for file in "$INSTALL_LIB_DIR"/*
 do
   echo "Removing RUNPATH on file: $file ..."
-  patchelf --remove-rpath "$file" || true
+  patchelf --remove-rpath "$file"
 done
 
 # 2. Add new RUNPATH sections with '$ORIGIN'.
