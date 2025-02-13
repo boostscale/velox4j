@@ -48,7 +48,11 @@ Velox4j at the time. But certainly, contributions are always welcomed if you wan
 ### Maven
 
 ```
-TODO
+<dependency>
+  <groupId>io.github.zhztheplayer</groupId>
+  <artifactId>velox4j</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+</dependency>
 ```
 
 

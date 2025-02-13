@@ -23,7 +23,9 @@ import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.resource.Resources;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.test.TpchTests;
@@ -57,47 +59,31 @@ public class QueryTest {
   }
 
   @Test
+  public void testHiveScan() {
+    final JniApi jniApi = JniApi.create(memoryManager);
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleScanNode(outputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = query.execute(jniApi);
+    UpIteratorTests.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation.tsv"))
+        .run();
+    jniApi.close();
+  }
+
+  @Test
   public void testAggregate() {
     final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = new TableScanNode(
-        "id-1",
-        outputType,
-        new HiveTableHandle(
-            "connector-hive",
-            "tab-1",
-            false,
-            Collections.emptyList(),
-            null,
-            outputType,
-            Collections.emptyMap()
-        ),
-        toAssignments(outputType)
-    );
+    final TableScanNode scanNode = newSampleScanNode(outputType);
     final List<BoundSplit> splits = List.of(
-        new BoundSplit(
-            scanNode.getId(),
-            -1,
-            new HiveConnectorSplit(
-                "connector-hive",
-                0,
-                false,
-                file.getAbsolutePath(),
-                FileFormat.PARQUET,
-                0,
-                file.length(),
-                Map.of(),
-                OptionalInt.empty(),
-                Optional.empty(),
-                Map.of(),
-                Optional.empty(),
-                Map.of(),
-                Map.of(),
-                Optional.empty(),
-                Optional.empty()
-            )
-        )
+        newSampleSplit(scanNode, file)
     );
     final AggregationNode aggregationNode = new AggregationNode("id-2", AggregateStep.SINGLE,
         List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
@@ -122,13 +108,7 @@ public class QueryTest {
     final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0,
-            "n_regionkey\tcnt\n" +
-                "0\t50\n" +
-                "1\t47\n" +
-                "4\t58\n" +
-                "3\t77\n" +
-                "2\t68\n")
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation-aggregate-1.tsv"))
         .run();
     jniApi.close();
   }
@@ -168,5 +148,48 @@ public class QueryTest {
           new HiveColumnHandle(name, ColumnType.REGULAR, type, type, List.of())));
     }
     return list;
+  }
+
+  private static BoundSplit newSampleSplit(TableScanNode scanNode, File file) {
+    return new BoundSplit(
+        scanNode.getId(),
+        -1,
+        new HiveConnectorSplit(
+            "connector-hive",
+            0,
+            false,
+            file.getAbsolutePath(),
+            FileFormat.PARQUET,
+            0,
+            file.length(),
+            Map.of(),
+            OptionalInt.empty(),
+            Optional.empty(),
+            Map.of(),
+            Optional.empty(),
+            Map.of(),
+            Map.of(),
+            Optional.empty(),
+            Optional.empty()
+        )
+    );
+  }
+
+  private static TableScanNode newSampleScanNode(RowType outputType) {
+    final TableScanNode scanNode = new TableScanNode(
+        "id-1",
+        outputType,
+        new HiveTableHandle(
+            "connector-hive",
+            "tab-1",
+            false,
+            Collections.emptyList(),
+            null,
+            outputType,
+            Collections.emptyMap()
+        ),
+        toAssignments(outputType)
+    );
+    return scanNode;
   }
 }
