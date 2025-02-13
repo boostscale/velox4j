@@ -33,17 +33,35 @@ do
 done
 
 # Force '$ORIGIN' runpaths for all so libraries to make the build portable.
+# 1. Remove any already set RUNPATH sections.
 for file in "$INSTALL_LIB_DIR"/*
 do
+  echo "Removing RUNPATH on file: $file ..."
   patchelf --remove-rpath "$file" || true
+done
+
+# 2. Add new RUNPATH sections with '$ORIGIN'.
+for file in "$INSTALL_LIB_DIR"/*
+do
+  echo "Removing RUNPATH on file: $file ..."
   patchelf --set-rpath '$ORIGIN' "$file"
+done
+
+# 3. Print new elf headers.
+for file in "$INSTALL_LIB_DIR"/*
+do
+  echo "Removing RUNPATH on file: $file ..."
   readelf -d "$file"
 done
 
+# Do final checks.
+# 1. Check ldd result.
 echo "Checking ldd result of libvelox4j.so: "
 ldd "$INSTALL_LIB_DIR/$VELOX4J_LIB_NAME"
 
+# 2. Check ld result.
 echo "Checking ld result of libvelox4j.so: "
 ld "$INSTALL_LIB_DIR/$VELOX4J_LIB_NAME"
 
+# Finished.
 echo "Successfully built velox4j-cpp."
