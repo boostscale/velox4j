@@ -111,6 +111,7 @@ final TableScanNode scanNode = new TableScanNode(
 
 // 3. Create a split associating with the table scan node, this makes
 // the scan read a local file "/tmp/nation.parquet".
+final File file = new File("/tmp/nation.parquet");
 final BoundSplit split = new BoundSplit(
     scanNode.getId(),
     -1,
@@ -118,7 +119,7 @@ final BoundSplit split = new BoundSplit(
         "connector-hive",
         0,
         false,
-        "/tmp/nation.parquet",
+        file.getAbsolutePath(),
         FileFormat.PARQUET,
         0,
         file.length(),
