@@ -72,7 +72,7 @@ of Velox4j at the time. But certainly, contributions are always welcomed if anyo
 
 ### Maven
 
-```
+```xml
 <dependency>
   <groupId>io.github.zhztheplayer</groupId>
   <artifactId>velox4j</artifactId>
