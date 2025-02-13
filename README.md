@@ -71,7 +71,7 @@ TODO
 Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be
 shipped onto difference platforms without rebuilding the Jar file.
 
-### Seamless Plan Mapping
+### Seamless Velox API Mapping
 
 Velox4j directly adopts Velox's existing JSON serde framework and implements the following
 JSON-serializable Velox components in Java-side:
@@ -85,7 +85,7 @@ in Velox4j's C++ code base. Which means, the Java side Velox components defined 
 Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
 code base even small, and any new Velox features easy to add to Velox4j.
 
-### Arrow Compatible
+### Compatible with Arrow
 
 Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow
 format through utility APIs provided by Velox4j.
