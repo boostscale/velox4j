@@ -80,6 +80,10 @@ of Velox4j at the time. But certainly, contributions are always welcomed if anyo
 </dependency>
 ```
 
+NOTE: The released Jars are built with x86-64 CPU + Ubuntu 20.04 operating system. Which means
+it may not work (say, crash when you use it) as expected on different platforms, especially on
+Linux distributions with lower versions of glibc.
+
 ## Get started
 
 The following is a brief example of using Velox4j to execute a query:
