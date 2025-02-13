@@ -18,7 +18,7 @@ sudo apt-get install -y liblz4-dev libsodium-dev libelf-dev
 sudo apt-get install -y autoconf automake g++ libnuma-dev libtool numactl unzip libdaxctl-dev
 sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
-sudo apt-get install -y chrpath
+sudo apt-get install -y chrpath patchelf
 
 # Install CMake
 cd /opt
