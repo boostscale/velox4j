@@ -170,7 +170,7 @@ memoryManager.close();
 Code of the `toAssignment` utility method used above:
 
 ```java
-  private static List<Assignment> toAssignments(RowType rowType) {
+private static List<Assignment> toAssignments(RowType rowType) {
   final List<Assignment> list = new ArrayList<>();
   for (int i = 0; i < rowType.size(); i++) {
     final String name = rowType.getNames().get(i);
