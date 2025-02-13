@@ -56,7 +56,6 @@ TODO
 
 The following is a brief example of using Velox4j to execute a query:
 
-
 ```
 TODO
 ```
