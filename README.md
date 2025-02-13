@@ -39,8 +39,8 @@ and on the following operating systems:
 
 - Linux
 
-Supports for platforms not on the above list will not be guaranteed by the main stream code of
-Velox4j at the time. But certainly, contributions are always welcomed if anyone tends to involve.
+Supports for platforms not on the above list will not be guaranteed to have by the main stream code
+of Velox4j at the time. But certainly, contributions are always welcomed if anyone tends to involve.
 
 
 ## Releases
