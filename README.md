@@ -2,13 +2,14 @@
 
 ## Project Status
 
-Velox4j is currently a **concet project**.
+Velox4j is currently a **concept project**.
 
 ## Introduction
 
 ### What is Velox?
 
-Velox is an "opensource unified execution engine" as it states. The project was originally funded by Meta in 2020. Projects often use Velox as a C++ library to accelerate SQL query executions.
+Velox is an "opensource unified execution engine" as it states. The project was originally
+funded by Meta in 2020. Projects often use Velox as a C++ library to accelerate SQL query executions.
 
 
 Homepages of Velox:
@@ -24,7 +25,8 @@ Critical open source projects depending on Velox:
 
 ### What is Velox4j?
 
-Velox4j is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's functionalities without writing and maintaining any C++ / JNI code.
+Velox4j is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's
+functionalities without writing and maintaining any C++ / JNI code.
 
 
 ## Platform Prerequisites
@@ -37,8 +39,8 @@ and on the following operating systems:
 
 - Linux
 
-Support for platforms not on the above list will not be guranteed by the main stream code of Velox4j at the time. But certianly, contributions are always welcomed
-if you want to involve and maintain.
+Support for platforms not on the above list will not be guaranteed by the main stream code of
+Velox4j at the time. But certainly, contributions are always welcomed if you want to involve and maintain.
 
 
 ## Releases
@@ -63,21 +65,27 @@ TODO
 
 ### Portable
 
-Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be shipped onto difference platforms without rebuilding the Jar file.
+Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be
+shipped onto difference platforms without rebuilding the Jar file.
 
 ### Seamless Plan Mapping
 
-Velox4j directly adopts Velox's exsiting JSON serdes and implements the following JSON-serializable Velox compoents in Java-side:
+Velox4j directly adopts Velox's existing JSON serde framework and implements the following
+JSON-serializable Velox components in Java-side:
 
 - Data types
 - Query plans
 - Expressions
 
-With the help of Velox's JSON serdes, there will be no re-interpretion layer for query plans in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's code base even small, and any new Velox features easy to add to Velox4j.
+With the help of Velox's own JSON serde, there will be no re-interpreting layer for query plans
+in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's
+Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
+code base even small, and any new Velox features easy to add to Velox4j.
 
 ### Arrow Compatible
 
-Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow format through utility APIs provided by Velox4j.
+Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow
+format through utility APIs provided by Velox4j.
 
 ## License
 
