@@ -28,6 +28,29 @@ Critical open source projects depending on Velox:
 Velox4j is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's
 functionalities without writing and maintaining any C++ / JNI code.
 
+## Design
+
+Velox4j is designed within the following manners:
+
+### Portable
+
+Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be
+shipped onto difference platforms without rebuilding the Jar file.
+
+### Seamless Velox API Mapping
+
+Velox4j directly adopts Velox's existing JSON serde framework and implements the following
+JSON-serializable Velox components in Java-side:
+
+- Data types
+- Query plans
+- Expressions
+
+With the help of Velox's own JSON serde, there will be no re-interpreting layer for query plans
+in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's
+Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
+code base even small, and any new Velox features easy to add to Velox4j.
+
 
 ## Platform Prerequisites
 
@@ -63,27 +86,6 @@ The following is a brief example of using Velox4j to execute a query:
 ```
 TODO
 ```
-
-## Design
-
-### Portable
-
-Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be
-shipped onto difference platforms without rebuilding the Jar file.
-
-### Seamless Velox API Mapping
-
-Velox4j directly adopts Velox's existing JSON serde framework and implements the following
-JSON-serializable Velox components in Java-side:
-
-- Data types
-- Query plans
-- Expressions
-
-With the help of Velox's own JSON serde, there will be no re-interpreting layer for query plans
-in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's
-Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
-code base even small, and any new Velox features easy to add to Velox4j.
 
 ### Compatible with Arrow
 
