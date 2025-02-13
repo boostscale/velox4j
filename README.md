@@ -44,6 +44,7 @@ JSON-serializable Velox components in Java-side:
 - Data types
 - Query plans
 - Expressions
+- Connectors
 
 With the help of Velox's own JSON serde, there will be no re-interpreting layer for query plans
 in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's
@@ -57,7 +58,7 @@ format through utility APIs provided by Velox4j.
 
 ## Platform Prerequisites
 
-The project is not only tested on the following CPU architectures:
+The project is now only tested on the following CPU architectures:
 
 - x86-64
 
