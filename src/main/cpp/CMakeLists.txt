@@ -38,9 +38,9 @@ endif ()
 
 # Import Velox.
 set(VELOX_REPO facebookincubator/velox)
-set(VELOX_REF 35711b7a7987be7c63f7a8bd8b56bc094e40e496)
+set(VELOX_REF d8cac2f0b0960757e61d74eb6f8d462e8637bdf3)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-set(VELOX_SOURCE_URL_MD5 daf8d7ae4be1fcfbbdf8054e3d98ad19)
+set(VELOX_SOURCE_URL_MD5 6725e2ff784604e3e1626d47beb43ff7)
 CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
 
 # Import JniHelpers.
