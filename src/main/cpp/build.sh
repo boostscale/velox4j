@@ -47,7 +47,7 @@ do
   patchelf --set-rpath '$ORIGIN' "$file"
 done
 
-# 3. Print new elf headers.
+# 3. Print new ELF headers.
 for file in "$INSTALL_LIB_DIR"/*
 do
   echo "Checking ELF header on file: $file ..."
