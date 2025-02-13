@@ -80,7 +80,7 @@ of Velox4j at the time. But certainly, contributions are always welcomed if anyo
 The following is a brief example of using Velox4j to execute a query:
 
 ```java
-// 1. Define the plan output schema:
+// 1. Define the plan output schema.
 final RowType outputType = new RowType(List.of(
         "n_nationkey",
         "n_name",
