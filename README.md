@@ -8,7 +8,7 @@ Velox4j is currently a **concept project**.
 
 ### What is Velox?
 
-Velox is an "opensource unified execution engine" as it states. The project was originally
+Velox is an "open source unified execution engine" as it states. The project was originally
 funded by Meta in 2020. Projects often use Velox as a C++ library to accelerate SQL query
 executions.
 
