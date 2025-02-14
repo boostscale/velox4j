@@ -15,7 +15,7 @@ executions.
 Homepages of Velox:
 
 - [Velox GitHub repository](https://github.com/facebookincubator/velox)
-- [Velox Official website](https://velox-lib.io/)
+- [Velox official website](https://velox-lib.io/)
 
 Critical open source projects depending on Velox:
 
