@@ -56,7 +56,9 @@ code base even small, and any new Velox features easy to add to Velox4j.
 Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow
 format through utility APIs provided by Velox4j.
 
-## Platform Prerequisites
+## Prerequisites
+
+### Platform 
 
 The project is now only tested on the following CPU architectures:
 
@@ -68,6 +70,13 @@ and on the following operating systems:
 
 Supports for platforms not on the above list will not be guaranteed to have by the main stream code
 of Velox4j at the time. But certainly, contributions are always welcomed if anyone tends to involve.
+
+### Build Toolchains
+
+The minimum toolchain versions for building Velox4j:
+
+- GCC 11
+- JDK 11
 
 ## Releases
 
@@ -91,7 +100,7 @@ Linux distributions with lower versions of glibc.
 mvn clean install -DskipTests
 ```
 
-## Get started
+## Get Started
 
 The following is a brief example of using Velox4j to execute a query:
 
