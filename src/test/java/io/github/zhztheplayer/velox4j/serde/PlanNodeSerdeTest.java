@@ -111,7 +111,7 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testFilterNode() {
-    final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
+    final JniApi jniApi = JniApi.create(memoryManager);
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
     final FilterNode filterNode = new FilterNode("id-2", List.of(scan),
@@ -122,7 +122,7 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testHashJoinNode() {
-    final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
+    final JniApi jniApi = JniApi.create(memoryManager);
     final PlanNode scan1 = SerdeTests.newSampleTableScanNode("id-1",
         new RowType(List.of("foo1", "bar1"),
             List.of(new IntegerType(), new IntegerType())));
