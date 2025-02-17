@@ -57,6 +57,11 @@ public class PlanNodeSerdeTest {
   }
 
   @Test
+  public void testJoinType() {
+    SerdeTests.testJavaBeanRoundTrip(JoinType.LEFT_SEMI_FILTER);
+  }
+
+  @Test
   public void testValuesNode() {
     final JniApi jniApi = JniApi.create(memoryManager);
     final PlanNode values = ValuesNode.create(jniApi, "id-1",
