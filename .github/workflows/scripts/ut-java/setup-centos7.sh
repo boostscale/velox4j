@@ -39,6 +39,9 @@ pip3 install cmake==3.28.3
 
 # Install Git >= 2.7.4
 case "$(git --version)" in "git version 2."*)
+  true
+  ;;
+  *)
   [ -f /etc/yum.repos.d/ius.repo ] || yum -y install https://repo.ius.io/ius-release-el7.rpm
   yum -y remove git
   yum -y install git236
@@ -56,7 +59,10 @@ make install
 
 # Install FLEX >= 2.6.0.
 case "$(PATH="/usr/local/bin:$PATH" flex --version 2>&1)" in "flex 2.6."*)
-cd /tmp
+  true
+  ;;
+  *)
+  cd /tmp
   yum -y install gettext-devel
   FLEX_URL="https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
   mkdir -p flex
