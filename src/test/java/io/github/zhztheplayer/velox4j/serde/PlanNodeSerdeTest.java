@@ -6,15 +6,18 @@ import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
+import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -64,13 +67,15 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testTableScanNode() {
-    final PlanNode scan = SerdeTests.newSampleTableScanNode();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
     SerdeTests.testVeloxSerializableRoundTrip(scan);
   }
 
   @Test
   public void testAggregationNode() {
-    final PlanNode scan = SerdeTests.newSampleTableScanNode();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
     final Aggregate aggregate = SerdeTests.newSampleAggregate();
     final AggregationNode aggregationNode = new AggregationNode(
         "id-1",
@@ -89,7 +94,8 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testProjectNode() {
-    final PlanNode scan = SerdeTests.newSampleTableScanNode();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
     final ProjectNode projectNode = new ProjectNode("id-1", List.of(scan),
         List.of("foo"),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
@@ -99,10 +105,36 @@ public class PlanNodeSerdeTest {
   @Test
   public void testFilterNode() {
     final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
-    final PlanNode scan = SerdeTests.newSampleTableScanNode();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
     final FilterNode filterNode = new FilterNode("id-1", List.of(scan),
         ConstantTypedExpr.create(jniApi, new BooleanValue(true)));
     SerdeTests.testVeloxSerializableRoundTrip(filterNode);
+    jniApi.close();
+  }
+
+  @Test
+  public void testHashJoinNode() {
+    final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
+    final PlanNode scan1 = SerdeTests.newSampleTableScanNode("id-1",
+        new RowType(List.of("foo1", "bar1"),
+            List.of(new IntegerType(), new IntegerType())));
+    final PlanNode scan2 = SerdeTests.newSampleTableScanNode("id-2",
+        new RowType(List.of("foo2", "bar2"),
+            List.of(new IntegerType(), new IntegerType())));
+    final PlanNode joinNode = new HashJoinNode(
+        "id-3",
+        JoinType.INNER,
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
+        ConstantTypedExpr.create(jniApi, new BooleanValue(true)),
+        scan1,
+        scan2,
+        new RowType(List.of("foo1", "bar1", "foo2", "bar2"),
+            List.of(new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
+        false
+        );
+    SerdeTests.testVeloxSerializableRoundTrip(joinNode);
     jniApi.close();
   }
 }

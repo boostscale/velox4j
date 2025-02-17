@@ -85,7 +85,7 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testHiveTableHandle() {
-    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
+    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(SerdeTests.newSampleOutputType());
     SerdeTests.testVeloxSerializableRoundTrip(handle);
   }
 

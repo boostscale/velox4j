@@ -20,10 +20,12 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
+import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
@@ -36,7 +38,6 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
-import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,11 +64,11 @@ public class QueryTest {
   }
 
   @Test
-  public void testHiveScan() {
+  public void testHiveScan1() {
     final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode(outputType);
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -75,7 +76,26 @@ public class QueryTest {
     final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"))
+        .run();
+    jniApi.close();
+  }
+
+
+  @Test
+  public void testHiveScan2() {
+    final JniApi jniApi = JniApi.create(memoryManager);
+    final File file = TpchTests.Table.REGION.file();
+    final RowType outputType = TpchTests.Table.REGION.schema();
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = query.execute(jniApi);
+    UpIteratorTests.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
         .run();
     jniApi.close();
   }
@@ -85,7 +105,7 @@ public class QueryTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode(outputType);
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -112,7 +132,7 @@ public class QueryTest {
     final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation-aggregate-1.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
         .run();
     jniApi.close();
   }
@@ -148,7 +168,7 @@ public class QueryTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode(outputType);
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -162,7 +182,7 @@ public class QueryTest {
     final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation-project-1.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
         .run();
     jniApi.close();
   }
@@ -172,7 +192,7 @@ public class QueryTest {
     final JniApi jniApi = JniApi.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode(outputType);
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -185,7 +205,40 @@ public class QueryTest {
     final UpIterator itr = query.execute(jniApi);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-nation-filter-1.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
+        .run();
+    jniApi.close();
+  }
+
+  @Test
+  public void testHashJoin() {
+    final JniApi jniApi = JniApi.create(memoryManager);
+    final File nationFile = TpchTests.Table.NATION.file();
+    final RowType nationOutputType = TpchTests.Table.NATION.schema();
+    final File regionFile = TpchTests.Table.REGION.file();
+    final RowType regionOutputType = TpchTests.Table.REGION.schema();
+    final TableScanNode nationScanNode = newSampleScanNode("id-1", nationOutputType);
+    final TableScanNode regionScanNode = newSampleScanNode("id-2", regionOutputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(nationScanNode, nationFile),
+        newSampleSplit(regionScanNode, regionFile)
+    );
+    final HashJoinNode hashJoinNode = new HashJoinNode("id-3",
+        JoinType.LEFT,
+        List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+        List.of(FieldAccessTypedExpr.create(new BigIntType(), "r_regionkey")),
+        null,
+        nationScanNode,
+        regionScanNode,
+        new RowType(List.of("n_nationkey", "n_name", "r_regionkey", "r_name"),
+            List.of(new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
+        false
+    );
+    final Query query = new Query(hashJoinNode, splits, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = query.execute(jniApi);
+    UpIteratorTests.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
         .run();
     jniApi.close();
   }
@@ -226,9 +279,9 @@ public class QueryTest {
     );
   }
 
-  private static TableScanNode newSampleScanNode(RowType outputType) {
+  private static TableScanNode newSampleScanNode(String planNodeId, RowType outputType) {
     final TableScanNode scanNode = new TableScanNode(
-        "id-1",
+        planNodeId,
         outputType,
         new HiveTableHandle(
             "connector-hive",

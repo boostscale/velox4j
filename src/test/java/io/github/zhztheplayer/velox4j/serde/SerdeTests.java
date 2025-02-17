@@ -169,14 +169,14 @@ public final class SerdeTests {
         Optional.of(new RowIdProperties(5, 10, "UUID-100")));
   }
 
-  public static ConnectorTableHandle newSampleHiveTableHandle() {
+  public static ConnectorTableHandle newSampleHiveTableHandle(RowType outputType) {
     final ConnectorTableHandle handle = new HiveTableHandle(
         "id-1",
         "tab-1",
         true,
         List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
         new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
-        new RowType(List.of("foo", "bar"), List.of(new VarCharType(), new VarCharType())),
+        outputType,
         Map.of("tk", "tv")
     );
     return handle;
@@ -194,11 +194,15 @@ public final class SerdeTests {
     return aggregate;
   }
 
-  public static PlanNode newSampleTableScanNode() {
-    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle();
-    final PlanNode scan = new TableScanNode("id-1", new RowType(List.of("foo", "bar"),
-        List.of(new IntegerType(), new IntegerType())), handle, Collections.emptyList());
+  public static PlanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
+    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(outputType);
+    final PlanNode scan = new TableScanNode(planNodeId, outputType,
+        handle, Collections.emptyList());
     return scan;
+  }
+
+  public static RowType newSampleOutputType() {
+    return new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new IntegerType()));
   }
 
   public static BaseVector newSampleIntVector(JniApi jniApi) {
