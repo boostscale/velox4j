@@ -27,6 +27,9 @@ endif ()
 include(UseJava)
 
 # Set Velox options.
+# Workaround for https://github.com/facebookincubator/velox/issues/12358.
+unset(BUILD_SHARED_LIBS CACHE)
+unset(BUILD_STATIC_LIBS CACHE)
 set(VELOX_DEPENDENCY_SOURCE AUTO)
 set(VELOX_ENABLE_CCACHE ON)
 set(VELOX_MONO_LIBRARY ON)
