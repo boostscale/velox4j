@@ -27,6 +27,8 @@ endif ()
 include(UseJava)
 
 # Set Velox options.
+# GFLAGS_IS_SUBPROJECT=ON: This avoids static library of gflags from being built in some cases.
+set(GFLAGS_IS_SUBPROJECT ON)
 set(VELOX_DEPENDENCY_SOURCE AUTO)
 set(VELOX_ENABLE_CCACHE ON)
 set(VELOX_MONO_LIBRARY ON)
