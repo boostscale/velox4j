@@ -17,6 +17,7 @@ import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
@@ -126,6 +127,7 @@ public final class VeloxSerializables {
     NAME_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
     NAME_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
     NAME_REGISTRY.registerClass("ProjectNode", ProjectNode.class);
+    NAME_REGISTRY.registerClass("FilterNode", FilterNode.class);
   }
 
   private static void retisterConfig() {

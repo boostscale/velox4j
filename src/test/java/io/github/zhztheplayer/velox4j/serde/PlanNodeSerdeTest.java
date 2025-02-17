@@ -3,16 +3,19 @@ package io.github.zhztheplayer.velox4j.serde;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
+import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -91,5 +94,15 @@ public class PlanNodeSerdeTest {
         List.of("foo"),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
     SerdeTests.testVeloxSerializableRoundTrip(projectNode);
+  }
+
+  @Test
+  public void testFilterNode() {
+    final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
+    final PlanNode scan = SerdeTests.newSampleTableScanNode();
+    final FilterNode filterNode = new FilterNode("id-1", List.of(scan),
+        ConstantTypedExpr.create(jniApi, new BooleanValue(true)));
+    SerdeTests.testVeloxSerializableRoundTrip(filterNode);
+    jniApi.close();
   }
 }

@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.plan;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
@@ -11,6 +12,7 @@ public class ProjectNode extends PlanNode {
   private final List<String> names;
   private final List<TypedExpr> projections;
 
+  @JsonCreator
   public ProjectNode(
       @JsonProperty("id") String id,
       @JsonProperty("sources") List<PlanNode> sources,
