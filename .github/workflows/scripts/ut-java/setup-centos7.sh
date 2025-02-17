@@ -24,7 +24,7 @@ yum -y install ccache patchelf
 yum -y install lz4-devel lzo-devel libzstd-devel snappy-devel double-conversion-devel
 yum -y install libevent-devel
 
-# Link c++ to the one in devtoolset.
+# Link cc / c++ to the ones in devtoolset.
 ln -s /opt/rh/devtoolset-11/root/usr/bin/cc /usr/bin/cc
 ln -s /opt/rh/devtoolset-11/root/usr/bin/c++ /usr/bin/c++
 
