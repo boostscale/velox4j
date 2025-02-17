@@ -37,7 +37,6 @@ import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
-import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
