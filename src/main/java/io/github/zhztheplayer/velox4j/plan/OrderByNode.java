@@ -12,7 +12,7 @@ public class OrderByNode extends PlanNode {
   private final List<PlanNode> sources;
   private final List<FieldAccessTypedExpr> sortingKeys;
   private final List<SortOrder> sortingOrders;
-  private final boolean isPartial;
+  private final boolean partial;
 
   @JsonCreator
   public OrderByNode(
@@ -20,12 +20,12 @@ public class OrderByNode extends PlanNode {
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
       @JsonProperty("sortingOrders") List<SortOrder> sortingOrders,
-      @JsonProperty("partial") boolean isPartial) {
+      @JsonProperty("partial") boolean partial) {
     super(id);
     this.sources = sources;
     this.sortingKeys = sortingKeys;
     this.sortingOrders = sortingOrders;
-    this.isPartial = isPartial;
+    this.partial = partial;
   }
 
   @Override
@@ -45,6 +45,6 @@ public class OrderByNode extends PlanNode {
 
   @JsonGetter("partial")
   public boolean isPartial() {
-    return isPartial;
+    return partial;
   }
 }

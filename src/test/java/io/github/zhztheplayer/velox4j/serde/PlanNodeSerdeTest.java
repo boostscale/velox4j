@@ -12,6 +12,7 @@ import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
+import io.github.zhztheplayer.velox4j.plan.LimitNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
@@ -148,10 +149,18 @@ public class PlanNodeSerdeTest {
   public void testOrderByNode() {
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
-    final OrderByNode orderByNode = new OrderByNode("id-1", List.of(scan),
+    final OrderByNode orderByNode = new OrderByNode("id-2", List.of(scan),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
         List.of(new SortOrder(true, false)),
         false);
     SerdeTests.testVeloxSerializableRoundTrip(orderByNode);
+  }
+
+  @Test
+  public void testLimitNode() {
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
+    final LimitNode limitNode = new LimitNode("id-2", List.of(scan), 5, 3, false);
+    SerdeTests.testVeloxSerializableRoundTrip(limitNode);
   }
 }
