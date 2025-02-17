@@ -176,7 +176,7 @@ public class QueryTest {
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
-    final FilterNode filterNode = new FilterNode("id-12", List.of(scanNode),
+    final FilterNode filterNode = new FilterNode("id-2", List.of(scanNode),
         new CallTypedExpr(new BooleanType(), List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
             ConstantTypedExpr.create(jniApi, new BigIntValue(3))),
