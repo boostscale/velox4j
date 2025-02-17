@@ -67,3 +67,24 @@ cd /tmp
   make install
   ;;
 esac
+
+# Install Java 11.
+yum install -y java-11-openjdk-devel
+alternatives --set java java-11-openjdk.x86_64
+
+# Install Maven.
+if [ -z "$(which mvn)" ]; then
+  MAVEN_VERSION=3.9.2
+  MAVEN_INSTALL_DIR=/opt/maven-$MAVEN_VERSION
+  if [ -d /opt/maven-$MAVEN_VERSION ]; then
+    echo "Failed to install maven: ${MAVEN_INSTALL_DIR} already exists." >&2
+    exit 1
+  fi
+
+  cd /tmp
+  wget https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz
+  tar -xvf apache-maven-$MAVEN_VERSION-bin.tar.gz
+  rm -f apache-maven-$MAVEN_VERSION-bin.tar.gz
+  mv apache-maven-$MAVEN_VERSION "${MAVEN_INSTALL_DIR}"
+  ln -s "${MAVEN_INSTALL_DIR}/bin/mvn" /usr/local/bin/mvn
+fi
