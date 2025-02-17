@@ -12,6 +12,7 @@ import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
+import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
@@ -83,7 +84,7 @@ public class PlanNodeSerdeTest {
         SerdeTests.newSampleOutputType());
     final Aggregate aggregate = SerdeTests.newSampleAggregate();
     final AggregationNode aggregationNode = new AggregationNode(
-        "id-1",
+        "id-2",
         AggregateStep.PARTIAL,
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
@@ -101,7 +102,7 @@ public class PlanNodeSerdeTest {
   public void testProjectNode() {
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
-    final ProjectNode projectNode = new ProjectNode("id-1", List.of(scan),
+    final ProjectNode projectNode = new ProjectNode("id-2", List.of(scan),
         List.of("foo"),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
     SerdeTests.testVeloxSerializableRoundTrip(projectNode);
@@ -112,7 +113,7 @@ public class PlanNodeSerdeTest {
     final JniApi jniApi = JniApi.create(MemoryManager.create(AllocationListener.NOOP));
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
-    final FilterNode filterNode = new FilterNode("id-1", List.of(scan),
+    final FilterNode filterNode = new FilterNode("id-2", List.of(scan),
         ConstantTypedExpr.create(jniApi, new BooleanValue(true)));
     SerdeTests.testVeloxSerializableRoundTrip(filterNode);
     jniApi.close();
@@ -141,5 +142,16 @@ public class PlanNodeSerdeTest {
         );
     SerdeTests.testVeloxSerializableRoundTrip(joinNode);
     jniApi.close();
+  }
+
+  @Test
+  public void testOrderByNode() {
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        SerdeTests.newSampleOutputType());
+    final OrderByNode orderByNode = new OrderByNode("id-1", List.of(scan),
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
+        List.of(new SortOrder(true, false)),
+        false);
+    SerdeTests.testVeloxSerializableRoundTrip(orderByNode);
   }
 }

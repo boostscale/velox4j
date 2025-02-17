@@ -30,12 +30,12 @@ public class ProjectNode extends PlanNode {
   }
 
   @JsonGetter("names")
-  public List<String> names() {
+  public List<String> getNames() {
     return names;
   }
 
   @JsonGetter("projections")
-  public List<TypedExpr> projections() {
+  public List<TypedExpr> getProjections() {
     return projections;
   }
 }
