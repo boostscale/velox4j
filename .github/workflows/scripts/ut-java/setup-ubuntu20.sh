@@ -4,10 +4,10 @@ set -e
 set -o pipefail
 set -u
 
-# APT update
+# APT update.
 sudo apt-get update
 
-# Install essentials
+# Install essentials.
 sudo apt-get install -y sudo locales wget tar tzdata git ccache ninja-build build-essential
 sudo apt-get install -y llvm-11-dev clang-11 libiberty-dev libdwarf-dev libre2-dev libz-dev
 sudo apt-get install -y liblzo2-dev libzstd-dev libsnappy-dev libdouble-conversion-dev libssl-dev
@@ -20,14 +20,14 @@ sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
 sudo apt-get install -y chrpath patchelf
 
-# Install CMake
+# Install CMake.
 cd /opt
 wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh
 mkdir cmake
 bash cmake-3.28.3-linux-x86_64.sh --skip-license --prefix=/opt/cmake
 sudo ln -s /opt/cmake/bin/cmake /usr/bin/cmake
 
-# Install GCC 11
+# Install GCC 11.
 sudo apt-get install -y software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get install -y gcc-11 g++-11

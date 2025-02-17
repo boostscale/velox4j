@@ -4,6 +4,7 @@ set -e
 set -o pipefail
 set -u
 
+# Setup YUM.
 sed -i -e "s/enabled=1/enabled=0/" /etc/yum/pluginconf.d/fastestmirror.conf
 sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
 sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
@@ -15,6 +16,7 @@ sed -i \
   -e 's/mirror\.centos\.org/vault.centos.org/' \
   /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
 
+# Install essentials.
 yum -y install epel-release
 yum -y install wget curl tar zip unzip which patch sudo
 yum -y install ninja-build perl-IPC-Cmd autoconf autoconf-archive automake libtool
@@ -32,10 +34,10 @@ ln -s /opt/rh/devtoolset-11/root/usr/bin/ld /usr/bin/ld
 
 pip3 install --upgrade pip
 
-# Install cmake >= 3.28.3.
+# Install CMake >= 3.28.3.
 pip3 install cmake==3.28.3
 
-# Install git >= 2.7.4
+# Install Git >= 2.7.4
 case "$(git --version)" in "git version 2."*)
   [ -f /etc/yum.repos.d/ius.repo ] || yum -y install https://repo.ius.io/ius-release-el7.rpm
   yum -y remove git
@@ -43,7 +45,7 @@ case "$(git --version)" in "git version 2."*)
   ;;
 esac
 
-# Install openssl >= 1.1.1.
+# Install OpenSSL >= 1.1.1.
 cd /tmp
 wget https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1o/openssl-1.1.1o.tar.gz
 tar -xzvf openssl-1.1.1o.tar.gz
@@ -52,7 +54,7 @@ cd openssl-1.1.1o
 make
 make install
 
-# Install flex >= 2.6.0.
+# Install FLEX >= 2.6.0.
 case "$(PATH="/usr/local/bin:$PATH" flex --version 2>&1)" in "flex 2.6."*)
 cd /tmp
   yum -y install gettext-devel
