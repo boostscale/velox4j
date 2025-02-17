@@ -155,7 +155,7 @@ public class QueryTest {
     );
     final List<BoundSplit> splits = List.of(
         new BoundSplit(
-            "id-1",
+            "id-2",
             -1,
             new ExternalStreamConnectorSplit("connector-external-stream", es.id())
         )
