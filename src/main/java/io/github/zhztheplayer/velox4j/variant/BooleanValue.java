@@ -15,7 +15,7 @@ public class BooleanValue extends Variant {
   }
 
   @JsonGetter("value")
-  public boolean isValue() {
+  public boolean getValue() {
     return value;
   }
 

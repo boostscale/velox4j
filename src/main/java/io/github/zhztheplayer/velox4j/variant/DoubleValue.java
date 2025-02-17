@@ -15,7 +15,7 @@ public class DoubleValue extends Variant {
   }
 
   @JsonGetter("value")
-  public double isValue() {
+  public double getValue() {
     return value;
   }
 

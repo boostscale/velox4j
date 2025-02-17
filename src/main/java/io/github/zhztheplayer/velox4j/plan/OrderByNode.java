@@ -34,12 +34,12 @@ public class OrderByNode extends PlanNode {
   }
 
   @JsonGetter("sortingKeys")
-  public List<FieldAccessTypedExpr> sortingKeys() {
+  public List<FieldAccessTypedExpr> getSortingKeys() {
     return sortingKeys;
   }
 
   @JsonGetter("sortingOrders")
-  public List<SortOrder> sortingOrders() {
+  public List<SortOrder> getSortingOrders() {
     return sortingOrders;
   }
 

@@ -16,7 +16,7 @@ public class ExternalStreamConnectorSplit extends ConnectorSplit {
   }
 
   @JsonGetter("esId")
-  public long esId() {
+  public long getEsId() {
     return esId;
   }
 }
