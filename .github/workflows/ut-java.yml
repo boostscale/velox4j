@@ -38,9 +38,6 @@ jobs:
       CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
       - uses: actions/checkout@v4
-      - name: Run setup script
-        run: |
-          bash .github/workflows/scripts/ut-java/setup-ubuntu20.sh
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
@@ -48,6 +45,9 @@ jobs:
           key: ut-java-ut-ubuntu20-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu20-ccache-
+      - name: Run setup script
+        run: |
+          bash .github/workflows/scripts/ut-java/setup-ubuntu20.sh
       - name: Build and run UTs
         run: |
           mvn clean test
@@ -59,26 +59,26 @@ jobs:
 
   ut-centos7:
     runs-on: ubuntu-20.04
-    container: centos:7
     env:
-      CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
       - uses: actions/checkout@v4
-      - name: Run setup script
-        run: |
-          bash .github/workflows/scripts/ut-java/setup-centos7.sh
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
-          path: '${{ env.CCACHE_DIR }}'
+          path: '${{ env.HOST_CCACHE_DIR }}'
           key: ut-java-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-centos7-ccache-
-      - name: Build and run UTs
+      - name: Run setup script / Build and run UTs
         run: |
-          mvn clean test
+          docker run -v ${{ github.workspace }}:/work -w /work centos:7 bash -c "
+            export CCACHE_DIR=/work/.ccache
+            bash .github/workflows/scripts/ut-java/setup-centos7.sh
+            mvn clean test
+          "
       - name: Save Ccache
         uses: actions/cache/save@v4
         with:
-          path: '${{ env.CCACHE_DIR }}'
+          path: '${{ env.HOST_CCACHE_DIR }}'
           key: ut-java-ut-centos7-ccache-${{github.sha}}
