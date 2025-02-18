@@ -20,8 +20,6 @@
 #include <velox/connectors/hive/HiveConnector.h>
 #include <velox/connectors/hive/HiveConnectorSplit.h>
 #include <velox/connectors/hive/HiveDataSink.h>
-#include <velox/connectors/hive/TableHandle.h>
-#include <velox/core/PlanNode.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
 #include <velox/exec/PartitionFunction.h>
@@ -30,7 +28,6 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
-#include <velox/type/Filter.h>
 #include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/query/Query.h"
