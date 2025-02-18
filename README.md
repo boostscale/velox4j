@@ -14,8 +14,8 @@ executions.
 
 Homepages of Velox:
 
-- [Velox GitHub repository](https://github.com/facebookincubator/velox)
-- [Velox official website](https://velox-lib.io/)
+- [GitHub repository](https://github.com/facebookincubator/velox)
+- [Official website](https://velox-lib.io/)
 
 Critical open source projects depending on Velox:
 
@@ -111,7 +111,7 @@ to be added:
 </repositories>
 ```
 
-NOTE: The released Jar is built with x86-64 CPU + Centos 7 operating system. Which means
+NOTE: The released Jar is built with x86-64 CPU + CentOS 7 operating system. Which means
 it may not work (say, crash when you use it) as expected on different platforms, especially on
 Linux distributions with lower versions of glibc.
 
