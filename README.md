@@ -80,6 +80,8 @@ The minimum toolchain versions for building Velox4j:
 
 ## Releases
 
+Velox4j currently only provides SNAPSHOT jar releases.
+
 ### Maven
 
 ```xml
@@ -90,7 +92,26 @@ The minimum toolchain versions for building Velox4j:
 </dependency>
 ```
 
-NOTE: The released Jars are built with x86-64 CPU + Ubuntu 20.04 operating system. Which means
+If the SNAPSHOT repository is not set in Maven, the following settings may also need
+to be added:
+
+```xml
+<repositories>
+  <repository>
+    <name>Central Portal Snapshots</name>
+    <id>central-portal-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    <releases>
+      <enabled>false</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
+
+NOTE: The released Jar is built with x86-64 CPU + Centos 7 operating system. Which means
 it may not work (say, crash when you use it) as expected on different platforms, especially on
 Linux distributions with lower versions of glibc.
 
