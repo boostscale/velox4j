@@ -49,4 +49,5 @@ install(RUNTIME_DEPENDENCY_SET 3rd DESTINATION lib COMPONENT velox4j PRE_EXCLUDE
         "linux-vdso\\.so\\.[0-9]+"
         "ld-linux-x86-64\\.so\\.[0-9]+"
         "libdl\\.so\\.[0-9]+"
+        "libpthread\\.so\\.[0-9]+"
 )
