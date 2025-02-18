@@ -65,6 +65,7 @@ public final class VeloxSerializables {
     registerConnectors();
     registerFilters();
     registerPlanNodes();
+    retisterConfig();
     registerQuery();
   }
 
@@ -133,6 +134,11 @@ public final class VeloxSerializables {
     NAME_REGISTRY.registerClass("HashJoinNode", HashJoinNode.class);
     NAME_REGISTRY.registerClass("OrderByNode", OrderByNode.class);
     NAME_REGISTRY.registerClass("LimitNode", LimitNode.class);
+  }
+
+  private static void retisterConfig() {
+    NAME_REGISTRY.registerClass("Velox4jConfig", Config.class);
+    NAME_REGISTRY.registerClass("Velox4jConnectorConfig", ConnectorConfig.class);
   }
 
   private static void registerQuery() {
