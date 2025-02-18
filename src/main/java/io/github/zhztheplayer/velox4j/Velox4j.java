@@ -31,7 +31,7 @@ public class Velox4j {
       }
       // If Velox4j was already initialized, throw.
       if (initialized.get()) {
-        throw new VeloxException("Velox4J has already been initialized");
+        throw new VeloxException("Could not change configuration after Velox4j was already initialized");
       }
       // Apply the configuration change.
       globalConfMap.put(key, value);
@@ -41,13 +41,6 @@ public class Velox4j {
   public static void initialize() {
     if (!initialized.compareAndSet(false, true)) {
       throw new VeloxException("Velox4J has already been initialized");
-    }
-    initialize0();
-  }
-
-  public static void ensureInitialized() {
-    if (!initialized.compareAndSet(false, true)) {
-      return;
     }
     initialize0();
   }

@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
@@ -13,6 +12,7 @@ import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
@@ -32,7 +32,7 @@ public class ExprSerdeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
     memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 

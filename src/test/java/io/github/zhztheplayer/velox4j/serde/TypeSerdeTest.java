@@ -1,8 +1,28 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
-import io.github.zhztheplayer.velox4j.type.*;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.type.ArrayType;
+import io.github.zhztheplayer.velox4j.type.BigIntType;
+import io.github.zhztheplayer.velox4j.type.BooleanType;
+import io.github.zhztheplayer.velox4j.type.DateType;
+import io.github.zhztheplayer.velox4j.type.DecimalType;
+import io.github.zhztheplayer.velox4j.type.DoubleType;
+import io.github.zhztheplayer.velox4j.type.FunctionType;
+import io.github.zhztheplayer.velox4j.type.HugeIntType;
+import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.type.IntervalDayTimeType;
+import io.github.zhztheplayer.velox4j.type.IntervalYearMonthType;
+import io.github.zhztheplayer.velox4j.type.MapType;
+import io.github.zhztheplayer.velox4j.type.OpaqueType;
+import io.github.zhztheplayer.velox4j.type.RealType;
+import io.github.zhztheplayer.velox4j.type.RowType;
+import io.github.zhztheplayer.velox4j.type.SmallIntType;
+import io.github.zhztheplayer.velox4j.type.TimestampType;
+import io.github.zhztheplayer.velox4j.type.TinyIntType;
+import io.github.zhztheplayer.velox4j.type.UnknownType;
+import io.github.zhztheplayer.velox4j.type.VarCharType;
+import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,7 +33,7 @@ public class TypeSerdeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
   }
 
   @Test

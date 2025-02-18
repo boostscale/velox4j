@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.query;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.config.Config;
@@ -35,6 +34,7 @@ import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.test.TpchTests;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.RowType;
@@ -57,7 +57,7 @@ public class QueryTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
     memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 

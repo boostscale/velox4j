@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
@@ -12,6 +11,7 @@ import io.github.zhztheplayer.velox4j.connector.FileProperties;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import java.util.OptionalLong;
 public class ConnectorSerdeTest {
   @BeforeClass
   public static void beforeClass() {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
   }
 
   @Test

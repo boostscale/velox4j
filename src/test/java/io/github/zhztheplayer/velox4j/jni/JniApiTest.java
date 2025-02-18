@@ -17,7 +17,6 @@
 
 package io.github.zhztheplayer.velox4j.jni;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
@@ -27,8 +26,9 @@ import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
+import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
@@ -52,7 +52,7 @@ public class JniApiTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
     memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 

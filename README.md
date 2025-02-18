@@ -127,7 +127,7 @@ The following is a brief example of using Velox4j to execute a query:
 
 ```java
 // 1. Initialize Velox4j.
-Velox4j.ensureInitialized();
+Velox4j.initialize();
 
 // 2. Define the plan output schema.
 final RowType outputType = new RowType(List.of(

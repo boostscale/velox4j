@@ -1,7 +1,7 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.variant.ArrayValue;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class VariantSerdeTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
   }
 
   @Test

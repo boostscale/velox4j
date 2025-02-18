@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
@@ -18,6 +17,7 @@ import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
@@ -32,7 +32,7 @@ public class PlanNodeSerdeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    Velox4j.ensureInitialized();
+    Velox4jTests.ensureInitialized();
     memoryManager = MemoryManager.create(AllocationListener.NOOP);
   }
 
@@ -140,7 +140,7 @@ public class PlanNodeSerdeTest {
         new RowType(List.of("foo1", "bar1", "foo2", "bar2"),
             List.of(new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
         false
-        );
+    );
     SerdeTests.testVeloxSerializableRoundTrip(joinNode);
     jniApi.close();
   }
