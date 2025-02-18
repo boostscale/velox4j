@@ -197,8 +197,9 @@ final UpIterator itr = query.execute(jniApi);
 // 8. Collect and print results.
 while (itr.hasNext()) {
   final RowVector rowVector = itr.next(); // 8.1. Get next RowVector returned by Velox.
-  final Table arrowTable = Arrow.toArrowTable(new RootAllocator(), rowVector); // 8.2. Convert the RowVector into Arrow format (an Arrow table in this case).
-  System.out.println(arrowTable.toVectorSchemaRoot().contentToTSVString()); // 8.3. Print the arrow table to stdout.
+  final VectorSchemaRoot vsr = Arrow.toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
+  System.out.println(vsr.contentToTSVString()); // 8.3. Print the arrow table to stdout.
+  vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
 }
 
 // 9. Close the JNI session.
