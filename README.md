@@ -92,7 +92,7 @@ Velox4j currently only provides SNAPSHOT jar releases.
 </dependency>
 ```
 
-If the SNAPSHOT repository is not set in Maven, the following settings may also need
+If the `Central Portal Snapshots` repository is not set in Maven, the following settings also need
 to be added:
 
 ```xml
