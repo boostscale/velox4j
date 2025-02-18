@@ -293,14 +293,19 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
   }
   switch (kind) {
     case velox::memory::MemoryPool::Kind::kLeaf: {
-      auto pool = veloxRootPool_->addLeafChild(name, true, velox::memory::MemoryReclaimer::create());
+      auto pool = veloxRootPool_->addLeafChild(
+          name, true, velox::memory::MemoryReclaimer::create());
       veloxPoolRefs_[name] = pool;
       return pool.get();
     }
     case velox::memory::MemoryPool::Kind::kAggregate: {
-      auto pool = veloxRootPool_->addAggregateChild(name, velox::memory::MemoryReclaimer::create());
+      auto pool = veloxRootPool_->addAggregateChild(
+          name, velox::memory::MemoryReclaimer::create());
       veloxPoolRefs_[name] = pool;
       return pool.get();
+    }
+    default: {
+      VELOX_FAIL("Unexpected memory pool kind");
     }
   }
   VELOX_FAIL("Unreachable code");

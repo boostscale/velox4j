@@ -15,17 +15,8 @@
  * limitations under the License.
  */
 
-#include "velox4j/init/Config.h"
-#include "velox4j/init/Init.h"
-
-#pragma once
+#include "Config.h"
 
 namespace velox4j {
-void testingEnsureInitializedForSpark() {
-  static std::once_flag flag;
-  auto conf = std::make_shared<ConfigArray>(
-      std::vector<std::pair<std::string, std::string>>{
-          {VELOX4J_INIT_PRESET.key, folly::to<std::string>(Preset::SPARK)}});
-  std::call_once(flag, [&]() { initialize(conf); });
+ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET("velox4j.init.preset", Preset::SPARK);
 }
-} // namespace velox4j

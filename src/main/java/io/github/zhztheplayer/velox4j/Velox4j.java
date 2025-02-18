@@ -1,15 +1,42 @@
 package io.github.zhztheplayer.velox4j;
 
+import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniLibLoader;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializables;
 import io.github.zhztheplayer.velox4j.variant.Variants;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Velox4j {
   private static final AtomicBoolean initialized = new AtomicBoolean(false);
+  private static final Map<String, String> globalConfMap = new LinkedHashMap<>();
+
+  public static void configure(String key, String value) {
+    Preconditions.checkNotNull(key, "Key cannot be null");
+    Preconditions.checkNotNull(value, "Value of key %s cannot be null", key);
+    synchronized (globalConfMap) {
+      if (globalConfMap.containsKey(key)) {
+        final String oldValue = Preconditions.checkNotNull(globalConfMap.get(key));
+        if (Objects.equals(oldValue, value)) {
+          // The configure call actually does nothing. Ignore.
+          return;
+        }
+      }
+      // If Velox4j was already initialized, throw.
+      if (initialized.get()) {
+        throw new VeloxException("Velox4J has already been initialized");
+      }
+      // Apply the configuration change.
+      globalConfMap.put(key, value);
+    }
+  }
 
   public static void initialize() {
     if (!initialized.compareAndSet(false, true)) {
@@ -26,8 +53,12 @@ public class Velox4j {
   }
 
   private static void initialize0() {
-    JniLibLoader.loadAll(JniWorkspace.getDefault().getWorkDir());
-    Variants.registerAll();
-    VeloxSerializables.registerAll();
+    synchronized (globalConfMap) {
+      final Config globalConf = Config.create(globalConfMap);
+      JniLibLoader.loadAll(JniWorkspace.getDefault().getWorkDir());
+      Variants.registerAll();
+      VeloxSerializables.registerAll();
+      StaticJniApi.get().initialize(globalConf);
+    }
   }
 }

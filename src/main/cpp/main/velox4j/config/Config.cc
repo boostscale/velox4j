@@ -65,6 +65,11 @@ folly::dynamic ConfigArray::serialize() const {
 std::shared_ptr<ConfigArray> ConfigArray::create(
     const folly::dynamic& obj,
     void* context) {
+  return createSimple(obj);
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::createSimple(
+    const folly::dynamic& obj) {
   std::vector<std::pair<std::string, std::string>> values;
   for (const auto& kv : obj["values"]) {
     values.emplace_back(kv["key"].asString(), kv["value"].asString());
@@ -75,6 +80,12 @@ std::shared_ptr<ConfigArray> ConfigArray::create(
 void ConfigArray::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
   registry.Register("Velox4jConfig", create);
+}
+
+std::shared_ptr<ConfigArray> ConfigArray::empty() {
+  static auto empty = std::make_shared<ConfigArray>(
+      std::vector<std::pair<std::string, std::string>>{});
+  return empty;
 }
 
 std::unordered_map<std::string, std::shared_ptr<config::ConfigBase>>

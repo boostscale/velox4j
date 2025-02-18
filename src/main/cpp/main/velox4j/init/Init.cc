@@ -30,6 +30,7 @@
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 #include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
+#include "velox4j/init/Config.h"
 #include "velox4j/query/Query.h"
 
 namespace velox4j {
@@ -45,56 +46,68 @@ void init(const std::function<void()>& f) {
   }
   f();
 }
-} // namespace
 
 void initForSpark() {
-  init([]() -> void {
-    config::globalConfig().memoryLeakCheckEnabled = true;
-    config::globalConfig().memoryPoolCapacityTransferAcrossTasks = true;
-    config::globalConfig().exceptionSystemStacktraceEnabled = true;
-    config::globalConfig().exceptionUserStacktraceEnabled = true;
-    filesystems::registerLocalFileSystem();
-    memory::MemoryManager::initialize({});
-    dwio::common::registerFileSinks();
-    parquet::registerParquetReaderFactory();
-    parquet::registerParquetWriterFactory();
-    functions::sparksql::registerFunctions();
-    aggregate::prestosql::registerAllAggregateFunctions(
-        "",
-        true /*registerCompanionFunctions*/,
-        false /*onlyPrestoSignatures*/,
-        true /*overwrite*/);
-    functions::aggregate::sparksql::registerAggregateFunctions(
-        "", true /*registerCompanionFunctions*/, true /*overwrite*/);
-    window::prestosql::registerAllWindowFunctions();
-    functions::window::sparksql::registerWindowFunctions("");
+  config::globalConfig().memoryLeakCheckEnabled = true;
+  config::globalConfig().memoryPoolCapacityTransferAcrossTasks = true;
+  config::globalConfig().exceptionSystemStacktraceEnabled = true;
+  config::globalConfig().exceptionUserStacktraceEnabled = true;
+  filesystems::registerLocalFileSystem();
+  memory::MemoryManager::initialize({});
+  dwio::common::registerFileSinks();
+  parquet::registerParquetReaderFactory();
+  parquet::registerParquetWriterFactory();
+  functions::sparksql::registerFunctions();
+  aggregate::prestosql::registerAllAggregateFunctions(
+      "",
+      true /*registerCompanionFunctions*/,
+      false /*onlyPrestoSignatures*/,
+      true /*overwrite*/);
+  functions::aggregate::sparksql::registerAggregateFunctions(
+      "", true /*registerCompanionFunctions*/, true /*overwrite*/);
+  window::prestosql::registerAllWindowFunctions();
+  functions::window::sparksql::registerWindowFunctions("");
 
-    ConfigArray::registerSerDe();
-    ConnectorConfigArray::registerSerDe();
-    Query::registerSerDe();
-    Type::registerSerDe();
-    common::Filter::registerSerDe();
-    connector::hive::HiveTableHandle::registerSerDe();
-    connector::hive::LocationHandle::registerSerDe();
-    connector::hive::HiveColumnHandle::registerSerDe();
-    connector::hive::HiveInsertTableHandle::registerSerDe();
-    connector::hive::HiveConnectorSplit::registerSerDe();
-    connector::hive::registerHivePartitionFunctionSerDe();
-    connector::registerConnector(
-        std::make_shared<connector::hive::HiveConnector>(
-            "connector-hive",
-            std::make_shared<facebook::velox::config::ConfigBase>(
-                std::unordered_map<std::string, std::string>()),
-            nullptr));
-    ExternalStreamConnectorSplit::registerSerDe();
-    ExternalStreamTableHandle::registerSerDe();
-    connector::registerConnector(std::make_shared<ExternalStreamConnector>(
-        "connector-external-stream",
-        std::make_shared<facebook::velox::config::ConfigBase>(
-            std::unordered_map<std::string, std::string>())));
-    core::PlanNode::registerSerDe();
-    core::ITypedExpr::registerSerDe();
-    exec::registerPartitionFunctionSerDe();
+  ConfigArray::registerSerDe();
+  ConnectorConfigArray::registerSerDe();
+  Query::registerSerDe();
+  Type::registerSerDe();
+  common::Filter::registerSerDe();
+  connector::hive::HiveTableHandle::registerSerDe();
+  connector::hive::LocationHandle::registerSerDe();
+  connector::hive::HiveColumnHandle::registerSerDe();
+  connector::hive::HiveInsertTableHandle::registerSerDe();
+  connector::hive::HiveConnectorSplit::registerSerDe();
+  connector::hive::registerHivePartitionFunctionSerDe();
+  connector::registerConnector(std::make_shared<connector::hive::HiveConnector>(
+      "connector-hive",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>()),
+      nullptr));
+  ExternalStreamConnectorSplit::registerSerDe();
+  ExternalStreamTableHandle::registerSerDe();
+  connector::registerConnector(std::make_shared<ExternalStreamConnector>(
+      "connector-external-stream",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>())));
+  core::PlanNode::registerSerDe();
+  core::ITypedExpr::registerSerDe();
+  exec::registerPartitionFunctionSerDe();
+}
+} // namespace
+
+void initialize(const std::shared_ptr<ConfigArray>& configArray) {
+  init([&]() -> void {
+    auto vConfig = std::make_shared<facebook::velox::config::ConfigBase>(
+        configArray->toMap());
+    auto preset = vConfig->get(VELOX4J_INIT_PRESET);
+    switch (preset) {
+      case SPARK:
+        initForSpark();
+        break;
+      default:
+        VELOX_FAIL("Unknown preset: {}", folly::to<std::string>(preset));
+    }
   });
 }
 } // namespace velox4j

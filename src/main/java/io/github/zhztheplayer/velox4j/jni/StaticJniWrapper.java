@@ -11,6 +11,9 @@ public class StaticJniWrapper {
 
   private StaticJniWrapper() {}
 
+  // Global initialization.
+  native void initialize(String globalConfJson);
+
   // Memory.
   native long createMemoryManager(AllocationListener listener);
 

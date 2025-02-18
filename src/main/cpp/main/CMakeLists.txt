@@ -20,6 +20,7 @@ set(VELOX4J_SOURCES
         velox4j/memory/MemoryManager.cc
         velox4j/memory/ArrowMemoryPool.cc
         velox4j/config/Config.cc
+        velox4j/init/Config.cc
 )
 set(VELOX4J_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}

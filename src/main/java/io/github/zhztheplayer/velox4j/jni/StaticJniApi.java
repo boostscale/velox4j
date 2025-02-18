@@ -1,7 +1,9 @@
 package io.github.zhztheplayer.velox4j.jni;
 
+import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();
@@ -13,6 +15,10 @@ public class StaticJniApi {
   private final StaticJniWrapper jni = StaticJniWrapper.get();
 
   private StaticJniApi() {}
+
+  public void initialize(Config globalConf) {
+    jni.initialize(Serde.toPrettyJson(globalConf));
+  }
 
   public MemoryManager createMemoryManager(AllocationListener listener) {
     return new MemoryManager(jni.createMemoryManager(listener));
