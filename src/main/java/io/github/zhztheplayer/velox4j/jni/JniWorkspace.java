@@ -40,8 +40,7 @@ public class JniWorkspace {
     } catch (IOException e) {
       throw new VeloxException(e);
     }
-    System.out.printf("Creating work directory %s...%n", defaultWorkDir);
-    Preconditions.checkState(defaultWorkDir.mkdirs(), "Cannot create work directory %s", defaultWorkDir);
+    System.out.printf("Created work directory %s.%n", defaultWorkDir);
     DEFAULT_WORK_DIR = defaultWorkDir.getAbsolutePath();
   }
 
