@@ -50,7 +50,6 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
-    <velox4j.libContainer>velox4j-lib</velox4j.libContainer>
   </properties>
 
   <build>
@@ -60,7 +59,7 @@
       </resource>
       <resource>
         <directory>${project.basedir}/src/main/cpp/build/dist/lib</directory>
-        <targetPath>${velox4j.libContainer}</targetPath>
+        <targetPath>velox4j-lib</targetPath>
       </resource>
     </resources>
     <plugins>
