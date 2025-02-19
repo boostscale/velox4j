@@ -16,54 +16,73 @@
  */
 package io.github.zhztheplayer.velox4j.jni;
 
+import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JniWorkspace {
   private static final Logger LOG = LoggerFactory.getLogger(JniWorkspace.class);
   private static final Map<String, JniWorkspace> INSTANCES = new ConcurrentHashMap<>();
-  private static final String DEFAULT_ROOT_DIR;
+
+  private static final String DEFAULT_WORK_DIR_MAGIC = "1609902915266301671";
+  private static final String DEFAULT_WORK_DIR;
 
   static {
-    try {
-      DEFAULT_ROOT_DIR = Files.createTempDirectory("velox4j-").toFile().getAbsolutePath();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    final File defaultWorkDir = new File(FileUtils.getTempDirectoryPath(),
+        String.format("velox4j-%s", DEFAULT_WORK_DIR_MAGIC));
+    final String defaultWorkDirPath = defaultWorkDir.getAbsolutePath();
+    if (defaultWorkDir.exists()) {
+      Preconditions.checkState(defaultWorkDir.isDirectory(),
+          "Default work directory %s already exists but is not recognized as a directory", defaultWorkDirPath);
+      System.out.printf("Deleting existing contents in work directory %s...%n", defaultWorkDirPath);
+      try {
+        FileUtils.deleteDirectory(defaultWorkDir);
+      } catch (IOException e) {
+        throw new VeloxException(e);
+      }
     }
+    System.out.printf("Creating work directory %s...%n", defaultWorkDirPath);
+    Preconditions.checkState(defaultWorkDir.mkdirs(), "Cannot create work directory %s", defaultWorkDirPath);
+    DEFAULT_WORK_DIR = defaultWorkDirPath;
   }
 
   private final File workDir;
 
-  private JniWorkspace(String rootDir) {
+  private JniWorkspace(File workDir) {
     try {
-      LOG.info("Creating JNI workspace in root directory {}", rootDir);
-      final Path root = Paths.get(rootDir);
-      final Path work = Files.createTempDirectory(root, "work-").toAbsolutePath();
-      this.workDir = work.toFile();
-      LOG.info("JNI workspace {} created in root directory {}", this.workDir, rootDir);
+      this.workDir = workDir;
+      mkdirs(this.workDir);
+      LOG.info("JNI workspace created in directory {}", this.workDir);
     } catch (Exception e) {
       throw new VeloxException(e);
     }
   }
 
   public static JniWorkspace getDefault() {
-    return createOrGet(DEFAULT_ROOT_DIR);
+    return createOrGet(DEFAULT_WORK_DIR);
   }
 
-  private static JniWorkspace createOrGet(String rootDir) {
-    return INSTANCES.computeIfAbsent(rootDir, JniWorkspace::new);
+  private static JniWorkspace createOrGet(String workDir) {
+    return INSTANCES.computeIfAbsent(workDir, d -> new JniWorkspace(new File(d)));
   }
 
-  public File getWorkDir() {
-    return workDir;
+  public File getSubDir(String subDir) {
+    final File file = new File(this.workDir, subDir);
+    mkdirs(file);
+    return file;
+  }
+
+  private static void mkdirs(File dir) {
+    if (!dir.exists()) {
+      Preconditions.checkState(dir.mkdirs(), "Failed to create directory %s", dir);
+    }
+    Preconditions.checkArgument(dir.isDirectory(), "File %s is not a directory", dir);
   }
 }

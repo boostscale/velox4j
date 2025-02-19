@@ -48,7 +48,7 @@ public class Velox4j {
   private static void initialize0() {
     synchronized (globalConfMap) {
       final Config globalConf = Config.create(globalConfMap);
-      JniLibLoader.loadAll(JniWorkspace.getDefault().getWorkDir());
+      JniLibLoader.loadAll(JniWorkspace.getDefault().getSubDir("lib"));
       Variants.registerAll();
       VeloxSerializables.registerAll();
       StaticJniApi.get().initialize(globalConf);

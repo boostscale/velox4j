@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.test;
 
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.resource.Resources;
 
 import java.io.BufferedOutputStream;
@@ -34,7 +35,8 @@ public final class ResourceTests {
 
   public static File copyResourceToTmp(String path) {
     try {
-      final File tmp = File.createTempFile("velox4j-test-", ".tmp");
+      final File folder = JniWorkspace.getDefault().getSubDir("test");
+      final File tmp = File.createTempFile("velox4j-test-", ".tmp", folder);
       Resources.copyResource(path, tmp);
       return tmp;
     } catch (IOException e) {
