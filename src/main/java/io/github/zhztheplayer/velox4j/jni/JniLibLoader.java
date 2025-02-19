@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.StandardSystemProperty;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.resource.ResourceFile;
 import io.github.zhztheplayer.velox4j.resource.Resources;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 public class JniLibLoader {
   private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
-  private static final String LIB_CONTAINER = "velox4j-lib";
+  private static final String LIB_CONTAINER = String.format("velox4j-lib/%s/%s", StandardSystemProperty.OS_NAME.value(), StandardSystemProperty.OS_ARCH.value());
   private static final Pattern LIB_PATTERN = Pattern.compile("^.+$");
   private static final String VELOX4J_LIB_NAME = "libvelox4j.so";
 

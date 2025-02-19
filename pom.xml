@@ -40,17 +40,17 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>4.13.1</junit.version>
-    <arrow.version>18.1.0</arrow.version>
-    <guava.version>33.4.0-jre</guava.version>
-    <commons-io.version>2.18.0</commons-io.version>
-    <jackson.version>2.18.0</jackson.version>
     <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED
     </surefire.add-opens.argLine>
     <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
+    <junit.version>4.13.1</junit.version>
+    <arrow.version>18.1.0</arrow.version>
+    <guava.version>33.4.0-jre</guava.version>
+    <commons-io.version>2.18.0</commons-io.version>
+    <jackson.version>2.18.0</jackson.version>
   </properties>
 
   <build>
@@ -60,7 +60,7 @@
       </resource>
       <resource>
         <directory>${project.basedir}/src/main/cpp/build/dist/lib</directory>
-        <targetPath>velox4j-lib</targetPath>
+        <targetPath>velox4j-lib/${os.name}/${os.arch}</targetPath>
       </resource>
     </resources>
     <plugins>
