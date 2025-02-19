@@ -30,14 +30,16 @@ public class JniLibLoader {
     }
     final List<ResourceFile> velox4jLibFiles = libFiles.stream().filter(f -> f.name().equals(VELOX4J_LIB_NAME)).collect(Collectors.toList());
     Preconditions.checkArgument(velox4jLibFiles.size() == 1, "Velox4j library not found");
+    System.out.printf("Found required libraries in container %s.%n", LIB_CONTAINER);
     final ResourceFile velox4jLibFile = velox4jLibFiles.get(0);
     for (ResourceFile libFile : libFiles) {
       final File copied = workDir.toPath().resolve(libFile.name()).toFile();
-      System.out.printf("Copying library %s to %s...%n", libFile.name(), copied);
+      System.out.printf("Copying library %s/%s to %s...%n", LIB_CONTAINER, libFile.name(), copied);
       libFile.copyTo(copied);
     }
     final File copiedVelox4jLib = workDir.toPath().resolve(velox4jLibFile.name()).toFile();
     Preconditions.checkState(copiedVelox4jLib.isFile(), "Velox4j library not copied to work directory");
     System.load(copiedVelox4jLib.getAbsolutePath());
+    System.out.printf("All required libraries were successfully loaded.%n", LIB_CONTAINER);
   }
 }
