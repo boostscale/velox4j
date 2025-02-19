@@ -25,6 +25,9 @@ public class JniLibLoader {
     }
     Preconditions.checkArgument(workDir.isDirectory(), "Work directory %s is not a directory", workDir);
     final List<ResourceFile> libFiles = Resources.getResources(LIB_CONTAINER, LIB_PATTERN);
+    if (libFiles.isEmpty()) {
+      throw new VeloxException(String.format("Library container %s not found in classpath. Please check whether the current platform is supported by the Jar", LIB_CONTAINER));
+    }
     final List<ResourceFile> velox4jLibFiles = libFiles.stream().filter(f -> f.name().equals(VELOX4J_LIB_NAME)).collect(Collectors.toList());
     Preconditions.checkArgument(velox4jLibFiles.size() == 1, "Velox4j library not found");
     final ResourceFile velox4jLibFile = velox4jLibFiles.get(0);
