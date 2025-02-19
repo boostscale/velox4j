@@ -17,6 +17,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 # Velox4j option definitions.
 option(VELOX4J_BUILD_TESTING "Build Velox4j tests." ON)
 
+# Velox4j non-bool option definitions.
+set(VELOX4J_INSTALL_DESTINATION "lib" CACHE STRING "The directory Velox4j's libraries are installed. This is relative to the value of CMAKE_INSTALL_PREFIX.")
+
 # Setup JNI.
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
