@@ -18,12 +18,12 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,26 +31,18 @@ public class JniWorkspace {
   private static final Logger LOG = LoggerFactory.getLogger(JniWorkspace.class);
   private static final Map<String, JniWorkspace> INSTANCES = new ConcurrentHashMap<>();
 
-  private static final String DEFAULT_WORK_DIR_MAGIC = "1609902915266301671";
   private static final String DEFAULT_WORK_DIR;
 
   static {
-    final File defaultWorkDir = new File(FileUtils.getTempDirectoryPath(),
-        String.format("velox4j-%s", DEFAULT_WORK_DIR_MAGIC));
-    final String defaultWorkDirPath = defaultWorkDir.getAbsolutePath();
-    if (defaultWorkDir.exists()) {
-      Preconditions.checkState(defaultWorkDir.isDirectory(),
-          "Default work directory %s already exists but is not recognized as a directory", defaultWorkDirPath);
-      System.out.printf("Deleting existing contents in work directory %s...%n", defaultWorkDirPath);
-      try {
-        FileUtils.deleteDirectory(defaultWorkDir);
-      } catch (IOException e) {
-        throw new VeloxException(e);
-      }
+    final File defaultWorkDir;
+    try {
+      defaultWorkDir = Files.createTempDirectory("velox4j-").toFile();
+    } catch (IOException e) {
+      throw new VeloxException(e);
     }
-    System.out.printf("Creating work directory %s...%n", defaultWorkDirPath);
-    Preconditions.checkState(defaultWorkDir.mkdirs(), "Cannot create work directory %s", defaultWorkDirPath);
-    DEFAULT_WORK_DIR = defaultWorkDirPath;
+    System.out.printf("Creating work directory %s...%n", defaultWorkDir);
+    Preconditions.checkState(defaultWorkDir.mkdirs(), "Cannot create work directory %s", defaultWorkDir);
+    DEFAULT_WORK_DIR = defaultWorkDir.getAbsolutePath();
   }
 
   private final File workDir;
