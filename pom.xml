@@ -8,7 +8,7 @@
   <artifactId>velox4j</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <description>Java bindings for Velox</description>
-  <url>https://github.com/zhztheplayer/velox4j</url>
+  <url>https://github.com/velox4j/velox4j</url>
 
   <licenses>
     <license>
@@ -19,9 +19,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com:zhztheplayer/velox4j.git</connection>
-    <developerConnection>scm:git:git@github.com:zhztheplayer/velox4j.git</developerConnection>
-    <url>https://github.com/zhztheplayer/velox4j</url>
+    <connection>scm:git:git@github.com:velox4j/velox4j.git</connection>
+    <developerConnection>scm:git:git@github.com:velox4j/velox4j.git</developerConnection>
+    <url>https://github.com/velox4j/velox4j</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -35,7 +35,7 @@
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/zhztheplayer/velox4j/issues</url>
+    <url>https://github.com/velox4j/velox4j/issues</url>
   </issueManagement>
 
   <properties>
