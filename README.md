@@ -111,9 +111,8 @@ to be added:
 </repositories>
 ```
 
-NOTE: The released Jar is built with x86-64 CPU + CentOS 7 operating system. Which means
-it may not work (say, crash when you use it) as expected on different platforms, especially on
-Linux distributions with lower versions of glibc.
+NOTE 1: The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
+NOTE 2: The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/velox4j/velox4j-integration-test).
 
 ## Build From Source
 
