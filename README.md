@@ -51,7 +51,7 @@ in Velox4j's C++ code base. Which means, the Java side Velox components defined 
 Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
 code base even small, and any new Velox features easy to add to Velox4j.
 
-### Compatible with Arrow
+### Compatible With Arrow
 
 Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow
 format through utility APIs provided by Velox4j.
@@ -111,9 +111,9 @@ to be added:
 </repositories>
 ```
 
-NOTE 1: The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
-
-NOTE 2: The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/velox4j/velox4j-integration-test).
+NOTE:
+1. The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
+2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/velox4j/velox4j-integration-test).
 
 ## Build From Source
 
