@@ -69,9 +69,7 @@
         <artifactId>maven-source-plugin</artifactId>
         <version>3.3.1</version>
         <configuration>
-          <excludes>
-            <exclude>velox4j-lib/*</exclude>
-          </excludes>
+          <excludeResources>true</excludeResources>
           <useDefaultManifestFile>false</useDefaultManifestFile>
           <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
         </configuration>
