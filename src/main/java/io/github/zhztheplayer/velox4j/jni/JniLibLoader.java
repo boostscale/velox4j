@@ -40,6 +40,6 @@ public class JniLibLoader {
     final File copiedVelox4jLib = workDir.toPath().resolve(velox4jLibFile.name()).toFile();
     Preconditions.checkState(copiedVelox4jLib.isFile(), "Velox4j library not copied to work directory");
     System.load(copiedVelox4jLib.getAbsolutePath());
-    System.out.printf("All required libraries were successfully loaded.%n", LIB_CONTAINER);
+    System.out.printf("All required libraries were successfully loaded.%n");
   }
 }
