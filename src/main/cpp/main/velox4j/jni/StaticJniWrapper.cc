@@ -38,7 +38,7 @@ void initialize0(JNIEnv* env, jobject javaThis, jstring globalConfJson) {
   JNI_METHOD_START
   spotify::jni::JavaString jGlobalConfJson{env, globalConfJson};
   auto dynamic = folly::parseJson(jGlobalConfJson.get());
-  auto confArray = ConfigArray::createSimple(dynamic);
+  auto confArray = ConfigArray::create(dynamic);
   initialize(confArray);
   JNI_METHOD_END()
 }
