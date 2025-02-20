@@ -10,7 +10,7 @@ public class ExternalStreams {
     this.jniApi = jniApi;
   }
 
-  public ExternalStream newExternalStream(DownIterator itr) {
+  public ExternalStream bind(DownIterator itr) {
     return jniApi.newExternalStream(itr);
   }
 }

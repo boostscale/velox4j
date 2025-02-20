@@ -189,10 +189,10 @@ final Query query = new Query(scanNode, List.of(split), Config.empty(), Connecto
 
 // 6. Create a Velox4j session.
 final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-final Session session = Session.create(memoryManager);
+final Session session = Velox4j.newSession(memoryManager);
 
 // 7. Execute the query.
-final UpIterator itr = session.executeQuery(query);
+final UpIterator itr = session.queryOps().execute(query);
 
 // 8. Collect and print results.
 while (itr.hasNext()) {

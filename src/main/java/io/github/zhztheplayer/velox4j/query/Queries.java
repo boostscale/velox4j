@@ -11,7 +11,7 @@ public class Queries {
     this.jniApi = jniApi;
   }
 
-  UpIterator executeQuery(Query query) {
+  UpIterator execute(Query query) {
     return jniApi.executeQuery(Serde.toPrettyJson(query));
   }
 }

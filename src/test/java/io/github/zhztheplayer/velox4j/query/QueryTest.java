@@ -78,7 +78,7 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"))
@@ -97,7 +97,7 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
@@ -134,7 +134,7 @@ public class QueryTest {
         List.of()
     );
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
@@ -146,9 +146,9 @@ public class QueryTest {
   public void testExternalStream() {
     final Session session = Velox4j.newSession(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = session.queryOps().executeQuery(Serde.fromJson(json, Query.class));
+    final UpIterator sampleIn = session.queryOps().execute(Serde.fromJson(json, Query.class));
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = session.externalStreamOps().newExternalStream(down);
+    final ExternalStream es = session.externalStreamOps().bind(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),
@@ -163,7 +163,7 @@ public class QueryTest {
         )
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.queryOps().executeQuery(query);
+    final UpIterator out = session.queryOps().execute(query);
     SampleQueryTests.assertIterator(out);
     session.close();
   }
@@ -184,7 +184,7 @@ public class QueryTest {
             FieldAccessTypedExpr.create(new VarCharType(), "n_comment")
         ));
     final Query query = new Query(projectNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
@@ -207,7 +207,7 @@ public class QueryTest {
             ConstantTypedExpr.create(new BigIntValue(3))),
             "greaterthanorequal"));
     final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
@@ -240,7 +240,7 @@ public class QueryTest {
         false
     );
     final Query query = new Query(hashJoinNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
@@ -264,7 +264,7 @@ public class QueryTest {
             new SortOrder(false, false)),
         false);
     final Query query = new Query(orderByNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-orderby-1.tsv"))
@@ -283,7 +283,7 @@ public class QueryTest {
     );
     final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
     final Query query = new Query(limitNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().executeQuery(query);
+    final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
