@@ -33,11 +33,7 @@ class ConfigArray : public facebook::velox::ISerializable {
 
   static std::shared_ptr<ConfigArray> empty();
 
-  static std::shared_ptr<ConfigArray> create(
-      const folly::dynamic& obj,
-      void* context);
-
-  static std::shared_ptr<ConfigArray> createSimple(const folly::dynamic& obj);
+  static std::shared_ptr<ConfigArray> create(const folly::dynamic& obj);
 
   static void registerSerDe();
 
@@ -52,14 +48,15 @@ class ConnectorConfigArray : public facebook::velox::ISerializable {
           values)
       : values_(std::move(values)) {}
 
-  std::unordered_map<std::string, std::shared_ptr<facebook::velox::config::ConfigBase>> toMap()
-      const;
+  std::unordered_map<
+      std::string,
+      std::shared_ptr<facebook::velox::config::ConfigBase>>
+  toMap() const;
 
   folly::dynamic serialize() const override;
 
   static std::shared_ptr<ConnectorConfigArray> create(
-      const folly::dynamic& obj,
-      void* context);
+      const folly::dynamic& obj);
 
   static void registerSerDe();
 

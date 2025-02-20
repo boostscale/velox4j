@@ -63,14 +63,7 @@ folly::dynamic ConfigArray::serialize() const {
   return obj;
 };
 
-std::shared_ptr<ConfigArray> ConfigArray::create(
-    const folly::dynamic& obj,
-    void* context) {
-  return createSimple(obj);
-}
-
-std::shared_ptr<ConfigArray> ConfigArray::createSimple(
-    const folly::dynamic& obj) {
+std::shared_ptr<ConfigArray> ConfigArray::create(const folly::dynamic& obj) {
   std::vector<std::pair<std::string, std::string>> values;
   for (const auto& kv : obj["values"]) {
     values.emplace_back(kv["key"].asString(), kv["value"].asString());
@@ -79,7 +72,7 @@ std::shared_ptr<ConfigArray> ConfigArray::createSimple(
 }
 
 void ConfigArray::registerSerDe() {
-  auto& registry = DeserializationWithContextRegistryForSharedPtr();
+  auto& registry = DeserializationRegistryForSharedPtr();
   registry.Register("Velox4jConfig", create);
 }
 
@@ -118,20 +111,19 @@ folly::dynamic ConnectorConfigArray::serialize() const {
 };
 
 std::shared_ptr<ConnectorConfigArray> ConnectorConfigArray::create(
-    const folly::dynamic& obj,
-    void* context) {
+    const folly::dynamic& obj) {
   std::vector<std::pair<std::string, std::shared_ptr<const ConfigArray>>>
       values;
   for (const auto& kv : obj["values"]) {
     auto conf = std::const_pointer_cast<const ConfigArray>(
-        ISerializable::deserialize<ConfigArray>(kv["config"], context));
+        ISerializable::deserialize<ConfigArray>(kv["config"]));
     values.emplace_back(kv["connectorId"].asString(), conf);
   }
   return std::make_shared<ConnectorConfigArray>(std::move(values));
 }
 
 void ConnectorConfigArray::registerSerDe() {
-  auto& registry = DeserializationWithContextRegistryForSharedPtr();
+  auto& registry = DeserializationRegistryForSharedPtr();
   registry.Register("Velox4jConnectorConfig", create);
 }
 } // namespace velox4j
