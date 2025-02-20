@@ -62,7 +62,7 @@ public final class SerdeTests {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = session.jniApi().deserializeAndSerialize(inJson);
+      final String outJson = JniApiTests.getJniApi(session).deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       assertJsonEquals(inJson, outJson2);

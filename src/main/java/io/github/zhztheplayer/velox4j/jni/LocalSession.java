@@ -15,14 +15,13 @@ public class LocalSession implements Session {
     this.id = id;
   }
 
+  private JniApi jniApi() {
+    return JniApi.create(this);
+  }
+
   @Override
   public long id() {
     return id;
-  }
-
-  @VisibleForTesting
-  public JniApi jniApi() {
-    return JniApi.create(this);
   }
 
   @Override
