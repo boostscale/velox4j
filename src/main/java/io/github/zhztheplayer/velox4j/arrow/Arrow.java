@@ -28,7 +28,7 @@ public class Arrow {
     }
   }
 
-  public static FieldVector toArrowVector(BufferAllocator alloc, RowVector vector) {
+  public static FieldVector toArrowVector(BufferAllocator alloc, BaseVector vector) {
     try (final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
         final ArrowArray array = ArrowArray.allocateNew(alloc)) {
       StaticJniApi.get().baseVectorToArrow(vector, schema, array);
