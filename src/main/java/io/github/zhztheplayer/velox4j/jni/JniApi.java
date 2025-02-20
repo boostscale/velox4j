@@ -10,6 +10,7 @@ import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.c.ArrowArray;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
  * provides objective forms of the required functionalities.
  */
 public final class JniApi {
-  static JniApi create(long sessionId) {
-    return new JniApi(JniWrapper.create(sessionId));
+  static JniApi create(Session session) {
+    return new JniApi(JniWrapper.create(session.id()));
   }
 
   private final JniWrapper jni;

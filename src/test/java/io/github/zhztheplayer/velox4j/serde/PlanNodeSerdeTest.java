@@ -1,10 +1,11 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
-import io.github.zhztheplayer.velox4j.jni.Session;
+import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -65,7 +66,7 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testValuesNode() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final PlanNode values = ValuesNode.create("id-1",
         List.of(SerdeTests.newSampleRowVector(session)), true, 1);
     SerdeTests.testVeloxSerializableRoundTrip(values);

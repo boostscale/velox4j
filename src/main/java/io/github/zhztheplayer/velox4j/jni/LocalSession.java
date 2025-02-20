@@ -2,25 +2,17 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
-import io.github.zhztheplayer.velox4j.connector.ExternalStream;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
-import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.query.Query;
-import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.query.Queries;
+import io.github.zhztheplayer.velox4j.session.Session;
 
 public class LocalSession implements Session {
   private final long id;
-  private final JniApi jni;
 
-  private LocalSession(long id) {
+  LocalSession(long id) {
     this.id = id;
-    this.jni = JniApi.create(id);
-  }
-
-  static LocalSession create(long id) {
-    return new LocalSession(id);
   }
 
   @Override
@@ -30,31 +22,31 @@ public class LocalSession implements Session {
 
   @VisibleForTesting
   public JniApi jniApi() {
-    return jni;
+    return JniApi.create(this);
   }
 
   @Override
-  public UpIterator executeQuery(Query query) {
-    return jni.executeQuery(Serde.toPrettyJson(query));
+  public Queries queryOps() {
+    return new Queries(jniApi());
   }
 
   @Override
-  public ExternalStream newExternalStream(DownIterator itr) {
-    return jni.newExternalStream(itr);
+  public ExternalStreams externalStreamOps() {
+    return new ExternalStreams(jniApi());
   }
 
   @Override
   public BaseVectors baseVectorOps() {
-    return new BaseVectors(jni);
+    return new BaseVectors(jniApi());
   }
 
   @Override
   public RowVectors rowVectorOps() {
-    return new RowVectors(jni);
+    return new RowVectors(jniApi());
   }
 
   @Override
   public Arrow arrowOps() {
-    return new Arrow(jni);
+    return new Arrow(jniApi());
   }
 }

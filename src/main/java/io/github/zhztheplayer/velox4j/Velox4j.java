@@ -6,7 +6,9 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniLibLoader;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializables;
+import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.variant.Variants;
 
 import java.util.LinkedHashMap;
@@ -43,6 +45,10 @@ public class Velox4j {
       throw new VeloxException("Velox4J has already been initialized");
     }
     initialize0();
+  }
+
+  public static Session newSession(MemoryManager memoryManager) {
+    return StaticJniApi.get().createSession(memoryManager);
   }
 
   private static void initialize0() {

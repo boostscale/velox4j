@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.query;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.config.Config;
@@ -18,7 +19,7 @@ import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.jni.Session;
+import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -69,7 +70,7 @@ public class QueryTest {
 
   @Test
   public void testHiveScan1() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -77,7 +78,7 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"))
@@ -88,7 +89,7 @@ public class QueryTest {
 
   @Test
   public void testHiveScan2() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.REGION.file();
     final RowType outputType = TpchTests.Table.REGION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -96,7 +97,7 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
@@ -106,7 +107,7 @@ public class QueryTest {
 
   @Test
   public void testAggregate() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -133,7 +134,7 @@ public class QueryTest {
         List.of()
     );
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
@@ -143,11 +144,11 @@ public class QueryTest {
 
   @Test
   public void testExternalStream() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = session.executeQuery(Serde.fromJson(json, Query.class));
+    final UpIterator sampleIn = session.queryOps().executeQuery(Serde.fromJson(json, Query.class));
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = session.newExternalStream(down);
+    final ExternalStream es = session.externalStreamOps().newExternalStream(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),
@@ -162,14 +163,14 @@ public class QueryTest {
         )
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.executeQuery(query);
+    final UpIterator out = session.queryOps().executeQuery(query);
     SampleQueryTests.assertIterator(out);
     session.close();
   }
 
   @Test
   public void testProject() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -183,7 +184,7 @@ public class QueryTest {
             FieldAccessTypedExpr.create(new VarCharType(), "n_comment")
         ));
     final Query query = new Query(projectNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
@@ -193,7 +194,7 @@ public class QueryTest {
 
   @Test
   public void testFilter() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -206,7 +207,7 @@ public class QueryTest {
             ConstantTypedExpr.create(new BigIntValue(3))),
             "greaterthanorequal"));
     final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
@@ -216,7 +217,7 @@ public class QueryTest {
 
   @Test
   public void testHashJoin() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File nationFile = TpchTests.Table.NATION.file();
     final RowType nationOutputType = TpchTests.Table.NATION.schema();
     final File regionFile = TpchTests.Table.REGION.file();
@@ -239,7 +240,7 @@ public class QueryTest {
         false
     );
     final Query query = new Query(hashJoinNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
@@ -249,7 +250,7 @@ public class QueryTest {
 
   @Test
   public void testOrderBy() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -263,7 +264,7 @@ public class QueryTest {
             new SortOrder(false, false)),
         false);
     final Query query = new Query(orderByNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-orderby-1.tsv"))
@@ -273,7 +274,7 @@ public class QueryTest {
 
   @Test
   public void testLimit() {
-    final Session session = Session.create(memoryManager);
+    final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -282,7 +283,7 @@ public class QueryTest {
     );
     final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
     final Query query = new Query(limitNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.executeQuery(query);
+    final UpIterator itr = session.queryOps().executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
