@@ -37,6 +37,10 @@ final class JniWrapper {
     return sessionId;
   }
 
+  // Expression evaluation.
+  native long createEvaluator(String exprJson);
+  native long evaluatorEval(long evaluatorId, long selectivityVectorId, long rvId);
+
   // Plan execution.
   native long executeQuery(String queryJson);
 

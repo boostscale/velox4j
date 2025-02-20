@@ -44,7 +44,7 @@ class Out : public UpIterator {
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
         nullptr,
         core::QueryConfig{query->queryConfig()->toMap()},
-        {},
+        query->connectorConfig()->toMap(),
         cache::AsyncDataCache::getInstance(),
         memoryManager_
             ->getVeloxPool(

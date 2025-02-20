@@ -12,6 +12,7 @@ import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.Expression;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
@@ -47,8 +48,8 @@ import io.github.zhztheplayer.velox4j.type.SmallIntType;
 import io.github.zhztheplayer.velox4j.type.TimestampType;
 import io.github.zhztheplayer.velox4j.type.TinyIntType;
 import io.github.zhztheplayer.velox4j.type.UnknownType;
-import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
+import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 
 public final class VeloxSerializables {
   private static final SerdeRegistry NAME_REGISTRY = SerdeRegistryFactory
@@ -66,6 +67,7 @@ public final class VeloxSerializables {
     registerFilters();
     registerPlanNodes();
     retisterConfig();
+    registerExpression();
     registerQuery();
   }
 
@@ -139,6 +141,10 @@ public final class VeloxSerializables {
   private static void retisterConfig() {
     NAME_REGISTRY.registerClass("Velox4jConfig", Config.class);
     NAME_REGISTRY.registerClass("Velox4jConnectorConfig", ConnectorConfig.class);
+  }
+
+  private static void registerExpression() {
+    NAME_REGISTRY.registerClass("Velox4jExpression", Expression.class);
   }
 
   private static void registerQuery() {

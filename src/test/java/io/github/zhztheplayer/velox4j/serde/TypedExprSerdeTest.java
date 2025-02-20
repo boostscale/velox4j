@@ -28,7 +28,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.List;
 
-public class ExprSerdeTest {
+public class TypedExprSerdeTest {
   private static MemoryManager memoryManager;
 
   @BeforeClass

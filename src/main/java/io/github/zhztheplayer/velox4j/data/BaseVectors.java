@@ -1,9 +1,14 @@
 package io.github.zhztheplayer.velox4j.data;
 
 import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.type.Type;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.table.Table;
 
 import java.util.List;
 
@@ -33,6 +38,10 @@ public class BaseVectors {
     return StaticJniApi.get().baseVectorGetType(vector);
   }
 
+  public static int getSize(BaseVector vector) {
+    return StaticJniApi.get().baseVectorGetSize(vector);
+  }
+
   public static BaseVector wrapInConstant(BaseVector vector, int length, int index) {
     return vector.jniApi().baseVectorWrapInConstant(vector, length, index);
   }
@@ -43,5 +52,11 @@ public class BaseVectors {
 
   public static RowVector asRowVector(BaseVector vector) {
     return vector.jniApi().baseVectorAsRowVector(vector);
+  }
+
+  public static String toString(BufferAllocator alloc, BaseVector vector) {
+    try (final FieldVector fv = Arrow.toArrowVector(alloc, vector)) {
+      return fv.toString();
+    }
   }
 }

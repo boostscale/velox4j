@@ -6,6 +6,7 @@ import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.data.SelectivityVectors;
+import io.github.zhztheplayer.velox4j.expression.Expressions;
 import io.github.zhztheplayer.velox4j.query.Queries;
 import io.github.zhztheplayer.velox4j.session.Session;
 
@@ -23,6 +24,11 @@ public class LocalSession implements Session {
   @Override
   public long id() {
     return id;
+  }
+
+  @Override
+  public Expressions expressionOps() {
+    return new Expressions(jniApi());
   }
 
   @Override

@@ -6,6 +6,7 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.expression.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
@@ -35,6 +36,14 @@ public final class JniApi {
 
   private JniApi(JniWrapper jni) {
     this.jni = jni;
+  }
+
+  public Evaluator createEvaluator(String exprJson) {
+    return new Evaluator(this, jni.createEvaluator(exprJson));
+  }
+
+  public BaseVector evaluatorEval(Evaluator evaluator, SelectivityVector sv, RowVector input) {
+    return baseVectorWrap(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
   }
 
   public UpIterator executeQuery(String queryJson) {

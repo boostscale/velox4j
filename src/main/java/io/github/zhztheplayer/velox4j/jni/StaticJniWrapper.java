@@ -32,6 +32,7 @@ public class StaticJniWrapper {
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
   native String baseVectorSerialize(long[] id);
   native String baseVectorGetType(long id);
+  native int baseVectorGetSize(long id);
   native String baseVectorGetEncoding(long id);
   native boolean selectivityVectorIsValid(long id, int idx);
 

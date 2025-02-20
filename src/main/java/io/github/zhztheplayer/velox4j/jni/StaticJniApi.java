@@ -63,8 +63,12 @@ public class StaticJniApi {
   }
 
   public Type baseVectorGetType(BaseVector vector) {
-    String typeJson = jni.baseVectorGetType(vector.id());
+    final String typeJson = jni.baseVectorGetType(vector.id());
     return Serde.fromJson(typeJson, Type.class);
+  }
+
+  public int baseVectorGetSize(BaseVector vector) {
+    return jni.baseVectorGetSize(vector.id());
   }
 
   public VectorEncoding baseVectorGetEncoding(BaseVector vector) {

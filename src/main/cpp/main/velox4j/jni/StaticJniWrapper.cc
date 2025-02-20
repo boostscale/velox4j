@@ -124,6 +124,13 @@ jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(nullptr)
 }
 
+jint baseVectorGetSize(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  return static_cast<jint>(vector->size());
+  JNI_METHOD_END(-1)
+}
+
 jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
@@ -206,6 +213,12 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "baseVectorGetType",
       (void*)baseVectorGetType,
       kTypeString,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorGetSize",
+      (void*)baseVectorGetSize,
+      kTypeInt,
       kTypeLong,
       nullptr);
   addNativeMethod(

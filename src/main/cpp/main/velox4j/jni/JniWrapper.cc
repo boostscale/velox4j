@@ -23,6 +23,7 @@
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
+#include "velox4j/expression/Evaluator.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
@@ -39,6 +40,33 @@ Session* sessionOf(JNIEnv* env, jobject javaThis) {
   const jlong sessionId = env->CallLongMethod(javaThis, methodId);
   checkException(env);
   return ObjectStore::retrieve<Session>(sessionId).get();
+}
+
+jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring exprJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jExprJson{env, exprJson};
+  auto evaluator =
+      std::make_shared<Evaluator>(session->memoryManager(), jExprJson.get());
+  return sessionOf(env, javaThis)->objectStore()->save(evaluator);
+  JNI_METHOD_END(-1L)
+}
+
+jlong evaluatorEval(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong evaluatorId,
+    jlong selectivityVectorId,
+    jlong rvId) {
+  JNI_METHOD_START
+  auto evaluator = ObjectStore::retrieve<Evaluator>(evaluatorId);
+  auto selectivityVector =
+      ObjectStore::retrieve<SelectivityVector>(selectivityVectorId);
+  auto input = ObjectStore::retrieve<RowVector>(rvId);
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save(evaluator->eval(*selectivityVector, *input));
+  JNI_METHOD_END(-1L)
 }
 
 jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
@@ -188,6 +216,20 @@ void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "sessionId", kTypeLong, nullptr);
+  addNativeMethod(
+      "createEvaluator",
+      (void*)createEvaluator,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "evaluatorEval",
+      (void*)evaluatorEval,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
   addNativeMethod(

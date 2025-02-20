@@ -32,6 +32,7 @@
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/init/Config.h"
 #include "velox4j/query/Query.h"
+#include "velox4j/expression/Expression.h"
 
 namespace velox4j {
 
@@ -70,6 +71,7 @@ void initForSpark() {
 
   ConfigArray::registerSerDe();
   ConnectorConfigArray::registerSerDe();
+  Expression::registerSerDe();
   Query::registerSerDe();
   Type::registerSerDe();
   common::Filter::registerSerDe();
