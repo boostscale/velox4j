@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
@@ -18,7 +17,8 @@ public class LocalSession implements Session {
   }
 
   private JniApi jniApi() {
-    return JniApi.create(this);
+    final JniWrapper jniWrapper = new JniWrapper(this.id);
+    return new JniApi(jniWrapper);
   }
 
   @Override

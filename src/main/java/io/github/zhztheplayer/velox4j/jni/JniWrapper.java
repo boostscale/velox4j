@@ -21,14 +21,9 @@ import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 
 final class JniWrapper {
-
-  static JniWrapper create(long sessionId) {
-    return new JniWrapper(sessionId);
-  }
-
   private final long sessionId;
 
-  private JniWrapper(long sessionId) {
+  JniWrapper(long sessionId) {
     this.sessionId = sessionId;
   }
 

@@ -12,6 +12,7 @@ public final class JniApiTests {
   }
 
   public static JniApi getJniApi(LocalSession session) {
-    return JniApi.create(session);
+    final JniWrapper jniWrapper = new JniWrapper(session.id());
+    return new JniApi(jniWrapper);
   }
 }
