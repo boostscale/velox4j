@@ -17,6 +17,7 @@
 
 package io.github.zhztheplayer.velox4j.jni;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 
 final class JniWrapper {
@@ -67,10 +68,12 @@ final class JniWrapper {
 
   native long baseVectorNewRef(long id);
 
-  // For tests.
+  @VisibleForTesting
   native String deserializeAndSerialize(String json);
 
+  @VisibleForTesting
   native String deserializeAndSerializeVariant(String json);
 
+  @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);
 }

@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
@@ -23,17 +24,14 @@ import java.util.stream.Collectors;
  * details like native pointers and serialized data from developers, instead
  * provides objective forms of the required functionalities.
  */
-public final class JniApi implements AutoCloseable {
-  public static JniApi create(MemoryManager memoryManager) {
-    final Session session = StaticJniApi.get().createSession(memoryManager);
-    return new JniApi(session, JniWrapper.create(session));
+public final class JniApi {
+  static JniApi create(Session session) {
+    return new JniApi(JniWrapper.create(session));
   }
 
-  private final Session session;
   private final JniWrapper jni;
 
-  private JniApi(Session session, JniWrapper jni) {
-    this.session = session;
+  private JniApi(JniWrapper jni) {
     this.jni = jni;
   }
 
@@ -111,23 +109,18 @@ public final class JniApi implements AutoCloseable {
     return rowVectorWrap(jni.baseVectorNewRef(vector.id()));
   }
 
-  // For tests.
+  @VisibleForTesting
   public String deserializeAndSerialize(String json) {
     return jni.deserializeAndSerialize(json);
   }
 
-  // For tests.
+  @VisibleForTesting
   public String deserializeAndSerializeVariant(String json) {
     return jni.deserializeAndSerializeVariant(json);
   }
 
-  // For tests.
+  @VisibleForTesting
   public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
     return new UpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
-  }
-
-  @Override
-  public void close() {
-    session.close();
   }
 }

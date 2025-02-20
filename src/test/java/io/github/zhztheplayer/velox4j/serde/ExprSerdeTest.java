@@ -10,6 +10,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
@@ -61,13 +62,13 @@ public class ExprSerdeTest {
 
   @Test
   public void testConstantTypedExpr() {
-    final JniApi jniApi = JniApi.create(memoryManager);
-    final BaseVector intVector = SerdeTests.newSampleIntVector(jniApi);
+    final Session session = Session.create(memoryManager);
+    final BaseVector intVector = SerdeTests.newSampleIntVector(session);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testVeloxSerializableRoundTrip(expr1);
-    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(jniApi, new IntegerValue(15));
+    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(session, new IntegerValue(15));
     SerdeTests.testVeloxSerializableRoundTrip(expr2);
-    jniApi.close();
+    session.close();
   }
 
   @Test

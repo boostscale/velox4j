@@ -63,26 +63,26 @@ public class JniApiTest {
 
   @Test
   public void testCreateAndClose() {
-    final JniApi jniApi = JniApi.create(memoryManager);
-    jniApi.close();
+    final Session session = createLocalSession(memoryManager);
+    session.close();
   }
 
   @Test
   public void testCreateTwice() {
-    final JniApi jniApi1 = JniApi.create(memoryManager);
-    final JniApi jniApi2 = JniApi.create(memoryManager);
-    jniApi1.close();
-    jniApi2.close();
+    final Session session1 = createLocalSession(memoryManager);
+    final Session session2 = createLocalSession(memoryManager);
+    session1.close();
+    session2.close();
   }
 
   @Test
   public void testCloseTwice() {
-    final JniApi jniApi = JniApi.create(memoryManager);
-    jniApi.close();
+    final LocalSession session = createLocalSession(memoryManager);
+    session.close();
     Assert.assertThrows(VeloxException.class, new ThrowingRunnable() {
       @Override
       public void run() {
-        jniApi.close();
+        session.close();
       }
     });
   }
@@ -90,46 +90,51 @@ public class JniApiTest {
   @Test
   public void testExecuteQueryTryRun() {
     final String json = SampleQueryTests.readQueryJson();
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final UpIterator itr = jniApi.executeQuery(json);
     itr.close();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testExecuteQuery() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     SampleQueryTests.assertIterator(itr);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testExecuteQueryTwice() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr1 = jniApi.executeQuery(json);
     final UpIterator itr2 = jniApi.executeQuery(json);
     SampleQueryTests.assertIterator(itr1);
     SampleQueryTests.assertIterator(itr2);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testVectorSerdeEmpty() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String serialized = jniApi.baseVectorSerialize(Collections.emptyList());
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertTrue(deserialized.isEmpty());
     final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testVectorSerdeSingle() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
@@ -138,13 +143,14 @@ public class JniApiTest {
     Assert.assertEquals(1, deserialized.size());
     final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    jniApi.close();
+    session.close();;
   }
 
 
   @Test
   public void testVectorSerdeMultiple() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
@@ -153,49 +159,53 @@ public class JniApiTest {
     Assert.assertEquals(2, deserialized.size());
     final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testArrowRoundTrip() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final String serialized = jniApi.baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
-    final BaseVector imported = Arrow.fromArrowVector(jniApi, alloc, arrowVector);
+    final BaseVector imported = Arrow.fromArrowVector(session, alloc, arrowVector);
     final String serializedImported = jniApi.baseVectorSerialize(List.of(imported));
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testVariantInferType() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     Assert.assertTrue(jniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
     Assert.assertTrue(jniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
     Assert.assertTrue(jniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testIteratorRoundTrip() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
     final ExternalStream es = jniApi.newExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
-    jniApi.close();
+    session.close();;
   }
 
   @Test
   public void testIteratorRoundTripInDifferentThread() throws InterruptedException {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final LocalSession session = createLocalSession(memoryManager);
+    final JniApi jniApi = session.jniApi();
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final DownIterator down = new DownIterator(itr);
@@ -209,6 +219,10 @@ public class JniApiTest {
     });
     thread.start();
     thread.join();
-    jniApi.close();
+    session.close();;
+  }
+
+  private static LocalSession createLocalSession(MemoryManager memoryManager) {
+    return StaticJniApi.get().createSession(memoryManager);
   }
 }

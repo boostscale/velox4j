@@ -18,7 +18,7 @@ import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -29,6 +29,7 @@ import io.github.zhztheplayer.velox4j.plan.LimitNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
@@ -68,7 +69,7 @@ public class QueryTest {
 
   @Test
   public void testHiveScan1() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -76,18 +77,18 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
 
   @Test
   public void testHiveScan2() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.REGION.file();
     final RowType outputType = TpchTests.Table.REGION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -95,17 +96,17 @@ public class QueryTest {
         newSampleSplit(scanNode, file)
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testAggregate() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -132,21 +133,21 @@ public class QueryTest {
         List.of()
     );
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testExternalStream() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = jniApi.executeQuery(json);
+    final UpIterator sampleIn = session.executeQuery(Serde.fromJson(json, Query.class));
     final DownIterator down = new DownIterator(sampleIn);
-    final ExternalStream es = jniApi.newExternalStream(down);
+    final ExternalStream es = session.newExternalStream(down);
     final TableScanNode scanNode = new TableScanNode(
         "id-1",
         SampleQueryTests.getSchema(),
@@ -161,14 +162,14 @@ public class QueryTest {
         )
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = query.execute(jniApi);
+    final UpIterator out = session.executeQuery(query);
     SampleQueryTests.assertIterator(out);
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testProject() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -182,17 +183,17 @@ public class QueryTest {
             FieldAccessTypedExpr.create(new VarCharType(), "n_comment")
         ));
     final Query query = new Query(projectNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testFilter() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -202,20 +203,20 @@ public class QueryTest {
     final FilterNode filterNode = new FilterNode("id-2", List.of(scanNode),
         new CallTypedExpr(new BooleanType(), List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
-            ConstantTypedExpr.create(jniApi, new BigIntValue(3))),
+            ConstantTypedExpr.create(session, new BigIntValue(3))),
             "greaterthanorequal"));
     final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testHashJoin() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File nationFile = TpchTests.Table.NATION.file();
     final RowType nationOutputType = TpchTests.Table.NATION.schema();
     final File regionFile = TpchTests.Table.REGION.file();
@@ -238,17 +239,17 @@ public class QueryTest {
         false
     );
     final Query query = new Query(hashJoinNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testOrderBy() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -262,17 +263,17 @@ public class QueryTest {
             new SortOrder(false, false)),
         false);
     final Query query = new Query(orderByNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-orderby-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testLimit() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
@@ -281,12 +282,12 @@ public class QueryTest {
     );
     final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
     final Query query = new Query(limitNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = query.execute(jniApi);
+    final UpIterator itr = session.executeQuery(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
         .run();
-    jniApi.close();
+    session.close();
   }
 
   private static List<Assignment> toAssignments(RowType rowType) {

@@ -66,8 +66,4 @@ public class Query extends VeloxSerializable {
   public ConnectorConfig getConnectorConfig() {
     return connectorConfig;
   }
-
-  public UpIterator execute(JniApi jniApi) {
-    return jniApi.executeQuery(Serde.toPrettyJson(this));
-  }
 }

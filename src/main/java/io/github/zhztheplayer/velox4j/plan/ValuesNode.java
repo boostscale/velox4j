@@ -8,6 +8,7 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 
 import java.util.List;
 
@@ -27,9 +28,9 @@ public class ValuesNode extends PlanNode {
     this.repeatTimes = repeatTimes;
   }
 
-  public static ValuesNode create(JniApi jniApi, String id, List<RowVector> vectors, boolean parallelizable,
+  public static ValuesNode create(Session session, String id, List<RowVector> vectors, boolean parallelizable,
       int repeatTimes) {
-    return new ValuesNode(id, BaseVectors.serialize(jniApi, vectors), parallelizable, repeatTimes);
+    return new ValuesNode(id, BaseVectors.serialize(session, vectors), parallelizable, repeatTimes);
   }
 
   @JsonGetter("data")

@@ -2,6 +2,7 @@ package io.github.zhztheplayer.velox4j.data;
 
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.type.Type;
 
 import java.util.List;
@@ -10,16 +11,16 @@ public class BaseVectors {
   private BaseVectors() {
   }
 
-  public static String serialize(JniApi jniApi, List<? extends BaseVector> vectors) {
-    return jniApi.baseVectorSerialize(vectors);
+  public static String serialize(Session session, List<? extends BaseVector> vectors) {
+    return session.baseVectorSerialize(vectors);
   }
 
   public static String serialize(BaseVector vector) {
     return vector.jniApi().baseVectorSerialize(List.of(vector));
   }
 
-  public static BaseVector deserialize(JniApi jniApi, String serialized) {
-    final List<BaseVector> vectors = jniApi.baseVectorDeserialize(serialized);
+  public static BaseVector deserialize(Session session, String serialized) {
+    final List<BaseVector> vectors = session.baseVectorDeserialize(serialized);
     Preconditions.checkState(vectors.size() == 1,
         "Expected one vector, but got %s", vectors.size());
     return vectors.get(0);

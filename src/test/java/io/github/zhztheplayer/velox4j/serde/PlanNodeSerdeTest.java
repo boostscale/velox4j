@@ -4,7 +4,7 @@ import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -65,11 +65,11 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testValuesNode() {
-    final JniApi jniApi = JniApi.create(memoryManager);
-    final PlanNode values = ValuesNode.create(jniApi, "id-1",
-        List.of(SerdeTests.newSampleRowVector(jniApi)), true, 1);
+    final Session session = Session.create(memoryManager);
+    final PlanNode values = ValuesNode.create(session, "id-1",
+        List.of(SerdeTests.newSampleRowVector(session)), true, 1);
     SerdeTests.testVeloxSerializableRoundTrip(values);
-    jniApi.close();
+    session.close();
   }
 
   @Test
@@ -111,18 +111,18 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testFilterNode() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
     final FilterNode filterNode = new FilterNode("id-2", List.of(scan),
-        ConstantTypedExpr.create(jniApi, new BooleanValue(true)));
+        ConstantTypedExpr.create(session, new BooleanValue(true)));
     SerdeTests.testVeloxSerializableRoundTrip(filterNode);
-    jniApi.close();
+    session.close();
   }
 
   @Test
   public void testHashJoinNode() {
-    final JniApi jniApi = JniApi.create(memoryManager);
+    final Session session = Session.create(memoryManager);
     final PlanNode scan1 = SerdeTests.newSampleTableScanNode("id-1",
         new RowType(List.of("foo1", "bar1"),
             List.of(new IntegerType(), new IntegerType())));
@@ -134,7 +134,7 @@ public class PlanNodeSerdeTest {
         JoinType.INNER,
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
-        ConstantTypedExpr.create(jniApi, new BooleanValue(true)),
+        ConstantTypedExpr.create(session, new BooleanValue(true)),
         scan1,
         scan2,
         new RowType(List.of("foo1", "bar1", "foo2", "bar2"),
@@ -142,7 +142,7 @@ public class PlanNodeSerdeTest {
         false
     );
     SerdeTests.testVeloxSerializableRoundTrip(joinNode);
-    jniApi.close();
+    session.close();
   }
 
   @Test

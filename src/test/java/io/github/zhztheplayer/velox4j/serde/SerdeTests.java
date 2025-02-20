@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
@@ -59,9 +60,9 @@ public final class SerdeTests {
 
   public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final JniApi jniApi = JniApi.create(memoryManager)) {
+        final Session session = Session.create(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = jniApi.deserializeAndSerialize(inJson);
+      final String outJson = session.deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       assertJsonEquals(inJson, outJson2);
@@ -77,9 +78,9 @@ public final class SerdeTests {
 
   public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final JniApi jniApi = JniApi.create(memoryManager)) {
+        final Session session = Session.create(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = jniApi.deserializeAndSerializeVariant(inJson);
+      final String outJson = session.deserializeAndSerializeVariant(inJson);
       final Variant outObj = Serde.fromJson(outJson, Variant.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       Assert.assertEquals(inObj, outObj);
@@ -205,19 +206,19 @@ public final class SerdeTests {
     return new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new IntegerType()));
   }
 
-  public static BaseVector newSampleIntVector(JniApi jniApi) {
+  public static BaseVector newSampleIntVector(Session session) {
     final BufferAllocator alloc = new RootAllocator();
     final IntVector arrowVector = new IntVector("foo", alloc);
     arrowVector.setValueCount(1);
     arrowVector.set(0, 15);
-    final BaseVector baseVector = Arrow.fromArrowVector(jniApi, alloc, arrowVector);
+    final BaseVector baseVector = Arrow.fromArrowVector(session, alloc, arrowVector);
     arrowVector.close();
     return baseVector;
   }
 
-  public static RowVector newSampleRowVector(JniApi jniApi) {
+  public static RowVector newSampleRowVector(Session session) {
     final String serialized = ResourceTests.readResourceAsString("vector/rowvector-1.b64");
-    final BaseVector deserialized = BaseVectors.deserialize(jniApi, serialized);
+    final BaseVector deserialized = BaseVectors.deserialize(session, serialized);
     return ((RowVector) deserialized);
   }
 

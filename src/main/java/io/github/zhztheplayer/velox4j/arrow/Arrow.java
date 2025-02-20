@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.arrow;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 import org.apache.arrow.c.Data;
@@ -34,11 +35,11 @@ public class Arrow {
     }
   }
 
-  public static BaseVector fromArrowVector(JniApi jniApi, BufferAllocator alloc, FieldVector arrowVector) {
+  public static BaseVector fromArrowVector(Session session, BufferAllocator alloc, FieldVector arrowVector) {
     try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
       Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
-      final BaseVector imported = jniApi.arrowToBaseVector(cSchema1, cArray1);
+      final BaseVector imported = session.arrowToBaseVector(cSchema1, cArray1);
       return imported;
     }
   }
