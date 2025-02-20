@@ -187,12 +187,12 @@ final BoundSplit split = new BoundSplit(
 // 5. Build the query.
 final Query query = new Query(scanNode, List.of(split), Config.empty(), ConnectorConfig.empty());
 
-// 6. Create a JNI session.
+// 6. Create a Velox4j session.
 final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-final JniApi jniApi = JniApi.create(memoryManager);
+final Session session = Session.create(memoryManager);
 
 // 7. Execute the query.
-final UpIterator itr = query.execute(jniApi);
+final UpIterator itr = session.executeQuery(query);
 
 // 8. Collect and print results.
 while (itr.hasNext()) {
@@ -202,8 +202,8 @@ while (itr.hasNext()) {
   vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
 }
 
-// 9. Close the JNI session.
-jniApi.close();
+// 9. Close the Velox4j session.
+session.close();
 memoryManager.close();
 ```
 
