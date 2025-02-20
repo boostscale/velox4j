@@ -46,11 +46,12 @@ final class JniWrapper {
   // For DownIterator.
   native long newExternalStream(DownIterator itr);
 
-  // For BaseVector / RowVector.
+  // For BaseVector / RowVector / SelectivityVector.
   native long arrowToBaseVector(long cSchema, long cArray);
   native long[] baseVectorDeserialize(String serialized);
   native long baseVectorWrapInConstant(long id, int length, int index);
   native long baseVectorNewRef(long id);
+  native long createSelectivityVector(int length);
 
   // For test.
   @VisibleForTesting

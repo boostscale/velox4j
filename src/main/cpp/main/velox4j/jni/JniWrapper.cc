@@ -124,6 +124,15 @@ jlong baseVectorNewRef(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(-1)
 }
 
+jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto vector =
+      std::make_shared<SelectivityVector>(static_cast<vector_size_t>(length));
+  return sessionOf(env, javaThis)->objectStore()->save(vector);
+  JNI_METHOD_END(-1)
+}
+
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
@@ -215,6 +224,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)baseVectorNewRef,
       kTypeLong,
       kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "createSelectivityVector",
+      (void*)createSelectivityVector,
+      kTypeLong,
+      kTypeInt,
       nullptr);
   addNativeMethod(
       "deserializeAndSerialize",

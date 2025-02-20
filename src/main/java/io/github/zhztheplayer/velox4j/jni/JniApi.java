@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.jni;
 import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
@@ -82,6 +83,10 @@ public final class JniApi {
 
   public RowVector baseVectorAsRowVector(BaseVector vector) {
     return rowVectorWrap(jni.baseVectorNewRef(vector.id()));
+  }
+
+  public SelectivityVector createSelectivityVector(int length) {
+    return new SelectivityVector(jni.createSelectivityVector(length));
   }
 
   @VisibleForTesting

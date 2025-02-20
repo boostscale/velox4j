@@ -28,11 +28,12 @@ public class StaticJniWrapper {
   // For Variant.
   native String variantInferType(String json);
 
-  // For BaseVector / RowVector.
+  // For BaseVector / RowVector / SelectivityVector.
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
   native String baseVectorSerialize(long[] id);
   native String baseVectorGetType(long id);
   native String baseVectorGetEncoding(long id);
+  native boolean selectivityVectorIsValid(long id, int idx);
 
   // For test.
   @VisibleForTesting

@@ -132,6 +132,14 @@ jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(nullptr)
 }
 
+jboolean selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<SelectivityVector>(svId);
+  auto valid = vector->isValid(static_cast<vector_size_t>(idx));
+  return static_cast<jboolean>(valid);
+  JNI_METHOD_END(false)
+}
+
 jstring
 deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
@@ -205,6 +213,13 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       (void*)baseVectorGetEncoding,
       kTypeString,
       kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "selectivityVectorIsValid",
+      (void*)selectivityVectorIsValid,
+      kTypeBool,
+      kTypeLong,
+      kTypeInt,
       nullptr);
   addNativeMethod(
       "deserializeAndSerializeVariant",

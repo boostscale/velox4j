@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.jni;
 import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -24,7 +25,8 @@ public class StaticJniApi {
 
   private final StaticJniWrapper jni = StaticJniWrapper.get();
 
-  private StaticJniApi() {}
+  private StaticJniApi() {
+  }
 
   public void initialize(Config globalConf) {
     jni.initialize(Serde.toPrettyJson(globalConf));
@@ -67,6 +69,10 @@ public class StaticJniApi {
 
   public VectorEncoding baseVectorGetEncoding(BaseVector vector) {
     return VectorEncoding.valueOf(jni.baseVectorGetEncoding(vector.id()));
+  }
+
+  public boolean selectivityVectorIsValid(SelectivityVector vector, int idx) {
+    return jni.selectivityVectorIsValid(vector.id(), idx);
   }
 
   @VisibleForTesting
