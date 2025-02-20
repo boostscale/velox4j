@@ -199,7 +199,7 @@ public class JniApiTest {
     final ExternalStream es = jniApi.newExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
-    session.close();;
+    session.close();
   }
 
   @Test
