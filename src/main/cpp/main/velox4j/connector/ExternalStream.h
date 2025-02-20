@@ -23,8 +23,6 @@
 #include "velox4j/lifecycle/ObjectStore.h"
 
 namespace velox4j {
-using namespace facebook::velox;
-
 class SuspendedSection {
  public:
   explicit SuspendedSection(facebook::velox::exec::Driver* driver);
@@ -50,10 +48,11 @@ class ExternalStream {
 
   virtual bool hasNext() = 0;
 
-  virtual RowVectorPtr next() = 0;
+  virtual facebook::velox::RowVectorPtr next() = 0;
 };
 
-class ExternalStreamConnectorSplit : public connector::ConnectorSplit {
+class ExternalStreamConnectorSplit
+    : public facebook::velox::connector::ConnectorSplit {
  public:
   ExternalStreamConnectorSplit(
       const std::string& connectorId,
@@ -73,7 +72,8 @@ class ExternalStreamConnectorSplit : public connector::ConnectorSplit {
   const ObjectHandle esId_;
 };
 
-class ExternalStreamTableHandle : public connector::ConnectorTableHandle {
+class ExternalStreamTableHandle
+    : public facebook::velox::connector::ConnectorTableHandle {
  public:
   explicit ExternalStreamTableHandle(const std::string& connectorId);
 
@@ -81,24 +81,27 @@ class ExternalStreamTableHandle : public connector::ConnectorTableHandle {
 
   static void registerSerDe();
 
-  static connector::ConnectorTableHandlePtr create(
+  static facebook::velox::connector::ConnectorTableHandlePtr create(
       const folly::dynamic& obj,
       void* context);
 };
 
-class ExternalStreamDataSource : public connector::DataSource {
+class ExternalStreamDataSource : public facebook::velox::connector::DataSource {
  public:
   explicit ExternalStreamDataSource(
-      const std::shared_ptr<connector::ConnectorTableHandle>& tableHandle);
+      const std::shared_ptr<facebook::velox::connector::ConnectorTableHandle>&
+          tableHandle);
 
-  void addSplit(std::shared_ptr<connector::ConnectorSplit> split) override;
+  void addSplit(std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+                    split) override;
 
-  std::optional<RowVectorPtr> next(uint64_t size, ContinueFuture& future)
-      override;
+  std::optional<facebook::velox::RowVectorPtr> next(
+      uint64_t size,
+      facebook::velox::ContinueFuture& future) override;
 
   void addDynamicFilter(
-      column_index_t outputChannel,
-      const std::shared_ptr<common::Filter>& filter) override {
+      facebook::velox::column_index_t outputChannel,
+      const std::shared_ptr<facebook::velox::common::Filter>& filter) override {
     // TODO.
     VELOX_NYI();
   }
@@ -113,7 +116,8 @@ class ExternalStreamDataSource : public connector::DataSource {
     return 0;
   }
 
-  std::unordered_map<std::string, RuntimeCounter> runtimeStats() override {
+  std::unordered_map<std::string, facebook::velox::RuntimeCounter>
+  runtimeStats() override {
     // TODO.
     return {};
   }
@@ -124,42 +128,46 @@ class ExternalStreamDataSource : public connector::DataSource {
   std::shared_ptr<ExternalStream> current_{nullptr};
 };
 
-class ExternalStreamConnector : public connector::Connector {
+class ExternalStreamConnector : public facebook::velox::connector::Connector {
  public:
   ExternalStreamConnector(
       const std::string& id,
-      const std::shared_ptr<const config::ConfigBase>& config);
+      const std::shared_ptr<const facebook::velox::config::ConfigBase>& config);
 
-  std::unique_ptr<connector::DataSource> createDataSource(
-      const RowTypePtr& outputType,
-      const std::shared_ptr<connector::ConnectorTableHandle>& tableHandle,
+  std::unique_ptr<facebook::velox::connector::DataSource> createDataSource(
+      const facebook::velox::RowTypePtr& outputType,
+      const std::shared_ptr<facebook::velox::connector::ConnectorTableHandle>&
+          tableHandle,
       const std::unordered_map<
           std::string,
-          std::shared_ptr<connector::ColumnHandle>>& columnHandles,
-      connector::ConnectorQueryCtx* connectorQueryCtx) override;
+          std::shared_ptr<facebook::velox::connector::ColumnHandle>>&
+          columnHandles,
+      facebook::velox::connector::ConnectorQueryCtx* connectorQueryCtx)
+      override;
 
-  std::unique_ptr<connector::DataSink> createDataSink(
-      RowTypePtr inputType,
-      std::shared_ptr<connector::ConnectorInsertTableHandle>
+  std::unique_ptr<facebook::velox::connector::DataSink> createDataSink(
+      facebook::velox::RowTypePtr inputType,
+      std::shared_ptr<facebook::velox::connector::ConnectorInsertTableHandle>
           connectorInsertTableHandle,
-      connector::ConnectorQueryCtx* connectorQueryCtx,
-      connector::CommitStrategy commitStrategy) override {
+      facebook::velox::connector::ConnectorQueryCtx* connectorQueryCtx,
+      facebook::velox::connector::CommitStrategy commitStrategy) override {
     VELOX_NYI();
   }
 
  private:
-  std::shared_ptr<const config::ConfigBase> config_;
+  std::shared_ptr<const facebook::velox::config::ConfigBase> config_;
 };
 
-class ExternalStreamConnectorFactory : public connector::ConnectorFactory {
+class ExternalStreamConnectorFactory
+    : public facebook::velox::connector::ConnectorFactory {
  public:
   static constexpr const char* kConnectorName = "external-stream";
 
   ExternalStreamConnectorFactory();
 
-  std::shared_ptr<connector::Connector> newConnector(
+  std::shared_ptr<facebook::velox::connector::Connector> newConnector(
       const std::string& id,
-      std::shared_ptr<const config::ConfigBase> config,
+      std::shared_ptr<const facebook::velox::config::ConfigBase> config,
       folly::Executor* ioExecutor,
       folly::Executor* cpuExecutor) override;
 };

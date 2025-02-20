@@ -23,16 +23,15 @@
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
-using namespace facebook::velox;
-class Query : public ISerializable {
+class Query : public facebook::velox::ISerializable {
  public:
   Query(
-      const std::shared_ptr<const core::PlanNode>& plan,
+      const std::shared_ptr<const facebook::velox::core::PlanNode>& plan,
       std::vector<std::shared_ptr<BoundSplit>>&& boundSplits,
       const std::shared_ptr<const ConfigArray>& queryConfig,
       const std::shared_ptr<const ConnectorConfigArray>& connectorConfig);
 
-  const std::shared_ptr<const core::PlanNode>& plan() const;
+  const std::shared_ptr<const facebook::velox::core::PlanNode>& plan() const;
   const std::vector<std::shared_ptr<BoundSplit>>& boundSplits() const;
   const std::shared_ptr<const ConfigArray>& queryConfig() const;
   const std::shared_ptr<const ConnectorConfigArray>& connectorConfig() const;
@@ -48,7 +47,7 @@ class Query : public ISerializable {
   static void registerSerDe();
 
  private:
-  const std::shared_ptr<const core::PlanNode> plan_;
+  const std::shared_ptr<const facebook::velox::core::PlanNode> plan_;
   const std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
   const std::shared_ptr<const ConfigArray> queryConfig_;
   const std::shared_ptr<const ConnectorConfigArray> connectorConfig_;

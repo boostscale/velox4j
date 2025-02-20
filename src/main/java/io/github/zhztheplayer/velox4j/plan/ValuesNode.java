@@ -28,9 +28,9 @@ public class ValuesNode extends PlanNode {
     this.repeatTimes = repeatTimes;
   }
 
-  public static ValuesNode create(Session session, String id, List<RowVector> vectors, boolean parallelizable,
+  public static ValuesNode create(String id, List<RowVector> vectors, boolean parallelizable,
       int repeatTimes) {
-    return new ValuesNode(id, BaseVectors.serialize(session, vectors), parallelizable, repeatTimes);
+    return new ValuesNode(id, BaseVectors.serialize(vectors), parallelizable, repeatTimes);
   }
 
   @JsonGetter("data")

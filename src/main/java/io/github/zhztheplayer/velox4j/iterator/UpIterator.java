@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.iterator;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.CppObject;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 
 import java.util.Iterator;
 
@@ -17,7 +18,7 @@ public class UpIterator implements CppObject, Iterator<RowVector> {
 
   @Override
   public boolean hasNext() {
-    return jniApi.upIteratorHasNext(this);
+    return StaticJniApi.get().upIteratorHasNext(this);
   }
 
   @Override

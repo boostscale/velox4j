@@ -1,9 +1,19 @@
 package io.github.zhztheplayer.velox4j.jni;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.config.Config;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.type.Type;
+import io.github.zhztheplayer.velox4j.variant.Variant;
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+
+import java.util.List;
 
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();
@@ -30,5 +40,37 @@ public class StaticJniApi {
 
   public void releaseCppObject(CppObject obj) {
     jni.releaseCppObject(obj.id());
+  }
+
+  public boolean upIteratorHasNext(UpIterator itr) {
+    return jni.upIteratorHasNext(itr.id());
+  }
+
+  public Type variantInferType(Variant variant) {
+    final String variantJson = Serde.toJson(variant);
+    final String typeJson = jni.variantInferType(variantJson);
+    return Serde.fromJson(typeJson, Type.class);
+  }
+
+  public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
+    jni.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
+  }
+
+  public String baseVectorSerialize(List<? extends BaseVector> vector) {
+    return jni.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
+  }
+
+  public Type baseVectorGetType(BaseVector vector) {
+    String typeJson = jni.baseVectorGetType(vector.id());
+    return Serde.fromJson(typeJson, Type.class);
+  }
+
+  public VectorEncoding baseVectorGetEncoding(BaseVector vector) {
+    return VectorEncoding.valueOf(jni.baseVectorGetEncoding(vector.id()));
+  }
+
+  @VisibleForTesting
+  public String deserializeAndSerializeVariant(String json) {
+    return jni.deserializeAndSerializeVariant(json);
   }
 }

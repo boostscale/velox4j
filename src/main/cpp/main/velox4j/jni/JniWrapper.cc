@@ -50,13 +50,6 @@ jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_END(-1L)
 }
 
-jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong itrId) {
-  JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
-  return itr->hasNext();
-  JNI_METHOD_END(false)
-}
-
 jlong upIteratorNext(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
@@ -69,18 +62,6 @@ jlong newExternalStream(JNIEnv* env, jobject javaThis, jobject itrRef) {
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
   JNI_METHOD_END(-1L)
-}
-
-jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
-  JNI_METHOD_START
-  spotify::jni::JavaString jJson{env, json};
-  auto dynamic = folly::parseJson(jJson.get());
-  auto deserialized = variant::create(dynamic);
-  auto type = deserialized.inferType();
-  auto serializedDynamic = type->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr);
 }
 
 jlong arrowToBaseVector(
@@ -99,37 +80,6 @@ jlong arrowToBaseVector(
       reinterpret_cast<struct ArrowArray*>(cArray));
   return session->objectStore()->save(vector);
   JNI_METHOD_END(-1L)
-}
-
-void baseVectorToArrow(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong vid,
-    jlong cSchema,
-    jlong cArray) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  fromBaseVectorToArrow(
-      vector,
-      reinterpret_cast<struct ArrowSchema*>(cSchema),
-      reinterpret_cast<struct ArrowArray*>(cArray));
-  JNI_METHOD_END()
-}
-
-jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlongArray vids) {
-  JNI_METHOD_START
-  std::ostringstream out;
-  auto safeArray = getLongArrayElementsSafe(env, vids);
-  for (int i = 0; i < safeArray.length(); ++i) {
-    const jlong& vid = safeArray.elems()[i];
-    auto vector = ObjectStore::retrieve<BaseVector>(vid);
-    saveVector(*vector, out);
-  }
-  auto serializedData = out.str();
-  auto encoded =
-      encoding::Base64::encode(serializedData.data(), serializedData.size());
-  return env->NewStringUTF(encoded.data());
-  JNI_METHOD_END(nullptr)
 }
 
 jlongArray
@@ -154,15 +104,6 @@ baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   JNI_METHOD_END(nullptr)
 }
 
-jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  auto serializedDynamic = vector->type()->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
 jlong baseVectorWrapInConstant(
     JNIEnv* env,
     jobject javaThis,
@@ -183,14 +124,6 @@ jlong baseVectorNewRef(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(-1)
 }
 
-jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  auto name = VectorEncoding::mapSimpleToName(vector->encoding());
-  return env->NewStringUTF(name.data());
-  JNI_METHOD_END(nullptr)
-}
-
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
@@ -201,18 +134,6 @@ jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
   auto deserialized =
       ISerializable::deserialize<ISerializable>(dynamic, serdePool);
   auto serializedDynamic = deserialized->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
-jstring
-deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
-  JNI_METHOD_START
-  spotify::jni::JavaString jJson{env, json};
-  auto dynamic = folly::parseJson(jJson.get());
-  auto deserialized = variant::create(dynamic);
-  auto serializedDynamic = deserialized.serialize();
   auto serializeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(serializeJson.data());
   JNI_METHOD_END(nullptr)
@@ -261,24 +182,12 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
-      "upIteratorHasNext",
-      (void*)upIteratorHasNext,
-      kTypeBool,
-      kTypeLong,
-      nullptr);
-  addNativeMethod(
       "upIteratorNext", (void*)upIteratorNext, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "newExternalStream",
       (void*)newExternalStream,
       kTypeLong,
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
-      nullptr);
-  addNativeMethod(
-      "variantInferType",
-      (void*)variantInferType,
-      kTypeString,
-      kTypeString,
       nullptr);
   addNativeMethod(
       "arrowToBaseVector",
@@ -288,30 +197,10 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "baseVectorToArrow",
-      (void*)baseVectorToArrow,
-      kTypeVoid,
-      kTypeLong,
-      kTypeLong,
-      kTypeLong,
-      nullptr);
-  addNativeMethod(
-      "baseVectorSerialize",
-      (void*)baseVectorSerialize,
-      kTypeString,
-      kTypeArray(kTypeLong),
-      nullptr);
-  addNativeMethod(
       "baseVectorDeserialize",
       (void*)baseVectorDeserialize,
       kTypeArray(kTypeLong),
       kTypeString,
-      nullptr);
-  addNativeMethod(
-      "baseVectorGetType",
-      (void*)baseVectorGetType,
-      kTypeString,
-      kTypeLong,
       nullptr);
   addNativeMethod(
       "baseVectorWrapInConstant",
@@ -322,12 +211,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "baseVectorGetEncoding",
-      (void*)baseVectorGetEncoding,
-      kTypeString,
-      kTypeLong,
-      nullptr);
-  addNativeMethod(
       "baseVectorNewRef",
       (void*)baseVectorNewRef,
       kTypeLong,
@@ -336,12 +219,6 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "deserializeAndSerialize",
       (void*)deserializeAndSerialize,
-      kTypeString,
-      kTypeString,
-      nullptr);
-  addNativeMethod(
-      "deserializeAndSerializeVariant",
-      (void*)deserializeAndSerializeVariant,
       kTypeString,
       kTypeString,
       nullptr);

@@ -17,14 +17,20 @@
 
 #include "StaticJniWrapper.h"
 #include <folly/json/json.h>
+#include <velox/common/encode/Base64.h>
+#include <velox/vector/VectorSaver.h>
 #include "JniCommon.h"
 #include "JniError.h"
+#include "velox4j/arrow/Arrow.h"
 #include "velox4j/config/Config.h"
 #include "velox4j/init/Init.h"
+#include "velox4j/iterator/UpIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 
 namespace velox4j {
+using namespace facebook::velox;
+
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/jni/StaticJniWrapper";
 
@@ -59,6 +65,84 @@ void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
   JNI_METHOD_END()
 }
 
+jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  return itr->hasNext();
+  JNI_METHOD_END(false)
+}
+
+jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized = variant::create(dynamic);
+  auto type = deserialized.inferType();
+  auto serializedDynamic = type->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr);
+}
+
+void baseVectorToArrow(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jlong cSchema,
+    jlong cArray) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  fromBaseVectorToArrow(
+      vector,
+      reinterpret_cast<struct ArrowSchema*>(cSchema),
+      reinterpret_cast<struct ArrowArray*>(cArray));
+  JNI_METHOD_END()
+}
+
+jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlongArray vids) {
+  JNI_METHOD_START
+  std::ostringstream out;
+  auto safeArray = getLongArrayElementsSafe(env, vids);
+  for (int i = 0; i < safeArray.length(); ++i) {
+    const jlong& vid = safeArray.elems()[i];
+    auto vector = ObjectStore::retrieve<BaseVector>(vid);
+    saveVector(*vector, out);
+  }
+  auto serializedData = out.str();
+  auto encoded =
+      encoding::Base64::encode(serializedData.data(), serializedData.size());
+  return env->NewStringUTF(encoded.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto serializedDynamic = vector->type()->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto name = VectorEncoding::mapSimpleToName(vector->encoding());
+  return env->NewStringUTF(name.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring
+deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized = variant::create(dynamic);
+  auto serializedDynamic = deserialized.serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
 } // namespace
 
 const char* StaticJniWrapper::getCanonicalName() const {
@@ -83,6 +167,50 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       (void*)releaseCppObject,
       kTypeVoid,
       kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "upIteratorHasNext",
+      (void*)upIteratorHasNext,
+      kTypeBool,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "variantInferType",
+      (void*)variantInferType,
+      kTypeString,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "baseVectorToArrow",
+      (void*)baseVectorToArrow,
+      kTypeVoid,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorSerialize",
+      (void*)baseVectorSerialize,
+      kTypeString,
+      kTypeArray(kTypeLong),
+      nullptr);
+  addNativeMethod(
+      "baseVectorGetType",
+      (void*)baseVectorGetType,
+      kTypeString,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorGetEncoding",
+      (void*)baseVectorGetEncoding,
+      kTypeString,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "deserializeAndSerializeVariant",
+      (void*)deserializeAndSerializeVariant,
+      kTypeString,
+      kTypeString,
       nullptr);
 
   registerNativeMethods(env);

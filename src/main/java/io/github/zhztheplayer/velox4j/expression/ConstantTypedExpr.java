@@ -8,6 +8,7 @@ import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.Session;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 
@@ -38,8 +39,8 @@ public class ConstantTypedExpr extends TypedExpr {
     return new ConstantTypedExpr(type, null, serialized);
   }
 
-  public static ConstantTypedExpr create(Session session, Variant value) {
-    return new ConstantTypedExpr(session.variantInferType(value), value, null);
+  public static ConstantTypedExpr create(Variant value) {
+    return new ConstantTypedExpr(StaticJniApi.get().variantInferType(value), value, null);
   }
 
   @JsonGetter("value")

@@ -41,39 +41,20 @@ final class JniWrapper {
   native long executeQuery(String queryJson);
 
   // For UpIterator.
-  native boolean upIteratorHasNext(long address);
-
   native long upIteratorNext(long address);
 
   // For DownIterator.
   native long newExternalStream(DownIterator itr);
 
-  // For Variant.
-  native String variantInferType(String json);
-
   // For BaseVector / RowVector.
   native long arrowToBaseVector(long cSchema, long cArray);
-
-  native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
-
-  native String baseVectorSerialize(long[] id);
-
   native long[] baseVectorDeserialize(String serialized);
-
-  native String baseVectorGetType(long id);
-
   native long baseVectorWrapInConstant(long id, int length, int index);
-
-  native String baseVectorGetEncoding(long id);
-
   native long baseVectorNewRef(long id);
 
+  // For test.
   @VisibleForTesting
   native String deserializeAndSerialize(String json);
-
-  @VisibleForTesting
-  native String deserializeAndSerializeVariant(String json);
-
   @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);
 }

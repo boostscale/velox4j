@@ -20,6 +20,7 @@
 #include "velox4j/lifecycle/ObjectStore.h"
 
 namespace velox4j {
+using namespace facebook::velox;
 
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/iterator/DownIterator";

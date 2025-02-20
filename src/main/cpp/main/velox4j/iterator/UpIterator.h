@@ -21,8 +21,6 @@
 
 namespace velox4j {
 
-using namespace facebook::velox;
-
 class UpIterator {
  public:
   // CTOR.
@@ -38,6 +36,6 @@ class UpIterator {
   virtual ~UpIterator() = default;
 
   virtual bool hasNext() = 0;
-  virtual RowVectorPtr next() = 0;
+  virtual facebook::velox::RowVectorPtr next() = 0;
 };
 } // namespace velox4j

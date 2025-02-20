@@ -22,14 +22,13 @@
 #pragma once
 
 namespace velox4j {
-using namespace facebook::velox;
 void fromBaseVectorToArrow(
-    VectorPtr vector,
+    facebook::velox::VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
 
-VectorPtr fromArrowToBaseVector(
-    memory::MemoryPool* pool,
+facebook::velox::VectorPtr fromArrowToBaseVector(
+    facebook::velox::memory::MemoryPool* pool,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
 } // namespace velox4j

@@ -22,7 +22,5 @@
 namespace velox4j {
 enum Preset { SPARK = 0 };
 
-using namespace facebook::velox::config;
-
-extern ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET;
+extern facebook::velox::config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET;
 } // namespace velox4j

@@ -21,24 +21,23 @@
 #include <velox/exec/Split.h>
 
 namespace velox4j {
-using namespace facebook::velox;
 
 class BoundSplit {
  public:
-  BoundSplit(core::PlanNodeId& planNodeId, std::shared_ptr<exec::Split>& split)
+  BoundSplit(facebook::velox::core::PlanNodeId& planNodeId, std::shared_ptr<facebook::velox::exec::Split>& split)
       : planNodeId_(planNodeId), split_(std::move(split)) {}
   virtual ~BoundSplit() = default;
 
-  const core::PlanNodeId& planNodeId() const {
+  const facebook::velox::core::PlanNodeId& planNodeId() const {
     return planNodeId_;
   }
 
-  exec::Split& split() const {
+  facebook::velox::exec::Split& split() const {
     return *split_;
   }
 
  private:
-  core::PlanNodeId planNodeId_;
-  std::shared_ptr<exec::Split> split_;
+  facebook::velox::core::PlanNodeId planNodeId_;
+  std::shared_ptr<facebook::velox::exec::Split> split_;
 };
 } // namespace velox4j

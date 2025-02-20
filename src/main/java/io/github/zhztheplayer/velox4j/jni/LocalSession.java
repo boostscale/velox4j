@@ -48,11 +48,6 @@ public class LocalSession implements Session {
   }
 
   @Override
-  public String baseVectorSerialize(List<? extends BaseVector> vector) {
-    return jni.baseVectorSerialize(vector);
-  }
-
-  @Override
   public List<BaseVector> baseVectorDeserialize(String serialized) {
     return jni.baseVectorDeserialize(serialized);
   }
@@ -63,18 +58,8 @@ public class LocalSession implements Session {
   }
 
   @Override
-  public Type variantInferType(Variant variant) {
-    return jni.variantInferType(variant);
-  }
-
-  @Override
   public String deserializeAndSerialize(String json) {
     return jni.deserializeAndSerialize(json);
-  }
-
-  @Override
-  public String deserializeAndSerializeVariant(String json) {
-    return jni.deserializeAndSerializeVariant(json);
   }
 
   @Override

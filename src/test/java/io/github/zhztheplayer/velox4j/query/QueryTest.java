@@ -203,7 +203,7 @@ public class QueryTest {
     final FilterNode filterNode = new FilterNode("id-2", List.of(scanNode),
         new CallTypedExpr(new BooleanType(), List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
-            ConstantTypedExpr.create(session, new BigIntValue(3))),
+            ConstantTypedExpr.create(new BigIntValue(3))),
             "greaterthanorequal"));
     final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator itr = session.executeQuery(query);

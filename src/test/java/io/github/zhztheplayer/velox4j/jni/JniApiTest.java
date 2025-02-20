@@ -104,7 +104,8 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     SampleQueryTests.assertIterator(itr);
-    session.close();;
+    session.close();
+    ;
   }
 
   @Test
@@ -116,19 +117,21 @@ public class JniApiTest {
     final UpIterator itr2 = jniApi.executeQuery(json);
     SampleQueryTests.assertIterator(itr1);
     SampleQueryTests.assertIterator(itr2);
-    session.close();;
+    session.close();
+    ;
   }
 
   @Test
   public void testVectorSerdeEmpty() {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = session.jniApi();
-    final String serialized = jniApi.baseVectorSerialize(Collections.emptyList());
+    final String serialized = StaticJniApi.get().baseVectorSerialize(Collections.emptyList());
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertTrue(deserialized.isEmpty());
-    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    final String serializedSecond = StaticJniApi.get().baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    session.close();;
+    session.close();
+    ;
   }
 
   @Test
@@ -138,12 +141,13 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final String serialized = jniApi.baseVectorSerialize(List.of(vector));
+    final String serialized = StaticJniApi.get().baseVectorSerialize(List.of(vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(1, deserialized.size());
-    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    final String serializedSecond = StaticJniApi.get().baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    session.close();;
+    session.close();
+    ;
   }
 
 
@@ -154,12 +158,13 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final String serialized = jniApi.baseVectorSerialize(List.of(vector, vector));
+    final String serialized = StaticJniApi.get().baseVectorSerialize(List.of(vector, vector));
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertEquals(2, deserialized.size());
-    final String serializedSecond = jniApi.baseVectorSerialize(deserialized);
+    final String serializedSecond = StaticJniApi.get().baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
-    session.close();;
+    session.close();
+    ;
   }
 
   @Test
@@ -169,24 +174,22 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final UpIterator itr = jniApi.executeQuery(json);
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final String serialized = jniApi.baseVectorSerialize(List.of(vector));
+    final String serialized = StaticJniApi.get().baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
     final BaseVector imported = Arrow.fromArrowVector(session, alloc, arrowVector);
-    final String serializedImported = jniApi.baseVectorSerialize(List.of(imported));
+    final String serializedImported = StaticJniApi.get().baseVectorSerialize(List.of(imported));
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
-    session.close();;
+    session.close();
+    ;
   }
 
   @Test
   public void testVariantInferType() {
-    final LocalSession session = createLocalSession(memoryManager);
-    final JniApi jniApi = session.jniApi();
-    Assert.assertTrue(jniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
-    Assert.assertTrue(jniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
-    Assert.assertTrue(jniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
-    session.close();;
+    Assert.assertTrue(StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(StaticJniApi.get().variantInferType(new RealValue(4.6f)) instanceof RealType);
+    Assert.assertTrue(StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
   }
 
   @Test
@@ -219,7 +222,8 @@ public class JniApiTest {
     });
     thread.start();
     thread.join();
-    session.close();;
+    session.close();
+    ;
   }
 
   private static LocalSession createLocalSession(MemoryManager memoryManager) {

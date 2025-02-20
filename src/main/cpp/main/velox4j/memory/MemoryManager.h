@@ -25,7 +25,6 @@
 #include "ArrowMemoryPool.h"
 
 namespace velox4j {
-using namespace facebook;
 
 namespace {}
 
@@ -40,9 +39,9 @@ class MemoryManager {
   MemoryManager& operator=(const MemoryManager&) = delete;
   MemoryManager& operator=(MemoryManager&&) = delete;
 
-  velox::memory::MemoryPool* getVeloxPool(
+  facebook::velox::memory::MemoryPool* getVeloxPool(
       const std::string& name,
-      const velox::memory::MemoryPool::Kind& kind);
+      const facebook::velox::memory::MemoryPool::Kind& kind);
 
   arrow::MemoryPool* getArrowPool(const std::string& name);
 
@@ -55,10 +54,10 @@ class MemoryManager {
   std::unique_ptr<MemoryAllocator> arrowAllocator_;
   std::unordered_map<std::string, std::unique_ptr<arrow::MemoryPool>>
       arrowPoolRefs_;
-  std::unique_ptr<velox::memory::MemoryManager> veloxMemoryManager_;
+  std::unique_ptr<facebook::velox::memory::MemoryManager> veloxMemoryManager_;
   std::shared_ptr<facebook::velox::memory::MemoryPool> veloxRootPool_;
-  std::unordered_map<std::string, std::shared_ptr<velox::memory::MemoryPool>>
+  std::unordered_map<std::string, std::shared_ptr<facebook::velox::memory::MemoryPool>>
       veloxPoolRefs_;
-  std::vector<std::shared_ptr<velox::memory::MemoryPool>> heldVeloxPoolRefs_;
+  std::vector<std::shared_ptr<facebook::velox::memory::MemoryPool>> heldVeloxPoolRefs_;
 };
 } // namespace velox4j

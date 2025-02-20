@@ -18,6 +18,7 @@
 #include "ExternalStream.h"
 
 namespace velox4j {
+using namespace facebook::velox;
 
 SuspendedSection::SuspendedSection(facebook::velox::exec::Driver* driver)
     : driver_(driver) {

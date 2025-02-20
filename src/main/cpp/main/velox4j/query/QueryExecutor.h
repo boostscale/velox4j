@@ -23,7 +23,6 @@
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
-using namespace facebook::velox;
 
 class QueryExecutor {
  public:

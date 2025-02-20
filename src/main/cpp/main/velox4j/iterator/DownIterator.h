@@ -22,7 +22,6 @@
 #include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
-using namespace facebook::velox;
 class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
  public:
   explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
@@ -54,7 +53,7 @@ class DownIterator : public ExternalStream {
 
   bool hasNext() override;
 
-  RowVectorPtr next() override;
+  facebook::velox::RowVectorPtr next() override;
 
  private:
   jobject ref_;

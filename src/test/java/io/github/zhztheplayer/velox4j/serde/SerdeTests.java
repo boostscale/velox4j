@@ -4,10 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
-import io.github.zhztheplayer.velox4j.jni.Session;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
-import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
@@ -26,9 +22,13 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.Session;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
@@ -77,16 +77,13 @@ public final class SerdeTests {
   }
 
   public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
-    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final Session session = Session.create(memoryManager)) {
-      final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = session.deserializeAndSerializeVariant(inJson);
-      final Variant outObj = Serde.fromJson(outJson, Variant.class);
-      final String outJson2 = Serde.toPrettyJson(outObj);
-      Assert.assertEquals(inObj, outObj);
-      assertJsonEquals(inJson, outJson2);
-      return new ObjectAndJson<>((T) outObj, outJson2);
-    }
+    final String inJson = Serde.toPrettyJson(inObj);
+    final String outJson = StaticJniApi.get().deserializeAndSerializeVariant(inJson);
+    final Variant outObj = Serde.fromJson(outJson, Variant.class);
+    final String outJson2 = Serde.toPrettyJson(outObj);
+    Assert.assertEquals(inObj, outObj);
+    assertJsonEquals(inJson, outJson2);
+    return new ObjectAndJson<>((T) outObj, outJson2);
   }
 
   public static <T extends Object> ObjectAndJson<T> testJavaBeanRoundTrip(T inObj) {

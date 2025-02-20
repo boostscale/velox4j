@@ -21,8 +21,7 @@
 #include <velox/core/QueryConfig.h>
 
 namespace velox4j {
-using namespace facebook::velox;
-class ConfigArray : public ISerializable {
+class ConfigArray : public facebook::velox::ISerializable {
  public:
   explicit ConfigArray(
       std::vector<std::pair<std::string, std::string>>&& values)
@@ -46,14 +45,14 @@ class ConfigArray : public ISerializable {
   const std::vector<std::pair<std::string, std::string>> values_;
 };
 
-class ConnectorConfigArray : public ISerializable {
+class ConnectorConfigArray : public facebook::velox::ISerializable {
  public:
   explicit ConnectorConfigArray(
       std::vector<std::pair<std::string, std::shared_ptr<const ConfigArray>>>&&
           values)
       : values_(std::move(values)) {}
 
-  std::unordered_map<std::string, std::shared_ptr<config::ConfigBase>> toMap()
+  std::unordered_map<std::string, std::shared_ptr<facebook::velox::config::ConfigBase>> toMap()
       const;
 
   folly::dynamic serialize() const override;

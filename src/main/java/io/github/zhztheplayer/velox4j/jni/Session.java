@@ -23,19 +23,12 @@ public interface Session extends CppObject {
 
   ExternalStream newExternalStream(DownIterator itr);
 
-  String baseVectorSerialize(List<? extends BaseVector> vector);
-
   List<BaseVector> baseVectorDeserialize(String serialized);
 
   BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array);
 
-  Type variantInferType(Variant variant);
-
   @VisibleForTesting
   String deserializeAndSerialize(String json);
-
-  @VisibleForTesting
-  String deserializeAndSerializeVariant(String json);
 
   @VisibleForTesting
   UpIterator createUpIteratorWithExternalStream(ExternalStream es);

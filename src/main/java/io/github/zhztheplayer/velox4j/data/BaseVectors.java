@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.data;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.Session;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.type.Type;
 
 import java.util.List;
@@ -11,12 +12,12 @@ public class BaseVectors {
   private BaseVectors() {
   }
 
-  public static String serialize(Session session, List<? extends BaseVector> vectors) {
-    return session.baseVectorSerialize(vectors);
+  public static String serialize(List<? extends BaseVector> vectors) {
+    return StaticJniApi.get().baseVectorSerialize(vectors);
   }
 
   public static String serialize(BaseVector vector) {
-    return vector.jniApi().baseVectorSerialize(List.of(vector));
+    return StaticJniApi.get().baseVectorSerialize(List.of(vector));
   }
 
   public static BaseVector deserialize(Session session, String serialized) {
@@ -27,7 +28,7 @@ public class BaseVectors {
   }
 
   public static Type getType(BaseVector vector) {
-    return vector.jniApi().baseVectorGetType(vector);
+    return StaticJniApi.get().baseVectorGetType(vector);
   }
 
   public static BaseVector wrapInConstant(BaseVector vector, int length, int index) {
@@ -35,7 +36,7 @@ public class BaseVectors {
   }
 
   public static VectorEncoding getEncoding(BaseVector vector) {
-    return vector.jniApi().baseVectorGetEncoding(vector);
+    return StaticJniApi.get().baseVectorGetEncoding(vector);
   }
 
   public static RowVector asRowVector(BaseVector vector) {

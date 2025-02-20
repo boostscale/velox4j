@@ -36,6 +36,7 @@
 #include "Config.h"
 
 namespace velox4j {
+using namespace facebook::velox;
 
 std::unordered_map<std::string, std::string> ConfigArray::toMap() const {
   std::unordered_map<std::string, std::string> map(values_.size());
