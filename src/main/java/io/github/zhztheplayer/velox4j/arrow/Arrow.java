@@ -14,8 +14,10 @@ import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.table.Table;
 
 public class Arrow {
-  private Arrow() {
+  private final JniApi jniApi;
 
+  public Arrow(JniApi jniApi) {
+    this.jniApi = jniApi;
   }
 
   public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
@@ -36,11 +38,11 @@ public class Arrow {
     }
   }
 
-  public static BaseVector fromArrowVector(Session session, BufferAllocator alloc, FieldVector arrowVector) {
+  public BaseVector fromArrowVector(BufferAllocator alloc, FieldVector arrowVector) {
     try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
       Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
-      final BaseVector imported = session.arrowToBaseVector(cSchema1, cArray1);
+      final BaseVector imported = jniApi.arrowToBaseVector(cSchema1, cArray1);
       return imported;
     }
   }

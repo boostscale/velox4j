@@ -177,7 +177,7 @@ public class JniApiTest {
     final String serialized = StaticJniApi.get().baseVectorSerialize(List.of(vector));
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
-    final BaseVector imported = Arrow.fromArrowVector(session, alloc, arrowVector);
+    final BaseVector imported = session.arrowOps().fromArrowVector(alloc, arrowVector);
     final String serializedImported = StaticJniApi.get().baseVectorSerialize(List.of(imported));
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
@@ -223,10 +223,9 @@ public class JniApiTest {
     thread.start();
     thread.join();
     session.close();
-    ;
   }
 
   private static LocalSession createLocalSession(MemoryManager memoryManager) {
-    return StaticJniApi.get().createSession(memoryManager);
+    return JniApiTests.createLocalSession(memoryManager);
   }
 }

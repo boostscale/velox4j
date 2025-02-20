@@ -9,7 +9,10 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import java.util.List;
 
 public class BaseVectors {
-  private BaseVectors() {
+  private final JniApi jniApi;
+
+  public BaseVectors(JniApi jniApi) {
+    this.jniApi = jniApi;
   }
 
   public static String serialize(List<? extends BaseVector> vectors) {
@@ -20,8 +23,8 @@ public class BaseVectors {
     return StaticJniApi.get().baseVectorSerialize(List.of(vector));
   }
 
-  public static BaseVector deserialize(Session session, String serialized) {
-    final List<BaseVector> vectors = session.baseVectorDeserialize(serialized);
+  public BaseVector deserialize(String serialized) {
+    final List<BaseVector> vectors = jniApi.baseVectorDeserialize(serialized);
     Preconditions.checkState(vectors.size() == 1,
         "Expected one vector, but got %s", vectors.size());
     return vectors.get(0);

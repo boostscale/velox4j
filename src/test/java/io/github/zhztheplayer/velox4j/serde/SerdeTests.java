@@ -22,6 +22,8 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.jni.JniApiTests;
+import io.github.zhztheplayer.velox4j.jni.LocalSession;
 import io.github.zhztheplayer.velox4j.jni.Session;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -60,9 +62,9 @@ public final class SerdeTests {
 
   public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final Session session = Session.create(memoryManager)) {
+        final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = session.deserializeAndSerialize(inJson);
+      final String outJson = session.jniApi().deserializeAndSerialize(inJson);
       final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
       final String outJson2 = Serde.toPrettyJson(outObj);
       assertJsonEquals(inJson, outJson2);
@@ -208,14 +210,14 @@ public final class SerdeTests {
     final IntVector arrowVector = new IntVector("foo", alloc);
     arrowVector.setValueCount(1);
     arrowVector.set(0, 15);
-    final BaseVector baseVector = Arrow.fromArrowVector(session, alloc, arrowVector);
+    final BaseVector baseVector = session.arrowOps().fromArrowVector(alloc, arrowVector);
     arrowVector.close();
     return baseVector;
   }
 
   public static RowVector newSampleRowVector(Session session) {
     final String serialized = ResourceTests.readResourceAsString("vector/rowvector-1.b64");
-    final BaseVector deserialized = BaseVectors.deserialize(session, serialized);
+    final BaseVector deserialized = session.baseVectorOps().deserialize(serialized);
     return ((RowVector) deserialized);
   }
 

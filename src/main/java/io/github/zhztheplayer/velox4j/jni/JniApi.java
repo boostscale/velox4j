@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
  * provides objective forms of the required functionalities.
  */
 public final class JniApi {
-  static JniApi create(Session session) {
-    return new JniApi(JniWrapper.create(session));
+  static JniApi create(long sessionId) {
+    return new JniApi(JniWrapper.create(sessionId));
   }
 
   private final JniWrapper jni;

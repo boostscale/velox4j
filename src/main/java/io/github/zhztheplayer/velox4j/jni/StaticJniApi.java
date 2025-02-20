@@ -34,7 +34,7 @@ public class StaticJniApi {
     return new MemoryManager(jni.createMemoryManager(listener));
   }
 
-  public LocalSession createSession(MemoryManager memoryManager) {
+  LocalSession createSession(MemoryManager memoryManager) {
     return LocalSession.create(jni.createSession(memoryManager.id()));
   }
 

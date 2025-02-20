@@ -197,7 +197,7 @@ final UpIterator itr = session.executeQuery(query);
 // 8. Collect and print results.
 while (itr.hasNext()) {
   final RowVector rowVector = itr.next(); // 8.1. Get next RowVector returned by Velox.
-  final VectorSchemaRoot vsr = Arrow.toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
+  final VectorSchemaRoot vsr = session.arrowOps().toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
   System.out.println(vsr.contentToTSVString()); // 8.3. Print the arrow table to stdout.
   vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
 }

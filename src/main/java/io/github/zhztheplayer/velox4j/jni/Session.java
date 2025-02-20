@@ -1,18 +1,13 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.BaseVectors;
+import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.query.Query;
-import io.github.zhztheplayer.velox4j.type.Type;
-import io.github.zhztheplayer.velox4j.variant.Variant;
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
-
-import java.util.List;
 
 public interface Session extends CppObject {
   static Session create(MemoryManager memoryManager) {
@@ -23,13 +18,9 @@ public interface Session extends CppObject {
 
   ExternalStream newExternalStream(DownIterator itr);
 
-  List<BaseVector> baseVectorDeserialize(String serialized);
+  BaseVectors baseVectorOps();
 
-  BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array);
+  RowVectors rowVectorOps();
 
-  @VisibleForTesting
-  String deserializeAndSerialize(String json);
-
-  @VisibleForTesting
-  UpIterator createUpIteratorWithExternalStream(ExternalStream es);
+  Arrow arrowOps();
 }

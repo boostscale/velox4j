@@ -1,18 +1,14 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.BaseVectors;
+import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
-import io.github.zhztheplayer.velox4j.type.Type;
-import io.github.zhztheplayer.velox4j.variant.Variant;
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
-
-import java.util.List;
 
 public class LocalSession implements Session {
   private final long id;
@@ -20,7 +16,7 @@ public class LocalSession implements Session {
 
   private LocalSession(long id) {
     this.id = id;
-    this.jni = JniApi.create(this);
+    this.jni = JniApi.create(id);
   }
 
   static LocalSession create(long id) {
@@ -33,7 +29,7 @@ public class LocalSession implements Session {
   }
 
   @VisibleForTesting
-  JniApi jniApi() {
+  public JniApi jniApi() {
     return jni;
   }
 
@@ -48,22 +44,17 @@ public class LocalSession implements Session {
   }
 
   @Override
-  public List<BaseVector> baseVectorDeserialize(String serialized) {
-    return jni.baseVectorDeserialize(serialized);
+  public BaseVectors baseVectorOps() {
+    return new BaseVectors(jni);
   }
 
   @Override
-  public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return jni.arrowToBaseVector(schema, array);
+  public RowVectors rowVectorOps() {
+    return new RowVectors(jni);
   }
 
   @Override
-  public String deserializeAndSerialize(String json) {
-    return jni.deserializeAndSerialize(json);
-  }
-
-  @Override
-  public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
-    return jni.createUpIteratorWithExternalStream(es);
+  public Arrow arrowOps() {
+    return new Arrow(jni);
   }
 }
