@@ -53,7 +53,7 @@ code base even small, and any new Velox features easy to add to Velox4j.
 
 ### Compatible With Arrow Java
 
-Velox4j is compatible with Apache Arrow's Java implementation. Built-in utilities converting between
+Velox4j is compatible with [Apache Arrow's Java implementation](https://arrow.apache.org/java/). Built-in utilities converting between
 Velox4j's RowVector / BaseVector and Arrow Java's VectorSchemaRoot / Table / FieldVector are provided.
 
 ## Prerequisites
