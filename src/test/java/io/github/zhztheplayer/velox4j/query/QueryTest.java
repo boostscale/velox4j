@@ -15,6 +15,7 @@ import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
@@ -123,7 +124,9 @@ public class QueryTest {
         Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
         ConnectorConfig.empty());
     final UpIterator itr = session.queryOps().execute(query);
-    final List<RowVector> allRvs = Streams.fromIterator(itr).collect(Collectors.toList());
+    final List<RowVector> allRvs = Streams.fromIterator(itr)
+        .map(v -> v.loadedVector().asRowVector())
+        .collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
     for (RowVector rv : allRvs) {
       Assert.assertTrue(rv.getSize() <= maxOutputBatchRows);

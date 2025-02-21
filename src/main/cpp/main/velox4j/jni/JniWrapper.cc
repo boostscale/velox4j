@@ -174,6 +174,14 @@ jlong baseVectorSlice(
   JNI_METHOD_END(-1)
 }
 
+jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto loadedVector = BaseVector::loadedVectorShared(vector);
+  return sessionOf(env, javaThis)->objectStore()->save(loadedVector);
+  JNI_METHOD_END(-1)
+}
+
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
@@ -296,6 +304,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeInt,
       kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "baseVectorLoadedVector",
+      (void*)baseVectorLoadedVector,
+      kTypeLong,
+      kTypeLong,
       nullptr);
   addNativeMethod(
       "createSelectivityVector",

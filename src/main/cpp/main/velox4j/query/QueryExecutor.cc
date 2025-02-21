@@ -134,17 +134,21 @@ class Out : public UpIterator {
       future.wait();
     }
     if (drivers_.empty()) {
-      // Driver references are not saved. Save it in the first run.
+      // Save driver references in the first run.
       //
       // Doing this will prevent the planned operators in drivers from being
-      // destroyed together with their memory pools in the last call to
+      // destroyed together with the drivers themselves in the last call to
       // Task::next (see
       // https://github.com/facebookincubator/velox/blob/4adec182144e23d7c7d6422e0090d5b59eb32b86/velox/exec/Driver.cpp#L727C13-L727C18),
-      // so will guarantee the output data from the task are accessible
-      // until task is ended.
+      // so if a lazy vector is not loaded while the scan is moved, a meaning
+      // error
+      // (https://github.com/facebookincubator/velox/blob/7af0fce2c27424fbdec1974d96bb1a6d1296419d/velox/dwio/common/ColumnLoader.cpp#L32-L35)
+      // can be thrown when the vector is being loaded rather than just crashing
+      // the process with "pure virtual function call" or so.
       task_->testingVisitDrivers([&](exec::Driver* driver) -> void {
         drivers_.push_back(driver->shared_from_this());
       });
+      VELOX_CHECK(!drivers_.empty());
     }
     pending_ = vector;
   }

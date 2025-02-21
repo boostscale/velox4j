@@ -52,6 +52,7 @@ final class JniWrapper {
   native long[] baseVectorDeserialize(String serialized);
   native long baseVectorWrapInConstant(long id, int length, int index);
   native long baseVectorSlice(long id, int offset, int length);
+  native long baseVectorLoadedVector(long id);
   native long createSelectivityVector(int length);
 
   // For test.

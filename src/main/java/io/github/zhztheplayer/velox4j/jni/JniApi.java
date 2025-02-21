@@ -82,6 +82,10 @@ public final class JniApi {
     return baseVectorWrap(jni.baseVectorSlice(vector.id(), offset, length));
   }
 
+  public BaseVector loadedVector(BaseVector vector) {
+    return baseVectorWrap(jni.baseVectorLoadedVector(vector.id()));
+  }
+
   public SelectivityVector createSelectivityVector(int length) {
     return new SelectivityVector(jni.createSelectivityVector(length));
   }
