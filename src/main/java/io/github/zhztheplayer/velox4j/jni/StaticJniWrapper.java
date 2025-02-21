@@ -21,7 +21,6 @@ public class StaticJniWrapper {
 
   // Lifecycle.
   native long createSession(long memoryManagerId);
-
   native void releaseCppObject(long objectId);
 
   // For UpIterator.
