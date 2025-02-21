@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.query;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
+import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.connector.Assignment;
@@ -14,6 +15,7 @@ import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
+import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
@@ -44,6 +46,7 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 public class QueryTest {
   private static MemoryManager memoryManager;
@@ -102,6 +106,33 @@ public class QueryTest {
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
         .run();
+    session.close();
+  }
+
+  @Test
+  public void testHiveScanCollectMultipleRowVectors() {
+    final Session session = Velox4j.newSession(memoryManager);
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final int maxOutputBatchRows = 7;
+    final Query query = new Query(scanNode, splits, Config.create(
+        Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
+        ConnectorConfig.empty());
+    final UpIterator itr = session.queryOps().execute(query);
+    final List<RowVector> allRvs = Streams.fromIterator(itr).collect(Collectors.toList());
+    Assert.assertTrue(allRvs.size() > 1);
+    for (RowVector rv : allRvs) {
+      Assert.assertTrue(rv.getSize() <= maxOutputBatchRows);
+    }
+    final RowVector appended = session.baseVectorOps().createEmpty(allRvs.get(0).getType()).asRowVector();
+    for (RowVector rv : allRvs) {
+      appended.append(rv);
+    }
+    Assert.assertEquals(ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"), appended.toString());
     session.close();
   }
 

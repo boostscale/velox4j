@@ -1,7 +1,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 
 public class StaticJniWrapper {
@@ -11,7 +10,8 @@ public class StaticJniWrapper {
     return INSTANCE;
   }
 
-  private StaticJniWrapper() {}
+  private StaticJniWrapper() {
+  }
 
   // Global initialization.
   native void initialize(String globalConfJson);
@@ -21,6 +21,7 @@ public class StaticJniWrapper {
 
   // Lifecycle.
   native long createSession(long memoryManagerId);
+
   native void releaseCppObject(long objectId);
 
   // For UpIterator.
@@ -31,11 +32,17 @@ public class StaticJniWrapper {
 
   // For BaseVector / RowVector / SelectivityVector.
   native void baseVectorToArrow(long rvAddress, long cSchema, long cArray);
+
   native String baseVectorSerialize(long[] id);
+
   native String baseVectorGetType(long id);
+
   native int baseVectorGetSize(long id);
+
   native String baseVectorGetEncoding(long id);
+
   native void baseVectorAppend(long id, long toAppendId);
+
   native boolean selectivityVectorIsValid(long id, int idx);
 
   // For test.

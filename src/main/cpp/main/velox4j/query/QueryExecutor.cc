@@ -133,12 +133,26 @@ class Out : public UpIterator {
           << taskStateString(task_->state());
       future.wait();
     }
+    if (drivers_.empty()) {
+      // Driver references are not saved. Save it in the first run.
+      //
+      // Doing this will prevent the planned operators in drivers from being
+      // destroyed together with their memory pools in the last call to
+      // Task::next (see
+      // https://github.com/facebookincubator/velox/blob/4adec182144e23d7c7d6422e0090d5b59eb32b86/velox/exec/Driver.cpp#L727C13-L727C18),
+      // so will guarantee the output data from the task are accessible
+      // until task is ended.
+      task_->testingVisitDrivers([&](exec::Driver* driver) -> void {
+        drivers_.push_back(driver->shared_from_this());
+      });
+    }
     pending_ = vector;
   }
 
   MemoryManager* const memoryManager_;
   const std::string queryJson_;
   std::shared_ptr<exec::Task> task_;
+  std::vector<std::shared_ptr<exec::Driver>> drivers_{};
   RowVectorPtr pending_;
 };
 } // namespace
