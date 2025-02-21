@@ -51,10 +51,10 @@ in Velox4j's C++ code base. Which means, the Java side Velox components defined 
 Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
 code base even small, and any new Velox features easy to add to Velox4j.
 
-### Compatible With Arrow
+### Compatible With Arrow Java
 
-Velox4j is compatible with Apache Arrow. The output of Velox4j query can be exported into Arrow
-format through utility APIs provided by Velox4j.
+Velox4j is compatible with Apache Arrow's Java implementation. Built-in utilities converting between
+Velox4j's RowVector / BaseVector and Arrow Java's VectorSchemaRoot / Table / FieldVector are provided.
 
 ## Prerequisites
 
@@ -197,7 +197,7 @@ final UpIterator itr = session.queryOps().execute(query);
 // 8. Collect and print results.
 while (itr.hasNext()) {
   final RowVector rowVector = itr.next(); // 8.1. Get next RowVector returned by Velox.
-  final VectorSchemaRoot vsr = session.arrowOps().toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
+  final VectorSchemaRoot vsr = Arrow.toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
   System.out.println(vsr.contentToTSVString()); // 8.3. Print the arrow table to stdout.
   vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
 }

@@ -165,7 +165,6 @@ public class JniApiTest {
     final String serializedSecond = StaticJniApi.get().baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
     session.close();
-    ;
   }
 
   @Test
