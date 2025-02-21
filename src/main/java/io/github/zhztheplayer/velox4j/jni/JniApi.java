@@ -49,12 +49,6 @@ public final class JniApi {
     return new ExternalStream(jni.newExternalStream(itr));
   }
 
-  private BaseVector baseVectorWrap(long id) {
-    final VectorEncoding encoding = VectorEncoding.valueOf(
-        StaticJniWrapper.get().baseVectorGetEncoding(id));
-    return BaseVector.wrap(this, id, encoding);
-  }
-
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
     return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
   }
@@ -81,5 +75,11 @@ public final class JniApi {
   @VisibleForTesting
   public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
     return new UpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
+  }
+
+  private BaseVector baseVectorWrap(long id) {
+    final VectorEncoding encoding = VectorEncoding.valueOf(
+        StaticJniWrapper.get().baseVectorGetEncoding(id));
+    return BaseVector.wrap(this, id, encoding);
   }
 }
