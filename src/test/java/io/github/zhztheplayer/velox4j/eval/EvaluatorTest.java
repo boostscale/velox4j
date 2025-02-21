@@ -1,4 +1,4 @@
-package io.github.zhztheplayer.velox4j.expression;
+package io.github.zhztheplayer.velox4j.eval;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.config.Config;
@@ -6,8 +6,9 @@ import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
+import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
+import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serde.SerdeTests;
@@ -15,7 +16,6 @@ import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
-import io.github.zhztheplayer.velox4j.type.IntegerType;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.AfterClass;
@@ -45,12 +45,12 @@ public class EvaluatorTest {
     final RowVector input = SerdeTests.newSampleRowVector(session);
     final int size = BaseVectors.getSize(input);
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
-    final Expression expr = new Expression(
+    final Evaluation expr = new Evaluation(
         FieldAccessTypedExpr.create(new BigIntType(), "c0"),
         Config.empty(),
         ConnectorConfig.empty()
     );
-    final Evaluator evaluator = session.expressionOps().createEvaluator(expr);
+    final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final BaseVector out = evaluator.eval(sv, input);
     final String outString = BaseVectors.toString(new RootAllocator(), out);
     Assert.assertEquals(
@@ -65,13 +65,13 @@ public class EvaluatorTest {
     final RowVector input = SerdeTests.newSampleRowVector(session);
     final int size = BaseVectors.getSize(input);
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
-    final Expression expr = new Expression(
+    final Evaluation expr = new Evaluation(
         FieldAccessTypedExpr.create(new BigIntType(), "c0"),
         Config.empty(),
         ConnectorConfig.empty()
     );
     final BufferAllocator alloc = new RootAllocator();
-    final Evaluator evaluator = session.expressionOps().createEvaluator(expr);
+    final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final String expected = ResourceTests.readResourceAsString("eval-output/field-access-1.txt");
     for (int i = 0; i < 10; i++) {
       final BaseVector out = evaluator.eval(sv, input);
@@ -87,7 +87,7 @@ public class EvaluatorTest {
     final RowVector input = SerdeTests.newSampleRowVector(session);
     final int size = BaseVectors.getSize(input);
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
-    final Expression expr = new Expression(
+    final Evaluation expr = new Evaluation(
         new CallTypedExpr(new BigIntType(), List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "c0"),
             FieldAccessTypedExpr.create(new BigIntType(), "a1")
@@ -95,7 +95,7 @@ public class EvaluatorTest {
         Config.empty(),
         ConnectorConfig.empty()
     );
-    final Evaluator evaluator = session.expressionOps().createEvaluator(expr);
+    final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final BaseVector out = evaluator.eval(sv, input);
     final String outString = BaseVectors.toString(new RootAllocator(), out);
     Assert.assertEquals(

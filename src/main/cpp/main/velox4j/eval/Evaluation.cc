@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "Expression.h"
+#include "Evaluation.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
-Expression::Expression(
+Evaluation::Evaluation(
     const core::TypedExprPtr& expr,
     const std::shared_ptr<const ConfigArray>& queryConfig,
     const std::shared_ptr<const ConnectorConfigArray>& connectorConfig)
@@ -28,29 +28,28 @@ Expression::Expression(
       queryConfig_(queryConfig),
       connectorConfig_(connectorConfig) {}
 
-const core::TypedExprPtr& Expression::expr() const {
+const core::TypedExprPtr& Evaluation::expr() const {
   return expr_;
 }
 
-const std::shared_ptr<const ConfigArray>& Expression::queryConfig() const {
+const std::shared_ptr<const ConfigArray>& Evaluation::queryConfig() const {
   return queryConfig_;
 }
 
-const std::shared_ptr<const ConnectorConfigArray>&
-Expression::connectorConfig() const {
+const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig() const {
   return connectorConfig_;
 }
 
-folly::dynamic Expression::serialize() const {
+folly::dynamic Evaluation::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
-  obj["name"] = "Velox4jExpression";
+  obj["name"] = "Velox4jEvaluation";
   obj["expr"] = expr_->serialize();
   obj["queryConfig"] = queryConfig_->serialize();
   obj["connectorConfig"] = connectorConfig_->serialize();
   return obj;
 }
 
-std::shared_ptr<Expression> Expression::create(
+std::shared_ptr<Evaluation> Evaluation::create(
     const folly::dynamic& obj,
     void* context) {
   auto expr = std::const_pointer_cast<const core::ITypedExpr>(
@@ -60,12 +59,12 @@ std::shared_ptr<Expression> Expression::create(
   auto connectorConfig = std::const_pointer_cast<const ConnectorConfigArray>(
       ISerializable::deserialize<ConnectorConfigArray>(
           obj["connectorConfig"], context));
-  return std::make_shared<Expression>(expr, queryConfig, connectorConfig);
+  return std::make_shared<Evaluation>(expr, queryConfig, connectorConfig);
 }
 
-void Expression::registerSerDe() {
+void Evaluation::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
-  registry.Register("Velox4jExpression", create);
+  registry.Register("Velox4jEvaluation", create);
 }
 
 } // namespace velox4j

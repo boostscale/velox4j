@@ -16,7 +16,7 @@
  */
 
 #include "Evaluator.h"
-#include "Expression.h"
+#include "Evaluation.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -30,7 +30,7 @@ Evaluator::Evaluator(MemoryManager* memoryManager, std::string exprJson)
       memory::MemoryPool::Kind::kLeaf);
   auto exprDynamic = folly::parseJson(exprJson_);
   auto expr =
-      ISerializable::deserialize<Expression>(exprDynamic, evaluatorSerdePool);
+      ISerializable::deserialize<Evaluation>(exprDynamic, evaluatorSerdePool);
   queryCtx_ = core::QueryCtx::create(
       nullptr,
       core::QueryConfig{expr->queryConfig()->toMap()},

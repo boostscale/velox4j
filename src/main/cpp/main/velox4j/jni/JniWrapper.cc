@@ -23,7 +23,7 @@
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
-#include "velox4j/expression/Evaluator.h"
+#include "velox4j/eval/Evaluator.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
@@ -42,10 +42,10 @@ Session* sessionOf(JNIEnv* env, jobject javaThis) {
   return ObjectStore::retrieve<Session>(sessionId).get();
 }
 
-jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring exprJson) {
+jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jExprJson{env, exprJson};
+  spotify::jni::JavaString jExprJson{env, evalJson};
   auto evaluator =
       std::make_shared<Evaluator>(session->memoryManager(), jExprJson.get());
   return sessionOf(env, javaThis)->objectStore()->save(evaluator);

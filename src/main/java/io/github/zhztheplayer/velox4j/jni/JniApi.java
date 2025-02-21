@@ -7,10 +7,9 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
-import io.github.zhztheplayer.velox4j.expression.Evaluator;
+import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.session.Session;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -30,8 +29,8 @@ public final class JniApi {
     this.jni = jni;
   }
 
-  public Evaluator createEvaluator(String exprJson) {
-    return new Evaluator(this, jni.createEvaluator(exprJson));
+  public Evaluator createEvaluator(String evalJson) {
+    return new Evaluator(this, jni.createEvaluator(evalJson));
   }
 
   public BaseVector evaluatorEval(Evaluator evaluator, SelectivityVector sv, RowVector input) {

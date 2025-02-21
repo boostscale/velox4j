@@ -21,9 +21,9 @@
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
-class Expression : public facebook::velox::ISerializable {
+class Evaluation : public facebook::velox::ISerializable {
  public:
-  Expression(
+  Evaluation(
       const facebook::velox::core::TypedExprPtr& expr,
       const std::shared_ptr<const ConfigArray>& queryConfig,
       const std::shared_ptr<const ConnectorConfigArray>& connectorConfig);
@@ -34,7 +34,7 @@ class Expression : public facebook::velox::ISerializable {
 
   folly::dynamic serialize() const override;
 
-  static std::shared_ptr<Expression> create(
+  static std::shared_ptr<Evaluation> create(
       const folly::dynamic& obj,
       void* context);
 

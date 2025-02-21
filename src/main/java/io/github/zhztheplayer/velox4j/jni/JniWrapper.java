@@ -33,7 +33,7 @@ final class JniWrapper {
   }
 
   // Expression evaluation.
-  native long createEvaluator(String exprJson);
+  native long createEvaluator(String evalJson);
   native long evaluatorEval(long evaluatorId, long selectivityVectorId, long rvId);
 
   // Plan execution.

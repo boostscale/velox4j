@@ -1,20 +1,21 @@
-package io.github.zhztheplayer.velox4j.expression;
+package io.github.zhztheplayer.velox4j.eval;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
+import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 
 
-public class Expression extends VeloxSerializable {
+public class Evaluation extends VeloxSerializable {
   private final TypedExpr expr;
   private final Config queryConfig;
   private final ConnectorConfig connectorConfig;
 
   @JsonCreator
-  public Expression(
+  public Evaluation(
       @JsonProperty("expr") TypedExpr expr,
       @JsonProperty("queryConfig") Config queryConfig,
       @JsonProperty("connectorConfig") ConnectorConfig connectorConfig) {

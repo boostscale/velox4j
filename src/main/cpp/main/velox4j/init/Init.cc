@@ -30,9 +30,9 @@
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
 #include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
+#include "velox4j/eval/Evaluation.h"
 #include "velox4j/init/Config.h"
 #include "velox4j/query/Query.h"
-#include "velox4j/expression/Expression.h"
 
 namespace velox4j {
 
@@ -71,7 +71,7 @@ void initForSpark() {
 
   ConfigArray::registerSerDe();
   ConnectorConfigArray::registerSerDe();
-  Expression::registerSerDe();
+  Evaluation::registerSerDe();
   Query::registerSerDe();
   Type::registerSerDe();
   common::Filter::registerSerDe();

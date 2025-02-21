@@ -7,12 +7,12 @@ import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
+import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
-import io.github.zhztheplayer.velox4j.expression.Expression;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
@@ -144,7 +144,7 @@ public final class VeloxSerializables {
   }
 
   private static void registerExpression() {
-    NAME_REGISTRY.registerClass("Velox4jExpression", Expression.class);
+    NAME_REGISTRY.registerClass("Velox4jEvaluation", Evaluation.class);
   }
 
   private static void registerQuery() {

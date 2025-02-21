@@ -3,7 +3,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
-import io.github.zhztheplayer.velox4j.expression.Expression;
+import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-public class ExpressionSerdeTest {
+public class EvaluationSerdeTest {
   private static MemoryManager memoryManager;
 
   @BeforeClass
@@ -31,7 +31,7 @@ public class ExpressionSerdeTest {
   @Test
   public void testExpression() {
     final CallTypedExpr expr = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
-    final Expression expression = new Expression(expr, Config.empty(), ConnectorConfig.empty());
-    SerdeTests.testVeloxSerializableRoundTrip(expression);
+    final Evaluation evaluation = new Evaluation(expr, Config.empty(), ConnectorConfig.empty());
+    SerdeTests.testVeloxSerializableRoundTrip(evaluation);
   }
 }
