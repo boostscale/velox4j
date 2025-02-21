@@ -51,7 +51,7 @@ std::unordered_map<std::string, std::string> ConfigArray::toMap() const {
 
 folly::dynamic ConfigArray::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
-  obj["name"] = "Velox4jConfig";
+  obj["name"] = "velox4j.Config";
   folly::dynamic values = folly::dynamic::array;
   for (const auto& kv : values_) {
     folly::dynamic kvObj = folly::dynamic::object;
@@ -73,7 +73,7 @@ std::shared_ptr<ConfigArray> ConfigArray::create(const folly::dynamic& obj) {
 
 void ConfigArray::registerSerDe() {
   auto& registry = DeserializationRegistryForSharedPtr();
-  registry.Register("Velox4jConfig", create);
+  registry.Register("velox4j.Config", create);
 }
 
 std::shared_ptr<ConfigArray> ConfigArray::empty() {
@@ -98,7 +98,7 @@ ConnectorConfigArray::toMap() const {
 
 folly::dynamic ConnectorConfigArray::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
-  obj["name"] = "Velox4jConnectorConfig";
+  obj["name"] = "velox4j.ConnectorConfig";
   folly::dynamic values = folly::dynamic::array;
   for (const auto& kv : values_) {
     folly::dynamic kvObj = folly::dynamic::object;
@@ -124,6 +124,6 @@ std::shared_ptr<ConnectorConfigArray> ConnectorConfigArray::create(
 
 void ConnectorConfigArray::registerSerDe() {
   auto& registry = DeserializationRegistryForSharedPtr();
-  registry.Register("Velox4jConnectorConfig", create);
+  registry.Register("velox4j.ConnectorConfig", create);
 }
 } // namespace velox4j

@@ -139,15 +139,15 @@ public final class VeloxSerializables {
   }
 
   private static void retisterConfig() {
-    NAME_REGISTRY.registerClass("Velox4jConfig", Config.class);
-    NAME_REGISTRY.registerClass("Velox4jConnectorConfig", ConnectorConfig.class);
+    NAME_REGISTRY.registerClass("velox4j.Config", Config.class);
+    NAME_REGISTRY.registerClass("velox4j.ConnectorConfig", ConnectorConfig.class);
   }
 
   private static void registerExpression() {
-    NAME_REGISTRY.registerClass("Velox4jEvaluation", Evaluation.class);
+    NAME_REGISTRY.registerClass("velox4j.Evaluation", Evaluation.class);
   }
 
   private static void registerQuery() {
-    NAME_REGISTRY.registerClass("Velox4jQuery", Query.class);
+    NAME_REGISTRY.registerClass("velox4j.Query", Query.class);
   }
 }

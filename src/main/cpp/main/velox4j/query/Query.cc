@@ -67,7 +67,7 @@ std::string Query::toString() const {
 
 folly::dynamic Query::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
-  obj["name"] = "Velox4jQuery";
+  obj["name"] = "velox4j.Query";
   obj["plan"] = plan_->serialize();
   folly::dynamic boundSplits = folly::dynamic::array;
   for (const auto& boundSplit : boundSplits_) {
@@ -106,6 +106,6 @@ std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
 
 void Query::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
-  registry.Register("Velox4jQuery", create);
+  registry.Register("velox4j.Query", create);
 }
 } // namespace velox4j

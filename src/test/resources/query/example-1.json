@@ -1,5 +1,5 @@
 {
-  "name": "Velox4jQuery",
+  "name": "velox4j.Query",
   "plan": {
     "aggregateNames": [
       "a0",
@@ -208,7 +208,7 @@
   },
   "boundSplits": [],
   "queryConfig": {
-    "name": "Velox4jConfig",
+    "name": "velox4j.Config",
     "values": [
       {
         "key": "max_output_batch_rows",
@@ -221,12 +221,12 @@
     ]
   },
   "connectorConfig": {
-    "name": "Velox4jConnectorConfig",
+    "name": "velox4j.ConnectorConfig",
     "values": [
       {
         "connectorId": "conn-1",
         "config": {
-          "name": "Velox4jConfig",
+          "name": "velox4j.Config",
           "values": [
             {
               "key": "k1",
@@ -246,7 +246,7 @@
       {
         "connectorId": "conn-2",
         "config": {
-          "name": "Velox4jConfig",
+          "name": "velox4j.Config",
           "values": [
             {
               "key": "k5",

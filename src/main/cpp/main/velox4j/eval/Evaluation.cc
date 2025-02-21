@@ -42,7 +42,7 @@ const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig()
 
 folly::dynamic Evaluation::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
-  obj["name"] = "Velox4jEvaluation";
+  obj["name"] = "velox4j.Evaluation";
   obj["expr"] = expr_->serialize();
   obj["queryConfig"] = queryConfig_->serialize();
   obj["connectorConfig"] = connectorConfig_->serialize();
@@ -64,7 +64,7 @@ std::shared_ptr<Evaluation> Evaluation::create(
 
 void Evaluation::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
-  registry.Register("Velox4jEvaluation", create);
+  registry.Register("velox4j.Evaluation", create);
 }
 
 } // namespace velox4j
