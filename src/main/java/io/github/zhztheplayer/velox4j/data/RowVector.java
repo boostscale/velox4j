@@ -7,7 +7,7 @@ import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.table.Table;
 
 public class RowVector extends BaseVector {
-  public RowVector(JniApi jniApi, long id) {
+  protected RowVector(JniApi jniApi, long id) {
     super(jniApi, id);
   }
 

@@ -42,7 +42,7 @@ public final class JniApi {
   }
 
   public RowVector upIteratorNext(UpIterator itr) {
-    return rowVectorWrap(jni.upIteratorNext(itr.id()));
+    return baseVectorWrap(jni.upIteratorNext(itr.id())).asRowVector();
   }
 
   public ExternalStream newExternalStream(DownIterator itr) {
@@ -53,18 +53,7 @@ public final class JniApi {
     // TODO Add JNI API `isRowVector` for performance.
     final VectorEncoding encoding = VectorEncoding.valueOf(
         StaticJniWrapper.get().baseVectorGetEncoding(id));
-    if (encoding == VectorEncoding.ROW) {
-      return new RowVector(this, id);
-    }
-    return new BaseVector(this, id);
-  }
-
-  private RowVector rowVectorWrap(long id) {
-    final BaseVector vector = baseVectorWrap(id);
-    if (vector instanceof RowVector) {
-      return ((RowVector) vector);
-    }
-    throw new VeloxException("Expected RowVector, got " + vector.getClass().getName());
+    return BaseVector.wrap(this, id, encoding);
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
@@ -79,10 +68,6 @@ public final class JniApi {
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
     return baseVectorWrap(jni.baseVectorWrapInConstant(vector.id(), length, index));
-  }
-
-  public RowVector baseVectorAsRowVector(BaseVector vector) {
-    return rowVectorWrap(jni.baseVectorNewRef(vector.id()));
   }
 
   public SelectivityVector createSelectivityVector(int length) {

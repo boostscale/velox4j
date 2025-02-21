@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.data;
 
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.CppObject;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
@@ -10,10 +11,17 @@ import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
 
 public class BaseVector implements CppObject {
+  public static BaseVector wrap(JniApi jniApi, long id, VectorEncoding encoding) {
+    if (encoding == VectorEncoding.ROW) {
+      return new RowVector(jniApi, id);
+    }
+    return new BaseVector(jniApi, id);
+  }
+
   private final JniApi jniApi;
   private final long id;
 
-  public BaseVector(JniApi jniApi, long id) {
+  protected BaseVector(JniApi jniApi, long id) {
     this.jniApi = jniApi;
     this.id = id;
   }
@@ -39,9 +47,11 @@ public class BaseVector implements CppObject {
     return jniApi.baseVectorWrapInConstant(this, length, index);
   }
 
-  @Deprecated
   public RowVector asRowVector() {
-    return jniApi.baseVectorAsRowVector(this);
+    if (this instanceof RowVector) {
+      return (RowVector) this;
+    }
+    throw new VeloxException(String.format("Not a RowVector. Encoding: %s", getEncoding()));
   }
 
   public String serialize() {

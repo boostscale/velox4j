@@ -53,9 +53,7 @@ public class Arrow {
         final VectorSchemaRoot vsr = table.toVectorSchemaRoot()) {
       Data.exportVectorSchemaRoot(alloc, vsr, null, cArray, cSchema);
       final BaseVector imported = jniApi.arrowToBaseVector(cSchema, cArray);
-      Preconditions.checkState(imported instanceof RowVector,
-          "Expected RowVector, got %s", imported.getClass().getName());
-      return (RowVector) imported;
+      return imported.asRowVector();
     }
   }
 }

@@ -216,7 +216,7 @@ public final class SerdeTests {
   public static RowVector newSampleRowVector(Session session) {
     final String serialized = ResourceTests.readResourceAsString("vector/rowvector-1.b64");
     final BaseVector deserialized = session.baseVectorOps().deserializeOne(serialized);
-    return ((RowVector) deserialized);
+    return deserialized.asRowVector();
   }
 
   public static class ObjectAndJson<T> {

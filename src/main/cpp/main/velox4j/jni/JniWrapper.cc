@@ -145,13 +145,6 @@ jlong baseVectorWrapInConstant(
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorNewRef(JNIEnv* env, jobject javaThis, jlong vid) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  return sessionOf(env, javaThis)->objectStore()->save(vector);
-  JNI_METHOD_END(-1)
-}
-
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
@@ -260,12 +253,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeInt,
       kTypeInt,
-      nullptr);
-  addNativeMethod(
-      "baseVectorNewRef",
-      (void*)baseVectorNewRef,
-      kTypeLong,
-      kTypeLong,
       nullptr);
   addNativeMethod(
       "createSelectivityVector",
