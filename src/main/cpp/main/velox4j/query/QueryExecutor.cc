@@ -140,7 +140,7 @@ class Out : public UpIterator {
       // destroyed together with the drivers themselves in the last call to
       // Task::next (see
       // https://github.com/facebookincubator/velox/blob/4adec182144e23d7c7d6422e0090d5b59eb32b86/velox/exec/Driver.cpp#L727C13-L727C18),
-      // so if a lazy vector is not loaded while the scan is moved, a meaning
+      // so if a lazy vector is not loaded while the scan is drained, a meaning
       // error
       // (https://github.com/facebookincubator/velox/blob/7af0fce2c27424fbdec1974d96bb1a6d1296419d/velox/dwio/common/ColumnLoader.cpp#L32-L35)
       // can be thrown when the vector is being loaded rather than just crashing

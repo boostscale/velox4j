@@ -17,6 +17,7 @@ import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
@@ -111,7 +112,7 @@ public class QueryTest {
   }
 
   @Test
-  public void testHiveScanCollectMultipleRowVectors() {
+  public void testHiveScanCollectMultipleRowVectorsLoadInline() {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
@@ -136,6 +137,36 @@ public class QueryTest {
       appended.append(rv);
     }
     Assert.assertEquals(ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"), appended.toString());
+    session.close();
+  }
+
+  @Test
+  public void testHiveScanCollectMultipleRowVectorsLoadLast() {
+    final Session session = Velox4j.newSession(memoryManager);
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final int maxOutputBatchRows = 7;
+    final Query query = new Query(scanNode, splits, Config.create(
+        Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
+        ConnectorConfig.empty());
+    final UpIterator itr = session.queryOps().execute(query);
+    final List<RowVector> allRvs = Streams.fromIterator(itr).collect(Collectors.toList());
+    Assert.assertTrue(allRvs.size() > 1);
+    for (int i = 0; i < allRvs.size(); i++) {
+      final RowVector rv = allRvs.get(i);
+      Assert.assertTrue(rv.getSize() <= maxOutputBatchRows);
+      if (i != allRvs.size() - 1) {
+        // Vectors except the last one should throw when loading.
+        Assert.assertThrows(VeloxException.class, rv::loadedVector);
+      } else {
+        // The last vector can be loaded without errors.
+        rv.loadedVector();
+      }
+    }
     session.close();
   }
 
