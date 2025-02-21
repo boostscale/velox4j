@@ -75,6 +75,10 @@ public class StaticJniApi {
     return VectorEncoding.valueOf(jni.baseVectorGetEncoding(vector.id()));
   }
 
+  public void baseVectorAppend(BaseVector vector, BaseVector toAppend) {
+    jni.baseVectorAppend(vector.id(), toAppend.id());
+  }
+
   public boolean selectivityVectorIsValid(SelectivityVector vector, int idx) {
     return jni.selectivityVectorIsValid(vector.id(), idx);
   }

@@ -79,8 +79,8 @@ jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
   auto deserialized = variant::create(dynamic);
   auto type = deserialized.inferType();
   auto serializedDynamic = type->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
   JNI_METHOD_END(nullptr);
 }
 
@@ -137,6 +137,14 @@ jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
   auto name = VectorEncoding::mapSimpleToName(vector->encoding());
   return env->NewStringUTF(name.data());
   JNI_METHOD_END(nullptr)
+}
+
+void baseVectorAppend(JNIEnv* env, jobject javaThis, jlong vid, jlong toAppendVid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto toAppend = ObjectStore::retrieve<BaseVector>(toAppendVid);
+  vector->append(toAppend.get());
+  JNI_METHOD_END()
 }
 
 jboolean selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
@@ -225,6 +233,13 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "baseVectorGetEncoding",
       (void*)baseVectorGetEncoding,
       kTypeString,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorAppend",
+      (void*)baseVectorAppend,
+      kTypeVoid,
+      kTypeLong,
       kTypeLong,
       nullptr);
   addNativeMethod(

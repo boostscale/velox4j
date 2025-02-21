@@ -92,6 +92,22 @@ jlong newExternalStream(JNIEnv* env, jobject javaThis, jobject itrRef) {
   JNI_METHOD_END(-1L)
 }
 
+jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
+  JNI_METHOD_START
+  // TODO Session memory pool.
+  auto session = sessionOf(env, javaThis);
+  auto serdePool = session->memoryManager()->getVeloxPool(
+      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  auto dynamic = folly::parseJson(jTypeJson.get());
+  auto type = ISerializable::deserialize<Type>(dynamic, serdePool);
+  auto vectorPool = session->memoryManager()->getVeloxPool(
+      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  auto vector = BaseVector::create(type, 0, vectorPool);
+  return session->objectStore()->save(vector);
+  JNI_METHOD_END(-1L)
+}
+
 jlong arrowToBaseVector(
     JNIEnv* env,
     jobject javaThis,
@@ -142,6 +158,19 @@ jlong baseVectorWrapInConstant(
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto constVector = BaseVector::wrapInConstant(length, index, vector);
   return sessionOf(env, javaThis)->objectStore()->save(constVector);
+  JNI_METHOD_END(-1)
+}
+
+jlong baseVectorSlice(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jint offset,
+    jint length) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  auto slicedVector = vector->slice(offset, length);
+  return sessionOf(env, javaThis)->objectStore()->save(slicedVector);
   JNI_METHOD_END(-1)
 }
 
@@ -234,6 +263,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
       nullptr);
   addNativeMethod(
+      "createEmptyBaseVector",
+      (void*)createEmptyBaseVector,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
       "arrowToBaseVector",
       (void*)arrowToBaseVector,
       kTypeLong,
@@ -249,6 +284,14 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "baseVectorWrapInConstant",
       (void*)baseVectorWrapInConstant,
+      kTypeLong,
+      kTypeLong,
+      kTypeInt,
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "baseVectorSlice",
+      (void*)baseVectorSlice,
       kTypeLong,
       kTypeLong,
       kTypeInt,

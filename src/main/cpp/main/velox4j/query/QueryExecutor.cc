@@ -25,6 +25,8 @@ namespace velox4j {
 
 using namespace facebook::velox;
 
+namespace {
+
 class Out : public UpIterator {
  public:
   Out(MemoryManager* memoryManager, std::string queryJson)
@@ -139,6 +141,7 @@ class Out : public UpIterator {
   std::shared_ptr<exec::Task> task_;
   RowVectorPtr pending_;
 };
+} // namespace
 
 QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::string planJson)
     : memoryManager_(memoryManager), queryJson_(std::move(planJson)) {}

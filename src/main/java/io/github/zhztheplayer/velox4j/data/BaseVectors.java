@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.data;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.type.Type;
 
 import java.util.List;
 
@@ -11,6 +12,10 @@ public class BaseVectors {
 
   public BaseVectors(JniApi jniApi) {
     this.jniApi = jniApi;
+  }
+
+  public BaseVector createEmpty(Type type) {
+    return jniApi.createEmptyBaseVector(type);
   }
 
   public static String serializeOne(BaseVector vector) {

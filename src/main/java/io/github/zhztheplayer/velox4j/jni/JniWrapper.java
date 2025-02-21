@@ -18,6 +18,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 
 final class JniWrapper {
@@ -46,9 +47,11 @@ final class JniWrapper {
   native long newExternalStream(DownIterator itr);
 
   // For BaseVector / RowVector / SelectivityVector.
+  native long createEmptyBaseVector(String typeJson);
   native long arrowToBaseVector(long cSchema, long cArray);
   native long[] baseVectorDeserialize(String serialized);
   native long baseVectorWrapInConstant(long id, int length, int index);
+  native long baseVectorSlice(long id, int offset, int length);
   native long createSelectivityVector(int length);
 
   // For test.

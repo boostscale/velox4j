@@ -51,16 +51,12 @@ public class BaseVector implements CppObject {
     return jniApi.baseVectorWrapInConstant(this, length, index);
   }
 
-  public RowVector asRowVector() {
-    if (this instanceof RowVector) {
-      Preconditions.checkState(encoding == VectorEncoding.ROW);
-      return (RowVector) this;
-    }
-    if (encoding == VectorEncoding.ROW) {
-      throw new VeloxException(String.format("The BaseVector has encoding ROW but was not wrapped" +
-          " as a Velox4j RowVector. Actual class: %s", getClass()));
-    }
-    throw new VeloxException(String.format("Not a RowVector. Encoding: %s", getEncoding()));
+  public BaseVector slice(int offset, int length) {
+    return jniApi.baseVectorSlice(this, offset, length);
+  }
+
+  public void append(BaseVector toAppend) {
+    StaticJniApi.get().baseVectorAppend(this, toAppend);
   }
 
   public String serialize() {
@@ -78,5 +74,17 @@ public class BaseVector implements CppObject {
     try (final BufferAllocator alloc = new RootAllocator()) {
       return toString(alloc);
     }
+  }
+
+  public RowVector asRowVector() {
+    if (this instanceof RowVector) {
+      Preconditions.checkState(encoding == VectorEncoding.ROW);
+      return (RowVector) this;
+    }
+    if (encoding == VectorEncoding.ROW) {
+      throw new VeloxException(String.format("The BaseVector has encoding ROW but was not wrapped" +
+          " as a Velox4j RowVector. Actual class: %s", getClass()));
+    }
+    throw new VeloxException(String.format("Not a RowVector. Encoding: %s", getEncoding()));
   }
 }

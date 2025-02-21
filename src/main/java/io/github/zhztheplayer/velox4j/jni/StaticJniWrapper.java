@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 
 public class StaticJniWrapper {
@@ -34,6 +35,7 @@ public class StaticJniWrapper {
   native String baseVectorGetType(long id);
   native int baseVectorGetSize(long id);
   native String baseVectorGetEncoding(long id);
+  native void baseVectorAppend(long id, long toAppendId);
   native boolean selectivityVectorIsValid(long id, int idx);
 
   // For test.

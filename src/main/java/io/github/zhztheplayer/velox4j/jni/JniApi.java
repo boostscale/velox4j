@@ -6,9 +6,13 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.query.Query;
+import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.type.Type;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -28,7 +32,8 @@ public final class JniApi {
     this.jni = jni;
   }
 
-  public Evaluator createEvaluator(String evalJson) {
+  public Evaluator createEvaluator(Evaluation evaluation) {
+    final String evalJson = Serde.toPrettyJson(evaluation);
     return new Evaluator(this, jni.createEvaluator(evalJson));
   }
 
@@ -36,7 +41,13 @@ public final class JniApi {
     return baseVectorWrap(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
   }
 
-  public UpIterator executeQuery(String queryJson) {
+  public UpIterator executeQuery(Query query) {
+    final String queryJson = Serde.toPrettyJson(query);
+    return new UpIterator(this, jni.executeQuery(queryJson));
+  }
+
+  @VisibleForTesting
+  UpIterator executeQuery(String queryJson) {
     return new UpIterator(this, jni.executeQuery(queryJson));
   }
 
@@ -46,6 +57,11 @@ public final class JniApi {
 
   public ExternalStream newExternalStream(DownIterator itr) {
     return new ExternalStream(jni.newExternalStream(itr));
+  }
+
+  public BaseVector createEmptyBaseVector(Type type) {
+    final String typeJson = Serde.toJson(type);
+    return baseVectorWrap(jni.createEmptyBaseVector(typeJson));
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
@@ -60,6 +76,10 @@ public final class JniApi {
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
     return baseVectorWrap(jni.baseVectorWrapInConstant(vector.id(), length, index));
+  }
+
+  public BaseVector baseVectorSlice(BaseVector vector, int offset, int length) {
+    return baseVectorWrap(jni.baseVectorSlice(vector.id(), offset, length));
   }
 
   public SelectivityVector createSelectivityVector(int length) {

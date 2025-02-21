@@ -11,6 +11,6 @@ public class Evaluations {
   }
 
   public Evaluator createEvaluator(Evaluation evaluation) {
-    return jniApi.createEvaluator(Serde.toPrettyJson(evaluation));
+    return jniApi.createEvaluator(evaluation);
   }
 }
