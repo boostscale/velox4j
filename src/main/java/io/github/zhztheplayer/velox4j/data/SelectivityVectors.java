@@ -13,8 +13,4 @@ public class SelectivityVectors {
   public SelectivityVector create(int length) {
     return jniApi.createSelectivityVector(length);
   }
-
-  public static boolean isValid(SelectivityVector vector, int idx) {
-    return StaticJniApi.get().selectivityVectorIsValid(vector, idx);
-  }
 }

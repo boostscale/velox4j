@@ -27,13 +27,13 @@ public class ConstantTypedExpr extends TypedExpr {
 
   public static ConstantTypedExpr create(BaseVector vector) {
     final BaseVector constVector;
-    if (BaseVectors.getEncoding(vector) == VectorEncoding.CONSTANT) {
+    if (vector.getEncoding() == VectorEncoding.CONSTANT) {
       constVector = vector;
     } else {
-      constVector = BaseVectors.wrapInConstant(vector, 1, 0);
+      constVector = vector.wrapInConstant(1, 0);
     }
-    final String serialized = BaseVectors.serialize(constVector);
-    final Type type = BaseVectors.getType(vector);
+    final String serialized = BaseVectors.serializeOne(constVector);
+    final Type type = vector.getType();
     return new ConstantTypedExpr(type, null, serialized);
   }
 

@@ -183,7 +183,6 @@ public class JniApiTest {
     Assert.assertEquals(serialized, serializedImported);
     arrowVector.close();
     session.close();
-    ;
   }
 
   @Test

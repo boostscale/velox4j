@@ -43,7 +43,7 @@ public class EvaluatorTest {
   public void testFieldAccess() {
     final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = SerdeTests.newSampleRowVector(session);
-    final int size = BaseVectors.getSize(input);
+    final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
     final Evaluation expr = new Evaluation(
         FieldAccessTypedExpr.create(new BigIntType(), "c0"),
@@ -52,7 +52,7 @@ public class EvaluatorTest {
     );
     final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final BaseVector out = evaluator.eval(sv, input);
-    final String outString = BaseVectors.toString(new RootAllocator(), out);
+    final String outString = out.toString();
     Assert.assertEquals(
         ResourceTests.readResourceAsString("eval-output/field-access-1.txt"),
         outString);
@@ -63,19 +63,18 @@ public class EvaluatorTest {
   public void testMultipleEvalCalls() {
     final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = SerdeTests.newSampleRowVector(session);
-    final int size = BaseVectors.getSize(input);
+    final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
     final Evaluation expr = new Evaluation(
         FieldAccessTypedExpr.create(new BigIntType(), "c0"),
         Config.empty(),
         ConnectorConfig.empty()
     );
-    final BufferAllocator alloc = new RootAllocator();
     final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final String expected = ResourceTests.readResourceAsString("eval-output/field-access-1.txt");
     for (int i = 0; i < 10; i++) {
       final BaseVector out = evaluator.eval(sv, input);
-      final String outString = BaseVectors.toString(alloc, out);
+      final String outString = out.toString();
       Assert.assertEquals(expected, outString);
     }
     session.close();
@@ -85,7 +84,7 @@ public class EvaluatorTest {
   public void testMultiply() {
     final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = SerdeTests.newSampleRowVector(session);
-    final int size = BaseVectors.getSize(input);
+    final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
     final Evaluation expr = new Evaluation(
         new CallTypedExpr(new BigIntType(), List.of(
@@ -97,7 +96,7 @@ public class EvaluatorTest {
     );
     final Evaluator evaluator = session.evaluationOps().createEvaluator(expr);
     final BaseVector out = evaluator.eval(sv, input);
-    final String outString = BaseVectors.toString(new RootAllocator(), out);
+    final String outString = out.toString();
     Assert.assertEquals(
         ResourceTests.readResourceAsString("eval-output/multiply-1.txt"),
         outString);

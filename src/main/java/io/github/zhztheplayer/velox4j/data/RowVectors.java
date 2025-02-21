@@ -15,10 +15,4 @@ public class RowVectors {
   public RowVectors(JniApi jniApi) {
     this.jniApi = jniApi;
   }
-
-  public static String toString(BufferAllocator alloc, RowVector rv) {
-    try (final Table t = Arrow.toArrowTable(alloc, rv); final VectorSchemaRoot vsr = t.toVectorSchemaRoot()) {
-      return vsr.contentToTSVString();
-    }
-  }
 }

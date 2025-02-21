@@ -2,7 +2,6 @@ package io.github.zhztheplayer.velox4j.test;
 
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
@@ -60,7 +59,7 @@ public final class UpIteratorTests {
       return assertRowVector(i, new Consumer<RowVector>() {
         @Override
         public void accept(RowVector vector) {
-          Assert.assertEquals(expected, RowVectors.toString(alloc, vector));
+          Assert.assertEquals(expected, vector.toString(alloc));
         }
       });
     }

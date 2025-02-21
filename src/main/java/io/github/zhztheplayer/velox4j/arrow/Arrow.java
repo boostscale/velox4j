@@ -8,6 +8,7 @@ import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 import org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.util.Preconditions;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.table.Table;
@@ -19,30 +20,42 @@ public class Arrow {
     this.jniApi = jniApi;
   }
 
-  public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
-    try (final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
-        final ArrowArray array = ArrowArray.allocateNew(alloc)) {
-      StaticJniApi.get().baseVectorToArrow(vector, schema, array);
-      final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, array, schema, null);
-      return new Table(vsr);
-    }
-  }
-
   public static FieldVector toArrowVector(BufferAllocator alloc, BaseVector vector) {
-    try (final ArrowSchema schema = ArrowSchema.allocateNew(alloc);
-        final ArrowArray array = ArrowArray.allocateNew(alloc)) {
-      StaticJniApi.get().baseVectorToArrow(vector, schema, array);
-      final FieldVector fv = Data.importVector(alloc, array, schema, null);
+    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
+      StaticJniApi.get().baseVectorToArrow(vector, cSchema, cArray);
+      final FieldVector fv = Data.importVector(alloc, cArray, cSchema, null);
       return fv;
     }
   }
 
+  public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
+    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
+      StaticJniApi.get().baseVectorToArrow(vector, cSchema, cArray);
+      final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, cArray, cSchema, null);
+      return new Table(vsr);
+    }
+  }
+
   public BaseVector fromArrowVector(BufferAllocator alloc, FieldVector arrowVector) {
-    try (final ArrowSchema cSchema1 = ArrowSchema.allocateNew(alloc);
-        final ArrowArray cArray1 = ArrowArray.allocateNew(alloc)) {
-      Data.exportVector(alloc, arrowVector, null, cArray1, cSchema1);
-      final BaseVector imported = jniApi.arrowToBaseVector(cSchema1, cArray1);
+    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
+      Data.exportVector(alloc, arrowVector, null, cArray, cSchema);
+      final BaseVector imported = jniApi.arrowToBaseVector(cSchema, cArray);
       return imported;
+    }
+  }
+
+  public RowVector fromArrowTable(BufferAllocator alloc, Table table) {
+    try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc);
+        final VectorSchemaRoot vsr = table.toVectorSchemaRoot()) {
+      Data.exportVectorSchemaRoot(alloc, vsr, null, cArray, cSchema);
+      final BaseVector imported = jniApi.arrowToBaseVector(cSchema, cArray);
+      Preconditions.checkState(imported instanceof RowVector,
+          "Expected RowVector, got %s", imported.getClass().getName());
+      return (RowVector) imported;
     }
   }
 }
