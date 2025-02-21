@@ -8,7 +8,7 @@ import org.apache.arrow.vector.table.Table;
 
 public class RowVector extends BaseVector {
   protected RowVector(JniApi jniApi, long id) {
-    super(jniApi, id);
+    super(jniApi, id, VectorEncoding.ROW);
   }
 
   @Override

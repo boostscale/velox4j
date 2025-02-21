@@ -50,7 +50,6 @@ public final class JniApi {
   }
 
   private BaseVector baseVectorWrap(long id) {
-    // TODO Add JNI API `isRowVector` for performance.
     final VectorEncoding encoding = VectorEncoding.valueOf(
         StaticJniWrapper.get().baseVectorGetEncoding(id));
     return BaseVector.wrap(this, id, encoding);

@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.data;
 
+import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
@@ -12,18 +13,21 @@ import org.apache.arrow.vector.FieldVector;
 
 public class BaseVector implements CppObject {
   public static BaseVector wrap(JniApi jniApi, long id, VectorEncoding encoding) {
+    // TODO Add JNI API `isRowVector` for performance.
     if (encoding == VectorEncoding.ROW) {
       return new RowVector(jniApi, id);
     }
-    return new BaseVector(jniApi, id);
+    return new BaseVector(jniApi, id, encoding);
   }
 
   private final JniApi jniApi;
   private final long id;
+  private final VectorEncoding encoding;
 
-  protected BaseVector(JniApi jniApi, long id) {
+  protected BaseVector(JniApi jniApi, long id, VectorEncoding encoding) {
     this.jniApi = jniApi;
     this.id = id;
+    this.encoding = encoding;
   }
 
   @Override
@@ -36,7 +40,7 @@ public class BaseVector implements CppObject {
   }
 
   public VectorEncoding getEncoding() {
-    return StaticJniApi.get().baseVectorGetEncoding(this);
+    return encoding;
   }
 
   public int getSize() {
@@ -49,7 +53,12 @@ public class BaseVector implements CppObject {
 
   public RowVector asRowVector() {
     if (this instanceof RowVector) {
+      Preconditions.checkState(encoding == VectorEncoding.ROW);
       return (RowVector) this;
+    }
+    if (encoding == VectorEncoding.ROW) {
+      throw new VeloxException(String.format("The BaseVector has encoding ROW but was not wrapped" +
+          " as a Velox4j RowVector. Actual class: %s", getClass()));
     }
     throw new VeloxException(String.format("Not a RowVector. Encoding: %s", getEncoding()));
   }
