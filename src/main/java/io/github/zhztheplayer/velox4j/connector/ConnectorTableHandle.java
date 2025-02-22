@@ -6,7 +6,7 @@ import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
 public abstract class ConnectorTableHandle extends VeloxSerializable {
   private final String connectorId;
 
-  public ConnectorTableHandle(String connectorId) {
+  protected ConnectorTableHandle(String connectorId) {
     this.connectorId = connectorId;
   }
 

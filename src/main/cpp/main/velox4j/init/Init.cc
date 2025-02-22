@@ -78,9 +78,12 @@ void initForSpark() {
   connector::hive::HiveTableHandle::registerSerDe();
   connector::hive::LocationHandle::registerSerDe();
   connector::hive::HiveColumnHandle::registerSerDe();
-  connector::hive::HiveInsertTableHandle::registerSerDe();
   connector::hive::HiveConnectorSplit::registerSerDe();
   connector::hive::registerHivePartitionFunctionSerDe();
+  connector::hive::HiveInsertTableHandle::registerSerDe();
+  connector::hive::LocationHandle::registerSerDe();
+  connector::hive::HiveSortingColumn::registerSerDe();
+  connector::hive::HiveBucketProperty::registerSerDe();
   connector::registerConnector(std::make_shared<connector::hive::HiveConnector>(
       "connector-hive",
       std::make_shared<facebook::velox::config::ConfigBase>(

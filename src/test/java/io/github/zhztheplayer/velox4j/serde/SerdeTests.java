@@ -5,13 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
+import io.github.zhztheplayer.velox4j.connector.CompressionKind;
+import io.github.zhztheplayer.velox4j.connector.ConnectorInsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
 import io.github.zhztheplayer.velox4j.connector.HiveBucketConversion;
+import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
+import io.github.zhztheplayer.velox4j.connector.HiveSortingColumn;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
+import io.github.zhztheplayer.velox4j.connector.LocationHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
@@ -103,14 +109,14 @@ public final class SerdeTests {
     }
   }
 
-  public static ColumnHandle newSampleHiveColumnHandle() {
+  public static HiveColumnHandle newSampleHiveColumnHandle() {
     final Type dataType = ArrayType.create(
         MapType.create(
             new VarCharType(),
             new RowType(List.of("id", "description"),
                 List.of(new BigIntType(),
                     new VarCharType()))));
-    final ColumnHandle handle = new HiveColumnHandle("complex_type",
+    final HiveColumnHandle handle = new HiveColumnHandle("complex_type",
         ColumnType.REGULAR, dataType, dataType, List.of(
         "complex_type[1][\"foo\"].id",
         "complex_type[2][\"foo\"].id"));
@@ -178,6 +184,36 @@ public final class SerdeTests {
         Map.of("tk", "tv")
     );
     return handle;
+  }
+
+  public static LocationHandle newSampleLocationHandle() {
+    return new LocationHandle("/tmp/target-path",
+        "/tmp/write-path", LocationHandle.TableType.EXISTING, "target-file-name");
+  }
+
+  public static HiveBucketProperty newSampleHiveBucketProperty() {
+    return new HiveBucketProperty(
+        HiveBucketProperty.Kind.PRESTO_NATIVE,
+        10,
+        List.of("foo", "bar"),
+        List.of(new IntegerType(), new VarCharType()),
+        List.of(
+            new HiveSortingColumn("foo", new SortOrder(true, true)),
+            new HiveSortingColumn("bar", new SortOrder(false, false))
+        )
+    );
+  }
+
+  public static HiveInsertTableHandle newSampleHiveInsertTableHandle() {
+    return new HiveInsertTableHandle(
+        List.of(newSampleHiveColumnHandle()),
+        newSampleLocationHandle(),
+        FileFormat.PARQUET,
+        newSampleHiveBucketProperty(),
+        CompressionKind.ZLIB,
+        Map.of("serde_key", "serde_value"),
+        false
+    );
   }
 
   public static Aggregate newSampleAggregate() {

@@ -8,14 +8,23 @@ import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
+import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
+import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
+import io.github.zhztheplayer.velox4j.connector.HiveSortingColumn;
+import io.github.zhztheplayer.velox4j.connector.InsertTableHandle;
+import io.github.zhztheplayer.velox4j.connector.LocationHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.type.IntegerType;
+import io.github.zhztheplayer.velox4j.type.VarCharType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.OptionalLong;
 
 public class ConnectorSerdeTest {
@@ -99,5 +108,23 @@ public class ConnectorSerdeTest {
   public void testExternalStreamTableHandle() {
     final ExternalStreamTableHandle handle = new ExternalStreamTableHandle("id-1");
     SerdeTests.testVeloxSerializableRoundTrip(handle);
+  }
+
+  @Test
+  public void testLocationHandle() {
+    final LocationHandle handle = SerdeTests.newSampleLocationHandle();
+    SerdeTests.testVeloxSerializableRoundTrip(handle);
+  }
+
+  @Test
+  public void testHiveBucketProperty() {
+    final HiveBucketProperty hiveBucketProperty = SerdeTests.newSampleHiveBucketProperty();
+    SerdeTests.testVeloxSerializableRoundTrip(hiveBucketProperty);
+  }
+
+  @Test
+  public void testHiveInsertTableHandle() {
+    final HiveInsertTableHandle hiveInsertTableHandle = SerdeTests.newSampleHiveInsertTableHandle();
+    SerdeTests.testVeloxSerializableRoundTrip(hiveInsertTableHandle);
   }
 }

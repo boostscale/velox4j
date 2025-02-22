@@ -8,7 +8,10 @@ public class SortOrder {
   private final boolean nullsFirst;
 
   @JsonCreator
-  public SortOrder(@JsonProperty("ascending") boolean ascending, @JsonProperty("nullsFirst") boolean nullsFirst) {
+  public SortOrder(
+      @JsonProperty("ascending") boolean ascending,
+      @JsonProperty("nullsFirst") boolean nullsFirst
+  ) {
     this.ascending = ascending;
     this.nullsFirst = nullsFirst;
   }
