@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 # Velox4j option definitions.
+option(VELOX4J_ENABLE_CCACHE "Use ccache if installed." ON)
 option(VELOX4J_BUILD_TESTING "Build Velox4j tests." ON)
 
 # Velox4j non-bool option definitions.
@@ -44,6 +45,9 @@ set(VELOX_ENABLE_ARROW ON)
 if (NOT VELOX4J_BUILD_TESTING)
     set(VELOX_BUILD_TESTING OFF)
 endif ()
+if (NOT VELOX4J_ENABLE_CCACHE)
+    set(VELOX_ENABLE_CCACHE OFF)
+endif ()
 
 # Import Velox.
 set(VELOX_PATCH_DIR ${CMAKE_CURRENT_LIST_DIR}/cmake/patches/velox)
@@ -68,13 +72,27 @@ set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)
 set(JNI_HELPERS_REF 7c58a9a24c87758fe94f33bec6a4463971af1e23)
 set(JNI_HELPERS_SOURCE_URL_MD5 3f168384670e0f21a2e2281f91cfb2e1)
 set(JNI_HELPERS_SOURCE_URL "https://github.com/${JNI_HELPERS_REPO}/archive/${JNI_HELPERS_REF}.zip")
-CPMAddPackage(NAME jni-helpers URL ${JNI_HELPERS_SOURCE_URL} URL_HASH MD5=${JNI_HELPERS_SOURCE_URL_MD5})
+CPMAddPackage(NAME JniHelpersLib URL ${JNI_HELPERS_SOURCE_URL} URL_HASH MD5=${JNI_HELPERS_SOURCE_URL_MD5})
 target_include_directories(JniHelpers PRIVATE ${JNI_INCLUDE_DIRS})
 target_link_libraries(JniHelpers PRIVATE ${JNI_LIBRARIES})
 
 # Directories of Velox4j.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
 set(VELOX4J_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+
+# Setup compiler launcher to ccache if using similar code with Velox.
+if (VELOX4J_ENABLE_CCACHE
+        AND NOT CMAKE_C_COMPILER_LAUNCHER
+        AND NOT CMAKE_CXX_COMPILER_LAUNCHER)
+    find_program(CCACHE_FOUND ccache)
+    if (CCACHE_FOUND)
+        message(STATUS "Using ccache: ${CCACHE_FOUND}")
+        set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_FOUND})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_FOUND})
+        # keep comments as they might matter to the compiler
+        set(ENV{CCACHE_COMMENTS} "1")
+    endif ()
+endif ()
 
 # Setup compiler flags using Velox's provided script.
 execute_process(
