@@ -44,7 +44,7 @@ public class TableWriteTraitsTest {
         SerdeTests.newSampleAggregationNode("id-2", "id-1")
     );
     Assert.assertEquals(
-        ResourceTests.readResourceAsString("table-write-traits/output-type-1.json"),
+        ResourceTests.readResourceAsString("table-write-traits/output-type-with-aggregation-node-1.json"),
         Serde.toPrettyJson(type)
     );
     session.close();
