@@ -38,6 +38,9 @@ public class StaticJniWrapper {
   native void baseVectorAppend(long id, long toAppendId);
   native boolean selectivityVectorIsValid(long id, int idx);
 
+  // For TableWrite.
+  native String tableWriteTraitsOutputType();
+
   // For test.
   @VisibleForTesting
   native String deserializeAndSerializeVariant(String json);

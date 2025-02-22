@@ -18,6 +18,8 @@
 #include "JniWrapper.h"
 #include <velox/common/encode/Base64.h>
 #include <velox/common/memory/Memory.h>
+#include <velox/core/PlanNode.h>
+#include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
 #include "JniCommon.h"
 #include "JniError.h"
@@ -184,11 +186,29 @@ jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
 
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
   auto vector =
       std::make_shared<SelectivityVector>(static_cast<vector_size_t>(length));
   return sessionOf(env, javaThis)->objectStore()->save(vector);
   JNI_METHOD_END(-1)
+}
+
+jstring tableWriteTraitsOutputTypeWithAggregationNode(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring aggregationNodeJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jJson{env, aggregationNodeJson};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto serdePool = session->memoryManager()->getVeloxPool(
+      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  auto aggregationNode = std::const_pointer_cast<core::AggregationNode>(
+      ISerializable::deserialize<core::AggregationNode>(dynamic, serdePool));
+  auto type = exec::TableWriteTraits::outputType(aggregationNode);
+  auto serializedDynamic = type->serialize();
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
+  JNI_METHOD_END(nullptr)
 }
 
 jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
@@ -316,6 +336,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)createSelectivityVector,
       kTypeLong,
       kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "tableWriteTraitsOutputTypeWithAggregationNode",
+      (void*)tableWriteTraitsOutputTypeWithAggregationNode,
+      kTypeString,
+      kTypeString,
       nullptr);
   addNativeMethod(
       "deserializeAndSerialize",

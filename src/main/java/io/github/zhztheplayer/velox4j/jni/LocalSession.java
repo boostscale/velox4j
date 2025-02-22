@@ -8,6 +8,7 @@ import io.github.zhztheplayer.velox4j.data.SelectivityVectors;
 import io.github.zhztheplayer.velox4j.eval.Evaluations;
 import io.github.zhztheplayer.velox4j.query.Queries;
 import io.github.zhztheplayer.velox4j.session.Session;
+import io.github.zhztheplayer.velox4j.write.TableWriteTraits;
 
 public class LocalSession implements Session {
   private final long id;
@@ -59,5 +60,10 @@ public class LocalSession implements Session {
   @Override
   public Arrow arrowOps() {
     return new Arrow(jniApi());
+  }
+
+  @Override
+  public TableWriteTraits tableWriteTraitsOps() {
+    return new TableWriteTraits(jniApi());
   }
 }

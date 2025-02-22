@@ -8,7 +8,9 @@ import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import org.apache.arrow.c.ArrowArray;
@@ -81,6 +83,12 @@ public class StaticJniApi {
 
   public boolean selectivityVectorIsValid(SelectivityVector vector, int idx) {
     return jni.selectivityVectorIsValid(vector.id(), idx);
+  }
+
+  public RowType tableWriteTraitsOutputType() {
+    final String typeJson = jni.tableWriteTraitsOutputType();
+    final RowType type = Serde.fromJson(typeJson, RowType.class);
+    return type;
   }
 
   @VisibleForTesting

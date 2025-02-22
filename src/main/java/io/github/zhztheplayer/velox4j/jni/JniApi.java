@@ -10,8 +10,10 @@ import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
@@ -88,6 +90,13 @@ public final class JniApi {
 
   public SelectivityVector createSelectivityVector(int length) {
     return new SelectivityVector(jni.createSelectivityVector(length));
+  }
+
+  public RowType tableWriteTraitsOutputTypeWithAggregationNode(AggregationNode aggregationNode) {
+    final String aggregationNodeJson = Serde.toJson(aggregationNode);
+    final String typeJson = jni.tableWriteTraitsOutputTypeWithAggregationNode(aggregationNodeJson);
+    final RowType type = Serde.fromJson(typeJson, RowType.class);
+    return type;
   }
 
   @VisibleForTesting

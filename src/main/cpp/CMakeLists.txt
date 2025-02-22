@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(velox4jcpp)
 
+# Include CPM.cmake.
+set(CPM_SOURCE_CACHE ${CMAKE_CURRENT_BINARY_DIR}/.cpm-cache)
 include(cmake/CPM.cmake)
 
 # Preconditions.
@@ -58,6 +60,7 @@ CPMAddPackage(
         PATCHES
         "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
         "${VELOX_PATCH_DIR}/0002-fix-Change-FetchContent-name-of-gtest-to-googletest-.patch"
+        "${VELOX_PATCH_DIR}/0003-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
 )
 
 # Import JniHelpers.

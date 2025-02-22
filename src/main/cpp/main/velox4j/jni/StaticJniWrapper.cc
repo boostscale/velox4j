@@ -19,6 +19,7 @@
 #include <folly/json/json.h>
 #include <velox/common/encode/Base64.h>
 #include <velox/vector/VectorSaver.h>
+#include <velox/exec/TableWriter.h>
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
@@ -166,6 +167,17 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
   return env->NewStringUTF(serializeJson.data());
   JNI_METHOD_END(nullptr)
 }
+
+jstring
+tableWriteTraitsOutputType(JNIEnv* env, jobject javaThis) {
+  JNI_METHOD_START
+  auto type = exec::TableWriteTraits::outputType(nullptr);
+  auto serializedDynamic = type->serialize();
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 } // namespace
 
 const char* StaticJniWrapper::getCanonicalName() const {
@@ -248,6 +260,11 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeBool,
       kTypeLong,
       kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "tableWriteTraitsOutputType",
+      (void*)tableWriteTraitsOutputType,
+      kTypeString,
       nullptr);
   addNativeMethod(
       "deserializeAndSerializeVariant",

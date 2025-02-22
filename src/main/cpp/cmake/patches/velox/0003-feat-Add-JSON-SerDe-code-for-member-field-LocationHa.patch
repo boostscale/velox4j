@@ -1,0 +1,50 @@
+From de29ccebb095ca08dff271e754cbe9a3604f53b6 Mon Sep 17 00:00:00 2001
+From: Hongze Zhang <hongze.zhang@intel.com>
+Date: Sat, 22 Feb 2025 19:21:09 +0800
+Subject: [PATCH] feat: Add JSON SerDe code for member field
+ LocationHandle::targetFileName_
+
+---
+ velox/connectors/hive/HiveDataSink.cpp | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/velox/connectors/hive/HiveDataSink.cpp b/velox/connectors/hive/HiveDataSink.cpp
+index 36e1d7831..838bdd0b6 100644
+--- a/velox/connectors/hive/HiveDataSink.cpp
++++ b/velox/connectors/hive/HiveDataSink.cpp
+@@ -1098,10 +1098,11 @@ std::string HiveInsertTableHandle::toString() const {
+ 
+ std::string LocationHandle::toString() const {
+   return fmt::format(
+-      "LocationHandle [targetPath: {}, writePath: {}, tableType: {},",
++      "LocationHandle [targetPath: {}, writePath: {}, tableType: {}, tableFileName: {},",
+       targetPath_,
+       writePath_,
+-      tableTypeName(tableType_));
++      tableTypeName(tableType_),
++      targetFileName_);
+ }
+ 
+ void LocationHandle::registerSerDe() {
+@@ -1115,6 +1116,7 @@ folly::dynamic LocationHandle::serialize() const {
+   obj["targetPath"] = targetPath_;
+   obj["writePath"] = writePath_;
+   obj["tableType"] = tableTypeName(tableType_);
++  obj["targetFileName"] = targetFileName_;
+   return obj;
+ }
+ 
+@@ -1122,7 +1124,9 @@ LocationHandlePtr LocationHandle::create(const folly::dynamic& obj) {
+   auto targetPath = obj["targetPath"].asString();
+   auto writePath = obj["writePath"].asString();
+   auto tableType = tableTypeFromName(obj["tableType"].asString());
+-  return std::make_shared<LocationHandle>(targetPath, writePath, tableType);
++  auto targetFileName = obj["targetFileName"].asString();
++  return std::make_shared<LocationHandle>(
++      targetPath, writePath, tableType, targetFileName);
+ }
+ 
+ std::unique_ptr<memory::MemoryReclaimer> HiveDataSink::WriterReclaimer::create(
+-- 
+2.25.1
+

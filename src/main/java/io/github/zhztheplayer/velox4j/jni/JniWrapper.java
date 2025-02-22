@@ -55,6 +55,9 @@ final class JniWrapper {
   native long baseVectorLoadedVector(long id);
   native long createSelectivityVector(int length);
 
+  // For TableWrite.
+  native String tableWriteTraitsOutputTypeWithAggregationNode(String aggregationNodeJson);
+
   // For test.
   @VisibleForTesting
   native String deserializeAndSerialize(String json);

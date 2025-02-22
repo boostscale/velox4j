@@ -8,14 +8,18 @@ import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.connector.Assignment;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
+import io.github.zhztheplayer.velox4j.connector.CommitStrategy;
+import io.github.zhztheplayer.velox4j.connector.CompressionKind;
+import io.github.zhztheplayer.velox4j.connector.ConnectorInsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.connector.LocationHandle;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
@@ -23,6 +27,7 @@ import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -33,6 +38,7 @@ import io.github.zhztheplayer.velox4j.plan.LimitNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
@@ -47,20 +53,24 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
+import io.github.zhztheplayer.velox4j.write.TableWriteTraits;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class QueryTest {
+  public static final String HIVE_CONNECTOR_ID = "connector-hive";
   private static MemoryManager memoryManager;
 
   @BeforeClass
@@ -75,11 +85,11 @@ public class QueryTest {
   }
 
   @Test
-  public void testHiveScan1() {
+  public void testTableScan1() {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -87,18 +97,18 @@ public class QueryTest {
     final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
         .run();
     session.close();
   }
 
 
   @Test
-  public void testHiveScan2() {
+  public void testTableScan2() {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.REGION.file();
     final RowType outputType = TpchTests.Table.REGION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -106,17 +116,17 @@ public class QueryTest {
     final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-scan-region.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-region.tsv"))
         .run();
     session.close();
   }
 
   @Test
-  public void testHiveScanCollectMultipleRowVectorsLoadInline() {
+  public void testTableScanCollectMultipleRowVectorsLoadInline() {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -136,16 +146,16 @@ public class QueryTest {
     for (RowVector rv : allRvs) {
       appended.append(rv);
     }
-    Assert.assertEquals(ResourceTests.readResourceAsString("query-output/tpch-scan-nation.tsv"), appended.toString());
+    Assert.assertEquals(ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"), appended.toString());
     session.close();
   }
 
   @Test
-  public void testHiveScanCollectMultipleRowVectorsLoadLast() {
+  public void testTableScanCollectMultipleRowVectorsLoadLast() {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -175,7 +185,7 @@ public class QueryTest {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -238,7 +248,7 @@ public class QueryTest {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -262,7 +272,7 @@ public class QueryTest {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -287,8 +297,8 @@ public class QueryTest {
     final RowType nationOutputType = TpchTests.Table.NATION.schema();
     final File regionFile = TpchTests.Table.REGION.file();
     final RowType regionOutputType = TpchTests.Table.REGION.schema();
-    final TableScanNode nationScanNode = newSampleScanNode("id-1", nationOutputType);
-    final TableScanNode regionScanNode = newSampleScanNode("id-2", regionOutputType);
+    final TableScanNode nationScanNode = newSampleTableScanNode("id-1", nationOutputType);
+    final TableScanNode regionScanNode = newSampleTableScanNode("id-2", regionOutputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(nationScanNode, nationFile),
         newSampleSplit(regionScanNode, regionFile)
@@ -318,7 +328,7 @@ public class QueryTest {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -342,7 +352,7 @@ public class QueryTest {
     final Session session = Velox4j.newSession(memoryManager);
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleScanNode("id-1", outputType);
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
@@ -356,6 +366,95 @@ public class QueryTest {
     session.close();
   }
 
+  @Test
+  public void testTableWrite() throws IOException {
+    final File folder = JniWorkspace.getDefault().getSubDir("test");
+    final String fileName = String.format("test-write-%s.tmp", UUID.randomUUID());
+    final Session session = Velox4j.newSession(memoryManager);
+    final File file = TpchTests.Table.NATION.file();
+    final RowType schema = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", schema);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode);
+    final Query query = new Query(tableWriteNode, splits, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = session.queryOps().execute(query);
+    UpIteratorTests.assertIterator(itr)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-write-1.tsv"))
+        .run();
+    session.close();
+  }
+
+  @Test
+  public void testTableWriteRoundTrip() throws IOException {
+    final Session session = Velox4j.newSession(memoryManager);
+    final File folder = JniWorkspace.getDefault().getSubDir("test");
+    final String fileName = String.format("test-write-%s.tmp", UUID.randomUUID());
+    final RowType schema = TpchTests.Table.NATION.schema();
+
+    // Read the sample nation file.
+    final File file = TpchTests.Table.NATION.file();
+    final TableScanNode scanNode1 = newSampleTableScanNode("id-1", schema);
+    final List<BoundSplit> splits1 = List.of(
+        newSampleSplit(scanNode1, file)
+    );
+    final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode1);
+    final Query query1 = new Query(tableWriteNode, splits1, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr1 = session.queryOps().execute(query1);
+    UpIteratorTests.assertIterator(itr1)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-write-1.tsv"))
+        .run();
+
+    // Read the file we just wrote.
+    final File writtenFile = folder.toPath().resolve(fileName).toFile();;
+    final TableScanNode scanNode2 = newSampleTableScanNode("id-1", schema);
+    final List<BoundSplit> splits2 = List.of(
+        newSampleSplit(scanNode2, writtenFile)
+    );
+    final Query query2 = new Query(scanNode2, splits2, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr2 = session.queryOps().execute(query2);
+    UpIteratorTests.assertIterator(itr2)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
+        .run();
+
+    session.close();
+  }
+
+  private static TableWriteNode newSampleTableWriteNode(String id, RowType schema, File folder, String fileName, TableScanNode scanNode) {
+    final ConnectorInsertTableHandle handle = new HiveInsertTableHandle(
+        toColumnHandles(schema),
+        new LocationHandle(
+            folder.getAbsolutePath(),
+            folder.getAbsolutePath(),
+            LocationHandle.TableType.NEW,
+            fileName
+        ),
+        FileFormat.PARQUET,
+        null,
+        CompressionKind.GZIP,
+        Map.of(),
+        true
+    );
+    final RowType outputType = TableWriteTraits.outputType();
+    final TableWriteNode tableWriteNode = new TableWriteNode(
+        id,
+        schema,
+        schema.getNames(),
+        null,
+        HIVE_CONNECTOR_ID,
+        handle,
+        false,
+        outputType,
+        CommitStrategy.NO_COMMIT,
+        List.of(scanNode)
+    );
+    return tableWriteNode;
+  }
+
   private static List<Assignment> toAssignments(RowType rowType) {
     final List<Assignment> list = new ArrayList<>();
     for (int i = 0; i < rowType.size(); i++) {
@@ -363,6 +462,16 @@ public class QueryTest {
       final Type type = rowType.getChildren().get(i);
       list.add(new Assignment(name,
           new HiveColumnHandle(name, ColumnType.REGULAR, type, type, List.of())));
+    }
+    return list;
+  }
+
+  public static List<HiveColumnHandle> toColumnHandles(RowType rowType) {
+    final List<HiveColumnHandle> list = new ArrayList<>();
+    for (int i = 0; i < rowType.size(); i++) {
+      final String name = rowType.getNames().get(i);
+      final Type type = rowType.getChildren().get(i);
+      list.add(new HiveColumnHandle(name, ColumnType.REGULAR, type, type, List.of()));
     }
     return list;
   }
@@ -392,7 +501,7 @@ public class QueryTest {
     );
   }
 
-  private static TableScanNode newSampleScanNode(String planNodeId, RowType outputType) {
+  private static TableScanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
     final TableScanNode scanNode = new TableScanNode(
         planNodeId,
         outputType,

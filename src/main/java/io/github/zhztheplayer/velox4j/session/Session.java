@@ -8,6 +8,7 @@ import io.github.zhztheplayer.velox4j.data.SelectivityVectors;
 import io.github.zhztheplayer.velox4j.eval.Evaluations;
 import io.github.zhztheplayer.velox4j.jni.CppObject;
 import io.github.zhztheplayer.velox4j.query.Queries;
+import io.github.zhztheplayer.velox4j.write.TableWriteTraits;
 
 public interface Session extends CppObject {
   Evaluations evaluationOps();
@@ -23,4 +24,6 @@ public interface Session extends CppObject {
   SelectivityVectors selectivityVectorOps();
 
   Arrow arrowOps();
+
+  TableWriteTraits tableWriteTraitsOps();
 }

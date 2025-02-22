@@ -40,8 +40,6 @@ public class LocationHandle extends VeloxSerializable {
     return tableType;
   }
 
-  // FIXME: This field doesn't serialize in Velox for now.
-  @JsonIgnore
   @JsonGetter("targetFileName")
   public String getTargetFileName() {
     return targetFileName;
