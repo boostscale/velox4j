@@ -27,7 +27,7 @@ set(VELOX4J_SOURCES
 set(VELOX4J_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}
         ${velox_SOURCE_DIR}
-        ${jni-helpers_SOURCE_DIR}
+        ${JniHelpersLib_SOURCE_DIR}
         ${JNI_INCLUDE_DIRS})
 set(VELOX4J_DEPENDENCIES
         velox
