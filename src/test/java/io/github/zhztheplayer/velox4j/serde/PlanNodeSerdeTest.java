@@ -3,8 +3,10 @@ package io.github.zhztheplayer.velox4j.serde;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
+import io.github.zhztheplayer.velox4j.connector.CommitStrategy;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
+import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -82,21 +84,8 @@ public class PlanNodeSerdeTest {
 
   @Test
   public void testAggregationNode() {
-    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
-        SerdeTests.newSampleOutputType());
-    final Aggregate aggregate = SerdeTests.newSampleAggregate();
-    final AggregationNode aggregationNode = new AggregationNode(
-        "id-2",
-        AggregateStep.PARTIAL,
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of("sum"),
-        List.of(aggregate),
-        true,
-        List.of(scan),
-        FieldAccessTypedExpr.create(new IntegerType(), "foo"),
-        List.of(0)
-    );
+    final AggregationNode aggregationNode = SerdeTests.newSampleAggregationNode(
+        "id-2", "id-1");
     SerdeTests.testVeloxSerializableRoundTrip(aggregationNode);
   }
 
@@ -159,5 +148,25 @@ public class PlanNodeSerdeTest {
         SerdeTests.newSampleOutputType());
     final LimitNode limitNode = new LimitNode("id-2", List.of(scan), 5, 3, false);
     SerdeTests.testVeloxSerializableRoundTrip(limitNode);
+  }
+
+  @Test
+  public void testTableWriteNode() {
+    final RowType rowType = SerdeTests.newSampleOutputType();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
+        rowType);
+    final TableWriteNode tableWriteNode = new TableWriteNode(
+        "id-2",
+        rowType,
+        rowType.getNames(),
+        SerdeTests.newSampleAggregationNode("id-4", "id-3"),
+        "connector-1",
+        SerdeTests.newSampleHiveInsertTableHandle(),
+        true,
+        rowType,
+        CommitStrategy.TASK_COMMIT,
+        List.of(scan)
+    );
+    SerdeTests.testVeloxSerializableRoundTrip(tableWriteNode);
   }
 }

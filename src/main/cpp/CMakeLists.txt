@@ -44,13 +44,21 @@ if (NOT VELOX4J_BUILD_TESTING)
 endif ()
 
 # Import Velox.
+set(VELOX_PATCH_DIR ${CMAKE_CURRENT_LIST_DIR}/cmake/patches/velox)
 set(VELOX_REF_FILE ${CMAKE_CURRENT_LIST_DIR}/velox-ref.txt)
 set(VELOX_REF_HASH_FILE ${CMAKE_CURRENT_LIST_DIR}/velox-ref-hash.txt)
 set(VELOX_REPO facebookincubator/velox)
 file(STRINGS ${VELOX_REF_FILE} VELOX_REF)
 file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
 set(VELOX_SOURCE_URL "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-CPMAddPackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
+CPMAddPackage(
+        NAME velox
+        URL ${VELOX_SOURCE_URL}
+        URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
+        PATCHES
+        "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
+        "${VELOX_PATCH_DIR}/0002-fix-Change-FetchContent-name-of-gtest-to-googletest-.patch"
+)
 
 # Import JniHelpers.
 set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)

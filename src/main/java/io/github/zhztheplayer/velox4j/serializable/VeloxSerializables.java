@@ -28,6 +28,7 @@ import io.github.zhztheplayer.velox4j.plan.LimitNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
@@ -144,6 +145,7 @@ public final class VeloxSerializables {
     NAME_REGISTRY.registerClass("HashJoinNode", HashJoinNode.class);
     NAME_REGISTRY.registerClass("OrderByNode", OrderByNode.class);
     NAME_REGISTRY.registerClass("LimitNode", LimitNode.class);
+    NAME_REGISTRY.registerClass("TableWriteNode", TableWriteNode.class);
   }
 
   private static void retisterConfig() {

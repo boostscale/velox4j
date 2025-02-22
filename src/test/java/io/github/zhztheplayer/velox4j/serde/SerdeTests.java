@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
+import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.CompressionKind;
@@ -28,6 +29,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.jni.JniApiTests;
 import io.github.zhztheplayer.velox4j.jni.LocalSession;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -125,7 +127,7 @@ public final class SerdeTests {
 
   public static HiveConnectorSplit newSampleHiveSplit() {
     return new HiveConnectorSplit(
-        "id-1",
+        "connector-1",
         5,
         true,
         "path/to/file",
@@ -150,7 +152,7 @@ public final class SerdeTests {
 
   public static HiveConnectorSplit newSampleHiveSplitWithMissingFields() {
     return new HiveConnectorSplit(
-        "id-1",
+        "connector-1",
         5,
         true,
         "path/to/file",
@@ -175,7 +177,7 @@ public final class SerdeTests {
 
   public static ConnectorTableHandle newSampleHiveTableHandle(RowType outputType) {
     final ConnectorTableHandle handle = new HiveTableHandle(
-        "id-1",
+        "connector-1",
         "tab-1",
         true,
         List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
@@ -233,6 +235,25 @@ public final class SerdeTests {
     final PlanNode scan = new TableScanNode(planNodeId, outputType,
         handle, Collections.emptyList());
     return scan;
+  }
+
+  public static AggregationNode newSampleAggregationNode(String aggNodeId, String scanNodeId) {
+    final PlanNode scan = SerdeTests.newSampleTableScanNode(scanNodeId,
+        SerdeTests.newSampleOutputType());
+    final Aggregate aggregate = SerdeTests.newSampleAggregate();
+    final AggregationNode aggregationNode = new AggregationNode(
+        aggNodeId,
+        AggregateStep.PARTIAL,
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        List.of("sum"),
+        List.of(aggregate),
+        true,
+        List.of(scan),
+        FieldAccessTypedExpr.create(new IntegerType(), "foo"),
+        List.of(0)
+    );
+    return aggregationNode;
   }
 
   public static RowType newSampleOutputType() {
