@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.test;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
+import io.github.zhztheplayer.velox4j.serde.Serde;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
 
@@ -60,6 +61,15 @@ public final class UpIteratorTests {
         @Override
         public void accept(RowVector vector) {
           Assert.assertEquals(expected, vector.toString(alloc));
+        }
+      });
+    }
+
+    public IteratorAssertionBuilder assertRowVectorTypeJson(int i, String typeJsonExpected) {
+      return assertRowVector(i, new Consumer<RowVector>() {
+        @Override
+        public void accept(RowVector vector) {
+          Assert.assertEquals(typeJsonExpected, Serde.toPrettyJson(vector.getType()));
         }
       });
     }

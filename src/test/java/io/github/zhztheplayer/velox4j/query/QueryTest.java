@@ -382,7 +382,7 @@ public class QueryTest {
     final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-write-1.tsv"))
+        .assertRowVectorTypeJson(0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
         .run();
     session.close();
   }
@@ -405,7 +405,7 @@ public class QueryTest {
     final UpIterator itr1 = session.queryOps().execute(query1);
     UpIteratorTests.assertIterator(itr1)
         .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-write-1.tsv"))
+        .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
         .run();
 
     // Read the file we just wrote.
