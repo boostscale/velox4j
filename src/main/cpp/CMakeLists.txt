@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.28)
 project(velox4jcpp)
 
 # Include CPM.cmake.
-set(CPM_SOURCE_CACHE ${CMAKE_CURRENT_BINARY_DIR}/.cpm-cache)
 include(cmake/CPM.cmake)
 
 # Preconditions.
