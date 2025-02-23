@@ -20,9 +20,6 @@ sudo apt-get install -y openjdk-8-jdk
 sudo apt-get install -y maven
 sudo apt-get install -y chrpath patchelf
 
-# Setup Ccache.
-ccache -M 300M
-
 # Install CMake.
 cd /opt
 wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh

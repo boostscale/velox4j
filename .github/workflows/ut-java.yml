@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CCACHE_MAXSIZE: 300M
     steps:
       - uses: actions/checkout@v4
       - name: Restore Ccache
@@ -74,6 +75,7 @@ jobs:
         run: |
           docker run -v ${{ github.workspace }}:/work -w /work centos:7 bash -c "
             export CCACHE_DIR=/work/.ccache
+            export CCACHE_MAXSIZE=300M
             bash .github/workflows/scripts/ut-java/setup-centos7.sh
             mvn clean test
           "
