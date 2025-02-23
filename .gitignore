@@ -1,5 +1,4 @@
 # Compiled class file
-/target
 *.class
 
 # Log file
@@ -24,10 +23,9 @@
 hs_err_pid*
 replay_pid*
 
-# IDEs
+# Others
 .idea
-
-# C / C++
-cmake-build-*
-build
+/target
+/src/main/cpp/cmake-build-*
+/src/main/cpp/build
 a.out
