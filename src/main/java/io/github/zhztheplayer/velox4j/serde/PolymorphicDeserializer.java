@@ -51,7 +51,7 @@ public class PolymorphicDeserializer {
         return deserializeWithRegistry(p, ctxt, nextRegistry, objectNode);
       }
       if (registry.isClass(value)) {
-        Class<?> clazz = registry.getClass(value);
+        final Class<?> clazz = registry.getClass(value);
         try {
           return p.getCodec().treeToValue(objectNode, clazz);
         } catch (JsonProcessingException e) {
