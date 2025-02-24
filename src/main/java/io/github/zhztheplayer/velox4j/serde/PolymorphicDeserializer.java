@@ -9,13 +9,17 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerUnsafe;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -89,6 +93,19 @@ public class PolymorphicDeserializer {
         if (java.lang.reflect.Modifier.isAbstract(beanClass.getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
           return new AbstractDeserializer(baseClass);
+        } else {
+          // Use a bean deserializer that ignores the JSON field names that are used by AbstractDeserializer to find concrete type.
+          Preconditions.checkState(deserializer instanceof BeanDeserializer);
+          final BeanDeserializer bd = (BeanDeserializer) deserializer;
+          Preconditions.checkState(BeanDeserializerUnsafe.getIgnorableProps(bd) == null);
+          Preconditions.checkState(BeanDeserializerUnsafe.getIncludableProps(bd) == null);
+          return bd.withByNameInclusion(
+              SerdeRegistry.findKvPairs(beanClass)
+                  .stream()
+                  .map(SerdeRegistry.KvPair::getKey)
+                  .collect(Collectors.toUnmodifiableSet()),
+              null
+          );
         }
       }
       return deserializer;

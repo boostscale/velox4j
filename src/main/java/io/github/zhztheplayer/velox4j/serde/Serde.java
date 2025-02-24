@@ -28,7 +28,7 @@ public final class Serde {
     jsonMapper.disable(MapperFeature.AUTO_DETECT_GETTERS);
     jsonMapper.disable(MapperFeature.AUTO_DETECT_SETTERS);
     jsonMapper.disable(MapperFeature.AUTO_DETECT_CREATORS);
-    jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    jsonMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     jsonMapper.disable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
     jsonMapper.addModule(new Jdk8Module());
     return jsonMapper.build();
