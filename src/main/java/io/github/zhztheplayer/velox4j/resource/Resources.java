@@ -27,7 +27,7 @@ public class Resources {
    * <p>
    * Code is copied from <a
    * href="https://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory">here</a>
-   * and then modified for Velox4j's use.
+   * and then modified for Velox4J's use.
    *
    * @param container The container folder. E.g., `META-INF`. Should not be left empty, because
    * Classloader requires for at a meaningful file name to search inside the loaded jar files.

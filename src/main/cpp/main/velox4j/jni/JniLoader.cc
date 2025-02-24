@@ -26,7 +26,7 @@
 #include "velox4j/memory/JavaAllocationListener.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
-  LOG(INFO) << "Initializing Velox4j...";
+  LOG(INFO) << "Initializing Velox4J...";
   JNIEnv* env = jniHelpersInitialize(jvm);
   if (env == nullptr) {
     return -1;
@@ -38,6 +38,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   velox4j::jniClassRegistry()->add(env, new velox4j::DownIteratorJniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::JavaAllocationListenerJniWrapper(env));
 
-  LOG(INFO) << "Velox4j initialized.";
+  LOG(INFO) << "Velox4J initialized.";
   return JAVA_VERSION;
 }

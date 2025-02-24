@@ -31,9 +31,9 @@ public class Velox4j {
           return;
         }
       }
-      // If Velox4j was already initialized, throw.
+      // If Velox4J was already initialized, throw.
       if (initialized.get()) {
-        throw new VeloxException("Could not change configuration after Velox4j was already initialized");
+        throw new VeloxException("Could not change configuration after Velox4J was already initialized");
       }
       // Apply the configuration change.
       globalConfMap.put(key, value);

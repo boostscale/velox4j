@@ -87,7 +87,7 @@ public class BaseVector implements CppObject {
     }
     if (encoding == VectorEncoding.ROW) {
       throw new VeloxException(String.format("The BaseVector has encoding ROW but was not wrapped" +
-          " as a Velox4j RowVector. Actual class: %s", getClass()));
+          " as a Velox4J RowVector. Actual class: %s", getClass()));
     }
     throw new VeloxException(String.format("Not a RowVector. Encoding: %s", getEncoding()));
   }

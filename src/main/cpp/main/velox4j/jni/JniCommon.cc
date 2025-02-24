@@ -121,7 +121,7 @@ JNIEnv* getLocalJNIEnv() {
   static std::atomic<uint32_t> nextThreadId{0};
   if (spotify::jni::JavaThreadUtils::getEnvForCurrentThread() == nullptr) {
     const std::string threadName =
-        fmt::format("Velox4j Native Thread {}", nextThreadId++);
+        fmt::format("Velox4J Native Thread {}", nextThreadId++);
     std::vector<char> threadNameCStr(threadName.length() + 1);
     std::strcpy(threadNameCStr.data(), threadName.data());
     JavaVM* vm = spotify::jni::JavaThreadUtils::getJavaVM();

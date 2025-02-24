@@ -15,12 +15,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
-# Velox4j option definitions.
+# Velox4J option definitions.
 option(VELOX4J_ENABLE_CCACHE "Use ccache if installed." ON)
-option(VELOX4J_BUILD_TESTING "Build Velox4j tests." ON)
+option(VELOX4J_BUILD_TESTING "Build Velox4J tests." ON)
 
-# Velox4j non-bool option definitions.
-set(VELOX4J_INSTALL_DESTINATION "lib" CACHE STRING "The directory Velox4j's libraries are installed. This is relative to the value of CMAKE_INSTALL_PREFIX.")
+# Velox4J non-bool option definitions.
+set(VELOX4J_INSTALL_DESTINATION "lib" CACHE STRING "The directory Velox4J's libraries are installed. This is relative to the value of CMAKE_INSTALL_PREFIX.")
 
 # Setup JNI.
 find_package(Java REQUIRED)
@@ -75,7 +75,7 @@ CPMAddPackage(NAME JniHelpersLib URL ${JNI_HELPERS_SOURCE_URL} URL_HASH MD5=${JN
 target_include_directories(JniHelpers PRIVATE ${JNI_INCLUDE_DIRS})
 target_link_libraries(JniHelpers PRIVATE ${JNI_LIBRARIES})
 
-# Directories of Velox4j.
+# Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
 set(VELOX4J_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
 

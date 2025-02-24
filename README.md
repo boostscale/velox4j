@@ -1,8 +1,8 @@
-# Velox4j: Java Bindings for Velox
+# Velox4J: Java Bindings for Velox
 
 ## Project Status
 
-Velox4j is currently a **concept project**.
+Velox4J is currently a **concept project**.
 
 ## Introduction
 
@@ -22,23 +22,23 @@ Critical open source projects depending on Velox:
 - [Presto](https://github.com/prestodb/presto)
 - [Apache Gluten (incubating)](https://github.com/apache/incubator-gluten)
 
-### What is Velox4j?
+### What is Velox4J?
 
-Velox4j is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's
+Velox4J is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's
 functionalities without writing and maintaining any C++ / JNI code.
 
 ## Design
 
-Velox4j is designed within the following manners:
+Velox4J is designed within the following manners:
 
 ### Portable
 
-Velox4j is designed to be portable. The eventual goal is to make one Velox4j release to be
+Velox4J is designed to be portable. The eventual goal is to make one Velox4J release to be
 shipped onto difference platforms without rebuilding the Jar file.
 
 ### Seamless Velox API Mapping
 
-Velox4j directly adopts Velox's existing JSON serde framework and implements the following
+Velox4J directly adopts Velox's existing JSON serde framework and implements the following
 JSON-serializable Velox components in Java-side:
 
 - Data types
@@ -47,14 +47,14 @@ JSON-serializable Velox components in Java-side:
 - Connectors
 
 With the help of Velox's own JSON serde, there will be no re-interpreting layer for query plans
-in Velox4j's C++ code base. Which means, the Java side Velox components defined in Velox4j's
-Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4j's
-code base even small, and any new Velox features easy to add to Velox4j.
+in Velox4J's C++ code base. Which means, the Java side Velox components defined in Velox4J's
+Java code will be 1-on-1 mapped to Velox's associated components. The design makes Velox4J's
+code base even small, and any new Velox features easy to add to Velox4J.
 
 ### Compatible With Arrow Java
 
-Velox4j is compatible with [Apache Arrow's Java implementation](https://arrow.apache.org/java/). Built-in utilities converting between
-Velox4j's RowVector / BaseVector and Arrow Java's VectorSchemaRoot / Table / FieldVector are provided.
+Velox4J is compatible with [Apache Arrow's Java implementation](https://arrow.apache.org/java/). Built-in utilities converting between
+Velox4J's RowVector / BaseVector and Arrow Java's VectorSchemaRoot / Table / FieldVector are provided.
 
 ## Prerequisites
 
@@ -69,18 +69,18 @@ and on the following operating systems:
 - Linux
 
 Supports for platforms not on the above list will not be guaranteed to have by the main stream code
-of Velox4j at the time. But certainly, contributions are always welcomed if anyone tends to involve.
+of Velox4J at the time. But certainly, contributions are always welcomed if anyone tends to involve.
 
 ### Build Toolchains
 
-The minimum toolchain versions for building Velox4j:
+The minimum toolchain versions for building Velox4J:
 
 - GCC 11
 - JDK 11
 
 ## Releases
 
-Velox4j currently only provides SNAPSHOT jar releases.
+Velox4J currently only provides SNAPSHOT jar releases.
 
 ### Maven
 
@@ -123,10 +123,10 @@ mvn clean install -DskipTests
 
 ## Get Started
 
-The following is a brief example of using Velox4j to execute a query:
+The following is a brief example of using Velox4J to execute a query:
 
 ```java
-// 1. Initialize Velox4j.
+// 1. Initialize Velox4J.
 Velox4j.initialize();
 
 // 2. Define the plan output schema.
@@ -187,7 +187,7 @@ final BoundSplit split = new BoundSplit(
 // 5. Build the query.
 final Query query = new Query(scanNode, List.of(split), Config.empty(), ConnectorConfig.empty());
 
-// 6. Create a Velox4j session.
+// 6. Create a Velox4J session.
 final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
 final Session session = Velox4j.newSession(memoryManager);
 
@@ -202,7 +202,7 @@ while (itr.hasNext()) {
   vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
 }
 
-// 9. Close the Velox4j session.
+// 9. Close the Velox4J session.
 session.close();
 memoryManager.close();
 ```

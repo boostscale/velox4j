@@ -43,7 +43,7 @@ void init(const std::function<void()>& f) {
   static std::atomic<bool> initialized{false};
   bool expected = false;
   if (!initialized.compare_exchange_strong(expected, true)) {
-    VELOX_FAIL("Velox4j was already initialized");
+    VELOX_FAIL("Velox4J was already initialized");
   }
   f();
 }
