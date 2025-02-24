@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.collection.Streams;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,14 +41,14 @@ public class PolymorphicDeserializer {
       return registry;
     }
 
-    private Object deserializeWithRegistry(JsonParser p, DeserializationContext ctxt, SerdeRegistry registry, ObjectNode objectNode) {
+    private Object deserializeWithRegistry(JsonParser p, SerdeRegistry registry, ObjectNode objectNode) {
       final String key = registry.key();
       final String value = objectNode.get(key).asText();
       Preconditions.checkArgument(registry.contains(value), "Value %s not registered in registry: %s", value, registry.prefixAndKey());
       if (registry.isFactory(value)) {
         final SerdeRegistryFactory rf = registry.getFactory(value);
         final SerdeRegistry nextRegistry = findRegistry(rf, objectNode);
-        return deserializeWithRegistry(p, ctxt, nextRegistry, objectNode);
+        return deserializeWithRegistry(p, nextRegistry, objectNode);
       }
       if (registry.isClass(value)) {
         final Class<?> clazz = registry.getClass(value);
@@ -69,10 +69,9 @@ public class PolymorphicDeserializer {
       }
       final ObjectNode objNode = (ObjectNode) treeNode;
       final SerdeRegistry registry = findRegistry(SerdeRegistryFactory.getForBaseClass(baseClass), objNode);
-      return deserializeWithRegistry(p, ctxt, registry, objNode);
+      return deserializeWithRegistry(p, registry, objNode);
     }
   }
-
 
   public static class Modifier extends BeanDeserializerModifier {
     private final Class<? extends NativeBean> baseClass;
@@ -83,8 +82,11 @@ public class PolymorphicDeserializer {
 
     @Override
     public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-      if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
-        if (java.lang.reflect.Modifier.isAbstract(beanDesc.getBeanClass().getModifiers())) {
+      final Class<?> beanClass = beanDesc.getBeanClass();
+      Preconditions.checkArgument(!java.lang.reflect.Modifier.isInterface(beanClass.getModifiers()),
+          String.format("Class %s is an interface which is not currently supported by PolymorphicDeserializer", baseClass));
+      if (baseClass.isAssignableFrom(beanClass)) {
+        if (java.lang.reflect.Modifier.isAbstract(beanClass.getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
           return new AbstractDeserializer(baseClass);
         }

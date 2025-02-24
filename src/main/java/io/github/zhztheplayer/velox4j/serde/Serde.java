@@ -39,7 +39,7 @@ public final class Serde {
     JSON.registerModule(new SimpleModule().setSerializerModifier(new PolymorphicSerializer.Modifier(baseClass)));
   }
 
-  public static ObjectMapper jsonMapper() {
+  static ObjectMapper jsonMapper() {
     return JSON;
   }
 
