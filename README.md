@@ -118,7 +118,7 @@ NOTE:
 ## Build From Source
 
 ```bash
-mvn clean install -DskipTests
+mvn clean install
 ```
 
 ## Get Started
