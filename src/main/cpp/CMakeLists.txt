@@ -62,8 +62,7 @@ CPMAddPackage(
         URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
         PATCHES
         "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
-        "${VELOX_PATCH_DIR}/0002-fix-Change-FetchContent-name-of-gtest-to-googletest-.patch"
-        "${VELOX_PATCH_DIR}/0003-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
+        "${VELOX_PATCH_DIR}/0002-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
 )
 
 # Import JniHelpers.
