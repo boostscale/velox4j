@@ -3,13 +3,13 @@ package io.github.zhztheplayer.velox4j.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Config extends VeloxSerializable {
+public class Config extends ISerializable {
   private static final Config EMPTY = new Config(List.of());
 
   public static Config empty() {

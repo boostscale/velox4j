@@ -7,9 +7,9 @@ import io.github.zhztheplayer.velox4j.jni.JniLibLoader;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializables;
+import io.github.zhztheplayer.velox4j.serializable.ISerializableRegistry;
 import io.github.zhztheplayer.velox4j.session.Session;
-import io.github.zhztheplayer.velox4j.variant.Variants;
+import io.github.zhztheplayer.velox4j.variant.VariantRegistry;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,8 +55,8 @@ public class Velox4j {
     synchronized (globalConfMap) {
       final Config globalConf = Config.create(globalConfMap);
       JniLibLoader.loadAll(JniWorkspace.getDefault().getSubDir("lib"));
-      Variants.registerAll();
-      VeloxSerializables.registerAll();
+      VariantRegistry.registerAll();
+      ISerializableRegistry.registerAll();
       StaticJniApi.get().initialize(globalConf);
     }
   }

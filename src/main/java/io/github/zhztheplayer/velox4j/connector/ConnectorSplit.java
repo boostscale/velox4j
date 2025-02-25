@@ -1,9 +1,9 @@
 package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public abstract class ConnectorSplit extends VeloxSerializable {
+public abstract class ConnectorSplit extends ISerializable {
   private final String connectorId;
   private final long splitWeight;
   private final boolean cacheable;

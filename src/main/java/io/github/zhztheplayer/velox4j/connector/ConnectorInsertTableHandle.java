@@ -1,8 +1,8 @@
 package io.github.zhztheplayer.velox4j.connector;
 
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public abstract class ConnectorInsertTableHandle extends VeloxSerializable {
+public abstract class ConnectorInsertTableHandle extends ISerializable {
   protected ConnectorInsertTableHandle() {
   }
 

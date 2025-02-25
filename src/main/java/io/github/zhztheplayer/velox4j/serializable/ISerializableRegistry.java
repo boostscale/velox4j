@@ -56,23 +56,23 @@ import io.github.zhztheplayer.velox4j.type.UnknownType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.type.VarbinaryType;
 
-public final class VeloxSerializables {
+public final class ISerializableRegistry {
   private static final SerdeRegistry NAME_REGISTRY = SerdeRegistryFactory
-      .createForBaseClass(VeloxSerializable.class).key("name");
+      .createForBaseClass(ISerializable.class).key("name");
 
-  private VeloxSerializables() {
+  private ISerializableRegistry() {
 
   }
 
   public static void registerAll() {
-    Serde.registerBaseClass(VeloxSerializable.class);
+    Serde.registerBaseClass(ISerializable.class);
     registerTypes();
     registerExprs();
     registerConnectors();
     registerFilters();
     registerPlanNodes();
     retisterConfig();
-    registerExpression();
+    registerEvaluation();
     registerQuery();
   }
 
@@ -153,7 +153,7 @@ public final class VeloxSerializables {
     NAME_REGISTRY.registerClass("velox4j.ConnectorConfig", ConnectorConfig.class);
   }
 
-  private static void registerExpression() {
+  private static void registerEvaluation() {
     NAME_REGISTRY.registerClass("velox4j.Evaluation", Evaluation.class);
   }
 

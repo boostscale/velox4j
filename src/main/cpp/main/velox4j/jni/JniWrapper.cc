@@ -211,19 +211,27 @@ jstring tableWriteTraitsOutputTypeWithAggregationNode(
   JNI_METHOD_END(nullptr)
 }
 
-jstring deserializeAndSerialize(JNIEnv* env, jobject javaThis, jstring json) {
+jlong createISerializable(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto serdePool = session->memoryManager()->getVeloxPool(
       "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jJson{env, json};
   auto dynamic = folly::parseJson(jJson.get());
-  auto deserialized =
-      ISerializable::deserialize<ISerializable>(dynamic, serdePool);
-  auto serializedDynamic = deserialized->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
+  auto deserialized = std::const_pointer_cast<ISerializable>(
+      ISerializable::deserialize<ISerializable>(dynamic, serdePool));
+  return session->objectStore()->save(deserialized);
+  JNI_METHOD_END(-1)
+}
+
+jlong createVariant(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized = variant::create(dynamic);
+  return session->objectStore()->save(std::make_shared<variant>(deserialized));
+  JNI_METHOD_END(-1)
 }
 
 class ExternalStreamAsUpIterator : public UpIterator {
@@ -344,11 +352,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "deserializeAndSerialize",
-      (void*)deserializeAndSerialize,
-      kTypeString,
+      "createISerializable",
+      (void*)createISerializable,
+      kTypeLong,
       kTypeString,
       nullptr);
+  addNativeMethod(
+      "createVariant", (void*)createVariant, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",
       (void*)createUpIteratorWithExternalStream,

@@ -1,13 +1,13 @@
 package io.github.zhztheplayer.velox4j.expression;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.type.Type;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class TypedExpr extends VeloxSerializable {
+public abstract class TypedExpr extends ISerializable {
   private final Type returnType;
   private final List<TypedExpr> inputs;
 

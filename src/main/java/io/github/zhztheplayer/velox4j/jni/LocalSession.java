@@ -7,7 +7,9 @@ import io.github.zhztheplayer.velox4j.data.RowVectors;
 import io.github.zhztheplayer.velox4j.data.SelectivityVectors;
 import io.github.zhztheplayer.velox4j.eval.Evaluations;
 import io.github.zhztheplayer.velox4j.query.Queries;
+import io.github.zhztheplayer.velox4j.serializable.ISerializables;
 import io.github.zhztheplayer.velox4j.session.Session;
+import io.github.zhztheplayer.velox4j.variant.Variants;
 import io.github.zhztheplayer.velox4j.write.TableWriteTraits;
 
 public class LocalSession implements Session {
@@ -65,5 +67,15 @@ public class LocalSession implements Session {
   @Override
   public TableWriteTraits tableWriteTraitsOps() {
     return new TableWriteTraits(jniApi());
+  }
+
+  @Override
+  public ISerializables iSerializableOps() {
+    return new ISerializables(jniApi());
+  }
+
+  @Override
+  public Variants variantOps() {
+    return new Variants(jniApi());
   }
 }

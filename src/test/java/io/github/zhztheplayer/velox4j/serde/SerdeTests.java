@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
-import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
 import io.github.zhztheplayer.velox4j.connector.ColumnType;
 import io.github.zhztheplayer.velox4j.connector.CompressionKind;
-import io.github.zhztheplayer.velox4j.connector.ConnectorInsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
 import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
@@ -30,13 +28,14 @@ import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.jni.JniApiTests;
 import io.github.zhztheplayer.velox4j.jni.LocalSession;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
@@ -48,6 +47,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
+import io.github.zhztheplayer.velox4j.variant.VariantCo;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.IntVector;
@@ -66,32 +66,35 @@ public final class SerdeTests {
     Assert.assertEquals(expected, actual);
   }
 
-  public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
+  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
+        final LocalSession session = JniApiTests.createLocalSession(memoryManager);
+        final ISerializableCo co = session.iSerializableOps().asCpp(inObj)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final String outJson = JniApiTests.getJniApi(session).deserializeAndSerialize(inJson);
-      final VeloxSerializable outObj = Serde.fromJson(outJson, VeloxSerializable.class);
+      final ISerializable outObj = co.asJava();
       final String outJson2 = Serde.toPrettyJson(outObj);
       assertJsonEquals(inJson, outJson2);
       return new ObjectAndJson<>((T) outObj, outJson2);
     }
   }
 
-  public static <T extends VeloxSerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(String inJson,
+  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(String inJson,
       Class<? extends T> valueType) {
     final T inObj = Serde.fromJson(inJson, valueType);
     return SerdeTests.testVeloxSerializableRoundTrip(inObj);
   }
 
   public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
-    final String inJson = Serde.toPrettyJson(inObj);
-    final String outJson = StaticJniApi.get().deserializeAndSerializeVariant(inJson);
-    final Variant outObj = Serde.fromJson(outJson, Variant.class);
-    final String outJson2 = Serde.toPrettyJson(outObj);
-    Assert.assertEquals(inObj, outObj);
-    assertJsonEquals(inJson, outJson2);
-    return new ObjectAndJson<>((T) outObj, outJson2);
+    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+        final LocalSession session = JniApiTests.createLocalSession(memoryManager);
+        final VariantCo co = session.variantOps().asCpp(inObj)) {
+      final String inJson = Serde.toPrettyJson(inObj);
+      final Variant outObj = co.asJava();
+      final String outJson2 = Serde.toPrettyJson(outObj);
+      Assert.assertEquals(inObj, outObj);
+      assertJsonEquals(inJson, outJson2);
+      return new ObjectAndJson<>((T) outObj, outJson2);
+    }
   }
 
   public static <T extends Object> ObjectAndJson<T> testJavaBeanRoundTrip(T inObj) {

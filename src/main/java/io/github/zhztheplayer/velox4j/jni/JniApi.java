@@ -13,8 +13,12 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
+import io.github.zhztheplayer.velox4j.variant.Variant;
+import io.github.zhztheplayer.velox4j.variant.VariantCo;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -99,9 +103,14 @@ public final class JniApi {
     return type;
   }
 
-  @VisibleForTesting
-  public String deserializeAndSerialize(String json) {
-    return jni.deserializeAndSerialize(json);
+  public ISerializableCo createISerializable(ISerializable iSerializable) {
+    final String json = Serde.toPrettyJson(iSerializable);
+    return new ISerializableCo(jni.createISerializable(json));
+  }
+
+  public VariantCo createVariantCo(Variant variant) {
+    final String json = Serde.toPrettyJson(variant);
+    return new VariantCo(jni.createVariant(json));
   }
 
   @VisibleForTesting

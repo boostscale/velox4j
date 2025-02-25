@@ -10,9 +10,12 @@ import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
+import io.github.zhztheplayer.velox4j.variant.VariantCo;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -91,8 +94,13 @@ public class StaticJniApi {
     return type;
   }
 
-  @VisibleForTesting
-  public String deserializeAndSerializeVariant(String json) {
-    return jni.deserializeAndSerializeVariant(json);
+  public ISerializable iSerializableDeserialize(ISerializableCo co) {
+    final String json = jni.iSerializableDeserialize(co.id());
+    return Serde.fromJson(json, ISerializable.class);
+  }
+
+  public Variant variantDeserialize(VariantCo co) {
+    final String json = jni.variantDeserialize(co.id());
+    return Serde.fromJson(json, Variant.class);
   }
 }

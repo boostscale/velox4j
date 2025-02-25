@@ -18,8 +18,8 @@
 #include "StaticJniWrapper.h"
 #include <folly/json/json.h>
 #include <velox/common/encode/Base64.h>
-#include <velox/vector/VectorSaver.h>
 #include <velox/exec/TableWriter.h>
+#include <velox/vector/VectorSaver.h>
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
@@ -140,7 +140,11 @@ jstring baseVectorGetEncoding(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(nullptr)
 }
 
-void baseVectorAppend(JNIEnv* env, jobject javaThis, jlong vid, jlong toAppendVid) {
+void baseVectorAppend(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jlong toAppendVid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto toAppend = ObjectStore::retrieve<BaseVector>(toAppendVid);
@@ -148,12 +152,31 @@ void baseVectorAppend(JNIEnv* env, jobject javaThis, jlong vid, jlong toAppendVi
   JNI_METHOD_END()
 }
 
-jboolean selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
+jboolean
+selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<SelectivityVector>(svId);
   auto valid = vector->isValid(static_cast<vector_size_t>(idx));
   return static_cast<jboolean>(valid);
   JNI_METHOD_END(false)
+}
+
+jstring iSerializableDeserialize(JNIEnv* env, jobject javaThis, jlong id) {
+  JNI_METHOD_START
+  auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
+  auto serializedDynamic = iSerializable->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring variantDeserialize(JNIEnv* env, jobject javaThis, jlong id) {
+  JNI_METHOD_START
+  auto v = ObjectStore::retrieve<variant>(id);
+  auto serializedDynamic = v->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
 }
 
 jstring
@@ -168,8 +191,7 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(nullptr)
 }
 
-jstring
-tableWriteTraitsOutputType(JNIEnv* env, jobject javaThis) {
+jstring tableWriteTraitsOutputType(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
   auto type = exec::TableWriteTraits::outputType(nullptr);
   auto serializedDynamic = type->serialize();
@@ -267,10 +289,16 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "deserializeAndSerializeVariant",
-      (void*)deserializeAndSerializeVariant,
+      "iSerializableDeserialize",
+      (void*)iSerializableDeserialize,
       kTypeString,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "variantDeserialize",
+      (void*)variantDeserialize,
       kTypeString,
+      kTypeLong,
       nullptr);
 
   registerNativeMethods(env);

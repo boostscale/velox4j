@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 
-public class Evaluation extends VeloxSerializable {
+public class Evaluation extends ISerializable {
   private final TypedExpr expr;
   private final Config queryConfig;
   private final ConnectorConfig connectorConfig;

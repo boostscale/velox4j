@@ -58,9 +58,10 @@ final class JniWrapper {
   // For TableWrite.
   native String tableWriteTraitsOutputTypeWithAggregationNode(String aggregationNodeJson);
 
-  // For test.
-  @VisibleForTesting
-  native String deserializeAndSerialize(String json);
+  // For serde.
+  native long createISerializable(String json);
+  native long createVariant(String json);
+
   @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);
 }

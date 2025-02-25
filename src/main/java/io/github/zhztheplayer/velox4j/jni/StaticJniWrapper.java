@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 
 public class StaticJniWrapper {
@@ -41,7 +40,7 @@ public class StaticJniWrapper {
   // For TableWrite.
   native String tableWriteTraitsOutputType();
 
-  // For test.
-  @VisibleForTesting
-  native String deserializeAndSerializeVariant(String json);
+  // For serde.
+  native String iSerializableDeserialize(long id);
+  native String variantDeserialize(long id);
 }

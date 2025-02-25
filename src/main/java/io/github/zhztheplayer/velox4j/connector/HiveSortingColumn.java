@@ -3,10 +3,10 @@ package io.github.zhztheplayer.velox4j.connector;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 
-public class HiveSortingColumn extends VeloxSerializable {
+public class HiveSortingColumn extends ISerializable {
   private final String sortColumn;
   private final SortOrder sortOrder;
 

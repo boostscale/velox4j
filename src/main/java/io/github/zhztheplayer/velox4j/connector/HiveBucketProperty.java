@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.github.zhztheplayer.velox4j.serializable.VeloxSerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.type.Type;
 
 import java.util.List;
 
-public class HiveBucketProperty extends VeloxSerializable {
+public class HiveBucketProperty extends ISerializable {
   private final Kind kind;
   private final int bucketCount;
   private final List<String> bucketedBy;
