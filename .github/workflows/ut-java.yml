@@ -49,7 +49,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-ccache-${{github.sha}}
+          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu24-ccache-
       - name: Run setup script
@@ -62,16 +62,10 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-ccache-${{github.sha}}
+          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
 
   ut-centos7:
-    strategy:
-      matrix:
-        runner: [
-          "ubuntu-24.04",
-          "ubuntu-24.04-arm"
-        ]
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04
     env:
       HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
