@@ -161,7 +161,7 @@ selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
   JNI_METHOD_END(false)
 }
 
-jstring iSerializableDeserialize(JNIEnv* env, jobject javaThis, jlong id) {
+jstring iSerializableAsJava(JNIEnv* env, jobject javaThis, jlong id) {
   JNI_METHOD_START
   auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
   auto serializedDynamic = iSerializable->serialize();
@@ -170,7 +170,7 @@ jstring iSerializableDeserialize(JNIEnv* env, jobject javaThis, jlong id) {
   JNI_METHOD_END(nullptr)
 }
 
-jstring variantDeserialize(JNIEnv* env, jobject javaThis, jlong id) {
+jstring variantAsJava(JNIEnv* env, jobject javaThis, jlong id) {
   JNI_METHOD_START
   auto v = ObjectStore::retrieve<variant>(id);
   auto serializedDynamic = v->serialize();
@@ -289,14 +289,14 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "iSerializableDeserialize",
-      (void*)iSerializableDeserialize,
+      "iSerializableAsJava",
+      (void*)iSerializableAsJava,
       kTypeString,
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "variantDeserialize",
-      (void*)variantDeserialize,
+      "variantAsJava",
+      (void*)variantAsJava,
       kTypeString,
       kTypeLong,
       nullptr);

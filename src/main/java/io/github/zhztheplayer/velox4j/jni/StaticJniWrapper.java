@@ -41,6 +41,6 @@ public class StaticJniWrapper {
   native String tableWriteTraitsOutputType();
 
   // For serde.
-  native String iSerializableDeserialize(long id);
-  native String variantDeserialize(long id);
+  native String iSerializableAsJava(long id);
+  native String variantAsJava(long id);
 }

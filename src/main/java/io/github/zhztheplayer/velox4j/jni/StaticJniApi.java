@@ -94,13 +94,13 @@ public class StaticJniApi {
     return type;
   }
 
-  public ISerializable iSerializableDeserialize(ISerializableCo co) {
-    final String json = jni.iSerializableDeserialize(co.id());
+  public ISerializable iSerializableAsJava(ISerializableCo co) {
+    final String json = jni.iSerializableAsJava(co.id());
     return Serde.fromJson(json, ISerializable.class);
   }
 
-  public Variant variantDeserialize(VariantCo co) {
-    final String json = jni.variantDeserialize(co.id());
+  public Variant variantAsJava(VariantCo co) {
+    final String json = jni.variantAsJava(co.id());
     return Serde.fromJson(json, Variant.class);
   }
 }

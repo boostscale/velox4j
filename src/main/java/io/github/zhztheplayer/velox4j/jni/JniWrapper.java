@@ -59,8 +59,8 @@ final class JniWrapper {
   native String tableWriteTraitsOutputTypeWithAggregationNode(String aggregationNodeJson);
 
   // For serde.
-  native long createISerializable(String json);
-  native long createVariant(String json);
+  native long iSerializableAsCpp(String json);
+  native long variantAsCpp(String json);
 
   @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);

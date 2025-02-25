@@ -30,7 +30,6 @@ import io.github.zhztheplayer.velox4j.jni.LocalSession;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.session.Session;
-import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;

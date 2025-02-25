@@ -103,14 +103,14 @@ public final class JniApi {
     return type;
   }
 
-  public ISerializableCo createISerializable(ISerializable iSerializable) {
+  public ISerializableCo iSerializableAsCpp(ISerializable iSerializable) {
     final String json = Serde.toPrettyJson(iSerializable);
-    return new ISerializableCo(jni.createISerializable(json));
+    return new ISerializableCo(jni.iSerializableAsCpp(json));
   }
 
-  public VariantCo createVariantCo(Variant variant) {
+  public VariantCo variantAsCpp(Variant variant) {
     final String json = Serde.toPrettyJson(variant);
-    return new VariantCo(jni.createVariant(json));
+    return new VariantCo(jni.variantAsCpp(json));
   }
 
   @VisibleForTesting

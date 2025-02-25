@@ -12,7 +12,7 @@ public class Variants {
   }
 
   public VariantCo asCpp(Variant variant) {
-    return jniApi.createVariantCo(variant);
+    return jniApi.variantAsCpp(variant);
   }
 
   public static void checkSameType(List<Variant> variants) {

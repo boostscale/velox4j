@@ -19,6 +19,6 @@ public class ISerializableCo implements CppObject {
   }
 
   public ISerializable asJava() {
-    return StaticJniApi.get().iSerializableDeserialize(this);
+    return StaticJniApi.get().iSerializableAsJava(this);
   }
 }

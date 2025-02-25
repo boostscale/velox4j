@@ -19,6 +19,6 @@ public class VariantCo implements CppObject {
   }
 
   public Variant asJava() {
-    return StaticJniApi.get().variantDeserialize(this);
+    return StaticJniApi.get().variantAsJava(this);
   }
 }

@@ -211,7 +211,7 @@ jstring tableWriteTraitsOutputTypeWithAggregationNode(
   JNI_METHOD_END(nullptr)
 }
 
-jlong createISerializable(JNIEnv* env, jobject javaThis, jstring json) {
+jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto serdePool = session->memoryManager()->getVeloxPool(
@@ -224,7 +224,7 @@ jlong createISerializable(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(-1)
 }
 
-jlong createVariant(JNIEnv* env, jobject javaThis, jstring json) {
+jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jJson{env, json};
@@ -352,13 +352,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "createISerializable",
-      (void*)createISerializable,
+      "iSerializableAsCpp",
+      (void*)iSerializableAsCpp,
       kTypeLong,
       kTypeString,
       nullptr);
   addNativeMethod(
-      "createVariant", (void*)createVariant, kTypeLong, kTypeString, nullptr);
+      "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",
       (void*)createUpIteratorWithExternalStream,

@@ -10,6 +10,6 @@ public class ISerializables {
   }
 
   public ISerializableCo asCpp(ISerializable iSerializable) {
-    return jniApi.createISerializable(iSerializable);
+    return jniApi.iSerializableAsCpp(iSerializable);
   }
 }
