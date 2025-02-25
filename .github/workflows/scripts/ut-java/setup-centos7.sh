@@ -31,6 +31,9 @@ rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld
 ln -s /opt/rh/devtoolset-11/root/usr/bin/cc /usr/bin/cc
 ln -s /opt/rh/devtoolset-11/root/usr/bin/c++ /usr/bin/c++
 ln -s /opt/rh/devtoolset-11/root/usr/bin/ld /usr/bin/ld
+cc --version
+c++ --version
+ld --version
 
 pip3 install --upgrade pip
 
