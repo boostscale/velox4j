@@ -65,7 +65,7 @@ jobs:
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
 
   ut-centos7:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     env:
       HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
