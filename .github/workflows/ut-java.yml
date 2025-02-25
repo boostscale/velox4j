@@ -17,7 +17,7 @@ name: Java UT
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
     paths:
       - '**/*'
   push:
@@ -33,7 +33,13 @@ concurrency:
 jobs:
 
   ut-ubuntu24:
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        runner: [
+          "ubuntu-24.04"
+          "ubuntu-24.04-arm"
+        ]
+    runs-on: ${{ matrix.runner }}
     env:
       CCACHE_DIR: "${{ github.workspace }}/.ccache"
       CCACHE_MAXSIZE: 3000M
