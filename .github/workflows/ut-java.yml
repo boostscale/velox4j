@@ -17,7 +17,7 @@ name: Java UT
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
     paths:
       - '**/*'
   push:
