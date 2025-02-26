@@ -1,0 +1,92 @@
+From 7bc02e8ec6cc3ddfaf3381199b90ab4fcc511f04 Mon Sep 17 00:00:00 2001
+From: Hongze Zhang <hongze.zhang@intel.com>
+Date: Wed, 26 Feb 2025 11:22:59 +0800
+Subject: [PATCH] Update FBOS to v2024.07.15
+
+---
+ CMake/resolve_dependency_modules/README.md            | 10 +++++-----
+ CMake/resolve_dependency_modules/folly/CMakeLists.txt |  4 ++--
+ scripts/setup-centos9.sh                              |  2 +-
+ scripts/setup-macos.sh                                |  2 +-
+ scripts/setup-ubuntu.sh                               |  2 +-
+ 5 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/CMake/resolve_dependency_modules/README.md b/CMake/resolve_dependency_modules/README.md
+index f764509f0..4a94d5042 100644
+--- a/CMake/resolve_dependency_modules/README.md
++++ b/CMake/resolve_dependency_modules/README.md
+@@ -32,11 +32,11 @@ by Velox. See details on bundling below.
+ | re2               | 2021-04-01      | Yes      |
+ | fmt               | 10.1.1          | Yes      |
+ | simdjson          | 3.9.3           | Yes      |
+-| folly             | v2024.07.01.00  | Yes      |
+-| fizz              | v2024.07.01.00  | No       |
+-| wangle            | v2024.07.01.00  | No       |
+-| mvfst             | v2024.07.01.00  | No       |
+-| fbthrift          | v2024.07.01.00  | No       |
++| folly             | v2024.07.15.00  | Yes      |
++| fizz              | v2024.07.15.00  | No       |
++| wangle            | v2024.07.15.00  | No       |
++| mvfst             | v2024.07.15.00  | No       |
++| fbthrift          | v2024.07.15.00  | No       |
+ | libstemmer        | 2.2.0           | Yes      |
+ | DuckDB (testing)  | 0.8.1           | Yes      |
+ | cpr (testing)     | 1.10.15         | Yes      |
+diff --git a/CMake/resolve_dependency_modules/folly/CMakeLists.txt b/CMake/resolve_dependency_modules/folly/CMakeLists.txt
+index d501ed8fe..f8a58964f 100644
+--- a/CMake/resolve_dependency_modules/folly/CMakeLists.txt
++++ b/CMake/resolve_dependency_modules/folly/CMakeLists.txt
+@@ -14,9 +14,9 @@
+ project(Folly)
+ cmake_minimum_required(VERSION 3.28)
+ 
+-set(VELOX_FOLLY_BUILD_VERSION v2024.07.01.00)
++set(VELOX_FOLLY_BUILD_VERSION v2024.07.15.00)
+ set(VELOX_FOLLY_BUILD_SHA256_CHECKSUM
+-    e78584ab7ba9a687285f2849bc0141e2422a5c808ad6ab3558c83d85975e25ed)
++    fbed82092b4e25aabcb5f665a35b16076c28f8bd30b63209649420f90df2dbb6)
+ set(VELOX_FOLLY_SOURCE_URL
+     "https://github.com/facebook/folly/releases/download/${VELOX_FOLLY_BUILD_VERSION}/folly-${VELOX_FOLLY_BUILD_VERSION}.tar.gz"
+ )
+diff --git a/scripts/setup-centos9.sh b/scripts/setup-centos9.sh
+index 6168c5148..2c854778f 100755
+--- a/scripts/setup-centos9.sh
++++ b/scripts/setup-centos9.sh
+@@ -40,7 +40,7 @@ USE_CLANG="${USE_CLANG:-false}"
+ export INSTALL_PREFIX=${INSTALL_PREFIX:-"/usr/local"}
+ DEPENDENCY_DIR=${DEPENDENCY_DIR:-$(pwd)/deps-download}
+ 
+-FB_OS_VERSION="v2024.07.01.00"
++FB_OS_VERSION="v2024.07.15.00"
+ FMT_VERSION="10.1.1"
+ BOOST_VERSION="boost-1.84.0"
+ THRIFT_VERSION="v0.16.0"
+diff --git a/scripts/setup-macos.sh b/scripts/setup-macos.sh
+index d38f37acc..7524904ee 100755
+--- a/scripts/setup-macos.sh
++++ b/scripts/setup-macos.sh
+@@ -43,7 +43,7 @@ VELOX_BUILD_SHARED=${VELOX_BUILD_SHARED:-"OFF"} #Build folly shared for use in l
+ DEPENDENCY_DIR=${DEPENDENCY_DIR:-$(pwd)}
+ MACOS_VELOX_DEPS="bison flex gflags glog googletest icu4c libevent libsodium lz4 lzo openssl protobuf@21 snappy xz zstd"
+ MACOS_BUILD_DEPS="ninja cmake"
+-FB_OS_VERSION="v2024.07.01.00"
++FB_OS_VERSION="v2024.07.15.00"
+ FMT_VERSION="10.1.1"
+ BOOST_VERSION="boost-1.84.0"
+ STEMMER_VERSION="2.2.0"
+diff --git a/scripts/setup-ubuntu.sh b/scripts/setup-ubuntu.sh
+index 3d3a7898a..3215c4ec5 100755
+--- a/scripts/setup-ubuntu.sh
++++ b/scripts/setup-ubuntu.sh
+@@ -72,7 +72,7 @@ function install_gcc11_if_needed {
+   fi
+ }
+ 
+-FB_OS_VERSION="v2024.07.01.00"
++FB_OS_VERSION="v2024.07.15.00"
+ FMT_VERSION="10.1.1"
+ BOOST_VERSION="boost-1.84.0"
+ THRIFT_VERSION="v0.16.0"
+-- 
+2.25.1
+
