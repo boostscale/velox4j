@@ -275,7 +275,7 @@ void logErrorOnLeak(const arrow::MemoryPool* pool, bool& leakFound) {
 }
 } // namespace
 
-bool MemoryManager::tryDestructSafe() {
+bool MemoryManager::tryDestruct() {
   bool leakFound{false};
   // Velox memory pools considered safe to destruct when no alive allocations.
   for (const auto& pair : veloxPoolRefs_) {
@@ -341,7 +341,7 @@ bool MemoryManager::tryDestructSafe() {
 }
 
 MemoryManager::~MemoryManager() {
-  bool succeeded = tryDestructSafe();
+  bool succeeded = tryDestruct();
   if (!succeeded) {
     LOG(ERROR)
         << "[Velox4J MemoryManager DTOR] "

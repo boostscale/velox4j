@@ -46,7 +46,7 @@ class MemoryManager {
   arrow::MemoryPool* getArrowPool(const std::string& name);
 
  private:
-  bool tryDestructSafe();
+  bool tryDestruct();
 
   const std::unique_ptr<AllocationListener> listener_;
   std::unique_ptr<MemoryAllocator> arrowAllocator_;
