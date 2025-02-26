@@ -252,32 +252,87 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       facebook::velox::memory::MemoryReclaimer::create());
 }
 
+namespace {
+void logErrorOnLeak(const velox::memory::MemoryPool* pool) {
+  if (pool->usedBytes() != 0) {
+    LOG(ERROR)
+        << "[Velox4J MemoryManager DTOR] "
+        << "Memory leak found on Velox memory pool: " << pool->toString()
+        << ". "
+        << "Please make sure your code released all opened resources already.";
+  }
+}
+void logErrorOnLeak(const arrow::MemoryPool* pool) {
+  if (pool->bytes_allocated() != 0) {
+    LOG(ERROR)
+        << "[Velox4J MemoryManager DTOR] "
+        << "Memory leak found on Arrow memory pool: " << pool->backend_name()
+        << ". "
+        << "Please make sure your code released all opened resources already.";
+  }
+}
+} // namespace
+
 MemoryManager::~MemoryManager() {
-  static const uint32_t kWaitTimeoutMs = 30000; // 30s by default
-  uint32_t accumulatedWaitMs = 0UL;
-  bool destructed = false;
-  for (int32_t tryCount = 0; accumulatedWaitMs < kWaitTimeoutMs; tryCount++) {
-    destructed = tryDestructSafe();
-    if (destructed) {
-      if (tryCount > 0) {
-        LOG(INFO)
-            << "All the outstanding memory resources successfully released. ";
-      }
-      break;
+  // Velox memory pools considered safe to destruct when no alive allocations.
+  for (const auto& pair : veloxPoolRefs_) {
+    const auto& veloxPool = pair.second;
+    VELOX_CHECK_NOT_NULL(veloxPool);
+    logErrorOnLeak(veloxPool.get());
+  }
+  logErrorOnLeak(veloxRootPool_.get());
+  veloxPoolRefs_.clear();
+  veloxRootPool_.reset();
+
+  // Velox memory manager considered safe to destruct when no alive pools.
+  if (veloxMemoryManager_) {
+    if (veloxMemoryManager_->numPools() > 3) {
+      LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
+                 << "There are " << veloxMemoryManager_->numPools()
+                 << " outstanding Velox memory pools.";
     }
-    uint32_t waitMs = 50 *
-        static_cast<uint32_t>(pow(1.5, tryCount)); // 50ms, 75ms, 112.5ms ...
-    LOG(INFO)
-        << "There are still outstanding Velox memory allocations. Waiting for "
-        << waitMs << " ms to let possible async tasks done... ";
-    usleep(waitMs * 1000);
-    accumulatedWaitMs += waitMs;
+    if (veloxMemoryManager_->numPools() < 3) {
+      VELOX_FAIL(
+          "Fatal: Velox memory manager should have at least 3 built-in pools");
+    }
+    int32_t spillPoolCount = 0;
+    int32_t cachePoolCount = 0;
+    int32_t tracePoolCount = 0;
+    veloxMemoryManager_->testingDefaultRoot().visitChildren(
+        [&](velox::memory::MemoryPool* child) -> bool {
+          if (child == veloxMemoryManager_->spillPool()) {
+            spillPoolCount++;
+          }
+          if (child == veloxMemoryManager_->cachePool()) {
+            cachePoolCount++;
+          }
+          if (child == veloxMemoryManager_->tracePool()) {
+            tracePoolCount++;
+          }
+          return true;
+        });
+    VELOX_CHECK(
+        spillPoolCount == 1,
+        "Illegal pool count state: spillPoolCount: " +
+            std::to_string(spillPoolCount));
+    VELOX_CHECK(
+        cachePoolCount == 1,
+        "Illegal pool count state: cachePoolCount: " +
+            std::to_string(cachePoolCount));
+    VELOX_CHECK(
+        tracePoolCount == 1,
+        "Illegal pool count state: tracePoolCount: " +
+            std::to_string(tracePoolCount));
   }
-  if (!destructed) {
-    LOG(ERROR) << "Failed to release Velox memory manager after "
-               << accumulatedWaitMs
-               << "ms as there are still outstanding memory resources. ";
+  veloxMemoryManager_.reset();
+
+  // Applies similar rule for Arrow memory pool.
+  for (const auto& pair : arrowPoolRefs_) {
+    const auto& arrowPool = pair.second;
+    VELOX_CHECK_NOT_NULL(arrowPool);
+    logErrorOnLeak(arrowPool.get());
   }
+  arrowPoolRefs_.clear();
 }
 
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
@@ -318,103 +373,5 @@ arrow::MemoryPool* MemoryManager::getArrowPool(const std::string& name) {
   arrowPoolRefs_[name] =
       std::make_unique<ArrowMemoryPool>(arrowAllocator_.get());
   return arrowPoolRefs_[name].get();
-}
-
-namespace {
-void hold0(
-    std::vector<std::shared_ptr<velox::memory::MemoryPool>>& container,
-    const velox::memory::MemoryPool* pool) {
-  pool->visitChildren([&](velox::memory::MemoryPool* child) -> bool {
-    auto shared = child->shared_from_this();
-    container.push_back(shared);
-    hold0(container, child);
-    return true;
-  });
-}
-} // namespace
-
-void MemoryManager::holdPools() {
-  hold0(heldVeloxPoolRefs_, veloxRootPool_.get());
-}
-
-bool MemoryManager::tryDestructSafe() {
-  // Velox memory pools considered safe to destruct when no alive allocations.
-  for (const auto& pool : heldVeloxPoolRefs_) {
-    if (pool && pool->usedBytes() != 0) {
-      return false;
-    }
-  }
-  for (const auto& pair : veloxPoolRefs_) {
-    const auto& veloxPool = pair.second;
-    if (veloxPool && veloxPool->usedBytes() != 0) {
-      return false;
-    }
-  }
-  if (veloxRootPool_->usedBytes() != 0) {
-    return false;
-  }
-  heldVeloxPoolRefs_.clear();
-  veloxPoolRefs_.clear();
-  veloxRootPool_.reset();
-
-  // Velox memory manager considered safe to destruct when no alive pools.
-  if (veloxMemoryManager_) {
-    if (veloxMemoryManager_->numPools() > 3) {
-      VLOG(2)
-          << "Attempt to destruct VeloxMemoryManager failed because there are "
-          << veloxMemoryManager_->numPools() << " outstanding memory pools.";
-      return false;
-    }
-    if (veloxMemoryManager_->numPools() == 3) {
-      // Assert the pool is spill pool
-      // See
-      // https://github.com/facebookincubator/velox/commit/e6f84e8ac9ef6721f527a2d552a13f7e79bdf72e
-      // https://github.com/facebookincubator/velox/commit/ac134400b5356c5ba3f19facee37884aa020afdc
-      int32_t spillPoolCount = 0;
-      int32_t cachePoolCount = 0;
-      int32_t tracePoolCount = 0;
-      veloxMemoryManager_->testingDefaultRoot().visitChildren(
-          [&](velox::memory::MemoryPool* child) -> bool {
-            if (child == veloxMemoryManager_->spillPool()) {
-              spillPoolCount++;
-            }
-            if (child == veloxMemoryManager_->cachePool()) {
-              cachePoolCount++;
-            }
-            if (child == veloxMemoryManager_->tracePool()) {
-              tracePoolCount++;
-            }
-            return true;
-          });
-      VELOX_CHECK(
-          spillPoolCount == 1,
-          "Illegal pool count state: spillPoolCount: " +
-              std::to_string(spillPoolCount));
-      VELOX_CHECK(
-          cachePoolCount == 1,
-          "Illegal pool count state: cachePoolCount: " +
-              std::to_string(cachePoolCount));
-      VELOX_CHECK(
-          tracePoolCount == 1,
-          "Illegal pool count state: tracePoolCount: " +
-              std::to_string(tracePoolCount));
-    }
-    if (veloxMemoryManager_->numPools() < 3) {
-      VELOX_FAIL("Unreachable code");
-    }
-  }
-  veloxMemoryManager_.reset();
-
-  // Applies similar rule for Arrow memory pool.
-  for (const auto& pair : arrowPoolRefs_) {
-    const auto& arrowPool = pair.second;
-    if (arrowPool && arrowPool->bytes_allocated() != 0) {
-      return false;
-    }
-  }
-  arrowPoolRefs_.clear();
-
-  // Successfully destructed.
-  return true;
 }
 } // namespace velox4j
