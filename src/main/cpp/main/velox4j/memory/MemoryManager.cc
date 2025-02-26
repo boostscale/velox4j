@@ -342,9 +342,12 @@ bool MemoryManager::tryDestructSafe() {
 
 MemoryManager::~MemoryManager() {
   bool succeeded = tryDestructSafe();
-  VELOX_CHECK(
-      succeeded,
-      "Fatal: Memory leak found, aborting the destruction of MemoryManager. This could cause the process to crash.");
+  if (!succeeded) {
+    LOG(ERROR)
+        << "[Velox4J MemoryManager DTOR] "
+        << "Fatal: Memory leak found, aborting the destruction of MemoryManager. This could cause the process to crash.";
+  }
+  VELOX_FAIL("Memory leak found during destruction of MemoryManager");
 }
 
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
