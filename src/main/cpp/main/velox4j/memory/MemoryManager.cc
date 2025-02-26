@@ -341,7 +341,13 @@ bool MemoryManager::tryDestruct() {
 }
 
 MemoryManager::~MemoryManager() {
-  bool succeeded = tryDestruct();
+  bool succeeded{false};
+  try {
+    succeeded = tryDestruct();
+  } catch (const std::exception& ex) {
+    LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
+               << " Error occurred: " << ex.what();
+  }
   if (!succeeded) {
     LOG(ERROR)
         << "[Velox4J MemoryManager DTOR] "
