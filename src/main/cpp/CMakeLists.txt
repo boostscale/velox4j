@@ -63,7 +63,6 @@ CPMAddPackage(
         PATCHES
         "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
         "${VELOX_PATCH_DIR}/0002-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
-        "${VELOX_PATCH_DIR}/0003-Update-FBOS-to-v2024.07.15.patch"
 )
 
 # Import JniHelpers.

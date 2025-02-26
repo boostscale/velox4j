@@ -17,7 +17,7 @@ name: Java UT
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
     paths:
       - '**/*'
   push:
@@ -33,13 +33,7 @@ concurrency:
 jobs:
 
   ut-ubuntu24:
-    strategy:
-      matrix:
-        runner: [
-          "ubuntu-24.04",
-          "ubuntu-24.04-arm"
-        ]
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04
     env:
       CCACHE_DIR: "${{ github.workspace }}/.ccache"
       CCACHE_MAXSIZE: 3000M
@@ -49,9 +43,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
+          key: ut-java-ut-ubuntu24-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
+            ut-java-ut-ubuntu24-ccache-
       - name: Run setup script
         run: |
           bash .github/workflows/scripts/ut-java/setup-ubuntu24.sh
@@ -62,10 +56,10 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
+          key: ut-java-ut-ubuntu24-ccache-${{github.sha}}
 
   ut-centos7:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
