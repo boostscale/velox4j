@@ -46,6 +46,8 @@ class MemoryManager {
   arrow::MemoryPool* getArrowPool(const std::string& name);
 
  private:
+  bool tryDestructSafe();
+
   const std::unique_ptr<AllocationListener> listener_;
   std::unique_ptr<MemoryAllocator> arrowAllocator_;
   std::unordered_map<std::string, std::unique_ptr<arrow::MemoryPool>>

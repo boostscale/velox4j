@@ -253,34 +253,37 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
 }
 
 namespace {
-void logErrorOnLeak(const velox::memory::MemoryPool* pool) {
+void logErrorOnLeak(const velox::memory::MemoryPool* pool, bool& leakFound) {
   if (pool->usedBytes() != 0) {
     LOG(ERROR)
         << "[Velox4J MemoryManager DTOR] "
         << "Memory leak found on Velox memory pool: " << pool->toString()
         << ". "
         << "Please make sure your code released all opened resources already.";
+    leakFound = true;
   }
 }
-void logErrorOnLeak(const arrow::MemoryPool* pool) {
+void logErrorOnLeak(const arrow::MemoryPool* pool, bool& leakFound) {
   if (pool->bytes_allocated() != 0) {
     LOG(ERROR)
         << "[Velox4J MemoryManager DTOR] "
         << "Memory leak found on Arrow memory pool: " << pool->backend_name()
         << ". "
         << "Please make sure your code released all opened resources already.";
+    leakFound = true;
   }
 }
 } // namespace
 
-MemoryManager::~MemoryManager() {
+bool MemoryManager::tryDestructSafe() {
+  bool leakFound{false};
   // Velox memory pools considered safe to destruct when no alive allocations.
   for (const auto& pair : veloxPoolRefs_) {
     const auto& veloxPool = pair.second;
     VELOX_CHECK_NOT_NULL(veloxPool);
-    logErrorOnLeak(veloxPool.get());
+    logErrorOnLeak(veloxPool.get(), leakFound);
   }
-  logErrorOnLeak(veloxRootPool_.get());
+  logErrorOnLeak(veloxRootPool_.get(), leakFound);
   veloxPoolRefs_.clear();
   veloxRootPool_.reset();
 
@@ -290,6 +293,7 @@ MemoryManager::~MemoryManager() {
       LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
                  << "There are " << veloxMemoryManager_->numPools()
                  << " outstanding Velox memory pools.";
+      leakFound = true;
     }
     if (veloxMemoryManager_->numPools() < 3) {
       VELOX_FAIL(
@@ -330,9 +334,17 @@ MemoryManager::~MemoryManager() {
   for (const auto& pair : arrowPoolRefs_) {
     const auto& arrowPool = pair.second;
     VELOX_CHECK_NOT_NULL(arrowPool);
-    logErrorOnLeak(arrowPool.get());
+    logErrorOnLeak(arrowPool.get(), leakFound);
   }
   arrowPoolRefs_.clear();
+  return !leakFound;
+}
+
+MemoryManager::~MemoryManager() {
+  bool succeeded = tryDestructSafe();
+  VELOX_CHECK(
+      succeeded,
+      "Fatal: Memory leak found, aborting the destruction of MemoryManager. This could cause the process to crash.");
 }
 
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
