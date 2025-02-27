@@ -63,6 +63,7 @@ CPMAddPackage(
         PATCHES
         "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
         "${VELOX_PATCH_DIR}/0002-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
+        "${VELOX_PATCH_DIR}/0003-fix-Add-a-patch-to-fix-folly-build-on-arm64-Linux.patch"
 )
 
 # Import JniHelpers.
