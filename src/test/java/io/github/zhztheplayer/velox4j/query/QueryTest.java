@@ -495,6 +495,7 @@ public class QueryTest {
             Optional.empty(),
             Map.of(),
             Map.of(),
+            Map.of(),
             Optional.empty(),
             Optional.empty()
         )
