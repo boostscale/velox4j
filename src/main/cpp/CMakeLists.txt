@@ -32,9 +32,6 @@ endif ()
 include(UseJava)
 
 # Set Velox options.
-# Workaround for https://github.com/facebookincubator/velox/issues/12358.
-unset(BUILD_SHARED_LIBS CACHE)
-unset(BUILD_STATIC_LIBS CACHE)
 set(VELOX_DEPENDENCY_SOURCE AUTO)
 set(VELOX_ENABLE_CCACHE ON)
 set(VELOX_MONO_LIBRARY ON)
@@ -61,9 +58,7 @@ CPMAddPackage(
         URL ${VELOX_SOURCE_URL}
         URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
         PATCHES
-        "${VELOX_PATCH_DIR}/0001-fix-Fix-ambiguous-sources-serde-logic-for-TableWrite.patch"
-        "${VELOX_PATCH_DIR}/0002-feat-Add-JSON-SerDe-code-for-member-field-LocationHa.patch"
-        "${VELOX_PATCH_DIR}/0003-fix-Add-a-patch-to-fix-folly-build-on-arm64-Linux.patch"
+        "${VELOX_PATCH_DIR}/0001-fix-Add-a-patch-to-fix-folly-build-on-arm64-Linux.patch"
 )
 
 # Import JniHelpers.
