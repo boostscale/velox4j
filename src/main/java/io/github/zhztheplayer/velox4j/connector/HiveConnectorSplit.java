@@ -22,6 +22,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
   private final Map<String, String> customSplitInfo;
   private final Optional<String> extraFileInfo;
   private final Map<String, String> serdeParameters;
+  private final Map<String, String> storageParameters;
   private final Map<String, String> infoColumns;
   private final Optional<FileProperties> properties;
   private final Optional<RowIdProperties> rowIdProperties;
@@ -41,6 +42,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
       @JsonProperty("customSplitInfo") Map<String, String> customSplitInfo,
       @JsonProperty("extraFileInfo") Optional<String> extraFileInfo,
       @JsonProperty("serdeParameters") Map<String, String> serdeParameters,
+      @JsonProperty("storageParameters") Map<String, String> storageParameters,
       @JsonProperty("infoColumns") Map<String, String> infoColumns,
       @JsonProperty("properties") Optional<FileProperties> properties,
       @JsonProperty("rowIdProperties") Optional<RowIdProperties> rowIdProperties) {
@@ -55,6 +57,7 @@ public class HiveConnectorSplit extends ConnectorSplit {
     this.customSplitInfo = Preconditions.checkNotNull(customSplitInfo);
     this.extraFileInfo = extraFileInfo;
     this.serdeParameters = Preconditions.checkNotNull(serdeParameters);
+    this.storageParameters = Preconditions.checkNotNull(storageParameters);
     this.infoColumns = Preconditions.checkNotNull(infoColumns);
     this.properties = properties;
     this.rowIdProperties = rowIdProperties;
@@ -121,6 +124,11 @@ public class HiveConnectorSplit extends ConnectorSplit {
   @JsonGetter("serdeParameters")
   public Map<String, String> getSerdeParameters() {
     return serdeParameters;
+  }
+
+  @JsonGetter("storageParameters")
+  public Map<String, String> storageParameters() {
+    return storageParameters;
   }
 
   @JsonGetter("infoColumns")
