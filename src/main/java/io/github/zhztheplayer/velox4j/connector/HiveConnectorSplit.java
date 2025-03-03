@@ -1,9 +1,6 @@
 package io.github.zhztheplayer.velox4j.connector;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
@@ -104,6 +101,8 @@ public class HiveConnectorSplit extends ConnectorSplit {
   }
 
   @JsonGetter("bucketConversion")
+  // FIXME: https://github.com/facebookincubator/velox/pull/12509
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
   public Optional<HiveBucketConversion> getBucketConversion() {
     return bucketConversion;
   }
