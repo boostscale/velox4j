@@ -118,7 +118,7 @@ NOTE:
 ## Build From Source
 
 ```bash
-mvn clean install
+mvn clean install -Dgpg.skip
 ```
 
 ## Get Started
