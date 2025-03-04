@@ -49,10 +49,10 @@ void init(const std::function<void()>& f) {
 }
 
 void initForSpark() {
-  config::globalConfig().memoryLeakCheckEnabled = true;
-  config::globalConfig().memoryPoolCapacityTransferAcrossTasks = true;
-  config::globalConfig().exceptionSystemStacktraceEnabled = true;
-  config::globalConfig().exceptionUserStacktraceEnabled = true;
+  FLAGS_velox_memory_leak_check_enabled = true;
+  FLAGS_velox_memory_pool_capacity_transfer_across_tasks = true;
+  FLAGS_velox_exception_user_stacktrace_enabled = true;
+  FLAGS_velox_exception_system_stacktrace_enabled = true;
   filesystems::registerLocalFileSystem();
   memory::MemoryManager::initialize({});
   dwio::common::registerFileSinks();
