@@ -3,6 +3,7 @@ package io.github.zhztheplayer.velox4j.expression;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
@@ -21,6 +22,8 @@ public class ConstantTypedExpr extends TypedExpr {
       @JsonProperty("value") Variant value,
       @JsonProperty("valueVector") String serializedVector) {
     super(returnType, Collections.emptyList());
+    Preconditions.checkArgument((value == null) != (serializedVector == null),
+        "Either a variant value or a serialized value vector should be provided when creating ConstantTypedExpr");
     this.value = value;
     this.serializedVector = serializedVector;
   }
