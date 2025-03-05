@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class PolymorphicDeserializer {
@@ -78,18 +79,18 @@ public class PolymorphicDeserializer {
   }
 
   public static class Modifier extends BeanDeserializerModifier {
-    private final Class<? extends NativeBean> baseClass;
+    private final Set<Class<? extends NativeBean>> baseClasses = new HashSet<>();
 
-    public Modifier(Class<? extends NativeBean> baseClass) {
-      this.baseClass = baseClass;
+    public Modifier() {
     }
 
     @Override
-    public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
+    public synchronized JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
       final Class<?> beanClass = beanDesc.getBeanClass();
-      Preconditions.checkArgument(!java.lang.reflect.Modifier.isInterface(beanClass.getModifiers()),
-          String.format("Class %s is an interface which is not currently supported by PolymorphicDeserializer", baseClass));
-      if (baseClass.isAssignableFrom(beanClass)) {
+      for (Class<? extends NativeBean> baseClass : baseClasses) {
+        if (!baseClass.isAssignableFrom(beanClass)) {
+          continue;
+        }
         if (java.lang.reflect.Modifier.isAbstract(beanClass.getModifiers())) {
           // We use the custom deserializer for abstract classes to find the concrete type information of the object.
           return new AbstractDeserializer(baseClass);
@@ -109,6 +110,13 @@ public class PolymorphicDeserializer {
         }
       }
       return deserializer;
+    }
+
+    public synchronized void registerBaseClass(Class<? extends NativeBean> clazz) {
+      Preconditions.checkArgument(!java.lang.reflect.Modifier.isInterface(clazz.getModifiers()),
+          String.format("Class %s is an interface which is not currently supported by PolymorphicDeserializer", clazz));
+      Preconditions.checkArgument(!baseClasses.contains(clazz), "Base class already registered: %s", clazz);
+      baseClasses.add(clazz);
     }
   }
 }

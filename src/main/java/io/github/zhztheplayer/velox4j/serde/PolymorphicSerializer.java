@@ -9,9 +9,10 @@ import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import com.fasterxml.jackson.databind.ser.std.ToEmptyObjectSerializer;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 public final class PolymorphicSerializer {
   private PolymorphicSerializer() {
@@ -47,15 +48,17 @@ public final class PolymorphicSerializer {
   }
 
   public static class Modifier extends BeanSerializerModifier {
-    private final Class<? extends NativeBean> baseClass;
+    private final Set<Class<? extends NativeBean>> baseClasses = new HashSet<>();
 
-    public Modifier(Class<? extends NativeBean> baseClass) {
-      this.baseClass = baseClass;
+    public Modifier() {
     }
 
     @Override
-    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-      if (baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
+    public synchronized JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+      for (Class<? extends NativeBean> baseClass : baseClasses) {
+        if (!baseClass.isAssignableFrom(beanDesc.getBeanClass())) {
+          continue;
+        }
         if (serializer instanceof ToEmptyObjectSerializer) {
           return new EmptyBeanSerializer();
         }
@@ -64,6 +67,13 @@ public final class PolymorphicSerializer {
         }
       }
       return serializer;
+    }
+
+    public synchronized void registerBaseClass(Class<? extends NativeBean> clazz) {
+      Preconditions.checkArgument(!java.lang.reflect.Modifier.isInterface(clazz.getModifiers()),
+          String.format("Class %s is an interface which is not currently supported by PolymorphicSerializer", clazz));
+      Preconditions.checkArgument(!baseClasses.contains(clazz), "Base class already registered: %s", clazz);
+      baseClasses.add(clazz);
     }
   }
 }
