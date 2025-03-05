@@ -67,13 +67,21 @@ public final class SerdeTests {
 
   public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final LocalSession session = JniApiTests.createLocalSession(memoryManager);
-        final ISerializableCo co = session.iSerializableOps().asCpp(inObj)) {
+        final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final ISerializable outObj = co.asJava();
-      final String outJson2 = Serde.toPrettyJson(outObj);
-      assertJsonEquals(inJson, outJson2);
-      return new ObjectAndJson<>((T) outObj, outJson2);
+
+      {
+        final ISerializable javaOutObj = Serde.fromJson(inJson, ISerializable.class);
+        final String javaOutJson = Serde.toPrettyJson(javaOutObj);
+        assertJsonEquals(inJson, javaOutJson);
+      }
+
+      try (final ISerializableCo inObjCo = session.iSerializableOps().asCpp(inObj)) {
+        final ISerializable cppOutObj = inObjCo.asJava();
+        final String cppOutJson = Serde.toPrettyJson(cppOutObj);
+        assertJsonEquals(inJson, cppOutJson);
+        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+      }
     }
   }
 
@@ -85,14 +93,22 @@ public final class SerdeTests {
 
   public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-        final LocalSession session = JniApiTests.createLocalSession(memoryManager);
-        final VariantCo co = session.variantOps().asCpp(inObj)) {
+        final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
-      final Variant outObj = co.asJava();
-      final String outJson2 = Serde.toPrettyJson(outObj);
-      Assert.assertEquals(inObj, outObj);
-      assertJsonEquals(inJson, outJson2);
-      return new ObjectAndJson<>((T) outObj, outJson2);
+
+      {
+        final Variant javaOutObj = Serde.fromJson(inJson, Variant.class);
+        final String javaOutJson = Serde.toPrettyJson(javaOutObj);
+        assertJsonEquals(inJson, javaOutJson);
+      }
+
+      try (final VariantCo inObjCo = session.variantOps().asCpp(inObj)) {
+        final Variant cppOutObj = inObjCo.asJava();
+        final String cppOutJson = Serde.toPrettyJson(cppOutObj);
+        Assert.assertEquals(inObj, cppOutObj);
+        assertJsonEquals(inJson, cppOutJson);
+        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+      }
     }
   }
 
