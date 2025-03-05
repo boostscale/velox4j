@@ -16,12 +16,12 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import java.io.IOException;
 
 public final class Serde {
-  private static final PolymorphicDeserializer.Modifier DE_SER_MOD = new PolymorphicDeserializer.Modifier();
+  private static final PolymorphicDeserializer.Modifier DESER_MOD = new PolymorphicDeserializer.Modifier();
   private static final PolymorphicSerializer.Modifier SER_MOD = new PolymorphicSerializer.Modifier();
-  private static final ObjectMapper JSON = newVeloxJsonMapper(DE_SER_MOD, SER_MOD);
+  private static final ObjectMapper JSON = newVeloxJsonMapper(DESER_MOD, SER_MOD);
 
   private static ObjectMapper newVeloxJsonMapper(
-      PolymorphicDeserializer.Modifier deSerMod, PolymorphicSerializer.Modifier serMod) {
+      PolymorphicDeserializer.Modifier deserializerModifier, PolymorphicSerializer.Modifier serializerModifier) {
     final JsonMapper.Builder jsonMapper = JsonMapper.builder();
     jsonMapper.serializationInclusion(JsonInclude.Include.NON_NULL);
     jsonMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
@@ -34,13 +34,13 @@ public final class Serde {
     jsonMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     jsonMapper.disable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
     jsonMapper.addModule(new Jdk8Module());
-    jsonMapper.addModule(new SimpleModule().setDeserializerModifier(deSerMod));
-    jsonMapper.addModule(new SimpleModule().setSerializerModifier(serMod));
+    jsonMapper.addModule(new SimpleModule().setDeserializerModifier(deserializerModifier));
+    jsonMapper.addModule(new SimpleModule().setSerializerModifier(serializerModifier));
     return jsonMapper.build();
   }
 
   public static void registerBaseClass(Class<? extends NativeBean> baseClass) {
-    DE_SER_MOD.registerBaseClass(baseClass);
+    DESER_MOD.registerBaseClass(baseClass);
     SER_MOD.registerBaseClass(baseClass);
   }
 
