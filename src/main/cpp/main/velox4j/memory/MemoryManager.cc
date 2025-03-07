@@ -97,7 +97,7 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
     VELOX_CHECK_EQ(ret, 1);
   }
 
-  bool growCapacity(velox::memory::MemoryPool* pool, uint64_t targetBytes)
+  void growCapacity(velox::memory::MemoryPool* pool, uint64_t targetBytes)
       override {
     // Set arbitration context to allow memory over-use during recursive
     // arbitration. See MemoryPoolImpl::maybeIncrementReservation.
@@ -115,7 +115,6 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
         pool->root() == candidate, "Illegal state in ListenableArbitrator");
 
     growCapacityInternal(pool->root(), targetBytes);
-    return true;
   }
 
   uint64_t shrinkCapacity(
@@ -152,7 +151,7 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
     return fmt::format(
         "ARBITRATOR[{}] CAPACITY {} {}",
         kind_,
-        velox::succinctBytes(capacity_),
+        velox::succinctBytes(capacity()),
         stats().toString());
   }
 
