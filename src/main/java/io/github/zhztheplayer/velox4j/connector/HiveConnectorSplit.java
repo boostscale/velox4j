@@ -101,8 +101,6 @@ public class HiveConnectorSplit extends ConnectorSplit {
   }
 
   @JsonGetter("bucketConversion")
-  // FIXME: https://github.com/facebookincubator/velox/pull/12509
-  @JsonInclude(JsonInclude.Include.NON_ABSENT)
   public Optional<HiveBucketConversion> getBucketConversion() {
     return bucketConversion;
   }
