@@ -17,15 +17,8 @@ sudo apt-get install -y libgoogle-glog-dev libbz2-dev libgflags-dev libgmock-dev
 sudo apt-get install -y liblz4-dev libsodium-dev libelf-dev
 sudo apt-get install -y autoconf automake g++ libnuma-dev libtool numactl unzip libdaxctl-dev
 sudo apt-get install -y openjdk-11-jdk
-sudo apt-get install -y maven
+sudo apt-get install -y maven cmake
 sudo apt-get install -y chrpath patchelf
-
-# Install CMake.
-cd /opt
-wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh
-mkdir cmake
-bash cmake-3.28.3-linux-x86_64.sh --skip-license --prefix=/opt/cmake
-sudo ln -s /opt/cmake/bin/cmake /usr/bin/cmake
 
 # Install GCC 11.
 sudo apt-get install -y software-properties-common
