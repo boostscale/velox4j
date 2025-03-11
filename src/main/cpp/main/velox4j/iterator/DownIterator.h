@@ -55,6 +55,8 @@ class DownIterator : public ExternalStream {
   // DTOR.
   ~DownIterator() override;
 
+  void close() override;
+
   std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) override;
 
@@ -67,6 +69,7 @@ class DownIterator : public ExternalStream {
   std::mutex mutex_;
   std::unique_ptr<folly::IOThreadPoolExecutor> waitExecutor_;
   std::vector<facebook::velox::ContinuePromise> promises_{};
+  std::atomic_bool closed_{false};
 };
 
 } // namespace velox4j

@@ -50,12 +50,7 @@ DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
 
 DownIterator::~DownIterator() {
   try {
-    auto* env = getLocalJNIEnv();
-    static const auto* clazz = jniClassRegistry()->get(kClassName);
-    static jmethodID methodId = clazz->getMethod("close");
-    env->CallVoidMethod(ref_, methodId);
-    checkException(env);
-    waitExecutor_->join();
+    DownIterator::close();
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
     LOG(WARNING)
@@ -65,6 +60,7 @@ DownIterator::~DownIterator() {
 }
 
 std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
+  VELOX_CHECK(!closed_);
   {
     std::lock_guard l(mutex_);
     VELOX_CHECK(
@@ -120,6 +116,20 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
   }
   VELOX_FAIL(
       "Unrecognizable state: {}", std::to_string(static_cast<int32_t>(state)));
+  return std::nullopt;
+}
+
+void DownIterator::close() {
+  bool expected = false;
+  if (!closed_.compare_exchange_strong(expected, true)) {
+    return;
+  }
+  auto* env = getLocalJNIEnv();
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("close");
+  env->CallVoidMethod(ref_, methodId);
+  checkException(env);
+  waitExecutor_->join();
 }
 
 void DownIterator::wait() {

@@ -1,0 +1,97 @@
+From cf276c8c040723b67cad114545c51297262c786a Mon Sep 17 00:00:00 2001
+From: Hongze Zhang <hongze.zzz123@gmail.com>
+Date: Tue, 11 Mar 2025 16:55:39 +0000
+Subject: [PATCH] Avoid cyclic reference on drivers' shared pointers created by
+ DriverBlockingState
+
+---
+ velox/exec/Task.cpp | 33 ++++++++++++++++-----------------
+ velox/exec/Task.h   |  5 +++--
+ 2 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/velox/exec/Task.cpp b/velox/exec/Task.cpp
+index 6c2b4ae5f..c2d5361c5 100644
+--- a/velox/exec/Task.cpp
++++ b/velox/exec/Task.cpp
+@@ -696,7 +696,7 @@ RowVectorPtr Task::next(ContinueFuture* future) {
+     driverBlockingStates_.reserve(drivers_.size());
+     for (auto i = 0; i < drivers_.size(); ++i) {
+       driverBlockingStates_.emplace_back(
+-          std::make_unique<DriverBlockingState>(drivers_[i].get()));
++          std::make_shared<DriverBlockingState>(drivers_[i].get()));
+     }
+   }
+
+@@ -3239,23 +3239,22 @@ void Task::DriverBlockingState::setDriverFuture(ContinueFuture& driverFuture) {
+   }
+   std::move(driverFuture)
+       .via(&folly::InlineExecutor::instance())
+-      .thenValue(
+-          [&, driverHolder = driver_->shared_from_this()](auto&& /* unused */) {
+-            std::vector<std::unique_ptr<ContinuePromise>> promises;
+-            {
+-              std::lock_guard<std::mutex> l(mutex_);
+-              VELOX_CHECK(blocked_);
+-              VELOX_CHECK_NULL(error_);
+-              promises = std::move(promises_);
+-              blocked_ = false;
+-            }
+-            for (auto& promise : promises) {
+-              promise->setValue();
+-            }
+-          })
++      .thenValue([&, holder = shared_from_this()](auto&& /* unused */) {
++        std::vector<std::unique_ptr<ContinuePromise>> promises;
++        {
++          std::lock_guard<std::mutex> l(mutex_);
++          VELOX_CHECK(blocked_);
++          VELOX_CHECK_NULL(error_);
++          promises = std::move(promises_);
++          blocked_ = false;
++        }
++        for (auto& promise : promises) {
++          promise->setValue();
++        }
++      })
+       .thenError(
+           folly::tag_t<std::exception>{},
+-          [&, driverHolder = driver_->shared_from_this()](
++          [&, holder = shared_from_this(), taskId = driver_->task()->taskId()](
+               std::exception const& e) {
+             std::lock_guard<std::mutex> l(mutex_);
+             VELOX_CHECK(blocked_);
+@@ -3263,7 +3262,7 @@ void Task::DriverBlockingState::setDriverFuture(ContinueFuture& driverFuture) {
+             try {
+               VELOX_FAIL(
+                   "A driver future from task {} was realized with error: {}",
+-                  driver_->task()->taskId(),
++                  taskId,
+                   e.what());
+             } catch (const VeloxException&) {
+               error_ = std::current_exception();
+diff --git a/velox/exec/Task.h b/velox/exec/Task.h
+index 998e973a5..a1cc14922 100644
+--- a/velox/exec/Task.h
++++ b/velox/exec/Task.h
+@@ -1121,7 +1121,8 @@ class Task : public std::enable_shared_from_this<Task> {
+   std::vector<std::shared_ptr<Driver>> drivers_;
+
+   // Tracks the blocking state for each driver under serialized execution mode.
+-  class DriverBlockingState {
++  class DriverBlockingState
++      : public enable_shared_from_this<DriverBlockingState> {
+    public:
+     explicit DriverBlockingState(const Driver* driver) : driver_(driver) {
+       VELOX_CHECK_NOT_NULL(driver_);
+@@ -1150,7 +1151,7 @@ class Task : public std::enable_shared_from_this<Task> {
+   };
+ 
+   // Tracks the driver blocking state under serialized execution mode.
+-  std::vector<std::unique_ptr<DriverBlockingState>> driverBlockingStates_;
++  std::vector<std::shared_ptr<DriverBlockingState>> driverBlockingStates_;
+ 
+   // When Drivers are closed by the Task, there is a chance that race and/or
+   // bugs can cause such Drivers to be held forever, in turn holding a pointer
+-- 
+2.43.0
+

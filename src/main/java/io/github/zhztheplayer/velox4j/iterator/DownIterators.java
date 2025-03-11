@@ -35,7 +35,7 @@ public final class DownIterators {
 
     @Override
     public void waitFor() throws InterruptedException {
-      throw new IllegalStateException();
+      throw new IllegalStateException("#waitFor is called while the iterator doesn't block");
     }
 
     @Override
@@ -95,8 +95,7 @@ public final class DownIterators {
 
     @Override
     public void close() {
-      Preconditions.checkState(closed.compareAndSet(false, true),
-          "Already closed");
+      closed.compareAndSet(false, true);
     }
   }
 }

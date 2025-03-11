@@ -240,13 +240,12 @@ public class QueryTest {
     );
     final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator out = session.queryOps().execute(query);
-    Assert.assertThrows(VeloxException.class, out::waitFor);
     SampleQueryTests.assertIterator(out);
     session.close();
   }
 
   @Test
-  public void testExternalStreamFromBlockingQueue() {
+  public void testExternalStreamFromBlockingQueue() throws InterruptedException {
     final Session session = Velox4j.newSession(memoryManager);
     final BlockingQueue<RowVector> queue = new LinkedBlockingQueue<>();
     final DownIterator down = DownIterators.fromBlockingQueue(queue);

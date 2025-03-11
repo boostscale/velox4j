@@ -48,6 +48,8 @@ class ExternalStream {
 
   virtual std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) = 0;
+
+  virtual void close() = 0;
 };
 
 class ExternalStreamConnectorSplit
