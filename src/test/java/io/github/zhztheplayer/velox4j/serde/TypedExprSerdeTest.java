@@ -22,16 +22,14 @@ import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.Collections;
 import java.util.List;
 
 public class TypedExprSerdeTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -42,6 +40,16 @@ public class TypedExprSerdeTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
   }
 
   @Test
@@ -64,7 +72,6 @@ public class TypedExprSerdeTest {
 
   @Test
   public void testConstantTypedExpr() {
-    final Session session = Velox4j.newSession(memoryManager);
     final BaseVector intVector = BaseVectorTests.newSampleIntVector(session);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testVeloxSerializableRoundTrip(expr1);
@@ -74,7 +81,6 @@ public class TypedExprSerdeTest {
     SerdeTests.testVeloxSerializableRoundTrip(expr3);
     final ConstantTypedExpr expr4 = new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
     SerdeTests.testVeloxSerializableRoundTrip(expr4);
-    session.close();
   }
 
   @Test

@@ -25,14 +25,13 @@ import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.List;
 
 public class PlanNodeSerdeTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -43,6 +42,16 @@ public class PlanNodeSerdeTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
   }
 
   @Test
@@ -70,11 +79,9 @@ public class PlanNodeSerdeTest {
   @Test
   public void testValuesNode() {
     // The case fails in debug build. Should investigate.
-    final Session session = Velox4j.newSession(memoryManager);
     final PlanNode values = ValuesNode.create("id-1",
         List.of(BaseVectorTests.newSampleRowVector(session)), true, 1);
     SerdeTests.testVeloxSerializableRoundTrip(values);
-    session.close();
   }
 
   @Test

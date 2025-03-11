@@ -12,15 +12,13 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.List;
 
 public class BaseVectorTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -33,19 +31,26 @@ public class BaseVectorTest {
     memoryManager.close();
   }
 
-  @Test
-  public void testCreateEmpty1() {
-    final Session session = Velox4j.newSession(memoryManager);
-    final Type type = new RealType();
-    final BaseVector vector = session.baseVectorOps().createEmpty(type);
-    Assert.assertEquals(Serde.toPrettyJson(type), Serde.toPrettyJson(vector.getType()));
-    Assert.assertEquals(0, vector.getSize());
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
     session.close();
   }
 
   @Test
+  public void testCreateEmpty1() {
+    final Type type = new RealType();
+    final BaseVector vector = session.baseVectorOps().createEmpty(type);
+    Assert.assertEquals(Serde.toPrettyJson(type), Serde.toPrettyJson(vector.getType()));
+    Assert.assertEquals(0, vector.getSize());
+  }
+
+  @Test
   public void testCreateEmpty2() {
-    final Session session = Velox4j.newSession(memoryManager);
     final Type type = new RowType(
         List.of("foo2", "bar2"),
         List.of(new IntegerType(), new IntegerType())
@@ -53,21 +58,17 @@ public class BaseVectorTest {
     final BaseVector vector = session.baseVectorOps().createEmpty(type);
     Assert.assertEquals(Serde.toPrettyJson(type), Serde.toPrettyJson(vector.getType()));
     Assert.assertEquals(0, vector.getSize());
-    session.close();
   }
 
   @Test
   public void testToString() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(ResourceTests.readResourceAsString("vector-output/to-string-1.txt"),
         input.toString());
-    session.close();
   }
 
   @Test
   public void testSlice() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(3, input.getSize());
     final RowVector sliced1 = input.slice(0, 2).asRowVector();
@@ -76,12 +77,10 @@ public class BaseVectorTest {
         sliced1.toString());
     Assert.assertEquals(ResourceTests.readResourceAsString("vector-output/slice-2.txt"),
         sliced2.toString());
-    session.close();
   }
 
   @Test
   public void testAppend() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input1 = BaseVectorTests.newSampleRowVector(session);
     final RowVector input2 = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(3, input1.getSize());
@@ -96,6 +95,5 @@ public class BaseVectorTest {
     Assert.assertEquals(9, input2.getSize());
     Assert.assertEquals(ResourceTests.readResourceAsString("vector-output/append-2.txt"),
         input2.toString());
-    session.close();
   }
 }

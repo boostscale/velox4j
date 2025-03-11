@@ -11,20 +11,17 @@ import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.serde.SerdeTests;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.List;
 
 public class EvaluationTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -37,9 +34,18 @@ public class EvaluationTest {
     memoryManager.close();
   }
 
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
+  }
+
   @Test
   public void testFieldAccess() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
@@ -54,12 +60,10 @@ public class EvaluationTest {
     Assert.assertEquals(
         ResourceTests.readResourceAsString("eval-output/field-access-1.txt"),
         outString);
-    session.close();
   }
 
   @Test
   public void testMultipleEvalCalls() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
@@ -75,12 +79,10 @@ public class EvaluationTest {
       final String outString = out.toString();
       Assert.assertEquals(expected, outString);
     }
-    session.close();
   }
 
   @Test
   public void testMultiply() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final int size = input.getSize();
     final SelectivityVector sv = session.selectivityVectorOps().create(size);
@@ -98,6 +100,5 @@ public class EvaluationTest {
     Assert.assertEquals(
         ResourceTests.readResourceAsString("eval-output/multiply-1.txt"),
         outString);
-    session.close();
   }
 }
