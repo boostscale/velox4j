@@ -66,11 +66,18 @@ void releaseCppObject(JNIEnv* env, jobject javaThis, jlong objId) {
   JNI_METHOD_END()
 }
 
-jboolean upIteratorHasNext(JNIEnv* env, jobject javaThis, jlong itrId) {
+jint upIteratorAdvance(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
-  return itr->hasNext();
-  JNI_METHOD_END(false)
+  return static_cast<jint>(itr->advance());
+  JNI_METHOD_END(-1)
+}
+
+void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  itr->wait();
+  JNI_METHOD_END()
 }
 
 jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
@@ -226,11 +233,13 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "upIteratorHasNext",
-      (void*)upIteratorHasNext,
-      kTypeBool,
+      "upIteratorAdvance",
+      (void*)upIteratorAdvance,
+      kTypeInt,
       kTypeLong,
       nullptr);
+  addNativeMethod(
+    "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,
@@ -295,11 +304,7 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "variantAsJava",
-      (void*)variantAsJava,
-      kTypeString,
-      kTypeLong,
-      nullptr);
+      "variantAsJava", (void*)variantAsJava, kTypeString, kTypeLong, nullptr);
 
   registerNativeMethods(env);
 }

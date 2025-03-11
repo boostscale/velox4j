@@ -49,8 +49,12 @@ public class StaticJniApi {
     jni.releaseCppObject(obj.id());
   }
 
-  public boolean upIteratorHasNext(UpIterator itr) {
-    return jni.upIteratorHasNext(itr.id());
+  public UpIterator.State upIteratorAdvance(UpIterator itr) {
+    return UpIterator.State.get(jni.upIteratorAdvance(itr.id()));
+  }
+
+  public void upIteratorWait(UpIterator itr) {
+    jni.upIteratorWait(itr.id());
   }
 
   public Type variantInferType(Variant variant) {
