@@ -256,6 +256,11 @@ class ExternalStreamAsUpIterator : public UpIterator {
     return State::AVAILABLE;
   }
 
+  void wait() override {
+    VELOX_CHECK_NULL(pending_);
+    VELOX_NYI("Not implemented: {}", __func__);
+  }
+
   RowVectorPtr get() override {
     VELOX_CHECK_NOT_NULL(
         pending_,

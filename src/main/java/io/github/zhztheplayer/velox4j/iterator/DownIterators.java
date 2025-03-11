@@ -2,7 +2,6 @@ package io.github.zhztheplayer.velox4j.iterator;
 
 import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.util.Iterator;
 import java.util.Queue;
@@ -15,8 +14,8 @@ public final class DownIterators {
     return new FromJavaIterator(itr);
   }
 
-  public static DownIterator fromQueue(Queue<RowVector> queue) {
-    return new FromQueue(queue);
+  public static DownIterator fromBlockingQueue(BlockingQueue<RowVector> queue) {
+    return new FromBlockingQueue(queue);
   }
 
   private static class FromJavaIterator implements DownIterator {
@@ -35,6 +34,11 @@ public final class DownIterators {
     }
 
     @Override
+    public void waitFor() throws InterruptedException {
+      throw new IllegalStateException();
+    }
+
+    @Override
     public long get() {
       return itr.next().id();
     }
@@ -45,15 +49,20 @@ public final class DownIterators {
     }
   }
 
-  private static class FromQueue implements DownIterator {
-    private final Queue<RowVector> queue;
+  private static class FromBlockingQueue implements DownIterator {
+    private final BlockingQueue<RowVector> queue;
+    private RowVector pending = null;
+    private AtomicBoolean closed = new AtomicBoolean(false);
 
-    public FromQueue(Queue<RowVector> queue) {
+    public FromBlockingQueue(BlockingQueue<RowVector> queue) {
       this.queue = queue;
     }
 
     @Override
     public State advance0() {
+      if (pending != null) {
+        return State.AVAILABLE;
+      }
       if (queue.isEmpty()) {
         return State.BLOCKED;
       }
@@ -61,13 +70,33 @@ public final class DownIterators {
     }
 
     @Override
+    public void waitFor() throws InterruptedException {
+      while (true) {
+        if (pending != null) {
+          return;
+        }
+        if (closed.get()) {
+          Thread.currentThread().interrupt();
+          throw new InterruptedException();
+        }
+        pending = queue.poll(100L, TimeUnit.MILLISECONDS);
+      }
+    }
+
+    @Override
     public long get() {
+      if (pending != null) {
+        final RowVector out = pending;
+        pending = null;
+        return out.id();
+      }
       return queue.remove().id();
     }
 
     @Override
     public void close() {
-
+      Preconditions.checkState(closed.compareAndSet(false, true),
+          "Already closed");
     }
   }
 }

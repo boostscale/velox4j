@@ -36,6 +36,7 @@ void DownIteratorJniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "advance", kTypeInt, nullptr);
+  cacheMethod(env, "waitFor", kTypeVoid, nullptr);
   cacheMethod(env, "get", kTypeLong, nullptr);
   cacheMethod(env, "close", kTypeVoid, nullptr);
 
@@ -44,6 +45,7 @@ void DownIteratorJniWrapper::initialize(JNIEnv* env) {
 
 DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
   ref_ = env->NewGlobalRef(ref);
+  waitExecutor_ = std::make_unique<folly::IOThreadPoolExecutor>(1);
 }
 
 DownIterator::~DownIterator() {
@@ -53,6 +55,7 @@ DownIterator::~DownIterator() {
     static jmethodID methodId = clazz->getMethod("close");
     env->CallVoidMethod(ref_, methodId);
     checkException(env);
+    waitExecutor_->join();
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
     LOG(WARNING)
@@ -81,7 +84,34 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
       // Returns a future that is fulfilled immediately to signal Velox
       // that this stream is still open and is currently waiting for input.
       future = std::move(readFuture);
-      readPromise.setValue();
+      {
+        std::lock_guard l(mutex_);
+        VELOX_CHECK(promises_.empty());
+        promises_.emplace_back(std::move(readPromise));
+      }
+      waitExecutor_->add([this]() -> void {
+        try {
+          wait();
+        } catch (const std::exception& e) {
+          std::lock_guard l(mutex_);
+          // Velox should guarantee the continue future is only requested once
+          // while it's not fulfilled.
+          VELOX_CHECK(promises_.size() == 1);
+          for (auto& p : promises_) {
+            p.setException(e);
+          }
+          promises_.clear();
+          return;
+        }
+        {
+          std::lock_guard l(mutex_);
+          VELOX_CHECK(promises_.size() == 1);
+          for (auto& p : promises_) {
+            p.setValue();
+          }
+          promises_.clear();
+        }
+      });
       return std::nullopt;
     }
     case State::FINISHED: {
@@ -90,6 +120,14 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
   }
   VELOX_FAIL(
       "Unrecognizable state: {}", std::to_string(static_cast<int32_t>(state)));
+}
+
+void DownIterator::wait() {
+  auto* env = getLocalJNIEnv();
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("waitFor");
+  env->CallVoidMethod(ref_, methodId);
+  checkException(env);
 }
 
 DownIterator::State DownIterator::advance() {
