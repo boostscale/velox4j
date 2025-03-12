@@ -9,13 +9,11 @@ import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 public class TableWriteTraitsTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -26,6 +24,16 @@ public class TableWriteTraitsTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
   }
 
   @Test
@@ -39,7 +47,6 @@ public class TableWriteTraitsTest {
 
   @Test
   public void testOutputTypeWithAggregationNode() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowType type = session.tableWriteTraitsOps().outputType(
         SerdeTests.newSampleAggregationNode("id-2", "id-1")
     );
@@ -47,6 +54,5 @@ public class TableWriteTraitsTest {
         ResourceTests.readResourceAsString("table-write-traits/output-type-with-aggregation-node-1.json"),
         Serde.toPrettyJson(type)
     );
-    session.close();
   }
 }

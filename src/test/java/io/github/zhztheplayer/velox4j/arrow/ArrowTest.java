@@ -13,13 +13,11 @@ import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.table.Table;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 public class ArrowTest {
   private static MemoryManager memoryManager;
+  private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -32,27 +30,33 @@ public class ArrowTest {
     memoryManager.close();
   }
 
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
+  }
+
   @Test
   public void testBaseVectorRoundTrip() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, input);
     final BaseVector imported = session.arrowOps().fromArrowVector(alloc, arrowVector);
     BaseVectorTests.assertEquals(input, imported);
     arrowVector.close();
-    session.close();
   }
 
   @Test
   public void testRowVectorRoundTrip() {
-    final Session session = Velox4j.newSession(memoryManager);
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final Table arrowTable = Arrow.toArrowTable(alloc, input);
     final RowVector imported = session.arrowOps().fromArrowTable(alloc, arrowTable);
     BaseVectorTests.assertEquals(input, imported);
     arrowTable.close();
-    session.close();
   }
 }
