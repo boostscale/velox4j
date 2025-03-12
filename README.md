@@ -179,6 +179,7 @@ final BoundSplit split = new BoundSplit(
         Optional.empty(),
         Map.of(),
         Map.of(),
+        Map.of(),
         Optional.empty(),
         Optional.empty()
     )
@@ -192,7 +193,7 @@ final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP
 final Session session = Velox4j.newSession(memoryManager);
 
 // 7. Execute the query.
-final UpIterator itr = session.queryOps().execute(query);
+final Iterator<RowVector> itr = UpIterators.asJavaIterator(session.queryOps().execute(query));
 
 // 8. Collect and print results.
 while (itr.hasNext()) {
