@@ -1,3 +1,6 @@
+set(BUILD_TESTING ON)
+include(CTest)
+
 add_library(velox4j_test INTERFACE)
 target_include_directories(velox4j_test INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}
