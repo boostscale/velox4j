@@ -13,59 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Java UT
+name: C++ UT
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [ opened, reopened, synchronize ]
-    paths:
-      - '**/*'
-  push:
-    branches:
-      - 'main'
-    paths:
-      - '**/*'
+  schedule:
+    - cron: "0 0 * * *"
 
 concurrency:
   group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-
-  ut-ubuntu24:
-    strategy:
-      matrix:
-        runner: [
-          "ubuntu-24.04",
-          "ubuntu-24.04-arm"
-        ]
-        exclude:
-          - runner: "ubuntu-24.04-arm"
-    runs-on: ${{ matrix.runner }}
-    env:
-      CCACHE_DIR: "${{ github.workspace }}/.ccache"
-      CCACHE_MAXSIZE: 3000M
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore Ccache
-        uses: actions/cache/restore@v4
-        with:
-          path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
-          restore-keys: |
-            ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
-      - name: Run setup script
-        run: |
-          bash .github/workflows/scripts/ut-java/setup-ubuntu24.sh
-      - name: Build and run UTs
-        run: |
-          mvn clean test
-      - name: Save Ccache
-        uses: actions/cache/save@v4
-        with:
-          path: '${{ env.CCACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
 
   ut-centos7:
     runs-on: ubuntu-latest
@@ -77,19 +36,19 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
-          key: ut-java-ut-centos7-ccache-${{github.sha}}
+          key: ut-cpp-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-ut-centos7-ccache-
+            ut-cpp-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
           docker run -v ${{ github.workspace }}:/work -w /work centos:7 bash -c "
             export CCACHE_DIR=/work/.ccache
             export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/ut-java/setup-centos7.sh
-            mvn clean test
+            bash .github/workflows/scripts/ut-cpp/setup-centos7.sh
+            bash src/main/cpp/test.sh
           "
       - name: Save Ccache
         uses: actions/cache/save@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
-          key: ut-java-ut-centos7-ccache-${{github.sha}}
+          key: ut-cpp-ut-centos7-ccache-${{github.sha}}
