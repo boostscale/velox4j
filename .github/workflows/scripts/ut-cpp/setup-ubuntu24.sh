@@ -1,0 +1,1 @@
+../setup/setup-ubuntu24.sh

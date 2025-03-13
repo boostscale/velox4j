@@ -1,0 +1,1 @@
+../setup/setup-centos7.sh
