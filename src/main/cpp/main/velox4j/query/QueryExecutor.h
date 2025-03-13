@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <velox/common/memory/Memory.h>
 #include <string>
+#include "Query.h"
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/memory/MemoryManager.h"
 
@@ -26,13 +26,13 @@ namespace velox4j {
 
 class QueryExecutor {
  public:
-  QueryExecutor(MemoryManager* memoryManager, std::string queryJson);
+  QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
 
   std::unique_ptr<UpIterator> execute() const;
 
  private:
   MemoryManager* const memoryManager_;
-  const std::string queryJson_;
+  const std::shared_ptr<const Query> query_;
 };
 
 } // namespace velox4j

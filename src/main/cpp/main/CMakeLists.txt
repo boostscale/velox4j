@@ -35,15 +35,15 @@ set(VELOX4J_DEPENDENCIES
         ${JNI_LIBRARIES})
 
 # The output library.
-add_library(velox4j-shared SHARED ${VELOX4J_SOURCES})
-target_include_directories(velox4j-shared PUBLIC ${VELOX4J_INCLUDES})
-target_link_libraries(velox4j-shared PUBLIC ${VELOX4J_DEPENDENCIES})
-set_target_properties(velox4j-shared PROPERTIES OUTPUT_NAME velox4j
+add_library(velox4j_shared SHARED ${VELOX4J_SOURCES})
+target_include_directories(velox4j_shared PUBLIC ${VELOX4J_INCLUDES})
+target_link_libraries(velox4j_shared PUBLIC ${VELOX4J_DEPENDENCIES})
+set_target_properties(velox4j_shared PROPERTIES OUTPUT_NAME velox4j
         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
         ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # Install.
-install(IMPORTED_RUNTIME_ARTIFACTS velox4j-shared RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} COMPONENT velox4j)
+install(IMPORTED_RUNTIME_ARTIFACTS velox4j_shared RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} COMPONENT velox4j)
 install(RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} COMPONENT velox4j PRE_EXCLUDE_REGEXES
         "libc\\.so\\.[0-9]+"
         "libstdc\\+\\+\\.so\\.[0-9]+"
