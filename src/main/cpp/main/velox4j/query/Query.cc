@@ -57,7 +57,7 @@ std::string Query::toString() const {
         return fmt::format(
             "BoundSplit plan node ID {}, split {}",
             s->planNodeId(),
-            s->split().toString());
+            s->split()->toString());
       });
   return fmt::format(
       "Query: plan {}, splits [{}]",
@@ -73,8 +73,8 @@ folly::dynamic Query::serialize() const {
   for (const auto& boundSplit : boundSplits_) {
     folly::dynamic boundSplitObj = folly::dynamic::object;
     boundSplitObj["planNodeId"] = boundSplit->planNodeId();
-    boundSplitObj["groupId"] = boundSplit->split().groupId;
-    boundSplitObj["split"] = boundSplit->split().connectorSplit->serialize();
+    boundSplitObj["groupId"] = boundSplit->split()->groupId;
+    boundSplitObj["split"] = boundSplit->split()->connectorSplit->serialize();
     boundSplits.push_back(boundSplitObj);
   }
   obj["boundSplits"] = boundSplits;

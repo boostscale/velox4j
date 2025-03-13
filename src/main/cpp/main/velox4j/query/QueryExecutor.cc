@@ -29,24 +29,17 @@ namespace {
 
 class Out : public UpIterator {
  public:
-  Out(MemoryManager* memoryManager, std::string queryJson)
-      : memoryManager_(memoryManager), queryJson_(std::move(queryJson)) {
+  Out(MemoryManager* memoryManager, std::shared_ptr<const Query> query)
+      : memoryManager_(memoryManager), query_(std::move(query)) {
     static std::atomic<uint32_t> executionId{
         0}; // Velox query ID, same with taskId.
     const uint32_t eid = executionId++;
-    auto querySerdePool = memoryManager_->getVeloxPool(
-        fmt::format("Query Serde Memory Pool - EID {}", std::to_string(eid)),
-        memory::MemoryPool::Kind::kLeaf);
-    // Keep the pool alive until the task is finished.
-    auto queryDynamic = folly::parseJson(queryJson_);
-    auto query =
-        ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
     core::PlanFragment planFragment{
-        query->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
+        query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
     std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
         nullptr,
-        core::QueryConfig{query->queryConfig()->toMap()},
-        query->connectorConfig()->toMap(),
+        core::QueryConfig{query_->queryConfig()->toMap()},
+        query_->connectorConfig()->toMap(),
         cache::AsyncDataCache::getInstance(),
         memoryManager_
             ->getVeloxPool(
@@ -64,8 +57,8 @@ class Out : public UpIterator {
         exec::Task::ExecutionMode::kSerial);
 
     std::unordered_set<core::PlanNodeId> planNodesWithSplits{};
-    for (const auto& boundSplit : query->boundSplits()) {
-      exec::Split& split = boundSplit->split();
+    for (const auto& boundSplit : query_->boundSplits()) {
+      exec::Split split = *boundSplit->split();
       planNodesWithSplits.emplace(boundSplit->planNodeId());
       task->addSplit(boundSplit->planNodeId(), std::move(split));
     }
@@ -169,19 +162,19 @@ class Out : public UpIterator {
   }
 
   MemoryManager* const memoryManager_;
-  const std::string queryJson_;
+  std::shared_ptr<const Query> query_;
   std::shared_ptr<exec::Task> task_;
   std::vector<std::shared_ptr<exec::Driver>> drivers_{};
   bool hasPendingState_{false};
-  State pendingState_;
+  State pendingState_{State::BLOCKED};
   RowVectorPtr pending_{nullptr};
 };
 } // namespace
 
-QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::string planJson)
-    : memoryManager_(memoryManager), queryJson_(std::move(planJson)) {}
+QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query)
+    : memoryManager_(memoryManager), query_(query) {}
 
 std::unique_ptr<UpIterator> QueryExecutor::execute() const {
-  return std::make_unique<Out>(memoryManager_, queryJson_);
+  return std::make_unique<Out>(memoryManager_, query_);
 }
 } // namespace velox4j

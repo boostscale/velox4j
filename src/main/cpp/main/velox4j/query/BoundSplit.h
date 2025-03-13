@@ -24,20 +24,20 @@ namespace velox4j {
 
 class BoundSplit {
  public:
-  BoundSplit(facebook::velox::core::PlanNodeId& planNodeId, std::shared_ptr<facebook::velox::exec::Split>& split)
-      : planNodeId_(planNodeId), split_(std::move(split)) {}
+  BoundSplit(const facebook::velox::core::PlanNodeId& planNodeId, const std::shared_ptr<const facebook::velox::exec::Split>& split)
+      : planNodeId_(planNodeId), split_(split) {}
   virtual ~BoundSplit() = default;
 
   const facebook::velox::core::PlanNodeId& planNodeId() const {
     return planNodeId_;
   }
 
-  facebook::velox::exec::Split& split() const {
-    return *split_;
+  const std::shared_ptr<const facebook::velox::exec::Split>& split() const {
+    return split_;
   }
 
  private:
-  facebook::velox::core::PlanNodeId planNodeId_;
-  std::shared_ptr<facebook::velox::exec::Split> split_;
+  const facebook::velox::core::PlanNodeId planNodeId_;
+  const std::shared_ptr<const facebook::velox::exec::Split> split_;
 };
 } // namespace velox4j
