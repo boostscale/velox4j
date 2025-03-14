@@ -32,6 +32,6 @@ public class EvaluationSerdeTest {
   public void testExpression() {
     final CallTypedExpr expr = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final Evaluation evaluation = new Evaluation(expr, Config.empty(), ConnectorConfig.empty());
-    SerdeTests.testVeloxSerializableRoundTrip(evaluation);
+    SerdeTests.testISerializableRoundTrip(evaluation);
   }
 }

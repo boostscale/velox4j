@@ -16,6 +16,6 @@ public class QuerySerdeTest {
   @Test
   public void testReadPlanJsonFromFile() {
     final String queryJson = ResourceTests.readResourceAsString("query/example-1.json");
-    SerdeTests.testVeloxSerializableRoundTrip(queryJson, Query.class);
+    SerdeTests.testISerializableRoundTrip(queryJson, Query.class);
   }
 }

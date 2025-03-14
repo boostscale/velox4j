@@ -10,21 +10,15 @@ import io.github.zhztheplayer.velox4j.connector.FileFormat;
 import io.github.zhztheplayer.velox4j.connector.FileProperties;
 import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
 import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveSortingColumn;
-import io.github.zhztheplayer.velox4j.connector.InsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.LocationHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
-import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
-import io.github.zhztheplayer.velox4j.type.IntegerType;
-import io.github.zhztheplayer.velox4j.type.VarCharType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.OptionalLong;
 
 public class ConnectorSerdeTest {
@@ -77,54 +71,54 @@ public class ConnectorSerdeTest {
   @Test
   public void testHiveColumnHandle() {
     final ColumnHandle handle = SerdeTests.newSampleHiveColumnHandle();
-    SerdeTests.testVeloxSerializableRoundTrip(handle);
+    SerdeTests.testISerializableRoundTrip(handle);
   }
 
   @Test
   public void testHiveConnectorSplit() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplit();
-    SerdeTests.testVeloxSerializableRoundTrip(split);
+    SerdeTests.testISerializableRoundTrip(split);
   }
 
   @Test
   public void testHiveConnectorSplitWithMissingFields() {
     final ConnectorSplit split = SerdeTests.newSampleHiveSplitWithMissingFields();
-    SerdeTests.testVeloxSerializableRoundTrip(split);
+    SerdeTests.testISerializableRoundTrip(split);
   }
 
   @Test
   public void testHiveTableHandle() {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(SerdeTests.newSampleOutputType());
-    SerdeTests.testVeloxSerializableRoundTrip(handle);
+    SerdeTests.testISerializableRoundTrip(handle);
   }
 
   @Test
   public void testExternalStreamConnectorSplit() {
     final ConnectorSplit split = new ExternalStreamConnectorSplit("id-1", 100);
-    SerdeTests.testVeloxSerializableRoundTrip(split);
+    SerdeTests.testISerializableRoundTrip(split);
   }
 
   @Test
   public void testExternalStreamTableHandle() {
     final ExternalStreamTableHandle handle = new ExternalStreamTableHandle("id-1");
-    SerdeTests.testVeloxSerializableRoundTrip(handle);
+    SerdeTests.testISerializableRoundTrip(handle);
   }
 
   @Test
   public void testLocationHandle() {
     final LocationHandle handle = SerdeTests.newSampleLocationHandle();
-    SerdeTests.testVeloxSerializableRoundTrip(handle);
+    SerdeTests.testISerializableRoundTrip(handle);
   }
 
   @Test
   public void testHiveBucketProperty() {
     final HiveBucketProperty hiveBucketProperty = SerdeTests.newSampleHiveBucketProperty();
-    SerdeTests.testVeloxSerializableRoundTrip(hiveBucketProperty);
+    SerdeTests.testISerializableRoundTrip(hiveBucketProperty);
   }
 
   @Test
   public void testHiveInsertTableHandle() {
     final HiveInsertTableHandle hiveInsertTableHandle = SerdeTests.newSampleHiveInsertTableHandle();
-    SerdeTests.testVeloxSerializableRoundTrip(hiveInsertTableHandle);
+    SerdeTests.testISerializableRoundTrip(hiveInsertTableHandle);
   }
 }

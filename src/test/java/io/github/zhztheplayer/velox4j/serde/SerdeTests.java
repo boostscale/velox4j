@@ -78,7 +78,7 @@ public final class SerdeTests {
     });
   }
 
-  public static <T extends ISerializable> ObjectAndJson<ISerializable> testVeloxSerializableRoundTrip(T inObj) {
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -98,10 +98,10 @@ public final class SerdeTests {
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<ISerializable> testVeloxSerializableRoundTrip(String inJson,
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(String inJson,
       Class<? extends T> valueType) {
     final T inObj = Serde.fromJson(inJson, valueType);
-    return SerdeTests.testVeloxSerializableRoundTrip(inObj);
+    return SerdeTests.testISerializableRoundTrip(inObj);
   }
 
   public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
