@@ -34,14 +34,7 @@ import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
-import io.github.zhztheplayer.velox4j.plan.FilterNode;
-import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
-import io.github.zhztheplayer.velox4j.plan.LimitNode;
-import io.github.zhztheplayer.velox4j.plan.OrderByNode;
-import io.github.zhztheplayer.velox4j.plan.ProjectNode;
-import io.github.zhztheplayer.velox4j.plan.TableScanNode;
-import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
+import io.github.zhztheplayer.velox4j.plan.*;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
@@ -91,6 +84,15 @@ public class QueryTest {
   @After
   public void tearDown() throws Exception {
     session.close();
+  }
+
+  @Test
+  public void testValues() {
+    final PlanNode values = ValuesNode.create("id-1",
+        List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
+    final Query query = new Query(values, List.of(), Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = session.queryOps().execute(query);
+    SampleQueryTests.assertIterator(itr, 5);
   }
 
   @Test

@@ -16,12 +16,12 @@ public class ConfigSerdeTest {
   @Test
   public void testConfig() {
     final Config config = ConfigTests.randomConfig();
-    SerdeTests.testVeloxSerializableRoundTrip(config);
+    SerdeTests.testISerializableRoundTrip(config);
   }
 
   @Test
   public void testConnectorConfig() {
     final ConnectorConfig connConfig = ConfigTests.randomConnectorConfig();
-    SerdeTests.testVeloxSerializableRoundTrip(connConfig);
+    SerdeTests.testISerializableRoundTrip(connConfig);
   }
 }

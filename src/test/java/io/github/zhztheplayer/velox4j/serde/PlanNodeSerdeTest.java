@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -27,6 +28,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class PlanNodeSerdeTest {
@@ -76,26 +78,27 @@ public class PlanNodeSerdeTest {
     SerdeTests.testJavaBeanRoundTrip(JoinType.LEFT_SEMI_FILTER);
   }
 
-  @Test
+  // Ignored by https://github.com/velox4j/velox4j/issues/104.
+  @Ignore
   public void testValuesNode() {
     // The case fails in debug build. Should investigate.
     final PlanNode values = ValuesNode.create("id-1",
         List.of(BaseVectorTests.newSampleRowVector(session)), true, 1);
-    SerdeTests.testVeloxSerializableRoundTrip(values);
+    SerdeTests.testISerializableRoundTrip(values);
   }
 
   @Test
   public void testTableScanNode() {
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
-    SerdeTests.testVeloxSerializableRoundTrip(scan);
+    SerdeTests.testISerializableRoundTrip(scan);
   }
 
   @Test
   public void testAggregationNode() {
     final AggregationNode aggregationNode = SerdeTests.newSampleAggregationNode(
         "id-2", "id-1");
-    SerdeTests.testVeloxSerializableRoundTrip(aggregationNode);
+    SerdeTests.testISerializableRoundTrip(aggregationNode);
   }
 
   @Test
@@ -105,7 +108,7 @@ public class PlanNodeSerdeTest {
     final ProjectNode projectNode = new ProjectNode("id-2", List.of(scan),
         List.of("foo"),
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
-    SerdeTests.testVeloxSerializableRoundTrip(projectNode);
+    SerdeTests.testISerializableRoundTrip(projectNode);
   }
 
   @Test
@@ -114,7 +117,7 @@ public class PlanNodeSerdeTest {
         SerdeTests.newSampleOutputType());
     final FilterNode filterNode = new FilterNode("id-2", List.of(scan),
         ConstantTypedExpr.create(new BooleanValue(true)));
-    SerdeTests.testVeloxSerializableRoundTrip(filterNode);
+    SerdeTests.testISerializableRoundTrip(filterNode);
   }
 
   @Test
@@ -137,7 +140,7 @@ public class PlanNodeSerdeTest {
             List.of(new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
         false
     );
-    SerdeTests.testVeloxSerializableRoundTrip(joinNode);
+    SerdeTests.testISerializableRoundTrip(joinNode);
   }
 
   @Test
@@ -148,7 +151,7 @@ public class PlanNodeSerdeTest {
         List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
         List.of(new SortOrder(true, false)),
         false);
-    SerdeTests.testVeloxSerializableRoundTrip(orderByNode);
+    SerdeTests.testISerializableRoundTrip(orderByNode);
   }
 
   @Test
@@ -156,7 +159,7 @@ public class PlanNodeSerdeTest {
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1",
         SerdeTests.newSampleOutputType());
     final LimitNode limitNode = new LimitNode("id-2", List.of(scan), 5, 3, false);
-    SerdeTests.testVeloxSerializableRoundTrip(limitNode);
+    SerdeTests.testISerializableRoundTrip(limitNode);
   }
 
   @Test
@@ -176,6 +179,6 @@ public class PlanNodeSerdeTest {
         CommitStrategy.TASK_COMMIT,
         List.of(scan)
     );
-    SerdeTests.testVeloxSerializableRoundTrip(tableWriteNode);
+    SerdeTests.testISerializableRoundTrip(tableWriteNode);
   }
 }

@@ -20,9 +20,16 @@ public final class SampleQueryTests {
   }
 
   public static void assertIterator(UpIterator itr) {
-    UpIteratorTests.assertIterator(itr)
-        .assertNumRowVectors(1)
-        .assertRowVectorToString(0, ResourceTests.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH))
-        .run();
+    assertIterator(itr, 1);
+  }
+
+  public static void assertIterator(UpIterator itr, int repeatTimes) {
+    UpIteratorTests.IteratorAssertionBuilder builder = UpIteratorTests.assertIterator(itr)
+        .assertNumRowVectors(repeatTimes);
+    for (int i = 0; i < repeatTimes; i++) {
+      builder = builder
+          .assertRowVectorToString(i, ResourceTests.readResourceAsString(SAMPLE_QUERY_OUTPUT_PATH));
+    }
+    builder.run();
   }
 }

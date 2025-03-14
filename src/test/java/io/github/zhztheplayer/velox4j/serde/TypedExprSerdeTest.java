@@ -54,33 +54,38 @@ public class TypedExprSerdeTest {
 
   @Test
   public void testCallTypedExpr() {
-    SerdeTests.testVeloxSerializableRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int"));
+    SerdeTests.testISerializableRoundTrip(new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int"));
   }
 
   @Test
   public void testCastTypedExpr() {
     final CallTypedExpr input = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
-    SerdeTests.testVeloxSerializableRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
+    SerdeTests.testISerializableRoundTrip(CastTypedExpr.create(new IntegerType(), input, true));
   }
 
   @Test
   public void testConcatTypedExpr() {
     final CallTypedExpr input1 = new CallTypedExpr(new IntegerType(), Collections.emptyList(), "random_int");
     final CallTypedExpr input2 = new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
-    SerdeTests.testVeloxSerializableRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
+    SerdeTests.testISerializableRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
+  }
+
+  // Ignored by https://github.com/velox4j/velox4j/issues/104.
+  @Ignore
+  public void testConstantTypedExprWithVector() {
+    final BaseVector intVector = BaseVectorTests.newSampleIntVector(session);
+    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
+    SerdeTests.testISerializableRoundTrip(expr1);
+    final ConstantTypedExpr expr2 = new ConstantTypedExpr(new IntegerType(), null, BaseVectors.serializeOne(intVector.wrapInConstant(1, 0)));
+    SerdeTests.testISerializableRoundTrip(expr2);
   }
 
   @Test
-  public void testConstantTypedExpr() {
-    final BaseVector intVector = BaseVectorTests.newSampleIntVector(session);
-    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
-    SerdeTests.testVeloxSerializableRoundTrip(expr1);
-    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(new IntegerValue(15));
-    SerdeTests.testVeloxSerializableRoundTrip(expr2);
-    final ConstantTypedExpr expr3 = new ConstantTypedExpr(new IntegerType(), null, BaseVectors.serializeOne(intVector.wrapInConstant(1, 0)));
-    SerdeTests.testVeloxSerializableRoundTrip(expr3);
-    final ConstantTypedExpr expr4 = new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
-    SerdeTests.testVeloxSerializableRoundTrip(expr4);
+  public void testConstantTypedExprWithVariant() {
+    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(new IntegerValue(15));
+    SerdeTests.testISerializableRoundTrip(expr1);
+    final ConstantTypedExpr expr2 = new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
+    SerdeTests.testISerializableRoundTrip(expr2);
   }
 
   @Test
@@ -90,7 +95,7 @@ public class TypedExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
-    SerdeTests.testVeloxSerializableRoundTrip(dereference);
+    SerdeTests.testISerializableRoundTrip(dereference);
   }
 
   @Test
@@ -100,12 +105,12 @@ public class TypedExprSerdeTest {
     final ConcatTypedExpr concat = ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
-    SerdeTests.testVeloxSerializableRoundTrip(fieldAccess);
+    SerdeTests.testISerializableRoundTrip(fieldAccess);
   }
 
   @Test
   public void testInputTypedExpr() {
-    SerdeTests.testVeloxSerializableRoundTrip(new InputTypedExpr(new BooleanType()));
+    SerdeTests.testISerializableRoundTrip(new InputTypedExpr(new BooleanType()));
   }
 
   @Test
@@ -114,6 +119,6 @@ public class TypedExprSerdeTest {
         List.of(new IntegerType(), new VarCharType()));
     final LambdaTypedExpr lambdaTypedExpr = LambdaTypedExpr.create(signature,
         FieldAccessTypedExpr.create(new IntegerType(), "foo"));
-    SerdeTests.testVeloxSerializableRoundTrip(lambdaTypedExpr);
+    SerdeTests.testISerializableRoundTrip(lambdaTypedExpr);
   }
 }

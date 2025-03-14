@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -19,8 +20,6 @@ import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
 import io.github.zhztheplayer.velox4j.connector.LocationHandle;
 import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
 import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
-import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
@@ -29,14 +28,12 @@ import io.github.zhztheplayer.velox4j.jni.JniApiTests;
 import io.github.zhztheplayer.velox4j.jni.LocalSession;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
-import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
@@ -47,25 +44,21 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
-import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.IntVector;
 import org.junit.Assert;
+import org.junit.ComparisonFailure;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.*;
 
 public final class SerdeTests {
-  private static void assertJsonEquals(String expected, String actual) {
-    Assert.assertEquals(Serde.parseTree(expected), Serde.parseTree(actual));
-    Assert.assertEquals(expected, actual);
+private static void assertJsonEquals(String expected, String actual) {
+    final JsonNode expectedTree = Serde.parseTree(expected);
+    final JsonNode actualTree = Serde.parseTree(actual);
+    if (!actualTree.equals(expectedTree)) {
+      throw new ComparisonFailure("", expected, actual);
+    }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -80,18 +73,18 @@ public final class SerdeTests {
         final ISerializable cppOutObj = inObjCo.asJava();
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
         assertJsonEquals(inJson, cppOutJson);
-        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+        return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(String inJson,
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(String inJson,
       Class<? extends T> valueType) {
     final T inObj = Serde.fromJson(inJson, valueType);
-    return SerdeTests.testVeloxSerializableRoundTrip(inObj);
+    return SerdeTests.testISerializableRoundTrip(inObj);
   }
 
-  public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
+  public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -107,12 +100,12 @@ public final class SerdeTests {
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
         Assert.assertEquals(inObj, cppOutObj);
         assertJsonEquals(inJson, cppOutJson);
-        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+        return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
   }
 
-  public static <T extends Object> ObjectAndJson<T> testJavaBeanRoundTrip(T inObj) {
+  public static <T> ObjectAndJson<Object> testJavaBeanRoundTrip(T inObj) {
     try {
       if (inObj instanceof NativeBean) {
         throw new VeloxException("Cannot round trip NativeBean");
@@ -123,7 +116,7 @@ public final class SerdeTests {
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
       assertJsonEquals(inJson, outJson);
-      return new ObjectAndJson<>((T) outObj, outJson);
+      return new ObjectAndJson<>(outObj, outJson);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

@@ -14,6 +14,6 @@ public class FilterSerdeTest {
 
   @Test
   public void testAlwaysTrue() {
-    SerdeTests.testVeloxSerializableRoundTrip(new AlwaysTrue());
+    SerdeTests.testISerializableRoundTrip(new AlwaysTrue());
   }
 }
