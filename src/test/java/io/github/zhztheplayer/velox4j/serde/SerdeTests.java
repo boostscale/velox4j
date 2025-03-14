@@ -112,7 +112,7 @@ public final class SerdeTests {
     }
   }
 
-  public static <T extends Object> ObjectAndJson<Object> testJavaBeanRoundTrip(T inObj) {
+  public static <T> ObjectAndJson<Object> testJavaBeanRoundTrip(T inObj) {
     try {
       if (inObj instanceof NativeBean) {
         throw new VeloxException("Cannot round trip NativeBean");
