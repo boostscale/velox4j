@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.serde;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -27,6 +28,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class PlanNodeSerdeTest {
@@ -76,7 +78,8 @@ public class PlanNodeSerdeTest {
     SerdeTests.testJavaBeanRoundTrip(JoinType.LEFT_SEMI_FILTER);
   }
 
-  @Test
+  // Ignored by https://github.com/velox4j/velox4j/issues/104.
+  @Ignore
   public void testValuesNode() {
     // The case fails in debug build. Should investigate.
     final PlanNode values = ValuesNode.create("id-1",

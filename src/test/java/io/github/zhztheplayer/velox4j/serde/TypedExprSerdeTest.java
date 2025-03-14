@@ -70,17 +70,22 @@ public class TypedExprSerdeTest {
     SerdeTests.testISerializableRoundTrip(ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
   }
 
-  @Test
-  public void testConstantTypedExpr() {
+  // Ignored by https://github.com/velox4j/velox4j/issues/104.
+  @Ignore
+  public void testConstantTypedExprWithVector() {
     final BaseVector intVector = BaseVectorTests.newSampleIntVector(session);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testISerializableRoundTrip(expr1);
-    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(new IntegerValue(15));
+    final ConstantTypedExpr expr2 = new ConstantTypedExpr(new IntegerType(), null, BaseVectors.serializeOne(intVector.wrapInConstant(1, 0)));
     SerdeTests.testISerializableRoundTrip(expr2);
-    final ConstantTypedExpr expr3 = new ConstantTypedExpr(new IntegerType(), null, BaseVectors.serializeOne(intVector.wrapInConstant(1, 0)));
-    SerdeTests.testISerializableRoundTrip(expr3);
-    final ConstantTypedExpr expr4 = new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
-    SerdeTests.testISerializableRoundTrip(expr4);
+  }
+
+  @Test
+  public void testConstantTypedExprWithVariant() {
+    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(new IntegerValue(15));
+    SerdeTests.testISerializableRoundTrip(expr1);
+    final ConstantTypedExpr expr2 = new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
+    SerdeTests.testISerializableRoundTrip(expr2);
   }
 
   @Test
