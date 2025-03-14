@@ -61,11 +61,11 @@ import java.util.OptionalLong;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {
-    Assert.assertEquals(Serde.parseTree(expected), Serde.parseTree(actual));
     Assert.assertEquals(expected, actual);
+    Assert.assertEquals(Serde.parseTree(expected), Serde.parseTree(actual));
   }
 
-  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(T inObj) {
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testVeloxSerializableRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -80,18 +80,18 @@ public final class SerdeTests {
         final ISerializable cppOutObj = inObjCo.asJava();
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
         assertJsonEquals(inJson, cppOutJson);
-        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+        return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<T> testVeloxSerializableRoundTrip(String inJson,
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testVeloxSerializableRoundTrip(String inJson,
       Class<? extends T> valueType) {
     final T inObj = Serde.fromJson(inJson, valueType);
     return SerdeTests.testVeloxSerializableRoundTrip(inObj);
   }
 
-  public static <T extends Variant> ObjectAndJson<T> testVariantRoundTrip(T inObj) {
+  public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -107,12 +107,12 @@ public final class SerdeTests {
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
         Assert.assertEquals(inObj, cppOutObj);
         assertJsonEquals(inJson, cppOutJson);
-        return new ObjectAndJson<>((T) cppOutObj, cppOutJson);
+        return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
   }
 
-  public static <T extends Object> ObjectAndJson<T> testJavaBeanRoundTrip(T inObj) {
+  public static <T extends Object> ObjectAndJson<Object> testJavaBeanRoundTrip(T inObj) {
     try {
       if (inObj instanceof NativeBean) {
         throw new VeloxException("Cannot round trip NativeBean");
@@ -123,7 +123,7 @@ public final class SerdeTests {
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
       assertJsonEquals(inJson, outJson);
-      return new ObjectAndJson<>((T) outObj, outJson);
+      return new ObjectAndJson<>(outObj, outJson);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
