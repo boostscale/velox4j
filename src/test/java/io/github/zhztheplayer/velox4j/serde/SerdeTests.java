@@ -1,6 +1,7 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -43,6 +44,9 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 
 import java.util.Collections;
@@ -54,8 +58,24 @@ import java.util.OptionalLong;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {
-    Assert.assertEquals(expected, actual);
-    Assert.assertEquals(Serde.parseTree(expected), Serde.parseTree(actual));
+    final JsonNode expectedTree = Serde.parseTree(expected);
+    final JsonNode actualTree = Serde.parseTree(actual);
+    MatcherAssert.assertThat(actualTree, new BaseMatcher<>() {
+      @Override
+      public void describeMismatch(Object item, Description description) {
+        description.appendText("was ").appendText(actual);
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText(expected);
+      }
+
+      @Override
+      public boolean matches(Object item) {
+        return ((JsonNode)item).equals(expectedTree);
+      }
+    });
   }
 
   public static <T extends ISerializable> ObjectAndJson<ISerializable> testVeloxSerializableRoundTrip(T inObj) {
