@@ -1,1 +1,1 @@
-../setup/setup-centos7.sh
+../common/setup-centos7.sh
