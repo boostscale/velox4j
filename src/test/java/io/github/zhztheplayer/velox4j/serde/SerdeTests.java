@@ -49,15 +49,17 @@ import org.hamcrest.Description;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.*;
 
 public final class SerdeTests {
-  private static void assertJsonEquals(String expected, String actual) {
+  public static final Comparator<JsonNode> DEFAULT_COMPARATOR = new Comparator<JsonNode>() {
+    @Override
+    public int compare(JsonNode o1, JsonNode o2) {
+      return Objects.equals(o1, o2) ? 0 : System.identityHashCode(o1) - System.identityHashCode(o2);
+    }
+  };
+
+  private static void assertJsonEquals(String expected, String actual, Comparator<JsonNode> comp) {
     final JsonNode expectedTree = Serde.parseTree(expected);
     final JsonNode actualTree = Serde.parseTree(actual);
     MatcherAssert.assertThat(actualTree, new BaseMatcher<>() {
@@ -73,12 +75,16 @@ public final class SerdeTests {
 
       @Override
       public boolean matches(Object item) {
-        return ((JsonNode)item).equals(expectedTree);
+        return ((JsonNode)item).equals(comp, expectedTree);
       }
     });
   }
 
   public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(T inObj) {
+    return testISerializableRoundTrip(inObj, DEFAULT_COMPARATOR);
+  }
+
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(T inObj, Comparator<JsonNode> comp) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -86,13 +92,13 @@ public final class SerdeTests {
       {
         final ISerializable javaOutObj = Serde.fromJson(inJson, ISerializable.class);
         final String javaOutJson = Serde.toPrettyJson(javaOutObj);
-        assertJsonEquals(inJson, javaOutJson);
+        assertJsonEquals(inJson, javaOutJson, comp);
       }
 
       try (final ISerializableCo inObjCo = session.iSerializableOps().asCpp(inObj)) {
         final ISerializable cppOutObj = inObjCo.asJava();
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
-        assertJsonEquals(inJson, cppOutJson);
+        assertJsonEquals(inJson, cppOutJson, comp);
         return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
@@ -100,8 +106,13 @@ public final class SerdeTests {
 
   public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(String inJson,
       Class<? extends T> valueType) {
+    return testISerializableRoundTrip(inJson, valueType, DEFAULT_COMPARATOR);
+  }
+
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(String inJson,
+      Class<? extends T> valueType, Comparator<JsonNode> comp) {
     final T inObj = Serde.fromJson(inJson, valueType);
-    return SerdeTests.testISerializableRoundTrip(inObj);
+    return SerdeTests.testISerializableRoundTrip(inObj, comp);
   }
 
   public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
@@ -112,14 +123,14 @@ public final class SerdeTests {
       {
         final Variant javaOutObj = Serde.fromJson(inJson, Variant.class);
         final String javaOutJson = Serde.toPrettyJson(javaOutObj);
-        assertJsonEquals(inJson, javaOutJson);
+        assertJsonEquals(inJson, javaOutJson, DEFAULT_COMPARATOR);
       }
 
       try (final VariantCo inObjCo = session.variantOps().asCpp(inObj)) {
         final Variant cppOutObj = inObjCo.asJava();
         final String cppOutJson = Serde.toPrettyJson(cppOutObj);
         Assert.assertEquals(inObj, cppOutObj);
-        assertJsonEquals(inJson, cppOutJson);
+        assertJsonEquals(inJson, cppOutJson, DEFAULT_COMPARATOR);
         return new ObjectAndJson<>(cppOutObj, cppOutJson);
       }
     }
@@ -135,7 +146,7 @@ public final class SerdeTests {
       final String inJson = jsonMapper.writeValueAsString(inObj);
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
-      assertJsonEquals(inJson, outJson);
+      assertJsonEquals(inJson, outJson, DEFAULT_COMPARATOR);
       return new ObjectAndJson<>(outObj, outJson);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
