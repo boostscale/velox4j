@@ -1,1 +1,1 @@
-../setup/setup-ubuntu24.sh
+../common/setup-ubuntu24.sh
