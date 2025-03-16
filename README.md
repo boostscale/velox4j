@@ -1,4 +1,4 @@
-# Velox4J: Java Bindings for Velox ![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-java.yml/badge.svg) ![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-cpp.yml/badge.svg) ![badge](https://github.com/velox4j/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg)
+# Velox4J: Java Bindings for Velox ![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-java.yml/badge.svg?branch=main) ![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-cpp.yml/badge.svg?branch=main) ![badge](https://github.com/velox4j/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg?branch=main)
 
 ## Project Status
 
