@@ -70,7 +70,7 @@ set(JNI_HELPERS_SOURCE_URL_MD5 3f168384670e0f21a2e2281f91cfb2e1)
 set(JNI_HELPERS_SOURCE_URL "https://github.com/${JNI_HELPERS_REPO}/archive/${JNI_HELPERS_REF}.zip")
 CPMAddPackage(NAME JniHelpersLib URL ${JNI_HELPERS_SOURCE_URL} URL_HASH MD5=${JNI_HELPERS_SOURCE_URL_MD5})
 target_include_directories(JniHelpers PRIVATE ${JNI_INCLUDE_DIRS})
-target_link_libraries(JniHelpers PRIVATE ${JNI_LIBRARIES})
+target_link_libraries(JniHelpers PRIVATE JNI::JNI)
 
 # Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)

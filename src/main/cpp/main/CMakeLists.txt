@@ -32,7 +32,7 @@ set(VELOX4J_INCLUDES
 set(VELOX4J_DEPENDENCIES
         velox
         JniHelpers
-        ${JNI_LIBRARIES})
+        JNI::JNI)
 
 # The output library.
 add_library(velox4j_shared SHARED ${VELOX4J_SOURCES})
