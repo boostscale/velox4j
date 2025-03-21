@@ -77,7 +77,17 @@ case "$(PATH="/usr/local/bin:$PATH" flex --version 2>&1)" in "flex 2.6."*)
   ;;
 esac
 
+# Install ICU 72.1.
+cd /tmp
+wget https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-src.tgz
+tar -xzvf icu4c-72_1-src.tgz
+cd icu
+source/configure --prefix=/usr --libdir=/usr/lib64 --disable-tests --disable-samples
+make
+make install
+
 # Install Java 11.
+cd /tmp
 yum install -y java-11-openjdk-devel
 alternatives --set java java-11-openjdk.x86_64
 
