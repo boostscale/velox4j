@@ -50,7 +50,7 @@ DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
 
 DownIterator::~DownIterator() {
   try {
-    DownIterator::close();
+    close();
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
     LOG(WARNING)

@@ -48,8 +48,6 @@ class ExternalStream {
 
   virtual std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) = 0;
-
-  virtual void close() = 0;
 };
 
 class ExternalStreamConnectorSplit
@@ -123,6 +121,8 @@ class ExternalStreamDataSource : public facebook::velox::connector::DataSource {
     // TODO.
     return {};
   }
+
+  void cancel() override;
 
  private:
   std::shared_ptr<ExternalStreamTableHandle> tableHandle_;

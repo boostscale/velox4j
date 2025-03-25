@@ -152,6 +152,13 @@ std::optional<RowVectorPtr> ExternalStreamDataSource::next(
   }
 }
 
+void ExternalStreamDataSource::cancel(){
+  // Reset the stream because it may hold pointer to the resident driver that
+  // causes reference cycle eventually.
+  // See https://github.com/facebookincubator/velox/pull/12701.
+  current_.reset();
+}
+
 ExternalStreamConnector::ExternalStreamConnector(
     const std::string& id,
     const std::shared_ptr<const config::ConfigBase>& config)
