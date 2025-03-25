@@ -64,7 +64,7 @@ Velox4J's RowVector / BaseVector and Arrow Java's VectorSchemaRoot / Table / Fie
 
 ### Platform 
 
-The project is now only tested on the following CPU architectures:
+The project and its releases are now only tested on the following CPU architectures:
 
 - x86-64
 
