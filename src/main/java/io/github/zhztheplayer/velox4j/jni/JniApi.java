@@ -12,6 +12,7 @@ import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
+import io.github.zhztheplayer.velox4j.query.QueryExecutor;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -47,14 +48,18 @@ public final class JniApi {
     return baseVectorWrap(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
   }
 
-  public UpIterator executeQuery(Query query) {
+  public QueryExecutor createQueryExecutor(Query query) {
     final String queryJson = Serde.toPrettyJson(query);
-    return new UpIterator(this, jni.executeQuery(queryJson));
+    return new QueryExecutor(this, jni.createQueryExecutor(queryJson));
   }
 
   @VisibleForTesting
-  UpIterator executeQuery(String queryJson) {
-    return new UpIterator(this, jni.executeQuery(queryJson));
+  QueryExecutor createQueryExecutor(String queryJson) {
+    return new QueryExecutor(this, jni.createQueryExecutor(queryJson));
+  }
+
+  public UpIterator queryExecutorExecute(QueryExecutor executor) {
+    return new UpIterator(this, jni.queryExecutorExecute(executor.id()));
   }
 
   public RowVector upIteratorGet(UpIterator itr) {

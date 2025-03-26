@@ -38,7 +38,8 @@ final class JniWrapper {
   native long evaluatorEval(long evaluatorId, long selectivityVectorId, long rvId);
 
   // Plan execution.
-  native long executeQuery(String queryJson);
+  native long createQueryExecutor(String queryJson);
+  native long queryExecutorExecute(long id);
 
   // For UpIterator.
   native long upIteratorGet(long id);
