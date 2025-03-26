@@ -87,6 +87,16 @@ public class QueryTest {
   }
 
   @Test
+  public void testValuesWith2Steps() {
+    final PlanNode values = ValuesNode.create("id-1",
+        List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
+    final Query query = new Query(values, List.of(), Config.empty(), ConnectorConfig.empty());
+    final QueryExecutor exec = session.queryOps().createQueryExecutor(query);
+    final UpIterator itr = exec.execute();
+    SampleQueryTests.assertIterator(itr, 5);
+  }
+
+  @Test
   public void testValues() {
     final PlanNode values = ValuesNode.create("id-1",
         List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);

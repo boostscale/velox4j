@@ -15,4 +15,8 @@ public class Queries {
       return exec.execute();
     }
   }
+
+  public QueryExecutor createQueryExecutor(Query query) {
+    return jniApi.createQueryExecutor(query);
+  }
 }
