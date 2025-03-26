@@ -71,19 +71,27 @@ jlong evaluatorEval(
   JNI_METHOD_END(-1L)
 }
 
-jlong executeQuery(JNIEnv* env, jobject javaThis, jstring queryJson) {
+jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
   auto querySerdePool = session->memoryManager()->getVeloxPool(
-      fmt::format("Query Serde Memory Pool"),
-      memory::MemoryPool::Kind::kLeaf);
+      fmt::format("Query Serde Memory Pool"), memory::MemoryPool::Kind::kLeaf);
   // Keep the pool alive until the task is finished.
   auto queryDynamic = folly::parseJson(jQueryJson.get());
-  auto query =
-      ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
-  QueryExecutor exec{session->memoryManager(), query};
-  return sessionOf(env, javaThis)->objectStore()->save(exec.execute());
+  auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
+  auto exec = std::make_shared<QueryExecutor>(session->memoryManager(), query);
+  return sessionOf(env, javaThis)->objectStore()->save(exec);
+  JNI_METHOD_END(-1L)
+}
+
+jlong queryExecutorExecute(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong queryExecutorId) {
+  JNI_METHOD_START
+  auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
+  return sessionOf(env, javaThis)->objectStore()->save(exec->execute());
   JNI_METHOD_END(-1L)
 }
 
@@ -320,7 +328,17 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "executeQuery", (void*)executeQuery, kTypeLong, kTypeString, nullptr);
+      "createQueryExecutor",
+      (void*)createQueryExecutor,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "queryExecutorExecute",
+      (void*)queryExecutorExecute,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(

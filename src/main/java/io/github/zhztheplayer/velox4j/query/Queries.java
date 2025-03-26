@@ -11,6 +11,12 @@ public class Queries {
   }
 
   public UpIterator execute(Query query) {
-    return jniApi.executeQuery(query);
+    try (final QueryExecutor exec = jniApi.createQueryExecutor(query)) {
+      return exec.execute();
+    }
+  }
+
+  public QueryExecutor createQueryExecutor(Query query) {
+    return jniApi.createQueryExecutor(query);
   }
 }

@@ -29,6 +29,7 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterators;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
+import io.github.zhztheplayer.velox4j.query.QueryExecutor;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
@@ -96,7 +97,8 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     itr.close();
     session.close();
   }
@@ -106,7 +108,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     SampleQueryTests.assertIterator(itr);
     session.close();
     ;
@@ -117,8 +120,9 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr1 = jniApi.executeQuery(json);
-    final UpIterator itr2 = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr1 = queryExecutor.execute();
+    final UpIterator itr2 = queryExecutor.execute();
     SampleQueryTests.assertIterator(itr1);
     SampleQueryTests.assertIterator(itr2);
     session.close();
@@ -143,7 +147,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = List.of(vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
@@ -159,7 +164,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = List.of(vector, vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
@@ -173,7 +179,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
@@ -195,7 +202,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.newExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
@@ -208,7 +216,8 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator itr = jniApi.executeQuery(json);
+    final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
+    final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.newExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
