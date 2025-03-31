@@ -238,7 +238,6 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       .alignment = velox::memory::MemoryAllocator::kMaxAlignment,
       .trackDefaultUsage = true, // memory usage tracking
       .checkUsageLeak = true, // leak check
-      .debugEnabled = false, // debug
       .coreOnAllocationFailureEnabled = false,
       .allocatorCapacity = velox::memory::kMaxMemory,
       .arbitratorKind = afr.getKind(),
