@@ -57,10 +57,11 @@ jobs:
             ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/work -w /velox4j ubuntu:24.04 bash -c "
+          docker run -v ${{ github.workspace }}:/velox4j -w / ubuntu:24.04 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
-            bash /velox4j/.github/workflows/scripts/ut-java/setup-ubuntu24.sh
+            cd /velox4j
+            bash .github/workflows/scripts/ut-java/setup-ubuntu24.sh
             mvn clean test
           "
       - name: Save Ccache
@@ -84,10 +85,11 @@ jobs:
             ut-java-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/work -w /velox4j centos:7 bash -c "
+          docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
-            bash /velox4j/.github/workflows/scripts/ut-java/setup-centos7.sh
+            cd /velox4j
+            bash .github/workflows/scripts/ut-java/setup-centos7.sh
             mvn clean test
           "
       - name: Save Ccache
