@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         runner: [
-          "ubuntu-24.04",
+          "ubuntu-latest",
           "ubuntu-24.04-arm"
         ]
         exclude:
