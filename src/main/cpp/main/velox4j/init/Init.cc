@@ -53,7 +53,10 @@ void initForSpark() {
   FLAGS_velox_exception_user_stacktrace_enabled = true;
   FLAGS_velox_exception_system_stacktrace_enabled = true;
   filesystems::registerLocalFileSystem();
-  memory::MemoryManager::initialize(memory::MemoryManager::Options{});
+  memory::MemoryManager::Options mmOptions;
+  mmOptions.trackDefaultUsage = true;
+  mmOptions.checkUsageLeak = true;
+  memory::MemoryManager::initialize(mmOptions);
   dwio::common::registerFileSinks();
   parquet::registerParquetReaderFactory();
   parquet::registerParquetWriterFactory();
@@ -124,7 +127,10 @@ void initForFlink() {
   FLAGS_velox_exception_user_stacktrace_enabled = true;
   FLAGS_velox_exception_system_stacktrace_enabled = true;
   filesystems::registerLocalFileSystem();
-  memory::MemoryManager::initialize(memory::MemoryManager::Options{});
+  memory::MemoryManager::Options mmOptions;
+  mmOptions.trackDefaultUsage = true;
+  mmOptions.checkUsageLeak = true;
+  memory::MemoryManager::initialize(mmOptions);
   dwio::common::registerFileSinks();
   parquet::registerParquetReaderFactory();
   parquet::registerParquetWriterFactory();

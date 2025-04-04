@@ -43,7 +43,7 @@ jobs:
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
-            bash .github/workflows/scripts/ut-java/setup-centos7.sh
+            bash .github/workflows/scripts/common/setup-centos7.sh
             mvn generate-resources
           "
       - name: Set up Java / Maven environment
