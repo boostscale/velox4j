@@ -6,20 +6,7 @@ import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
-import io.github.zhztheplayer.velox4j.connector.Assignment;
-import io.github.zhztheplayer.velox4j.connector.ColumnType;
-import io.github.zhztheplayer.velox4j.connector.CommitStrategy;
-import io.github.zhztheplayer.velox4j.connector.CompressionKind;
-import io.github.zhztheplayer.velox4j.connector.ConnectorInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.ExternalStream;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
-import io.github.zhztheplayer.velox4j.connector.FileFormat;
-import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
-import io.github.zhztheplayer.velox4j.connector.LocationHandle;
+import io.github.zhztheplayer.velox4j.connector.*;
 import io.github.zhztheplayer.velox4j.data.BaseVectorTests;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
@@ -646,7 +633,8 @@ public class QueryTest {
         null,
         CompressionKind.GZIP,
         Map.of(),
-        true
+        true,
+        new HiveInsertFileNameGenerator()
     );
     final RowType outputType = TableWriteTraits.outputType();
     final TableWriteNode tableWriteNode = new TableWriteNode(

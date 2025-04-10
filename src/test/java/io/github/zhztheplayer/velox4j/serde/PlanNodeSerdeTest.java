@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -28,7 +27,6 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import org.junit.*;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class PlanNodeSerdeTest {

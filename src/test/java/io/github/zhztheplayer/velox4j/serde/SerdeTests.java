@@ -5,21 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
-import io.github.zhztheplayer.velox4j.connector.ColumnType;
-import io.github.zhztheplayer.velox4j.connector.CompressionKind;
-import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
-import io.github.zhztheplayer.velox4j.connector.FileFormat;
-import io.github.zhztheplayer.velox4j.connector.FileProperties;
-import io.github.zhztheplayer.velox4j.connector.HiveBucketConversion;
-import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
-import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveSortingColumn;
-import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
-import io.github.zhztheplayer.velox4j.connector.LocationHandle;
-import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
-import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
+import io.github.zhztheplayer.velox4j.connector.*;
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
@@ -227,7 +213,8 @@ private static void assertJsonEquals(String expected, String actual) {
         newSampleHiveBucketProperty(),
         CompressionKind.ZLIB,
         Map.of("serde_key", "serde_value"),
-        false
+        false,
+        new HiveInsertFileNameGenerator()
     );
   }
 
