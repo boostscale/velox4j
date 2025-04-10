@@ -2,15 +2,7 @@ package io.github.zhztheplayer.velox4j.serializable;
 
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
-import io.github.zhztheplayer.velox4j.connector.HiveColumnHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.HiveSortingColumn;
-import io.github.zhztheplayer.velox4j.connector.HiveTableHandle;
-import io.github.zhztheplayer.velox4j.connector.LocationHandle;
+import io.github.zhztheplayer.velox4j.connector.*;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
@@ -130,6 +122,7 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("HiveSortingColumn", HiveSortingColumn.class);
     NAME_REGISTRY.registerClass("HiveBucketProperty", HiveBucketProperty.class);
     NAME_REGISTRY.registerClass("HiveInsertTableHandle", HiveInsertTableHandle.class);
+    NAME_REGISTRY.registerClass("HiveInsertFileNameGenerator", HiveInsertFileNameGenerator.class);
   }
 
   private static void registerFilters() {

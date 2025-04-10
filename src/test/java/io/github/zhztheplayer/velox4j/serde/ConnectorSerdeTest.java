@@ -1,18 +1,6 @@
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.connector.Assignment;
-import io.github.zhztheplayer.velox4j.connector.ColumnHandle;
-import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.ConnectorTableHandle;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamConnectorSplit;
-import io.github.zhztheplayer.velox4j.connector.ExternalStreamTableHandle;
-import io.github.zhztheplayer.velox4j.connector.FileFormat;
-import io.github.zhztheplayer.velox4j.connector.FileProperties;
-import io.github.zhztheplayer.velox4j.connector.HiveBucketProperty;
-import io.github.zhztheplayer.velox4j.connector.HiveInsertTableHandle;
-import io.github.zhztheplayer.velox4j.connector.LocationHandle;
-import io.github.zhztheplayer.velox4j.connector.RowIdProperties;
-import io.github.zhztheplayer.velox4j.connector.SubfieldFilter;
+import io.github.zhztheplayer.velox4j.connector.*;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import org.junit.Assert;
@@ -120,5 +108,11 @@ public class ConnectorSerdeTest {
   public void testHiveInsertTableHandle() {
     final HiveInsertTableHandle hiveInsertTableHandle = SerdeTests.newSampleHiveInsertTableHandle();
     SerdeTests.testISerializableRoundTrip(hiveInsertTableHandle);
+  }
+
+  @Test
+  public void testHiveInsertFileNameGenerator() {
+    final HiveInsertFileNameGenerator fileNameGenerator = new HiveInsertFileNameGenerator();
+    SerdeTests.testISerializableRoundTrip(fileNameGenerator);
   }
 }
