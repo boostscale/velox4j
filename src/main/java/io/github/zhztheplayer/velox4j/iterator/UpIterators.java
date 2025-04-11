@@ -20,6 +20,7 @@ public final class UpIterators {
         final UpIterator.State state = upIterator.advance();
         switch (state) {
           case BLOCKED:
+            upIterator.waitFor();
             continue;
           case AVAILABLE:
             return true;
