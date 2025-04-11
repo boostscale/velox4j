@@ -41,9 +41,7 @@ set_target_properties(velox4j_shared PROPERTIES OUTPUT_NAME velox4j
         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
         ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
-# Install.
-install(IMPORTED_RUNTIME_ARTIFACTS velox4j_shared RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} COMPONENT velox4j)
-install(RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} COMPONENT velox4j PRE_EXCLUDE_REGEXES
+set(VELOX4J_3RD_EXCLUSIONS
         "libc\\.so\\.[0-9]+"
         "libstdc\\+\\+\\.so\\.[0-9]+"
         "libgcc_s\\.so\\.[0-9]+"
@@ -51,5 +49,22 @@ install(RUNTIME_DEPENDENCY_SET 3rd DESTINATION ${VELOX4J_INSTALL_DESTINATION} CO
         "linux-vdso\\.so\\.[0-9]+"
         "ld-linux-x86-64\\.so\\.[0-9]+"
         "libdl\\.so\\.[0-9]+"
-        "libpthread\\.so\\.[0-9]+"
-)
+        "libpthread\\.so\\.[0-9]+")
+
+install(CODE "
+    file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR 3rd_deps
+            LIBRARIES $<TARGET_FILE:velox4j_shared>
+            PRE_EXCLUDE_REGEXES
+            ${VELOX4J_3RD_EXCLUSIONS}
+    )
+    message(\"Found all shared 3rd dependencies of velox4j: \${3rd_deps}\")
+    foreach(dep IN LISTS 3rd_deps)
+        get_filename_component(link_name \${dep} NAME)
+        get_filename_component(link_target \${dep} REALPATH)
+        message(\"Installing 3rd dependency of velox4j: \${link_name}->\${link_target} to destination: ${VELOX4J_INSTALL_DESTINATION}...\")
+        file(INSTALL DESTINATION ${VELOX4J_INSTALL_DESTINATION} TYPE FILE FILES \${link_target} RENAME \${link_name})
+    endforeach()
+    message(\"Installing main velox4j library...\")
+    file(INSTALL DESTINATION ${VELOX4J_INSTALL_DESTINATION} TYPE FILE FILES $<TARGET_FILE:velox4j_shared>)
+" COMPONENT velox4j)
