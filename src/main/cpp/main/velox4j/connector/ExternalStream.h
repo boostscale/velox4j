@@ -76,6 +76,10 @@ class ExternalStreamTableHandle
  public:
   explicit ExternalStreamTableHandle(const std::string& connectorId);
 
+  std::string toString() const override {
+    return "ExternalStreamTableHandle";
+  }
+
   folly::dynamic serialize() const override;
 
   static void registerSerDe();
