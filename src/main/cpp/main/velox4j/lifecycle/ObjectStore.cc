@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-#include <glog/logging.h>
-#include <iostream>
 #include "ObjectStore.h"
+#include <glog/logging.h>
 
 namespace velox4j {
 // static
@@ -30,17 +29,19 @@ ObjectStore::~ObjectStore() {
   // destructing in reversed order (the last added object destructed first)
   const std::lock_guard<std::mutex> lock(mtx_);
   for (auto itr = aliveObjects_.rbegin(); itr != aliveObjects_.rend(); ++itr) {
-    ResourceHandle handle = *itr;
+    const std::string_view description = (*itr).second;
+    ResourceHandle handle = (*itr).first;
+    LOG(WARNING)
+        << "Unclosed object ["
+        << "Store ID: " << storeId_ << ", Resource handle ID: " << handle
+        << ", Description: " << description
+        << "] is found when object store is closing. Velox4J will"
+           " destroy it automatically but it's recommended to manually close"
+           " the object through the Java API CppObject#close() after use,"
+           " to minimize peak memory pressure of the application.";
     store_.erase(handle);
   }
   stores().erase(storeId_);
-}
-
-ObjectHandle ObjectStore::save(std::shared_ptr<void> obj) {
-  const std::lock_guard<std::mutex> lock(mtx_);
-  ResourceHandle handle = store_.insert(std::move(obj));
-  aliveObjects_.insert(handle);
-  return toObjHandle(handle);
 }
 
 void ObjectStore::releaseInternal(ResourceHandle handle) {

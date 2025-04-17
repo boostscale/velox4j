@@ -56,7 +56,7 @@ jlong createMemoryManager(JNIEnv* env, jobject javaThis, jobject jListener) {
 jlong createSession(JNIEnv* env, jobject javaThis, long memoryManagerId) {
   JNI_METHOD_START
   auto mm = ObjectStore::retrieve<MemoryManager>(memoryManagerId);
-  return ObjectStore::global()->save(std::make_unique<Session>(mm.get()));
+  return ObjectStore::global()->save(std::make_shared<Session>(mm.get()));
   JNI_METHOD_END(-1L)
 }
 
