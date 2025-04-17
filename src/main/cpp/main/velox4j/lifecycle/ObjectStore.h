@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <set>
+#include <map>
 #include "ResourceMap.h"
 
 namespace velox4j {
@@ -78,8 +78,9 @@ public:
 template <typename T>
 ObjectHandle save(std::shared_ptr<T> obj) {
    const std::lock_guard<std::mutex> lock(mtx_);
+   const std::string description = typeid(T).name();
    ResourceHandle handle = store_.insert(std::move(obj));
-   aliveObjects_.insert(handle);
+   aliveObjects_.emplace(handle, description);
    return toObjHandle(handle);
 } 
 
@@ -97,6 +98,7 @@ private:
    const std::lock_guard<std::mutex> lock(mtx_);
    std::shared_ptr<void> object = store_.lookup(handle);
    // Programming carefully. This will lead to ub if wrong typename T was passed in.
+   VELOX_DCHECK_EQ(aliveObjects_.find(handle)->second, typeid(T).name());
    auto casted = std::static_pointer_cast<T>(object);
    return casted;
  }
@@ -106,7 +108,8 @@ private:
  explicit ObjectStore(StoreHandle storeId) : storeId_(storeId){};
  StoreHandle storeId_;
  ResourceMap<std::shared_ptr<void>> store_;
- std::set<ResourceHandle> aliveObjects_{};
+ // Preserves handles of objects in the store in order, with the text descriptions associated with them.
+ std::map<ResourceHandle, std::string> aliveObjects_{};
  std::mutex mtx_;
 };
 } // namespace gluten

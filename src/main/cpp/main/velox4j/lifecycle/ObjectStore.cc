@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-#include <glog/logging.h>
-#include <iostream>
 #include "ObjectStore.h"
+#include <glog/logging.h>
 
 namespace velox4j {
 // static
@@ -30,7 +29,11 @@ ObjectStore::~ObjectStore() {
   // destructing in reversed order (the last added object destructed first)
   const std::lock_guard<std::mutex> lock(mtx_);
   for (auto itr = aliveObjects_.rbegin(); itr != aliveObjects_.rend(); ++itr) {
-    ResourceHandle handle = *itr;
+    const std::string description = (*itr).second;
+    ResourceHandle handle = (*itr).first;
+    LOG(WARNING)
+        << "Unreleased object found when object store is closing. Store ID: "
+        << storeId_ << " Description: " << description;
     store_.erase(handle);
   }
   stores().erase(storeId_);
