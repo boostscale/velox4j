@@ -32,12 +32,13 @@ ObjectStore::~ObjectStore() {
     const std::string_view description = (*itr).second;
     ResourceHandle handle = (*itr).first;
     LOG(WARNING)
-        << "Unclosed object found when object store is closing. Velox4J will"
+        << "Unclosed object ["
+        << " Store ID: " << storeId_ << ", Resource handle ID: " << handle
+        << ", Description: " << description
+        << "]found when object store is closing. Velox4J will"
            " destroy it automatically but it's recommended to manually close"
            " the object through the Java API CppObject#close() after use,"
-           " to minimize peak memory pressure of the application. Store ID: "
-        << storeId_ << ", Resource handle ID: " << handle
-        << ", Description: " << description;
+           " to minimize peak memory pressure of the application.";
     store_.erase(handle);
   }
   stores().erase(storeId_);
