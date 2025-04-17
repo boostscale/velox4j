@@ -75,7 +75,13 @@ public:
    return storeId_;
  }
 
- ObjectHandle save(std::shared_ptr<void> obj);
+template <typename T>
+ObjectHandle save(std::shared_ptr<T> obj) {
+   const std::lock_guard<std::mutex> lock(mtx_);
+   ResourceHandle handle = store_.insert(std::move(obj));
+   aliveObjects_.insert(handle);
+   return toObjHandle(handle);
+} 
 
 private:
  static ResourceMap<ObjectStore*>& stores();

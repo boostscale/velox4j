@@ -91,7 +91,7 @@ jlong queryExecutorExecute(
     jlong queryExecutorId) {
   JNI_METHOD_START
   auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
-  return sessionOf(env, javaThis)->objectStore()->save(exec->execute());
+  return sessionOf(env, javaThis)->objectStore()->save<UpIterator>(exec->execute());
   JNI_METHOD_END(-1L)
 }
 

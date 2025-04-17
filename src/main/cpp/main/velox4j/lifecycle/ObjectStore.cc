@@ -36,13 +36,6 @@ ObjectStore::~ObjectStore() {
   stores().erase(storeId_);
 }
 
-ObjectHandle ObjectStore::save(std::shared_ptr<void> obj) {
-  const std::lock_guard<std::mutex> lock(mtx_);
-  ResourceHandle handle = store_.insert(std::move(obj));
-  aliveObjects_.insert(handle);
-  return toObjHandle(handle);
-}
-
 void ObjectStore::releaseInternal(ResourceHandle handle) {
   const std::lock_guard<std::mutex> lock(mtx_);
   store_.erase(handle);
