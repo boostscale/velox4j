@@ -33,9 +33,9 @@ ObjectStore::~ObjectStore() {
     ResourceHandle handle = (*itr).first;
     LOG(WARNING)
         << "Unclosed object ["
-        << " Store ID: " << storeId_ << ", Resource handle ID: " << handle
+        << "Store ID: " << storeId_ << ", Resource handle ID: " << handle
         << ", Description: " << description
-        << "]found when object store is closing. Velox4J will"
+        << "] is found when object store is closing. Velox4J will"
            " destroy it automatically but it's recommended to manually close"
            " the object through the Java API CppObject#close() after use,"
            " to minimize peak memory pressure of the application.";
