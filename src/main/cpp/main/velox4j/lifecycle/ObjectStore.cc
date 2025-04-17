@@ -33,7 +33,8 @@ ObjectStore::~ObjectStore() {
     ResourceHandle handle = (*itr).first;
     LOG(WARNING)
         << "Unreleased object found when object store is closing. Store ID: "
-        << storeId_ << " Description: " << description;
+        << storeId_ << ", Resource handle ID: " << handle
+        << ", Description: " << description;
     store_.erase(handle);
   }
   stores().erase(storeId_);
