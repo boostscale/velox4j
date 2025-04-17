@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <arrow/api.h>
 #include <arrow/c/abi.h>
 #include <velox/vector/ComplexVector.h>
-
-#pragma once
 
 namespace velox4j {
 void fromBaseVectorToArrow(
