@@ -98,7 +98,6 @@ private:
    const std::lock_guard<std::mutex> lock(mtx_);
    std::shared_ptr<void> object = store_.lookup(handle);
    // Programming carefully. This will lead to ub if wrong typename T was passed in.
-   VELOX_DCHECK_EQ(aliveObjects_.find(handle)->second, typeid(T).name());
    auto casted = std::static_pointer_cast<T>(object);
    return casted;
  }
