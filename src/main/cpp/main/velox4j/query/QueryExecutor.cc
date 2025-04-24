@@ -109,6 +109,11 @@ class Out : public UpIterator {
     return out;
   }
 
+  std::unique_ptr<QueryStats> collectStats() override {
+    const auto stats = task_->taskStats();
+    return std::make_unique<QueryStats>(stats);
+  }
+
  private:
   State advance0(bool wait) {
     while (true) {

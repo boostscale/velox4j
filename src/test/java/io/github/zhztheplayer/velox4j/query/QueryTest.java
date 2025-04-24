@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.query;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -188,31 +189,39 @@ public class QueryTest {
     final List<BoundSplit> splits = List.of(
         newSampleSplit(scanNode, file)
     );
-    final AggregationNode aggregationNode = new AggregationNode("id-2", AggregateStep.SINGLE,
-        List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
-        List.of(),
-        List.of("cnt"),
-        List.of(new Aggregate(
-            new CallTypedExpr(new BigIntType(), List.of(
-                FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
-                "sum"),
-            List.of(new BigIntType()),
-            null,
-            List.of(),
-            List.of(),
-            false
-        )),
-        false,
-        List.of(scanNode),
-        null,
-        List.of()
-    );
+    final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator itr = session.queryOps().execute(query);
     UpIteratorTests.assertIterator(itr)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
         .run();
+  }
+
+  @Test
+  public void testAggregateStats() {
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
+    final List<BoundSplit> splits = List.of(
+        newSampleSplit(scanNode, file)
+    );
+    final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
+    final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
+    final UpIterator itr = session.queryOps().execute(query);
+    UpIteratorTests.collect(itr);
+    final QueryStats queryStats = itr.collectStats();
+
+    final JsonNode scanStats = queryStats.planStats("id-1");
+    Assert.assertEquals("TableScan", scanStats.get("operatorType").asText());
+    Assert.assertEquals(1, scanStats.get("numDrivers").asInt());
+    Assert.assertEquals(1, scanStats.get("numSplits").asInt());
+    Assert.assertEquals(25, scanStats.get("inputRows").asInt());
+
+    final JsonNode aggStats = queryStats.planStats("id-2");
+    Assert.assertEquals("Aggregation", aggStats.get("operatorType").asText());
+    Assert.assertEquals(25, aggStats.get("inputRows").asInt());
+    Assert.assertEquals(5, aggStats.get("outputRows").asInt());
   }
 
   @Test
@@ -715,5 +724,28 @@ public class QueryTest {
         toAssignments(outputType)
     );
     return scanNode;
+  }
+
+  private static AggregationNode newSampleAggregationNodeSumNationKeyByRegionKey(String planNodeId, PlanNode source) {
+    final AggregationNode aggregationNode = new AggregationNode(planNodeId, AggregateStep.SINGLE,
+        List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+        List.of(),
+        List.of("cnt"),
+        List.of(new Aggregate(
+            new CallTypedExpr(new BigIntType(), List.of(
+                FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
+                "sum"),
+            List.of(new BigIntType()),
+            null,
+            List.of(),
+            List.of(),
+            false
+        )),
+        false,
+        List.of(source),
+        null,
+        List.of()
+    );
+    return aggregationNode;
   }
 }

@@ -22,7 +22,7 @@ public final class UpIteratorTests {
     return vectors.get(0);
   }
 
-  private static List<RowVector> collect(UpIterator itr) {
+  public static List<RowVector> collect(UpIterator itr) {
     final List<RowVector> vectors = Streams.fromIterator(UpIterators.asJavaIterator(itr))
         .collect(Collectors.toList());
     return vectors;

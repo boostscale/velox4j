@@ -285,6 +285,10 @@ class ExternalStreamAsUpIterator : public UpIterator {
     return out;
   };
 
+  std::unique_ptr<QueryStats> collectStats() override {
+    return std::make_unique<QueryStats>(exec::TaskStats{});
+  }
+
  private:
   const std::shared_ptr<ExternalStream> es_;
   RowVectorPtr pending_{nullptr};

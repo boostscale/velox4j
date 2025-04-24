@@ -80,6 +80,16 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END()
 }
 
+jstring upIteratorCollectStats(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  const auto queryStats = itr->collectStats();
+  const auto statsDynamic = queryStats->toJson();
+  const auto statsJson = folly::toPrettyJson(statsDynamic);
+  return env->NewStringUTF(statsJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   spotify::jni::JavaString jJson{env, json};
@@ -239,7 +249,9 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-    "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+      "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+  addNativeMethod(
+      "upIteratorCollectStats", (void*)upIteratorCollectStats, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,
