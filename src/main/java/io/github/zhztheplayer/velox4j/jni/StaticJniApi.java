@@ -1,6 +1,5 @@
 package io.github.zhztheplayer.velox4j.jni;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
@@ -8,8 +7,7 @@ import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
-import io.github.zhztheplayer.velox4j.query.QueryStats;
+import io.github.zhztheplayer.velox4j.query.SerialTaskStats;
 import io.github.zhztheplayer.velox4j.query.SerialTask;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
@@ -59,9 +57,9 @@ public class StaticJniApi {
     jni.upIteratorWait(itr.id());
   }
 
-  public QueryStats serialTaskCollectStats(SerialTask serialTask) {
+  public SerialTaskStats serialTaskCollectStats(SerialTask serialTask) {
     final String statsJson = jni.serialTaskCollectStats(serialTask.id());
-    return QueryStats.fromJson(statsJson);
+    return SerialTaskStats.fromJson(statsJson);
   }
 
   public Type variantInferType(Variant variant) {

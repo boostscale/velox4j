@@ -21,9 +21,6 @@
 #include "BoundSplit.h"
 #include "velox4j/config/Config.h"
 
-#include <velox/exec/Operator.h>
-#include <velox/exec/TaskStats.h>
-
 namespace velox4j {
 class Query : public facebook::velox::ISerializable {
  public:
@@ -53,15 +50,5 @@ class Query : public facebook::velox::ISerializable {
   const std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
   const std::shared_ptr<const ConfigArray> queryConfig_;
   const std::shared_ptr<const ConnectorConfigArray> connectorConfig_;
-};
-
-class QueryStats {
-public:
-  QueryStats(const facebook::velox::exec::TaskStats& taskStats);
-
-  folly::dynamic toJson() const;
-
-private:
-  facebook::velox::exec::TaskStats taskStats_;
 };
 } // namespace velox4j

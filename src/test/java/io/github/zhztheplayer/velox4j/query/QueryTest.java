@@ -210,15 +210,15 @@ public class QueryTest {
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
     final SerialTask serialTask = session.queryOps().execute(query);
     UpIteratorTests.collect(serialTask);
-    final QueryStats queryStats = serialTask.collectStats();
+    final SerialTaskStats serialTaskStats = serialTask.collectStats();
 
-    final JsonNode scanStats = queryStats.planStats("id-1");
+    final JsonNode scanStats = serialTaskStats.planStats("id-1");
     Assert.assertEquals("TableScan", scanStats.get("operatorType").asText());
     Assert.assertEquals(1, scanStats.get("numDrivers").asInt());
     Assert.assertEquals(1, scanStats.get("numSplits").asInt());
     Assert.assertEquals(25, scanStats.get("inputRows").asInt());
 
-    final JsonNode aggStats = queryStats.planStats("id-2");
+    final JsonNode aggStats = serialTaskStats.planStats("id-2");
     Assert.assertEquals("Aggregation", aggStats.get("operatorType").asText());
     Assert.assertEquals(25, aggStats.get("inputRows").asInt());
     Assert.assertEquals(5, aggStats.get("outputRows").asInt());

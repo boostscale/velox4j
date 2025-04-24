@@ -34,7 +34,7 @@ public class SerialTask implements UpIterator {
     return id;
   }
 
-  public QueryStats collectStats() {
+  public SerialTaskStats collectStats() {
     return StaticJniApi.get().serialTaskCollectStats(this);
   }
 }

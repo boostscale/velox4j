@@ -17,12 +17,23 @@
 
 #pragma once
 
-#include <string>
+#include <velox/exec/TaskStats.h>
+
 #include "Query.h"
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
+
+class SerialTaskStats {
+public:
+ SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats);
+
+ folly::dynamic toJson() const;
+
+private:
+ facebook::velox::exec::TaskStats taskStats_;
+};
 
 class SerialTask : public UpIterator {
  public:
@@ -36,7 +47,7 @@ class SerialTask : public UpIterator {
 
   facebook::velox::RowVectorPtr get() override;
 
-  std::unique_ptr<QueryStats> collectStats();
+  std::unique_ptr<SerialTaskStats> collectStats();
 
  private:
   State advance0(bool wait);

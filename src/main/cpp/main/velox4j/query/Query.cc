@@ -110,13 +110,4 @@ void Query::registerSerDe() {
   auto& registry = DeserializationWithContextRegistryForSharedPtr();
   registry.Register("velox4j.Query", create);
 }
-
-QueryStats::QueryStats(const facebook::velox::exec::TaskStats& taskStats)
-    : taskStats_(taskStats) {}
-
-folly::dynamic QueryStats::toJson() const {
-  folly::dynamic obj = folly::dynamic::object;
-  obj["planStats"] = exec::toPlanStatsJson(taskStats_);
-  return obj;
-}
 } // namespace velox4j
