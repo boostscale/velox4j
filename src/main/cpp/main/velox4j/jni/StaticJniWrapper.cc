@@ -85,8 +85,8 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
 jstring serialTaskCollectStats(JNIEnv* env, jobject javaThis, jlong stId) {
   JNI_METHOD_START
   auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
-  const auto queryStats = serialTask->collectStats();
-  const auto statsDynamic = queryStats->toJson();
+  const auto stats = serialTask->collectStats();
+  const auto statsDynamic = stats->toJson();
   const auto statsJson = folly::toPrettyJson(statsDynamic);
   return env->NewStringUTF(statsJson.data());
   JNI_METHOD_END(nullptr)
