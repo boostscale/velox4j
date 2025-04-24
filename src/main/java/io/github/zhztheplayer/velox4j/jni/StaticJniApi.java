@@ -10,6 +10,7 @@ import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.QueryStats;
+import io.github.zhztheplayer.velox4j.query.SerialTask;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -58,8 +59,8 @@ public class StaticJniApi {
     jni.upIteratorWait(itr.id());
   }
 
-  public QueryStats upIteratorCollectStats(UpIterator itr) {
-    final String statsJson = jni.upIteratorCollectStats(itr.id());
+  public QueryStats serialTaskCollectStats(SerialTask serialTask) {
+    final String statsJson = jni.serialTaskCollectStats(serialTask.id());
     return QueryStats.fromJson(statsJson);
   }
 

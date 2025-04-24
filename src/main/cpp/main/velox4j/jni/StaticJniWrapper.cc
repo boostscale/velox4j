@@ -20,6 +20,8 @@
 #include <velox/common/encode/Base64.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
+#include <velox4j/query/QueryExecutor.h>
+
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
@@ -80,10 +82,10 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END()
 }
 
-jstring upIteratorCollectStats(JNIEnv* env, jobject javaThis, jlong itrId) {
+jstring serialTaskCollectStats(JNIEnv* env, jobject javaThis, jlong stId) {
   JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
-  const auto queryStats = itr->collectStats();
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  const auto queryStats = serialTask->collectStats();
   const auto statsDynamic = queryStats->toJson();
   const auto statsJson = folly::toPrettyJson(statsDynamic);
   return env->NewStringUTF(statsJson.data());
@@ -251,7 +253,7 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
-      "upIteratorCollectStats", (void*)upIteratorCollectStats, kTypeString, kTypeLong, nullptr);
+      "serialTaskCollectStats", (void*)serialTaskCollectStats, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,

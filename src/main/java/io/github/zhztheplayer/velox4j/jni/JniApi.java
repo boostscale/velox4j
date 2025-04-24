@@ -9,10 +9,12 @@ import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
+import io.github.zhztheplayer.velox4j.iterator.GenericUpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.query.QueryExecutor;
+import io.github.zhztheplayer.velox4j.query.SerialTask;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -58,8 +60,8 @@ public final class JniApi {
     return new QueryExecutor(this, jni.createQueryExecutor(queryJson));
   }
 
-  public UpIterator queryExecutorExecute(QueryExecutor executor) {
-    return new UpIterator(this, jni.queryExecutorExecute(executor.id()));
+  public SerialTask queryExecutorExecute(QueryExecutor executor) {
+    return new SerialTask(this, jni.queryExecutorExecute(executor.id()));
   }
 
   public RowVector upIteratorGet(UpIterator itr) {
@@ -120,7 +122,7 @@ public final class JniApi {
 
   @VisibleForTesting
   public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
-    return new UpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
+    return new GenericUpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
   }
 
   private BaseVector baseVectorWrap(long id) {

@@ -91,7 +91,7 @@ jlong queryExecutorExecute(
     jlong queryExecutorId) {
   JNI_METHOD_START
   auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
-  return sessionOf(env, javaThis)->objectStore()->save<UpIterator>(exec->execute());
+  return sessionOf(env, javaThis)->objectStore()->save<SerialTask>(exec->execute());
   JNI_METHOD_END(-1L)
 }
 
@@ -283,10 +283,6 @@ class ExternalStreamAsUpIterator : public UpIterator {
     auto out = pending_;
     pending_ = nullptr;
     return out;
-  };
-
-  std::unique_ptr<QueryStats> collectStats() override {
-    return std::make_unique<QueryStats>(exec::TaskStats{});
   }
 
  private:

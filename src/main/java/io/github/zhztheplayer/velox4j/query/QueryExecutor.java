@@ -18,7 +18,7 @@ public class QueryExecutor implements CppObject {
     return id;
   }
 
-  public UpIterator execute() {
+  public SerialTask execute() {
     return jniApi.queryExecutorExecute(this);
   }
 }

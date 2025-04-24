@@ -25,161 +25,146 @@ namespace velox4j {
 
 using namespace facebook::velox;
 
-namespace {
+SerialTask::SerialTask(
+    MemoryManager* memoryManager,
+    std::shared_ptr<const Query> query)
+    : memoryManager_(memoryManager), query_(std::move(query)) {
+  static std::atomic<uint32_t> executionId{
+      0}; // Velox query ID, same with taskId.
+  const uint32_t eid = executionId++;
+  core::PlanFragment planFragment{
+      query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
+  std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
+      nullptr,
+      core::QueryConfig{query_->queryConfig()->toMap()},
+      query_->connectorConfig()->toMap(),
+      cache::AsyncDataCache::getInstance(),
+      memoryManager_
+          ->getVeloxPool(
+              fmt::format("Query Memory Pool - EID {}", std::to_string(eid)),
+              memory::MemoryPool::Kind::kAggregate)
+          ->shared_from_this(),
+      nullptr,
+      fmt::format("Query Context - EID {}", std::to_string(eid)));
 
-class Out : public UpIterator {
- public:
-  Out(MemoryManager* memoryManager, std::shared_ptr<const Query> query)
-      : memoryManager_(memoryManager), query_(std::move(query)) {
-    static std::atomic<uint32_t> executionId{
-        0}; // Velox query ID, same with taskId.
-    const uint32_t eid = executionId++;
-    core::PlanFragment planFragment{
-        query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
-    std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
-        nullptr,
-        core::QueryConfig{query_->queryConfig()->toMap()},
-        query_->connectorConfig()->toMap(),
-        cache::AsyncDataCache::getInstance(),
-        memoryManager_
-            ->getVeloxPool(
-                fmt::format("Query Memory Pool - EID {}", std::to_string(eid)),
-                memory::MemoryPool::Kind::kAggregate)
-            ->shared_from_this(),
-        nullptr,
-        fmt::format("Query Context - EID {}", std::to_string(eid)));
+  auto task = exec::Task::create(
+      fmt::format("Task - EID {}", std::to_string(eid)),
+      std::move(planFragment),
+      0,
+      std::move(queryCtx),
+      exec::Task::ExecutionMode::kSerial);
 
-    auto task = exec::Task::create(
-        fmt::format("Task - EID {}", std::to_string(eid)),
-        std::move(planFragment),
-        0,
-        std::move(queryCtx),
-        exec::Task::ExecutionMode::kSerial);
-
-    std::unordered_set<core::PlanNodeId> planNodesWithSplits{};
-    for (const auto& boundSplit : query_->boundSplits()) {
-      exec::Split split = *boundSplit->split();
-      planNodesWithSplits.emplace(boundSplit->planNodeId());
-      task->addSplit(boundSplit->planNodeId(), std::move(split));
-    }
-    for (const auto& nodeWithSplits : planNodesWithSplits) {
-      task->noMoreSplits(nodeWithSplits);
-    }
-
-    task_ = task;
-
-    if (!task_->supportSerialExecutionMode()) {
-      VELOX_FAIL(
-          "Task doesn't support single threaded execution: " +
-          task->toString());
-    }
+  std::unordered_set<core::PlanNodeId> planNodesWithSplits{};
+  for (const auto& boundSplit : query_->boundSplits()) {
+    exec::Split split = *boundSplit->split();
+    planNodesWithSplits.emplace(boundSplit->planNodeId());
+    task->addSplit(boundSplit->planNodeId(), std::move(split));
+  }
+  for (const auto& nodeWithSplits : planNodesWithSplits) {
+    task->noMoreSplits(nodeWithSplits);
   }
 
-  ~Out() override {
-    if (task_ != nullptr && task_->isRunning()) {
-      // FIXME: Calling .wait() may take no effect in single thread execution
-      //  mode.
-      task_->requestCancel().wait();
-    }
-  }
+  task_ = task;
 
-  State advance() override {
-    if (hasPendingState_) {
-      hasPendingState_ = false;
-      return pendingState_;
-    }
-    VELOX_CHECK_NULL(pending_);
-    return advance0(false);
+  if (!task_->supportSerialExecutionMode()) {
+    VELOX_FAIL(
+        "Task doesn't support single threaded execution: " + task->toString());
   }
+}
 
-  void wait() override {
-    VELOX_CHECK(!hasPendingState_);
-    VELOX_CHECK_NULL(pending_);
-    pendingState_ = advance0(true);
-    hasPendingState_ = true;
+SerialTask::~SerialTask() {
+  if (task_ != nullptr && task_->isRunning()) {
+    // FIXME: Calling .wait() may take no effect in single thread execution
+    //  mode.
+    task_->requestCancel().wait();
   }
+}
 
-  RowVectorPtr get() override {
-    VELOX_CHECK(!hasPendingState_);
-    VELOX_CHECK_NOT_NULL(
-        pending_,
-        "Out: No pending row vector to return.  No pending row vector to return. Make sure the iterator is available via member function advance() first");
-    const auto out = pending_;
-    pending_ = nullptr;
-    return out;
+UpIterator::State SerialTask::advance() {
+  if (hasPendingState_) {
+    hasPendingState_ = false;
+    return pendingState_;
   }
+  VELOX_CHECK_NULL(pending_);
+  return advance0(false);
+}
 
-  std::unique_ptr<QueryStats> collectStats() override {
-    const auto stats = task_->taskStats();
-    return std::make_unique<QueryStats>(stats);
-  }
+void SerialTask::wait() {
+  VELOX_CHECK(!hasPendingState_);
+  VELOX_CHECK_NULL(pending_);
+  pendingState_ = advance0(true);
+  hasPendingState_ = true;
+}
 
- private:
-  State advance0(bool wait) {
-    while (true) {
-      auto future = ContinueFuture::makeEmpty();
-      auto out = task_->next(&future);
-      saveDrivers();
-      if (!future.valid()) {
-        // Velox task is not blocked and a row vector should be gotten.
-        if (out == nullptr) {
-          return State::FINISHED;
-        }
-        pending_ = std::move(out);
-        return State::AVAILABLE;
+RowVectorPtr SerialTask::get() {
+  VELOX_CHECK(!hasPendingState_);
+  VELOX_CHECK_NOT_NULL(
+      pending_,
+      "SerialTask: No pending row vector to return.  No pending row vector to return. Make sure the iterator is available via member function advance() first");
+  const auto out = pending_;
+  pending_ = nullptr;
+  return out;
+}
+
+std::unique_ptr<QueryStats> SerialTask::collectStats() {
+  const auto stats = task_->taskStats();
+  return std::make_unique<QueryStats>(stats);
+}
+
+UpIterator::State SerialTask::advance0(bool wait) {
+  while (true) {
+    auto future = ContinueFuture::makeEmpty();
+    auto out = task_->next(&future);
+    saveDrivers();
+    if (!future.valid()) {
+      // Velox task is not blocked and a row vector should be gotten.
+      if (out == nullptr) {
+        return State::FINISHED;
       }
-      if (!wait) {
-        return State::BLOCKED;
-      }
-      // Wait for Velox task to respond.
-      VLOG(2)
-          << "Velox task " << task_->taskId()
-          << " is busy when ::next() is called. Will wait and try again. Task state: "
-          << taskStateString(task_->state());
-      VELOX_CHECK_NULL(
-          out,
-          "Expected to wait but still got non-null output from Velox task");
-      // Avoid waiting forever because Velox doesn't propagate
-      // Driver's async errors directly to Task::next.
-      // https://github.com/facebookincubator/velox/blob/9a5946a09780020c1da86c37e8c377e2585d6800/velox/exec/Task.cpp#L3279
-      std::move(future).wait(std::chrono::seconds(1));
+      pending_ = std::move(out);
+      return State::AVAILABLE;
     }
-  }
-
-  void saveDrivers() {
-    if (drivers_.empty()) {
-      // Save driver references in the first run.
-      //
-      // Doing this will prevent the planned operators in drivers from being
-      // destroyed together with the drivers themselves in the last call to
-      // Task::next (see
-      // https://github.com/facebookincubator/velox/blob/4adec182144e23d7c7d6422e0090d5b59eb32b86/velox/exec/Driver.cpp#L727C13-L727C18),
-      // so if a lazy vector is not loaded while the scan is drained, a meaning
-      // error
-      // (https://github.com/facebookincubator/velox/blob/7af0fce2c27424fbdec1974d96bb1a6d1296419d/velox/dwio/common/ColumnLoader.cpp#L32-L35)
-      // can be thrown when the vector is being loaded rather than just crashing
-      // the process with "pure virtual function call" or so.
-      task_->testingVisitDrivers([&](exec::Driver* driver) -> void {
-        drivers_.push_back(driver->shared_from_this());
-      });
-      VELOX_CHECK(!drivers_.empty());
+    if (!wait) {
+      return State::BLOCKED;
     }
+    // Wait for Velox task to respond.
+    VLOG(2)
+        << "Velox task " << task_->taskId()
+        << " is busy when ::next() is called. Will wait and try again. Task state: "
+        << taskStateString(task_->state());
+    VELOX_CHECK_NULL(
+        out, "Expected to wait but still got non-null output from Velox task");
+    // Avoid waiting forever because Velox doesn't propagate
+    // Driver's async errors directly to Task::next.
+    // https://github.com/facebookincubator/velox/blob/9a5946a09780020c1da86c37e8c377e2585d6800/velox/exec/Task.cpp#L3279
+    std::move(future).wait(std::chrono::seconds(1));
   }
+}
 
-  MemoryManager* const memoryManager_;
-  std::shared_ptr<const Query> query_;
-  std::shared_ptr<exec::Task> task_;
-  std::vector<std::shared_ptr<exec::Driver>> drivers_{};
-  bool hasPendingState_{false};
-  State pendingState_{State::BLOCKED};
-  RowVectorPtr pending_{nullptr};
-};
-} // namespace
+void SerialTask::saveDrivers() {
+  if (drivers_.empty()) {
+    // Save driver references in the first run.
+    //
+    // Doing this will prevent the planned operators in drivers from being
+    // destroyed together with the drivers themselves in the last call to
+    // Task::next (see
+    // https://github.com/facebookincubator/velox/blob/4adec182144e23d7c7d6422e0090d5b59eb32b86/velox/exec/Driver.cpp#L727C13-L727C18),
+    // so if a lazy vector is not loaded while the scan is drained, a meaning
+    // error
+    // (https://github.com/facebookincubator/velox/blob/7af0fce2c27424fbdec1974d96bb1a6d1296419d/velox/dwio/common/ColumnLoader.cpp#L32-L35)
+    // can be thrown when the vector is being loaded rather than just crashing
+    // the process with "pure virtual function call" or so.
+    task_->testingVisitDrivers([&](exec::Driver* driver) -> void {
+      drivers_.push_back(driver->shared_from_this());
+    });
+    VELOX_CHECK(!drivers_.empty());
+  }
+}
 
 QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query)
     : memoryManager_(memoryManager), query_(query) {}
 
-std::unique_ptr<UpIterator> QueryExecutor::execute() const {
-  return std::make_unique<Out>(memoryManager_, query_);
+std::unique_ptr<SerialTask> QueryExecutor::execute() const {
+  return std::make_unique<SerialTask>(memoryManager_, query_);
 }
 } // namespace velox4j
