@@ -9,6 +9,7 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.query.QueryStats;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -55,6 +56,11 @@ public class StaticJniApi {
 
   public void upIteratorWait(UpIterator itr) {
     jni.upIteratorWait(itr.id());
+  }
+
+  public QueryStats upIteratorCollectStats(UpIterator itr) {
+    final String statsJson = jni.upIteratorCollectStats(itr.id());
+    return QueryStats.fromJson(statsJson);
   }
 
   public Type variantInferType(Variant variant) {
