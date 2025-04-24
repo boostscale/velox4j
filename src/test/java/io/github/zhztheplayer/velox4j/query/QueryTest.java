@@ -209,6 +209,7 @@ public class QueryTest {
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
     final UpIterator itr = session.queryOps().execute(query);
+    UpIteratorTests.collect(itr);
     final QueryStats queryStats = itr.collectStats();
 
     final JsonNode scanStats = queryStats.planStats("id-1");
