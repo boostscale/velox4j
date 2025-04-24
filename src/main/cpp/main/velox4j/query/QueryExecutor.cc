@@ -16,6 +16,9 @@
  */
 
 #include "QueryExecutor.h"
+
+#include <velox/exec/Operator.h>
+#include <velox/exec/PlanNodeStats.h>
 #include <velox/exec/Task.h>
 #include "velox4j/query/Query.h"
 
@@ -24,6 +27,15 @@
 namespace velox4j {
 
 using namespace facebook::velox;
+
+SerialTaskStats::SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats)
+    : taskStats_(taskStats) {}
+
+folly::dynamic SerialTaskStats::toJson() const {
+  folly::dynamic obj = folly::dynamic::object;
+  obj["planStats"] = exec::toPlanStatsJson(taskStats_);
+  return obj;
+}
 
 SerialTask::SerialTask(
     MemoryManager* memoryManager,
@@ -106,9 +118,9 @@ RowVectorPtr SerialTask::get() {
   return out;
 }
 
-std::unique_ptr<QueryStats> SerialTask::collectStats() {
+std::unique_ptr<SerialTaskStats> SerialTask::collectStats() {
   const auto stats = task_->taskStats();
-  return std::make_unique<QueryStats>(stats);
+  return std::make_unique<SerialTaskStats>(stats);
 }
 
 UpIterator::State SerialTask::advance0(bool wait) {
