@@ -42,8 +42,5 @@ class UpIterator {
   virtual State advance() = 0;
   virtual void wait() = 0;
   virtual facebook::velox::RowVectorPtr get() = 0;
-
-  // Metrics.
-  virtual std::unique_ptr<QueryStats> collectStats() = 0;
 };
 } // namespace velox4j

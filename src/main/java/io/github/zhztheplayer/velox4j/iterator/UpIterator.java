@@ -10,13 +10,19 @@ import io.github.zhztheplayer.velox4j.query.QueryStats;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpIterator implements CppObject {
-  private static final Map<Integer, State> STATE_ID_LOOKUP = new HashMap<>();
-
-  public enum State {
+public interface UpIterator extends CppObject {
+  enum State {
     AVAILABLE(0),
     BLOCKED(1),
     FINISHED(2);
+
+    private static Map<Integer, State> STATE_ID_LOOKUP = new HashMap<>();
+
+    static {
+      for (State state : State.values()) {
+        STATE_ID_LOOKUP.put(state.id, state);
+      }
+    }
 
     public static State get(int id) {
       Preconditions.checkArgument(STATE_ID_LOOKUP.containsKey(id), "ID not found: %d", id);
@@ -27,8 +33,6 @@ public class UpIterator implements CppObject {
 
     State(int id) {
       this.id = id;
-      Preconditions.checkArgument(!STATE_ID_LOOKUP.containsKey(id));
-      STATE_ID_LOOKUP.put(id, this);
     }
 
     public int getId() {
@@ -36,32 +40,9 @@ public class UpIterator implements CppObject {
     }
   }
 
-  private final JniApi jniApi;
-  private final long id;
+  State advance();
 
-  public UpIterator(JniApi jniApi, long id) {
-    this.jniApi = jniApi;
-    this.id = id;
-  }
+  void waitFor();
 
-  public State advance() {
-    return StaticJniApi.get().upIteratorAdvance(this);
-  }
-
-  public void waitFor() {
-    StaticJniApi.get().upIteratorWait(this);
-  }
-
-  public RowVector get() {
-    return jniApi.upIteratorGet(this);
-  }
-
-  public QueryStats collectStats() {
-    return StaticJniApi.get().upIteratorCollectStats(this);
-  }
-
-  @Override
-  public long id() {
-    return id;
-  }
+  RowVector get();
 }

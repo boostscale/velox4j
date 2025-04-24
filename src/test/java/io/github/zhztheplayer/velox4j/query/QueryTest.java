@@ -208,9 +208,9 @@ public class QueryTest {
     );
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
     final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.collect(itr);
-    final QueryStats queryStats = itr.collectStats();
+    final SerialTask serialTask = session.queryOps().execute(query);
+    UpIteratorTests.collect(serialTask);
+    final QueryStats queryStats = serialTask.collectStats();
 
     final JsonNode scanStats = queryStats.planStats("id-1");
     Assert.assertEquals("TableScan", scanStats.get("operatorType").asText());

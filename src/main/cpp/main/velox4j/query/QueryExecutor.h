@@ -24,11 +24,39 @@
 
 namespace velox4j {
 
+class SerialTask : public UpIterator {
+ public:
+  SerialTask(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+
+  ~SerialTask() override;
+
+  State advance() override;
+
+  void wait() override;
+
+  facebook::velox::RowVectorPtr get() override;
+
+  std::unique_ptr<QueryStats> collectStats();
+
+ private:
+  State advance0(bool wait);
+
+  void saveDrivers();
+
+  MemoryManager* const memoryManager_;
+  std::shared_ptr<const Query> query_;
+  std::shared_ptr<facebook::velox::exec::Task> task_;
+  std::vector<std::shared_ptr<facebook::velox::exec::Driver>> drivers_{};
+  bool hasPendingState_{false};
+  State pendingState_{State::BLOCKED};
+  facebook::velox::RowVectorPtr pending_{nullptr};
+};
+
 class QueryExecutor {
  public:
   QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
 
-  std::unique_ptr<UpIterator> execute() const;
+  std::unique_ptr<SerialTask> execute() const;
 
  private:
   MemoryManager* const memoryManager_;

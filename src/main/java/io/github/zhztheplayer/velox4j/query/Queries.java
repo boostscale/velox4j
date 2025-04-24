@@ -10,7 +10,7 @@ public class Queries {
     this.jniApi = jniApi;
   }
 
-  public UpIterator execute(Query query) {
+  public SerialTask execute(Query query) {
     try (final QueryExecutor exec = jniApi.createQueryExecutor(query)) {
       return exec.execute();
     }
