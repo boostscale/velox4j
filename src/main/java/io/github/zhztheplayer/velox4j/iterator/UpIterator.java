@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UpIterator implements CppObject {
-  private static final Map<Integer, State> ID_LOOKUP = new HashMap<>();
+  private static final Map<Integer, State> STATE_ID_LOOKUP = new HashMap<>();
 
   public enum State {
     AVAILABLE(0),
@@ -18,16 +18,16 @@ public class UpIterator implements CppObject {
     FINISHED(2);
 
     public static State get(int id) {
-      Preconditions.checkArgument(ID_LOOKUP.containsKey(id), "ID not found: %d", id);
-      return ID_LOOKUP.get(id);
+      Preconditions.checkArgument(STATE_ID_LOOKUP.containsKey(id), "ID not found: %d", id);
+      return STATE_ID_LOOKUP.get(id);
     }
 
     private final int id;
 
     State(int id) {
       this.id = id;
-      Preconditions.checkArgument(!ID_LOOKUP.containsKey(id));
-      ID_LOOKUP.put(id, this);
+      Preconditions.checkArgument(!STATE_ID_LOOKUP.containsKey(id));
+      STATE_ID_LOOKUP.put(id, this);
     }
 
     public int getId() {
