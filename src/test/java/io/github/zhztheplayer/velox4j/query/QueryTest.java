@@ -14,10 +14,7 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
-import io.github.zhztheplayer.velox4j.iterator.DownIterator;
-import io.github.zhztheplayer.velox4j.iterator.DownIterators;
-import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.iterator.UpIterators;
+import io.github.zhztheplayer.velox4j.iterator.*;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -26,11 +23,7 @@ import io.github.zhztheplayer.velox4j.plan.*;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.test.ResourceTests;
-import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
-import io.github.zhztheplayer.velox4j.test.TpchTests;
-import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
-import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.test.*;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.RowType;
@@ -295,7 +288,82 @@ public class QueryTest {
   }
 
   @Test
-  public void testExternalStreamFromBlockingQueueTowThreads() throws InterruptedException {
+  public void testExternalStreamFromBlockingQueueWithInfiniteIteratorOut() throws InterruptedException {
+    final BlockingQueue<RowVector> queue = new LinkedBlockingQueue<>();
+    final DownIterator down = DownIterators.fromBlockingQueue(queue);
+    final ExternalStream es = session.externalStreamOps().bind(down);
+    final TableScanNode scanNode = new TableScanNode(
+        "id-1",
+        SampleQueryTests.getSchema(),
+        new ExternalStreamTableHandle("connector-external-stream"),
+        List.of()
+    );
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+
+    final InfiniteIterator<RowVector> out;
+    final RowVector rv = BaseVectorTests.newSampleRowVector(session);
+
+    {
+      final SerialTask task = session.queryOps().execute(query);
+      task.addSplit(scanNode.getId(), split);
+      task.noMoreSplits(scanNode.getId());
+      out = UpIterators.asInfiniteIterator(task);
+    }
+
+    // No input added, the iterator is not available.
+    Assert.assertThrows(VeloxException.class, out::get);
+    Assert.assertFalse(out.available());
+    Assert.assertFalse(out.available());
+
+    // Add one input.
+    queue.add(rv);
+    Assert.assertThrows(VeloxException.class, out::get);
+    out.waitFor();
+    out.waitFor();
+    Assert.assertTrue(out.available());
+    BaseVectorTests.assertEquals(rv, out.get());
+    Assert.assertThrows(VeloxException.class, out::get);
+    Assert.assertFalse(out.available());
+    Assert.assertFalse(out.available());
+
+    // Add multiple inputs at a time.
+    queue.add(rv);
+    queue.add(rv);
+    Assert.assertThrows(VeloxException.class, out::get);
+    out.waitFor();
+    Assert.assertTrue(out.available());
+    Assert.assertTrue(out.available());
+    out.waitFor();
+    BaseVectorTests.assertEquals(rv, out.get());
+    Assert.assertThrows(VeloxException.class, out::get);
+    out.waitFor();
+    Assert.assertTrue(out.available());
+    Assert.assertTrue(out.available());
+    out.waitFor();
+    BaseVectorTests.assertEquals(rv, out.get());
+    Assert.assertThrows(VeloxException.class, out::get);
+    Assert.assertFalse(out.available());
+    Assert.assertFalse(out.available());
+
+    // Async wait.
+    final Thread asyncWaiter = TestThreads.newTestThread(new Runnable() {
+      @Override
+      public void run() {
+        out.waitFor();
+        Assert.assertTrue(out.available());
+        BaseVectorTests.assertEquals(rv, out.get());
+        Assert.assertFalse(out.available());
+      }
+    });
+    asyncWaiter.start();
+    Thread.sleep(500L);
+    queue.add(rv);
+    asyncWaiter.join();
+  }
+
+  @Test
+  public void testExternalStreamFromBlockingQueueTwoThreads() throws InterruptedException {
     final BlockingQueue<RowVector> queue = new LinkedBlockingQueue<>();
     final DownIterator down = DownIterators.fromBlockingQueue(queue);
     final ExternalStream es = session.externalStreamOps().bind(down);
@@ -319,7 +387,7 @@ public class QueryTest {
     Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
     Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
-    final Thread testThread = new Thread(() -> {
+    final Thread testThread = TestThreads.newTestThread(() -> {
       try {
         synchronized (control) {
           // Signals the main thread to add one input after 500ms.
@@ -368,7 +436,7 @@ public class QueryTest {
       control.wait();
 
       // Add one input after 1s.
-      new Thread(() -> {
+      TestThreads.newTestThread(() -> {
         try {
           Thread.sleep(500L);
         } catch (InterruptedException e) {
@@ -383,7 +451,7 @@ public class QueryTest {
       control.wait();
 
       // Add two inputs at a time after 1s.
-      new Thread(() -> {
+      TestThreads.newTestThread(() -> {
         try {
           Thread.sleep(500L);
         } catch (InterruptedException e) {
