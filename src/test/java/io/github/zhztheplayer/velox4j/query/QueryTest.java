@@ -78,19 +78,19 @@ public class QueryTest {
   public void testValuesWith2Steps() {
     final PlanNode values = ValuesNode.create("id-1",
         List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
-    final Query query = new Query(values, List.of(), Config.empty(), ConnectorConfig.empty());
+    final Query query = new Query(values, Config.empty(), ConnectorConfig.empty());
     final QueryExecutor exec = session.queryOps().createQueryExecutor(query);
-    final UpIterator itr = exec.execute();
-    SampleQueryTests.assertIterator(itr, 5);
+    final SerialTask task = exec.execute();
+    SampleQueryTests.assertIterator(task, 5);
   }
 
   @Test
   public void testValues() {
     final PlanNode values = ValuesNode.create("id-1",
         List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
-    final Query query = new Query(values, List.of(), Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    SampleQueryTests.assertIterator(itr, 5);
+    final Query query = new Query(values, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    SampleQueryTests.assertIterator(task, 5);
   }
 
   @Test
@@ -98,12 +98,12 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
-    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final ConnectorSplit split = newSampleSplit(file);
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
         .run();
@@ -115,12 +115,12 @@ public class QueryTest {
     final File file = TpchTests.Table.REGION.file();
     final RowType outputType = TpchTests.Table.REGION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
-    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final ConnectorSplit split = newSampleSplit(file);
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-region.tsv"))
         .run();
@@ -131,15 +131,15 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final int maxOutputBatchRows = 7;
-    final Query query = new Query(scanNode, splits, Config.create(
+    final Query query = new Query(scanNode, Config.create(
         Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
         ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(itr))
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(task))
         .map(v -> v.loadedVector().asRowVector())
         .collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
@@ -158,15 +158,15 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final int maxOutputBatchRows = 7;
-    final Query query = new Query(scanNode, splits, Config.create(
+    final Query query = new Query(scanNode, Config.create(
         Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
         ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(itr)).collect(Collectors.toList());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(task)).collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
     for (int i = 0; i < allRvs.size(); i++) {
       final RowVector rv = allRvs.get(i);
@@ -185,14 +185,14 @@ public class QueryTest {
   public void testAggregate() {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);;
+    final ConnectorSplit split = newSampleSplit(file);
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
-    final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(aggregationNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
         .run();
@@ -202,13 +202,13 @@ public class QueryTest {
   public void testAggregateStats() {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
-    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);;
+    final ConnectorSplit split = newSampleSplit(file);
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
-    final Query query = new Query(aggregationNode, splits, Config.empty(), ConnectorConfig.empty());
+    final Query query = new Query(aggregationNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask serialTask = session.queryOps().execute(query);
+    serialTask.addSplit(scanNode.getId(), -1, split);
+    serialTask.noMoreSplits(scanNode.getId());
     UpIteratorTests.collect(serialTask);
     final SerialTaskStats serialTaskStats = serialTask.collectStats();
 
@@ -235,17 +235,13 @@ public class QueryTest {
         SampleQueryTests.getSchema(),
         new ExternalStreamTableHandle("connector-external-stream"),
         List.of()
-    );
-    final List<BoundSplit> splits = List.of(
-        new BoundSplit(
-            "id-1",
-            -1,
-            new ExternalStreamConnectorSplit("connector-external-stream", es.id())
-        )
-    );
-    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.queryOps().execute(query);
-    SampleQueryTests.assertIterator(out);
+    );;
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    SampleQueryTests.assertIterator(task);
   }
 
   @Test
@@ -259,48 +255,43 @@ public class QueryTest {
         new ExternalStreamTableHandle("connector-external-stream"),
         List.of()
     );
-    final List<BoundSplit> splits = List.of(
-        new BoundSplit(
-            scanNode.getId(),
-            -1,
-            new ExternalStreamConnectorSplit("connector-external-stream", es.id())
-        )
-    );
-    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.queryOps().execute(query);
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
     // No input added, the up-iterator is considered blocked.
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
     // Add one input.
     queue.add(rv);
-    out.waitFor();
-    Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-    Assert.assertThrows(VeloxException.class, out::advance);
-    BaseVectorTests.assertEquals(rv, out.get());
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    task.waitFor();
+    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertThrows(VeloxException.class, task::advance);
+    BaseVectorTests.assertEquals(rv, task.get());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
     // Add multiple inputs at a time.
     queue.add(rv);
     queue.add(rv);
-    out.waitFor();
-    Assert.assertThrows(VeloxException.class, out::waitFor);
-    Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-    Assert.assertThrows(VeloxException.class, out::advance);
-    BaseVectorTests.assertEquals(rv, out.get());
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-    Assert.assertThrows(VeloxException.class, out::advance);
-    BaseVectorTests.assertEquals(rv, out.get());
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-
+    task.waitFor();
+    Assert.assertThrows(VeloxException.class, task::waitFor);
+    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertThrows(VeloxException.class, task::advance);
+    BaseVectorTests.assertEquals(rv, task.get());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertThrows(VeloxException.class, task::advance);
+    BaseVectorTests.assertEquals(rv, task.get());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
   }
 
   @Test
@@ -314,23 +305,19 @@ public class QueryTest {
         new ExternalStreamTableHandle("connector-external-stream"),
         List.of()
     );
-    final List<BoundSplit> splits = List.of(
-        new BoundSplit(
-            scanNode.getId(),
-            -1,
-            new ExternalStreamConnectorSplit("connector-external-stream", es.id())
-        )
-    );
-    final Query query = new Query(scanNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.queryOps().execute(query);
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
     final Object control = new Object();
 
     // No input added, the up-iterator is considered blocked.
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
     final Thread testThread = new Thread(() -> {
       try {
@@ -340,32 +327,32 @@ public class QueryTest {
           control.wait();
 
           // The wait calls should not throw.
-          out.waitFor();
-          Assert.assertThrows(VeloxException.class, out::waitFor);
-          Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-          Assert.assertThrows(VeloxException.class, out::advance);
-          BaseVectorTests.assertEquals(rv, out.get());
-          Assert.assertThrows(VeloxException.class, out::get);
-          Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-          Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+          task.waitFor();
+          Assert.assertThrows(VeloxException.class, task::waitFor);
+          Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+          Assert.assertThrows(VeloxException.class, task::advance);
+          BaseVectorTests.assertEquals(rv, task.get());
+          Assert.assertThrows(VeloxException.class, task::get);
+          Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+          Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
           // Signals the main thread to add two inputs after 500ms.
           control.notifyAll();
           control.wait();
 
           // The wait calls should not throw.
-          out.waitFor();
-          Assert.assertThrows(VeloxException.class, out::waitFor);
-          Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-          Assert.assertThrows(VeloxException.class, out::advance);
-          BaseVectorTests.assertEquals(rv, out.get());
-          Assert.assertThrows(VeloxException.class, out::get);
-          Assert.assertEquals(UpIterator.State.AVAILABLE, out.advance());
-          Assert.assertThrows(VeloxException.class, out::advance);
-          BaseVectorTests.assertEquals(rv, out.get());
-          Assert.assertThrows(VeloxException.class, out::get);
-          Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-          Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+          task.waitFor();
+          Assert.assertThrows(VeloxException.class, task::waitFor);
+          Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+          Assert.assertThrows(VeloxException.class, task::advance);
+          BaseVectorTests.assertEquals(rv, task.get());
+          Assert.assertThrows(VeloxException.class, task::get);
+          Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+          Assert.assertThrows(VeloxException.class, task::advance);
+          BaseVectorTests.assertEquals(rv, task.get());
+          Assert.assertThrows(VeloxException.class, task::get);
+          Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+          Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
           // Signals the main thread that the test has passed.
           control.notifyAll();
@@ -430,34 +417,30 @@ public class QueryTest {
         List.of(scanNode),
         ConstantTypedExpr.create(new BooleanValue(false))
     );
-    final List<BoundSplit> splits = List.of(
-        new BoundSplit(
-            scanNode.getId(),
-            -1,
-            new ExternalStreamConnectorSplit("connector-external-stream", es.id())
-        )
-    );
-    final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator out = session.queryOps().execute(query);
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
     // No input added, the up-iterator is considered blocked.
-    Assert.assertThrows(VeloxException.class, out::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    Assert.assertThrows(VeloxException.class, task::get);
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
     // Add one input.
     queue.add(rv);
     Thread.sleep(500L);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
     // Add multiple inputs at a time.
     queue.add(rv);
     queue.add(rv);
     Thread.sleep(500L);
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, out.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
 
   }
 
@@ -466,18 +449,18 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final ProjectNode projectNode = new ProjectNode("id-2", List.of(scanNode),
         List.of("n_nationkey", "n_comment"),
         List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey"),
             FieldAccessTypedExpr.create(new VarCharType(), "n_comment")
         ));
-    final Query query = new Query(projectNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(projectNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
         .run();
@@ -488,17 +471,17 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final FilterNode filterNode = new FilterNode("id-2", List.of(scanNode),
         new CallTypedExpr(new BooleanType(), List.of(
             FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
             ConstantTypedExpr.create(new BigIntValue(3))),
             "greaterthanorequal"));
-    final Query query = new Query(filterNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
         .run();
@@ -512,10 +495,8 @@ public class QueryTest {
     final RowType regionOutputType = TpchTests.Table.REGION.schema();
     final TableScanNode nationScanNode = newSampleTableScanNode("id-1", nationOutputType);
     final TableScanNode regionScanNode = newSampleTableScanNode("id-2", regionOutputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(nationScanNode, nationFile),
-        newSampleSplit(regionScanNode, regionFile)
-    );
+    final ConnectorSplit nationSplit = newSampleSplit(nationFile);
+    final ConnectorSplit regionSplit = newSampleSplit(regionFile);
     final HashJoinNode hashJoinNode = new HashJoinNode("id-3",
         JoinType.LEFT,
         List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
@@ -527,9 +508,13 @@ public class QueryTest {
             List.of(new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
         false
     );
-    final Query query = new Query(hashJoinNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(hashJoinNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(nationScanNode.getId(), -1, nationSplit);
+    task.addSplit(regionScanNode.getId(), -1, regionSplit);
+    task.noMoreSplits(nationScanNode.getId());
+    task.noMoreSplits(regionScanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
         .run();
@@ -540,18 +525,18 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final OrderByNode orderByNode = new OrderByNode("id-2", List.of(scanNode),
         List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
             FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
         List.of(new SortOrder(true, false),
             new SortOrder(false, false)),
         false);
-    final Query query = new Query(orderByNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(orderByNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-orderby-1.tsv"))
         .run();
@@ -562,13 +547,13 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType outputType = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
-    final Query query = new Query(limitNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(limitNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
         .run();
@@ -581,13 +566,13 @@ public class QueryTest {
     final File file = TpchTests.Table.NATION.file();
     final RowType schema = TpchTests.Table.NATION.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", schema);
-    final List<BoundSplit> splits = List.of(
-        newSampleSplit(scanNode, file)
-    );
+    final ConnectorSplit split = newSampleSplit(file);
     final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode);
-    final Query query = new Query(tableWriteNode, splits, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr = session.queryOps().execute(query);
-    UpIteratorTests.assertIterator(itr)
+    final Query query = new Query(tableWriteNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), -1, split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorTypeJson(0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
         .run();
@@ -602,13 +587,13 @@ public class QueryTest {
     // Read the sample nation file.
     final File file = TpchTests.Table.NATION.file();
     final TableScanNode scanNode1 = newSampleTableScanNode("id-1", schema);
-    final List<BoundSplit> splits1 = List.of(
-        newSampleSplit(scanNode1, file)
-    );
+    final ConnectorSplit split1 = newSampleSplit(file);
     final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode1);
-    final Query query1 = new Query(tableWriteNode, splits1, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr1 = session.queryOps().execute(query1);
-    UpIteratorTests.assertIterator(itr1)
+    final Query query1 = new Query(tableWriteNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task1 = session.queryOps().execute(query1);
+    task1.addSplit(scanNode1.getId(), -1, split1);
+    task1.noMoreSplits(scanNode1.getId());
+    UpIteratorTests.assertIterator(task1)
         .assertNumRowVectors(1)
         .assertRowVectorTypeJson(0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
         .run();
@@ -617,12 +602,12 @@ public class QueryTest {
     final File writtenFile = folder.toPath().resolve(fileName).toFile();
     ;
     final TableScanNode scanNode2 = newSampleTableScanNode("id-1", schema);
-    final List<BoundSplit> splits2 = List.of(
-        newSampleSplit(scanNode2, writtenFile)
-    );
-    final Query query2 = new Query(scanNode2, splits2, Config.empty(), ConnectorConfig.empty());
-    final UpIterator itr2 = session.queryOps().execute(query2);
-    UpIteratorTests.assertIterator(itr2)
+    final ConnectorSplit splits2 = newSampleSplit(writtenFile);
+    final Query query2 = new Query(scanNode2, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task2 = session.queryOps().execute(query2);
+    task2.addSplit(scanNode2.getId(), -1, splits2);
+    task2.noMoreSplits(scanNode2.getId());
+    UpIteratorTests.assertIterator(task2)
         .assertNumRowVectors(1)
         .assertRowVectorToString(0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
         .run();
@@ -682,29 +667,25 @@ public class QueryTest {
     return list;
   }
 
-  private static BoundSplit newSampleSplit(TableScanNode scanNode, File file) {
-    return new BoundSplit(
-        scanNode.getId(),
-        -1,
-        new HiveConnectorSplit(
-            "connector-hive",
-            0,
-            false,
-            file.getAbsolutePath(),
-            FileFormat.PARQUET,
-            0,
-            file.length(),
-            Map.of(),
-            OptionalInt.empty(),
-            Optional.empty(),
-            Map.of(),
-            Optional.empty(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Optional.empty(),
-            Optional.empty()
-        )
+  private static ConnectorSplit newSampleSplit(File file) {
+    return new HiveConnectorSplit(
+        "connector-hive",
+        0,
+        false,
+        file.getAbsolutePath(),
+        FileFormat.PARQUET,
+        0,
+        file.length(),
+        Map.of(),
+        OptionalInt.empty(),
+        Optional.empty(),
+        Map.of(),
+        Optional.empty(),
+        Map.of(),
+        Map.of(),
+        Map.of(),
+        Optional.empty(),
+        Optional.empty()
     );
   }
 

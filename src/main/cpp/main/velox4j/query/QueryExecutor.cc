@@ -28,7 +28,7 @@ namespace velox4j {
 
 using namespace facebook::velox;
 
-SerialTaskStats::SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats)
+SerialTaskStats::SerialTaskStats(const exec::TaskStats& taskStats)
     : taskStats_(taskStats) {}
 
 folly::dynamic SerialTaskStats::toJson() const {
@@ -109,16 +109,14 @@ RowVectorPtr SerialTask::get() {
 }
 
 void SerialTask::addSplit(
-    const facebook::velox::core::PlanNodeId& planNodeId,
+    const core::PlanNodeId& planNodeId,
     int32_t groupId,
-    std::shared_ptr<facebook::velox::connector::ConnectorSplit>
-        connectorSplit) {
+    std::shared_ptr<connector::ConnectorSplit> connectorSplit) {
   auto cs = connectorSplit;
   task_->addSplit(planNodeId, exec::Split{std::move(cs), groupId});
 }
 
-void SerialTask::noMoreSplits(
-    const facebook::velox::core::PlanNodeId& planNodeId) {
+void SerialTask::noMoreSplits(const core::PlanNodeId& planNodeId) {
   task_->noMoreSplits(planNodeId);
 }
 
@@ -177,7 +175,9 @@ void SerialTask::saveDrivers() {
   }
 }
 
-QueryExecutor::QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query)
+QueryExecutor::QueryExecutor(
+    MemoryManager* memoryManager,
+    std::shared_ptr<const Query> query)
     : memoryManager_(memoryManager), query_(query) {}
 
 std::unique_ptr<SerialTask> QueryExecutor::execute() const {

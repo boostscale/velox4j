@@ -206,7 +206,6 @@
     ],
     "step": "FINAL"
   },
-  "boundSplits": [],
   "queryConfig": {
     "name": "velox4j.Config",
     "values": [
