@@ -13,7 +13,7 @@ public interface UpIterator extends CppObject {
     BLOCKED(1),
     FINISHED(2);
 
-    private static Map<Integer, State> STATE_ID_LOOKUP = new HashMap<>();
+    private final static Map<Integer, State> STATE_ID_LOOKUP = new HashMap<>();
 
     static {
       for (State state : State.values()) {
