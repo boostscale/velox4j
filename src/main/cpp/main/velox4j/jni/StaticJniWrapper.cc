@@ -82,6 +82,37 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END()
 }
 
+void serialTaskAddSplit(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong stId,
+    jstring planNodeId,
+    jint groupId,
+    jstring connectorSplitJson) {
+  JNI_METHOD_START
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  spotify::jni::JavaString jPlanNodeId{env, planNodeId};
+  spotify::jni::JavaString jConnectorSplitJson{env, connectorSplitJson};
+  auto jConnectorSplitDynamic = folly::parseJson(jConnectorSplitJson.get());
+  auto connectorSplit = std::const_pointer_cast<connector::ConnectorSplit>(
+      ISerializable::deserialize<connector::ConnectorSplit>(
+          jConnectorSplitDynamic));
+  serialTask->addSplit(jPlanNodeId.get(), groupId, connectorSplit);
+  JNI_METHOD_END()
+}
+
+void serialTaskNoMoreSplits(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong stId,
+    jstring planNodeId) {
+  JNI_METHOD_START
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  spotify::jni::JavaString jPlanNodeId{env, planNodeId};
+  serialTask->noMoreSplits(jPlanNodeId.get());
+  JNI_METHOD_END()
+}
+
 jstring serialTaskCollectStats(JNIEnv* env, jobject javaThis, jlong stId) {
   JNI_METHOD_START
   auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
@@ -253,7 +284,27 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
-      "serialTaskCollectStats", (void*)serialTaskCollectStats, kTypeString, kTypeLong, nullptr);
+      "serialTaskAddSplit",
+      (void*)serialTaskAddSplit,
+      kTypeVoid,
+      kTypeLong,
+      kTypeString,
+      kTypeInt,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "serialTaskNoMoreSplits",
+      (void*)serialTaskNoMoreSplits,
+      kTypeVoid,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "serialTaskCollectStats",
+      (void*)serialTaskCollectStats,
+      kTypeString,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,

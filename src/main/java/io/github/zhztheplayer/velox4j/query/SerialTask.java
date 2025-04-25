@@ -1,5 +1,6 @@
 package io.github.zhztheplayer.velox4j.query;
 
+import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
@@ -32,6 +33,14 @@ public class SerialTask implements UpIterator {
   @Override
   public long id() {
     return id;
+  }
+
+  public void addSplit(String planNodeId, ConnectorSplit split) {
+    StaticJniApi.get().serialTaskAddSplit(this, planNodeId, -1, split);
+  }
+
+  public void noMoreSplits(String planNodeId) {
+    StaticJniApi.get().serialTaskNoMoreSplits(this, planNodeId);
   }
 
   public SerialTaskStats collectStats() {

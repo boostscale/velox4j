@@ -28,18 +28,15 @@ import java.util.List;
 
 public class Query extends ISerializable {
   private final PlanNode plan;
-  private final List<BoundSplit> boundSplits;
   private final Config queryConfig;
   private final ConnectorConfig connectorConfig;
 
   @JsonCreator
   public Query(
       @JsonProperty("plan") PlanNode plan,
-      @JsonProperty("boundSplits") List<BoundSplit> boundSplits,
       @JsonProperty("queryConfig") Config queryConfig,
       @JsonProperty("connectorConfig") ConnectorConfig connectorConfig) {
     this.plan = plan;
-    this.boundSplits = boundSplits;
     this.queryConfig = queryConfig;
     this.connectorConfig = connectorConfig;
   }
@@ -47,11 +44,6 @@ public class Query extends ISerializable {
   @JsonGetter("plan")
   public PlanNode getPlan() {
     return plan;
-  }
-
-  @JsonGetter("boundSplits")
-  public List<BoundSplit> getSplits() {
-    return boundSplits;
   }
 
   @JsonGetter("queryConfig")

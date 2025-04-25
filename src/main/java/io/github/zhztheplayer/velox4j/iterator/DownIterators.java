@@ -51,8 +51,9 @@ public final class DownIterators {
 
   private static class FromBlockingQueue implements DownIterator {
     private final BlockingQueue<RowVector> queue;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+
     private RowVector pending = null;
-    private AtomicBoolean closed = new AtomicBoolean(false);
 
     public FromBlockingQueue(BlockingQueue<RowVector> queue) {
       this.queue = queue;
