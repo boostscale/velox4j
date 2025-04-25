@@ -14,6 +14,28 @@ public final class UpIterators {
       this.upIterator = upIterator;
     }
 
+    private boolean couldAdvance() {
+      final UpIterator.State state = upIterator.advance();
+      switch (state) {
+        case BLOCKED:
+          return false;
+        case AVAILABLE:
+          return true;
+        case FINISHED:
+          return false;
+        default:
+          throw new IllegalStateException("Unknown state: " + state);
+      }
+    }
+
+    public boolean hasNext(boolean blocking) {
+      if (blocking) {
+        return hasNext();
+      } else {
+        return couldAdvance();
+      }
+    }
+
     @Override
     public boolean hasNext() {
       while (true) {
