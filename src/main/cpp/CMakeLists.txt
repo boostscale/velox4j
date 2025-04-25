@@ -58,8 +58,6 @@ CPMAddPackage(
         NAME velox
         URL ${VELOX_SOURCE_URL}
         URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-        PATCHES
-        "${VELOX_PATCH_DIR}/0001-fix-Add-a-patch-to-fix-folly-build-on-arm64-Linux.patch"
 )
 
 # Import JniHelpers.
