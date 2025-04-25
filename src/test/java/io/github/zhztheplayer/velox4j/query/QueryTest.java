@@ -288,7 +288,7 @@ public class QueryTest {
   }
 
   @Test
-  public void testExternalStreamFromBlockingQueueWithInfiniteIteratorOut() throws InterruptedException {
+  public void testExternalStreamFromBlockingQueueWithInfiniteIteratorOut() throws Exception {
     final BlockingQueue<RowVector> queue = new LinkedBlockingQueue<>();
     final DownIterator down = DownIterators.fromBlockingQueue(queue);
     final ExternalStream es = session.externalStreamOps().bind(down);

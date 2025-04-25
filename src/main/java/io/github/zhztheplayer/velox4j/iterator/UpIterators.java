@@ -67,7 +67,7 @@ public final class UpIterators {
           isAvailable = true;
           return true;
         case FINISHED:
-          throw new VeloxException("InfiniteIterator was closed by user");
+          throw new VeloxException("InfiniteIterator reaches FINISHED state, which is not supposed to happen");
         default:
           throw new IllegalStateException("Unknown state: " + state);
       }
@@ -87,7 +87,7 @@ public final class UpIterators {
           isAvailable = true;
           return;
         case FINISHED:
-          throw new VeloxException("InfiniteIterator was closed by user");
+          throw new VeloxException("InfiniteIterator reaches FINISHED state, which is not supposed to happen");
         default:
           throw new IllegalStateException("Unknown state: " + state);
       }
