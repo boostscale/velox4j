@@ -101,7 +101,7 @@ public class QueryTest {
     final ConnectorSplit split = newSampleSplit(file);
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -118,7 +118,7 @@ public class QueryTest {
     final ConnectorSplit split = newSampleSplit(file);
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -137,7 +137,7 @@ public class QueryTest {
         Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
         ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(task))
         .map(v -> v.loadedVector().asRowVector())
@@ -164,7 +164,7 @@ public class QueryTest {
         Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
         ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final List<RowVector> allRvs = Streams.fromIterator(UpIterators.asJavaIterator(task)).collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
@@ -190,7 +190,7 @@ public class QueryTest {
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
     final Query query = new Query(aggregationNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -207,7 +207,7 @@ public class QueryTest {
     final AggregationNode aggregationNode = newSampleAggregationNodeSumNationKeyByRegionKey("id-2", scanNode);
     final Query query = new Query(aggregationNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask serialTask = session.queryOps().execute(query);
-    serialTask.addSplit(scanNode.getId(), -1, split);
+    serialTask.addSplit(scanNode.getId(), split);
     serialTask.noMoreSplits(scanNode.getId());
     UpIteratorTests.collect(serialTask);
     final SerialTaskStats serialTaskStats = serialTask.collectStats();
@@ -239,7 +239,7 @@ public class QueryTest {
     final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     SampleQueryTests.assertIterator(task);
   }
@@ -258,7 +258,7 @@ public class QueryTest {
     final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
@@ -308,7 +308,7 @@ public class QueryTest {
     final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
@@ -420,7 +420,7 @@ public class QueryTest {
     final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", es.id());
     final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final RowVector rv = BaseVectorTests.newSampleRowVector(session);
 
@@ -458,7 +458,7 @@ public class QueryTest {
         ));
     final Query query = new Query(projectNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -479,7 +479,7 @@ public class QueryTest {
             "greaterthanorequal"));
     final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -510,8 +510,8 @@ public class QueryTest {
     );
     final Query query = new Query(hashJoinNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(nationScanNode.getId(), -1, nationSplit);
-    task.addSplit(regionScanNode.getId(), -1, regionSplit);
+    task.addSplit(nationScanNode.getId(), nationSplit);
+    task.addSplit(regionScanNode.getId(), regionSplit);
     task.noMoreSplits(nationScanNode.getId());
     task.noMoreSplits(regionScanNode.getId());
     UpIteratorTests.assertIterator(task)
@@ -534,7 +534,7 @@ public class QueryTest {
         false);
     final Query query = new Query(orderByNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -551,7 +551,7 @@ public class QueryTest {
     final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
     final Query query = new Query(limitNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -570,7 +570,7 @@ public class QueryTest {
     final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode);
     final Query query = new Query(tableWriteNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
-    task.addSplit(scanNode.getId(), -1, split);
+    task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     UpIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
@@ -591,7 +591,7 @@ public class QueryTest {
     final TableWriteNode tableWriteNode = newSampleTableWriteNode("id-2", schema, folder, fileName, scanNode1);
     final Query query1 = new Query(tableWriteNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task1 = session.queryOps().execute(query1);
-    task1.addSplit(scanNode1.getId(), -1, split1);
+    task1.addSplit(scanNode1.getId(), split1);
     task1.noMoreSplits(scanNode1.getId());
     UpIteratorTests.assertIterator(task1)
         .assertNumRowVectors(1)
@@ -605,7 +605,7 @@ public class QueryTest {
     final ConnectorSplit splits2 = newSampleSplit(writtenFile);
     final Query query2 = new Query(scanNode2, Config.empty(), ConnectorConfig.empty());
     final SerialTask task2 = session.queryOps().execute(query2);
-    task2.addSplit(scanNode2.getId(), -1, splits2);
+    task2.addSplit(scanNode2.getId(), splits2);
     task2.noMoreSplits(scanNode2.getId());
     UpIteratorTests.assertIterator(task2)
         .assertNumRowVectors(1)
