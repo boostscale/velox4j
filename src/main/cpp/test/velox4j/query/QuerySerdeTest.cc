@@ -54,10 +54,8 @@ TEST_F(QuerySerdeTest, sanity) {
                   .partialAggregation({"c0"}, {"count(1)", "sum(c1)"})
                   .finalAggregation()
                   .planNode();
-  std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
   auto query = std::make_shared<Query>(
       plan,
-      std::move(boundSplits),
       std::make_shared<const ConfigArray>(
           std::vector<std::pair<std::string, std::string>>({})),
       std::make_shared<const ConnectorConfigArray>(

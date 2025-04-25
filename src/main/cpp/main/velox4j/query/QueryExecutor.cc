@@ -66,16 +66,6 @@ SerialTask::SerialTask(
       std::move(queryCtx),
       exec::Task::ExecutionMode::kSerial);
 
-  std::unordered_set<core::PlanNodeId> planNodesWithSplits{};
-  for (const auto& boundSplit : query_->boundSplits()) {
-    exec::Split split = *boundSplit->split();
-    planNodesWithSplits.emplace(boundSplit->planNodeId());
-    task->addSplit(boundSplit->planNodeId(), std::move(split));
-  }
-  for (const auto& nodeWithSplits : planNodesWithSplits) {
-    task->noMoreSplits(nodeWithSplits);
-  }
-
   task_ = task;
 
   if (!task_->supportSerialExecutionMode()) {
@@ -116,6 +106,20 @@ RowVectorPtr SerialTask::get() {
   const auto out = pending_;
   pending_ = nullptr;
   return out;
+}
+
+void SerialTask::addSplit(
+    const facebook::velox::core::PlanNodeId& planNodeId,
+    int32_t groupId,
+    std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+        connectorSplit) {
+  auto cs = connectorSplit;
+  task_->addSplit(planNodeId, exec::Split{std::move(cs), groupId});
+}
+
+void SerialTask::noMoreSplits(
+    const facebook::velox::core::PlanNodeId& planNodeId) {
+  task_->noMoreSplits(planNodeId);
 }
 
 std::unique_ptr<SerialTaskStats> SerialTask::collectStats() {

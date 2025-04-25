@@ -119,23 +119,23 @@ TEST_F(QueryTest, fuzzer) {
                   .endTableScan()
                   .planNode();
 
-  std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
-  const auto fuzzerSplits = makeFuzzerSplits(rowsPerSplit, numSplits);
-  for (const auto& s : fuzzerSplits) {
-    boundSplits.push_back(std::make_shared<BoundSplit>(
-        plan->id(), std::make_shared<exec::Split>(s)));
-  }
   auto query = std::make_shared<const Query>(
       plan,
-      std::move(boundSplits),
       std::make_shared<const ConfigArray>(
           std::vector<std::pair<std::string, std::string>>({})),
       std::make_shared<const ConnectorConfigArray>(
           std::vector<
               std::pair<std::string, std::shared_ptr<const ConfigArray>>>({})));
   auto executor = std::make_shared<QueryExecutor>(memoryManager_.get(), query);
-  auto itr = executor->execute();
-  auto vectors = collect(*itr);
+  auto serialTask = executor->execute();
+
+  const auto fuzzerSplits = makeFuzzerSplits(rowsPerSplit, numSplits);
+  for (const auto& s : fuzzerSplits) {
+    serialTask->addSplit(plan->id(), s.groupId, s.connectorSplit);
+  }
+  serialTask->noMoreSplits(plan->id());
+
+  auto vectors = collect(*serialTask);
 
   size_t actualRows = 0;
   for (const auto& v : vectors) {

@@ -47,6 +47,14 @@ class SerialTask : public UpIterator {
 
   facebook::velox::RowVectorPtr get() override;
 
+ void addSplit(
+     const facebook::velox::core::PlanNodeId& planNodeId,
+     int32_t groupId,
+     std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+         connectorSplit);
+
+ void noMoreSplits(const facebook::velox::core::PlanNodeId& planNodeId);
+
   std::unique_ptr<SerialTaskStats> collectStats();
 
  private:
