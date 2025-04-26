@@ -1,10 +1,8 @@
 package io.github.zhztheplayer.velox4j.iterator;
 
-import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,11 +12,13 @@ public final class DownIterators {
     return new FromJavaIterator(itr);
   }
 
+  // Deprecated: Use ExternalStreams.newBlockingQueue() instead.
+  @Deprecated
   public static DownIterator fromBlockingQueue(BlockingQueue<RowVector> queue) {
     return new FromBlockingQueue(queue);
   }
 
-  private static class FromJavaIterator implements DownIterator {
+  private static class FromJavaIterator extends BaseDownIterator {
     private final Iterator<RowVector> itr;
 
     private FromJavaIterator(Iterator<RowVector> itr) {
@@ -39,8 +39,8 @@ public final class DownIterators {
     }
 
     @Override
-    public long get() {
-      return itr.next().id();
+    public RowVector get0() {
+      return itr.next();
     }
 
     @Override
@@ -49,7 +49,7 @@ public final class DownIterators {
     }
   }
 
-  private static class FromBlockingQueue implements DownIterator {
+  private static class FromBlockingQueue extends BaseDownIterator {
     private final BlockingQueue<RowVector> queue;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -85,18 +85,36 @@ public final class DownIterators {
     }
 
     @Override
-    public long get() {
+    public RowVector get0() {
       if (pending != null) {
         final RowVector out = pending;
         pending = null;
-        return out.id();
+        return out;
       }
-      return queue.remove().id();
+      return queue.remove();
     }
 
     @Override
     public void close() {
       closed.compareAndSet(false, true);
     }
+  }
+
+  private static abstract class BaseDownIterator implements DownIterator {
+    protected BaseDownIterator() {
+    }
+
+    @Override
+    public final int advance() {
+      return advance0().getId();
+    }
+
+    @Override
+    public final long get() {
+      return get0().id();
+    }
+
+    protected abstract DownIterator.State advance0();
+    protected abstract RowVector get0();
   }
 }

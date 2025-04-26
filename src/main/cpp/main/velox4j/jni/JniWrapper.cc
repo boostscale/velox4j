@@ -21,6 +21,7 @@
 #include <velox/core/PlanNode.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
+
 #include "JniCommon.h"
 #include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
@@ -29,6 +30,7 @@
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
+#include "velox4j/iterator/BlockingQueue.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -102,10 +104,17 @@ jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jlong newExternalStream(JNIEnv* env, jobject javaThis, jobject itrRef) {
+jlong createExternalStreamFromDownIterator(JNIEnv* env, jobject javaThis, jobject itrRef) {
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
+  JNI_METHOD_END(-1L)
+}
+
+jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
+  JNI_METHOD_START
+  auto queue = std::make_shared<BlockingQueue>();
+  return sessionOf(env, javaThis)->objectStore()->save(queue);
   JNI_METHOD_END(-1L)
 }
 
@@ -342,10 +351,15 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
-      "newExternalStream",
-      (void*)newExternalStream,
+      "createExternalStreamFromDownIterator",
+      (void*)createExternalStreamFromDownIterator,
       kTypeLong,
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
+      nullptr);
+  addNativeMethod(
+      "createBlockingQueue",
+      (void*)createBlockingQueue,
+      kTypeLong,
       nullptr);
   addNativeMethod(
       "createEmptyBaseVector",

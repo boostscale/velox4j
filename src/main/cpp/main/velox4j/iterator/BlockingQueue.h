@@ -18,56 +18,39 @@
 #pragma once
 
 #include <folly/executors/IOThreadPoolExecutor.h>
-#include <JniHelpers.h>
-#include <velox/vector/ComplexVector.h>
 #include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
-class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
+
+class BlockingQueue : public ExternalStream {
  public:
-  explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
-    DownIteratorJniWrapper::initialize(env);
-  }
-
-  DownIteratorJniWrapper() : JavaClass() {};
-
-  const char* getCanonicalName() const override;
-
-  void initialize(JNIEnv* env) override;
-
-  void mapFields() override;
-};
-
-class DownIterator : public ExternalStream {
- public:
-  enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
-
   // CTOR.
-  DownIterator(JNIEnv* env, jobject ref);
+  BlockingQueue();
 
   // Delete copy/move CTORs.
-  DownIterator(DownIterator&&) = delete;
-  DownIterator(const DownIterator&) = delete;
-  DownIterator& operator=(const DownIterator&) = delete;
-  DownIterator& operator=(DownIterator&&) = delete;
+  BlockingQueue(BlockingQueue&&) = delete;
+  BlockingQueue(const BlockingQueue&) = delete;
+  BlockingQueue& operator=(const BlockingQueue&) = delete;
+  BlockingQueue& operator=(BlockingQueue&&) = delete;
 
   // DTOR.
-  ~DownIterator() override;
+  ~BlockingQueue() override;
 
   std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) override;
 
+  void put(facebook::velox::RowVectorPtr rowVector);
+
+  bool empty() const;
+
  private:
-  State advance();
-  void wait();
-  facebook::velox::RowVectorPtr get();
   void close();
 
-  jobject ref_;
-  std::mutex mutex_;
+  mutable std::mutex mutex_;
+  mutable std::condition_variable condVar_;
+  std::queue<facebook::velox::RowVectorPtr> queue_;
   std::unique_ptr<folly::IOThreadPoolExecutor> waitExecutor_;
   std::vector<facebook::velox::ContinuePromise> promises_{};
   std::atomic_bool closed_{false};
 };
-
 } // namespace velox4j

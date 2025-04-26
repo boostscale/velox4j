@@ -2,6 +2,7 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
@@ -68,8 +69,12 @@ public final class JniApi {
     return baseVectorWrap(jni.upIteratorGet(itr.id())).asRowVector();
   }
 
-  public ExternalStream newExternalStream(DownIterator itr) {
-    return new ExternalStream(jni.newExternalStream(itr));
+  public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
+    return new ExternalStreams.GenericExternalStream(jni.createExternalStreamFromDownIterator(itr));
+  }
+
+  public ExternalStreams.BlockingQueue createBlockingQueue() {
+    return new ExternalStreams.BlockingQueue(jni.createBlockingQueue());
   }
 
   public BaseVector createEmptyBaseVector(Type type) {

@@ -45,7 +45,8 @@ final class JniWrapper {
   native long upIteratorGet(long id);
 
   // For DownIterator.
-  native long newExternalStream(DownIterator itr);
+  native long createExternalStreamFromDownIterator(DownIterator itr);
+  native long createBlockingQueue();
 
   // For BaseVector / RowVector / SelectivityVector.
   native long createEmptyBaseVector(String typeJson);

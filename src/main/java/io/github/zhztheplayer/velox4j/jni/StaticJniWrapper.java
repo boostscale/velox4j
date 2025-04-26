@@ -26,6 +26,9 @@ public class StaticJniWrapper {
   native int upIteratorAdvance(long id);
   native void upIteratorWait(long id);
 
+  // For DownIterator.
+  native void blockingQueuePut(long id, long rvId);
+
   // For SerialTask.
   native void serialTaskAddSplit(long id, String planNodeId, int groupId, String connectorSplitJson);
   native void serialTaskNoMoreSplits(long id, String planNodeId);

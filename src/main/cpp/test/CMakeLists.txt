@@ -26,7 +26,14 @@ add_test(velox4j_query_serde_test velox4j_query_serde_test)
 
 add_executable(velox4j_query_test
         ${TEST_OBJECT_FILES}
-        velox4j/query/QueryTest.cpp
+        velox4j/query/QueryTest.cc
 )
 target_link_libraries(velox4j_query_test velox4j_test)
 add_test(velox4j_query_test velox4j_query_test)
+
+add_executable(velox4j_blocking_queue_test
+        ${TEST_OBJECT_FILES}
+        velox4j/iterator/BlockingQueueTest.cc
+)
+target_link_libraries(velox4j_blocking_queue_test velox4j_test)
+add_test(velox4j_blocking_queue_test velox4j_blocking_queue_test)

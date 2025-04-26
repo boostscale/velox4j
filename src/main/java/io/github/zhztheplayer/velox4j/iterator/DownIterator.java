@@ -20,15 +20,14 @@ public interface DownIterator {
   }
 
   @CalledFromNative
-  default int advance() {
-      return advance0().getId();
-  }
+  int advance();
+
   @CalledFromNative
   void waitFor() throws InterruptedException;
+
   @CalledFromNative
   long get();
+
   @CalledFromNative
   void close();
-
-  State advance0();
 }

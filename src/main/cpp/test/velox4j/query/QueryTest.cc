@@ -66,8 +66,9 @@ class QueryTest : public testing::Test, public test::VectorTestBase {
       switch (state) {
         case UpIterator::State::AVAILABLE: {
           const auto rv = itr.get();
-          out.push_back(std::dynamic_pointer_cast<RowVector>(
-              RowVector::loadedVectorShared(rv)));
+          out.push_back(
+              std::dynamic_pointer_cast<RowVector>(
+                  RowVector::loadedVectorShared(rv)));
           break;
         }
         case UpIterator::State::BLOCKED:
@@ -82,7 +83,8 @@ class QueryTest : public testing::Test, public test::VectorTestBase {
 
   exec::Split makeFuzzerSplit(size_t numRows) const {
     return exec::Split(
-        std::make_shared<connector::fuzzer::FuzzerConnectorSplit>(kFuzzerConnectorId, numRows));
+        std::make_shared<connector::fuzzer::FuzzerConnectorSplit>(
+            kFuzzerConnectorId, numRows));
   }
 
   std::vector<exec::Split> makeFuzzerSplits(
