@@ -32,6 +32,7 @@ import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.query.QueryExecutor;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
+import io.github.zhztheplayer.velox4j.test.TestThreads;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
@@ -221,7 +222,7 @@ public class JniApiTest {
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.newExternalStream(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
-    final Thread thread = new Thread(new Runnable() {
+    final Thread thread = TestThreads.newTestThread(new Runnable() {
       @Override
       public void run() {
         SampleQueryTests.assertIterator(up);
