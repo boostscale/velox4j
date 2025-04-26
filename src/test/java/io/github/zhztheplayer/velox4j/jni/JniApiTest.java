@@ -206,7 +206,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.newExternalStream(down);
+    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
     session.close();
@@ -220,7 +220,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.newExternalStream(down);
+    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     final Thread thread = TestThreads.newTestThread(new Runnable() {
       @Override

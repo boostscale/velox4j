@@ -2,7 +2,9 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
+import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.data.SelectivityVector;
 import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
@@ -56,6 +58,10 @@ public class StaticJniApi {
 
   public void upIteratorWait(UpIterator itr) {
     jni.upIteratorWait(itr.id());
+  }
+
+  public void blockingQueuePut(ExternalStreams.BlockingQueue queue, RowVector rowVector) {
+    jni.blockingQueuePut(queue.id(), rowVector.id());
   }
 
   public void serialTaskAddSplit(SerialTask serialTask, String planNodeId, int groupId,

@@ -20,7 +20,6 @@
 #include <velox/common/encode/Base64.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
-#include <velox4j/query/QueryExecutor.h>
 
 #include "JniCommon.h"
 #include "JniError.h"
@@ -30,6 +29,8 @@
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"
+#include "velox4j/iterator/BlockingQueue.h"
+#include "velox4j/query/QueryExecutor.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -79,6 +80,14 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   itr->wait();
+  JNI_METHOD_END()
+}
+
+void blockingQueuePut(JNIEnv* env, jobject javaThis, jlong queueId, jlong rvId) {
+  JNI_METHOD_START
+  auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
+  auto rv = ObjectStore::retrieve<RowVector>(rvId);
+  queue->put(rv);
   JNI_METHOD_END()
 }
 
@@ -283,6 +292,8 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       nullptr);
   addNativeMethod(
       "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+  addNativeMethod(
+      "blockingQueuePut", (void*)blockingQueuePut, kTypeVoid, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "serialTaskAddSplit",
       (void*)serialTaskAddSplit,
