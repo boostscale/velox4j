@@ -64,6 +64,10 @@ public class StaticJniApi {
     jni.blockingQueuePut(queue.id(), rowVector.id());
   }
 
+  public void blockingQueueNoMoreInput(ExternalStreams.BlockingQueue queue) {
+    jni.blockingQueueNoMoreInput(queue.id());
+  }
+
   public void serialTaskAddSplit(SerialTask serialTask, String planNodeId, int groupId,
       ConnectorSplit split) {
     final String splitJson = Serde.toJson(split);
