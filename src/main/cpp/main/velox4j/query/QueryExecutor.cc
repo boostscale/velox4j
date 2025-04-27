@@ -102,7 +102,7 @@ RowVectorPtr SerialTask::get() {
   VELOX_CHECK(!hasPendingState_);
   VELOX_CHECK_NOT_NULL(
       pending_,
-      "SerialTask: No pending row vector to return.  No pending row vector to return. Make sure the iterator is available via member function advance() first");
+      "SerialTask: No pending row vector to return. Make sure the iterator is available via member function advance() first");
   const auto out = pending_;
   pending_ = nullptr;
   return out;

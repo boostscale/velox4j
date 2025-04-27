@@ -30,6 +30,8 @@ class BlockingQueue : public ExternalStream {
    CLOSED = 2
   };
 
+ static std::string stateToString(State state);
+
   // CTOR.
   BlockingQueue();
 

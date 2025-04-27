@@ -20,6 +20,18 @@
 namespace velox4j {
 using namespace facebook::velox;
 
+std::string BlockingQueue::stateToString(State state) {
+  switch (state) {
+    case OPEN:
+      return "OPEN";
+    case FINISHED:
+      return "FINISHED";
+    case CLOSED:
+      return "CLOSED";
+  }
+  VELOX_FAIL("unknown state");
+}
+
 BlockingQueue::BlockingQueue() {
   waitExecutor_ = std::make_unique<folly::IOThreadPoolExecutor>(1);
 }
@@ -119,11 +131,11 @@ bool BlockingQueue::empty() const {
 }
 
 void BlockingQueue::ensureOpen() const {
-  VELOX_CHECK(state_ == OPEN, "Queue is not open");
+  VELOX_CHECK(state_ == OPEN, "Queue is not open. Current state is {}", stateToString(state_));
 }
 
 void BlockingQueue::ensureNotClosed() const {
-  VELOX_CHECK(state_ != CLOSED, "Queue was closed");
+  VELOX_CHECK(state_ != CLOSED, "Queue was closed.");
 }
 
 void BlockingQueue::close() {
