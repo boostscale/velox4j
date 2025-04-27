@@ -49,5 +49,9 @@ public class ExternalStreams {
     public void put(RowVector rowVector) {
       StaticJniApi.get().blockingQueuePut(this, rowVector);
     }
+
+    public void noMoreInput() {
+      StaticJniApi.get().blockingQueueNoMoreInput(this);
+    }
   }
 }

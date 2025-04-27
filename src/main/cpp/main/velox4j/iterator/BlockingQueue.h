@@ -24,6 +24,12 @@ namespace velox4j {
 
 class BlockingQueue : public ExternalStream {
  public:
+  enum State {
+   OPEN = 0,
+   FINISHED = 1,
+   CLOSED = 2
+  };
+
   // CTOR.
   BlockingQueue();
 
@@ -41,9 +47,15 @@ class BlockingQueue : public ExternalStream {
 
   void put(facebook::velox::RowVectorPtr rowVector);
 
+  void noMoreInput();
+
   bool empty() const;
 
  private:
+  void ensureOpen() const;
+
+  void ensureNotClosed() const;
+
   void close();
 
   mutable std::mutex mutex_;
@@ -51,6 +63,6 @@ class BlockingQueue : public ExternalStream {
   std::queue<facebook::velox::RowVectorPtr> queue_;
   std::unique_ptr<folly::IOThreadPoolExecutor> waitExecutor_;
   std::vector<facebook::velox::ContinuePromise> promises_{};
-  std::atomic_bool closed_{false};
+  State state_{OPEN};
 };
 } // namespace velox4j

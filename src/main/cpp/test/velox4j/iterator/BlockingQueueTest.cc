@@ -54,20 +54,26 @@ TEST_F(BlockingQueueTest, sanity) {
   for (auto& row : data_) {
     queue.put(row);
   }
+  queue.noMoreInput();
 
   // Read the data back.
   for (auto& expectedRow : data_) {
-    facebook::velox::ContinueFuture future;
+    ContinueFuture future;
     auto result = queue.read(future);
     ASSERT_FALSE(!future.valid());
     ASSERT_EQ(result.value()->size(), expectedRow->size());
   }
 
+  ContinueFuture future;
+  auto result = queue.read(future);
+  ASSERT_FALSE(!future.valid());
+  ASSERT_EQ(result, nullptr);
+
   ASSERT_TRUE(queue.empty());
 }
 
 TEST_F(BlockingQueueTest, concurrentPutAndRead) {
-  velox4j::BlockingQueue queue;
+  BlockingQueue queue;
   const int numIterations = 10;
 
   // Consumer thread.
@@ -75,7 +81,7 @@ TEST_F(BlockingQueueTest, concurrentPutAndRead) {
     for (int i = 0; i < numIterations; ++i) {
       for (auto& expectedRow : data_) {
         while (true) {
-          facebook::velox::ContinueFuture future = ContinueFuture::makeEmpty();
+          ContinueFuture future = ContinueFuture::makeEmpty();
           auto result = queue.read(future);
           if (future.valid()) {
             future.wait();
@@ -85,6 +91,16 @@ TEST_F(BlockingQueueTest, concurrentPutAndRead) {
           break;
         }
       }
+    }
+    while (true) {
+      ContinueFuture future = ContinueFuture::makeEmpty();
+      auto result = queue.read(future);
+      if (future.valid()) {
+        future.wait();
+        continue;
+      }
+      ASSERT_EQ(result, nullptr);
+      break;
     }
   });
 
@@ -98,6 +114,7 @@ TEST_F(BlockingQueueTest, concurrentPutAndRead) {
         queue.put(row);
       }
     }
+    queue.noMoreInput();
   });
 
   producer.join();

@@ -91,6 +91,13 @@ void blockingQueuePut(JNIEnv* env, jobject javaThis, jlong queueId, jlong rvId) 
   JNI_METHOD_END()
 }
 
+void blockingQueueNoMoreInput(JNIEnv* env, jobject javaThis, jlong queueId) {
+  JNI_METHOD_START
+  auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
+  queue->noMoreInput();
+  JNI_METHOD_END()
+}
+
 void serialTaskAddSplit(
     JNIEnv* env,
     jobject javaThis,
@@ -294,6 +301,8 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
       "blockingQueuePut", (void*)blockingQueuePut, kTypeVoid, kTypeLong, kTypeLong, nullptr);
+  addNativeMethod(
+      "blockingQueueNoMoreInput", (void*)blockingQueueNoMoreInput, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
       "serialTaskAddSplit",
       (void*)serialTaskAddSplit,

@@ -28,15 +28,19 @@ BlockingQueue::~BlockingQueue() {
   close();
 }
 
-std::optional<RowVectorPtr> BlockingQueue::read(
-    ContinueFuture& future) {
+std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture& future) {
   {
     std::unique_lock lock(mutex_);
-
+    ensureNotClosed();
     if (!queue_.empty()) {
       auto rowVector = queue_.front();
       queue_.pop();
       return rowVector;
+    }
+    // Queue is empty, checks the current state. If it's FINISHED,
+    // returns a nullptr to Velox to signal the stream is gracefully ended.
+    if (state_ == FINISHED) {
+      return nullptr;
     }
   }
 
@@ -56,27 +60,34 @@ std::optional<RowVectorPtr> BlockingQueue::read(
   waitExecutor_->add([this]() -> void {
     std::unique_lock lock(mutex_);
     // Async wait for a new element.
-    condVar_.wait(lock, [this]() { return closed_ || !queue_.empty(); });
-    if (closed_) {
-      try {
-        VELOX_FAIL("BlockingQueue was just closed");
-      } catch (const std::exception& e) {
-        // Velox should guarantee the continue future is only requested once
-        // while it's not fulfilled.
+    condVar_.wait(lock, [this]() { return state_ != OPEN || !queue_.empty(); });
+    switch (state_) {
+      case OPEN:
+      case FINISHED: {
+        VELOX_CHECK(!queue_.empty());
         VELOX_CHECK(promises_.size() == 1);
         for (auto& p : promises_) {
-          p.setException(e);
-          promises_.clear();
-          return;
+          p.setValue();
         }
+        promises_.clear();
+        break;
+      }
+      case CLOSED: {
+        try {
+          VELOX_FAIL("BlockingQueue was just closed");
+        } catch (const std::exception& e) {
+          // Velox should guarantee the continue future is only requested once
+          // while it's not fulfilled.
+          VELOX_CHECK(promises_.size() == 1);
+          for (auto& p : promises_) {
+            p.setException(e);
+            promises_.clear();
+            return;
+          }
+        }
+        break;
       }
     }
-    VELOX_CHECK(!queue_.empty());
-    VELOX_CHECK(promises_.size() == 1);
-    for (auto& p : promises_) {
-      p.setValue();
-    }
-    promises_.clear();
   });
 
   return std::nullopt;
@@ -85,7 +96,17 @@ std::optional<RowVectorPtr> BlockingQueue::read(
 void BlockingQueue::put(RowVectorPtr rowVector) {
   {
     std::lock_guard lock(mutex_);
+    ensureOpen();
     queue_.push(std::move(rowVector));
+  }
+  condVar_.notify_one();
+}
+
+void BlockingQueue::noMoreInput() {
+  {
+    std::lock_guard lock(mutex_);
+    ensureOpen();
+    state_ = FINISHED;
   }
   condVar_.notify_one();
 }
@@ -97,13 +118,19 @@ bool BlockingQueue::empty() const {
   }
 }
 
+void BlockingQueue::ensureOpen() const {
+  VELOX_CHECK(state_ == OPEN, "Queue is not open");
+}
+
+void BlockingQueue::ensureNotClosed() const {
+  VELOX_CHECK(state_ != CLOSED, "Queue was closed");
+}
+
 void BlockingQueue::close() {
   {
     std::lock_guard lock(mutex_);
-    bool expected = false;
-    if (!closed_.compare_exchange_strong(expected, true)) {
-      return;
-    }
+    ensureNotClosed();
+    state_ = CLOSED;
   }
   condVar_.notify_one();
   waitExecutor_->join();
