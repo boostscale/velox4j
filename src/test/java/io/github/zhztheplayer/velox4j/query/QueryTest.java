@@ -323,7 +323,42 @@ public class QueryTest {
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
     Assert.assertEquals(UpIterator.State.FINISHED, task.advance());
-    Assert.assertThrows(VeloxException.class, task::advance);
+    Assert.assertThrows(VeloxException.class, task::get);
+  }
+
+  @Test
+  public void testBlockingQueueNoMoreInputTwoThreads() throws InterruptedException {
+    final ExternalStreams.BlockingQueue queue = session.externalStreamOps().newBlockingQueue();
+    final TableScanNode scanNode = new TableScanNode(
+        "id-1",
+        SampleQueryTests.getSchema(),
+        new ExternalStreamTableHandle("connector-external-stream"),
+        List.of()
+    );
+    final ConnectorSplit split = new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), split);
+    task.noMoreSplits(scanNode.getId());
+
+
+    final Thread consumer = TestThreads.newTestThread(() -> {
+      while (true) {
+        final UpIterator.State state = task.advance();
+        if (state == UpIterator.State.BLOCKED) {
+          task.waitFor();
+          continue;
+        }
+        Assert.assertEquals(UpIterator.State.FINISHED, state);
+        Assert.assertThrows(VeloxException.class, task::get);
+        break;
+      }
+    });
+    consumer.start();
+
+    Thread.sleep(500L);
+    queue.noMoreInput();
+    consumer.join();
   }
 
   @Test

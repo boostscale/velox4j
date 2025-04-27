@@ -1,5 +1,5 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
+ * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
@@ -58,8 +58,7 @@ std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture& future) {
 
   // Blocked. Async wait for a new element.
   auto [readPromise, readFuture] =
-      makeVeloxContinuePromiseContract(
-          fmt::format("BlockingQueue::read"));
+      makeVeloxContinuePromiseContract(fmt::format("BlockingQueue::read"));
   // Returns a future that is fulfilled immediately to signal Velox
   // that this stream is still open and is currently waiting for input.
   future = std::move(readFuture);
@@ -74,9 +73,11 @@ std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture& future) {
     // Async wait for a new element.
     condVar_.wait(lock, [this]() { return state_ != OPEN || !queue_.empty(); });
     switch (state_) {
-      case OPEN:
-      case FINISHED: {
+      case OPEN: {
         VELOX_CHECK(!queue_.empty());
+        // Fall through.
+      }
+      case FINISHED: {
         VELOX_CHECK(promises_.size() == 1);
         for (auto& p : promises_) {
           p.setValue();
@@ -131,7 +132,10 @@ bool BlockingQueue::empty() const {
 }
 
 void BlockingQueue::ensureOpen() const {
-  VELOX_CHECK(state_ == OPEN, "Queue is not open. Current state is {}", stateToString(state_));
+  VELOX_CHECK(
+      state_ == OPEN,
+      "Queue is not open. Current state is {}",
+      stateToString(state_));
 }
 
 void BlockingQueue::ensureNotClosed() const {
