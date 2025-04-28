@@ -18,6 +18,9 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import java.util.List;
 
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
@@ -37,8 +40,6 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
 
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();

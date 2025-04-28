@@ -23,9 +23,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 public class JniWorkspace {
   private static final Logger LOG = LoggerFactory.getLogger(JniWorkspace.class);

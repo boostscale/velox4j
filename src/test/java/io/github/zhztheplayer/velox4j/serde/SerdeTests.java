@@ -21,6 +21,9 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.ComparisonFailure;
+
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.connector.*;
@@ -48,8 +51,6 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
-import org.junit.Assert;
-import org.junit.ComparisonFailure;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {

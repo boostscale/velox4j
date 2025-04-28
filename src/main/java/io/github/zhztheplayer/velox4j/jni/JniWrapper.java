@@ -17,6 +17,7 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
+
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 
 final class JniWrapper {

@@ -21,6 +21,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 public class RowType extends Type {

@@ -20,6 +20,10 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.variant.ArrayValue;
@@ -36,9 +40,6 @@ import io.github.zhztheplayer.velox4j.variant.TimestampValue;
 import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
 import io.github.zhztheplayer.velox4j.variant.VarBinaryValue;
 import io.github.zhztheplayer.velox4j.variant.VarCharValue;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class VariantSerdeTest {
   @BeforeClass

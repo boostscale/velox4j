@@ -16,6 +16,8 @@
 */
 package io.github.zhztheplayer.velox4j.write;
 
+import org.junit.*;
+
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -25,7 +27,6 @@ import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import org.junit.*;
 
 public class TableWriteTraitsTest {
   private static MemoryManager memoryManager;

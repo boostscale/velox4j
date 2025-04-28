@@ -18,6 +18,8 @@ package io.github.zhztheplayer.velox4j.eval;
 
 import java.util.List;
 
+import org.junit.*;
+
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
@@ -33,7 +35,6 @@ import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
-import org.junit.*;
 
 public class EvaluationTest {
   private static MemoryManager memoryManager;

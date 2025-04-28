@@ -19,6 +19,15 @@ package io.github.zhztheplayer.velox4j.jni;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
+
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
@@ -43,14 +52,6 @@ import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.variant.DoubleValue;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
-import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.FieldVector;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 
 public class JniApiTest {
   private static MemoryManager memoryManager;

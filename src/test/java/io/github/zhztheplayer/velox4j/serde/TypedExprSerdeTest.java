@@ -19,6 +19,8 @@ package io.github.zhztheplayer.velox4j.serde;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.*;
+
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectorTests;
@@ -41,7 +43,6 @@ import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
-import org.junit.*;
 
 public class TypedExprSerdeTest {
   private static MemoryManager memoryManager;

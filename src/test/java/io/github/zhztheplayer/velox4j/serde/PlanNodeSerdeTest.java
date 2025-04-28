@@ -18,6 +18,8 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import java.util.List;
 
+import org.junit.*;
+
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
@@ -43,7 +45,6 @@ import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
-import org.junit.*;
 
 public class PlanNodeSerdeTest {
   private static MemoryManager memoryManager;

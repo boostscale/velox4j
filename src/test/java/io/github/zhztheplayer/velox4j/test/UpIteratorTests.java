@@ -22,14 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.apache.arrow.memory.RootAllocator;
+import org.junit.Assert;
+
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.CloseableIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterators;
 import io.github.zhztheplayer.velox4j.serde.Serde;
-import org.apache.arrow.memory.RootAllocator;
-import org.junit.Assert;
 
 public final class UpIteratorTests {
   public static RowVector collectSingleVector(UpIterator itr) {

@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.plan;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.join.JoinType;

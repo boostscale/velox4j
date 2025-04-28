@@ -18,14 +18,15 @@ package io.github.zhztheplayer.velox4j.data;
 
 import java.util.List;
 
-import io.github.zhztheplayer.velox4j.serde.Serde;
-import io.github.zhztheplayer.velox4j.session.Session;
-import io.github.zhztheplayer.velox4j.test.ResourceTests;
-import io.github.zhztheplayer.velox4j.type.Type;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.IntVector;
 import org.junit.Assert;
+
+import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.session.Session;
+import io.github.zhztheplayer.velox4j.test.ResourceTests;
+import io.github.zhztheplayer.velox4j.type.Type;
 
 public final class BaseVectorTests {
   private BaseVectorTests() {}

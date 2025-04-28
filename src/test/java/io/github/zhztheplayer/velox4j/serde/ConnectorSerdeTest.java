@@ -18,12 +18,13 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import java.util.OptionalLong;
 
-import io.github.zhztheplayer.velox4j.connector.*;
-import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
-import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.github.zhztheplayer.velox4j.connector.*;
+import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 
 public class ConnectorSerdeTest {
   @BeforeClass

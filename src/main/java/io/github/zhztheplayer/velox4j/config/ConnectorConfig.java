@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 public class ConnectorConfig extends ISerializable {

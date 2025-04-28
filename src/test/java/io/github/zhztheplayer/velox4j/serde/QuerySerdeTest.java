@@ -16,11 +16,12 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 
 public class QuerySerdeTest {
 

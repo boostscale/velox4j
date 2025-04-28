@@ -18,6 +18,8 @@ package io.github.zhztheplayer.velox4j.data;
 
 import java.util.List;
 
+import org.junit.*;
+
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
@@ -29,7 +31,6 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
-import org.junit.*;
 
 public class BaseVectorTest {
   private static MemoryManager memoryManager;

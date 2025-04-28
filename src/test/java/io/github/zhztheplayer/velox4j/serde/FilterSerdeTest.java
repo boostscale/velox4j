@@ -16,10 +16,11 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
-import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 
 public class FilterSerdeTest {
 

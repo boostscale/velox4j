@@ -16,11 +16,12 @@
 */
 package io.github.zhztheplayer.velox4j.data;
 
-import io.github.zhztheplayer.velox4j.arrow.Arrow;
-import io.github.zhztheplayer.velox4j.jni.JniApi;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.table.Table;
+
+import io.github.zhztheplayer.velox4j.arrow.Arrow;
+import io.github.zhztheplayer.velox4j.jni.JniApi;
 
 public class RowVector extends BaseVector {
   protected RowVector(JniApi jniApi, long id) {

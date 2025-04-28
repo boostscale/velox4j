@@ -21,6 +21,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 
 public class FilterNode extends PlanNode {
