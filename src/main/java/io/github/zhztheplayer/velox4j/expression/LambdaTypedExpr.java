@@ -1,4 +1,22 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.expression;
+
+import java.util.Collections;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -8,24 +26,25 @@ import io.github.zhztheplayer.velox4j.type.FunctionType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 
-import java.util.Collections;
-
 public class LambdaTypedExpr extends TypedExpr {
   private final Type signature;
   private final TypedExpr body;
 
   @JsonCreator
-  private LambdaTypedExpr(@JsonProperty("type") Type returnType, @JsonProperty("signature") Type signature,
+  private LambdaTypedExpr(
+      @JsonProperty("type") Type returnType,
+      @JsonProperty("signature") Type signature,
       @JsonProperty("body") TypedExpr body) {
     super(returnType, Collections.emptyList());
     this.signature = signature;
     this.body = body;
-    Preconditions.checkArgument(returnType instanceof FunctionType,
-        "LambdaTypedExpr returnType should be FunctionType");
+    Preconditions.checkArgument(
+        returnType instanceof FunctionType, "LambdaTypedExpr returnType should be FunctionType");
   }
 
   public static LambdaTypedExpr create(RowType signature, TypedExpr body) {
-    final FunctionType returnType = FunctionType.create(signature.getChildren(), body.getReturnType());
+    final FunctionType returnType =
+        FunctionType.create(signature.getChildren(), body.getReturnType());
     return new LambdaTypedExpr(returnType, signature, body);
   }
 

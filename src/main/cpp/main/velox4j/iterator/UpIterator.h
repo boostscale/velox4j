@@ -23,17 +23,17 @@
 namespace velox4j {
 
 class UpIterator {
- public:
+public:
   enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
 
   // CTOR.
   UpIterator() = default;
 
   // Delete copy/move CTORs.
-  UpIterator(UpIterator&&) = delete;
-  UpIterator(const UpIterator&) = delete;
-  UpIterator& operator=(const UpIterator&) = delete;
-  UpIterator& operator=(UpIterator&&) = delete;
+  UpIterator(UpIterator &&) = delete;
+  UpIterator(const UpIterator &) = delete;
+  UpIterator &operator=(const UpIterator &) = delete;
+  UpIterator &operator=(UpIterator &&) = delete;
 
   // DTOR.
   virtual ~UpIterator() = default;

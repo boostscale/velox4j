@@ -20,14 +20,13 @@
 namespace velox4j {
 using namespace facebook::velox;
 
-SuspendedSection::SuspendedSection(facebook::velox::exec::Driver* driver)
+SuspendedSection::SuspendedSection(facebook::velox::exec::Driver *driver)
     : driver_(driver) {
   if (driver_->task()->enterSuspended(driver_->state()) !=
       facebook::velox::exec::StopReason::kNone) {
-    VELOX_FAIL(
-        "Terminate detected when entering suspended section for driver {} from task {}",
-        driver_->driverCtx()->driverId,
-        driver_->task()->taskId());
+    VELOX_FAIL("Terminate detected when entering suspended section for driver "
+               "{} from task {}",
+               driver_->driverCtx()->driverId, driver_->task()->taskId());
   }
 }
 
@@ -42,13 +41,10 @@ SuspendedSection::~SuspendedSection() {
 }
 
 ExternalStreamConnectorSplit::ExternalStreamConnectorSplit(
-    const std::string& connectorId,
-    ObjectHandle esId)
+    const std::string &connectorId, ObjectHandle esId)
     : ConnectorSplit(connectorId), esId_(esId) {}
 
-const ObjectHandle ExternalStreamConnectorSplit::esId() const {
-  return esId_;
-}
+const ObjectHandle ExternalStreamConnectorSplit::esId() const { return esId_; }
 
 folly::dynamic ExternalStreamConnectorSplit::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
@@ -59,19 +55,19 @@ folly::dynamic ExternalStreamConnectorSplit::serialize() const {
 }
 
 void ExternalStreamConnectorSplit::registerSerDe() {
-  auto& registry = DeserializationWithContextRegistryForSharedPtr();
+  auto &registry = DeserializationWithContextRegistryForSharedPtr();
   registry.Register("ExternalStreamConnectorSplit", create);
 }
 
 std::shared_ptr<ExternalStreamConnectorSplit>
-ExternalStreamConnectorSplit::create(const folly::dynamic& obj, void* context) {
+ExternalStreamConnectorSplit::create(const folly::dynamic &obj, void *context) {
   const auto connectorId = obj["connectorId"].asString();
   const auto esId = obj["esId"].asInt();
   return std::make_shared<ExternalStreamConnectorSplit>(connectorId, esId);
 }
 
 ExternalStreamTableHandle::ExternalStreamTableHandle(
-    const std::string& connectorId)
+    const std::string &connectorId)
     : ConnectorTableHandle(connectorId) {}
 
 folly::dynamic ExternalStreamTableHandle::serialize() const {
@@ -81,19 +77,18 @@ folly::dynamic ExternalStreamTableHandle::serialize() const {
 }
 
 void ExternalStreamTableHandle::registerSerDe() {
-  auto& registry = DeserializationWithContextRegistryForSharedPtr();
+  auto &registry = DeserializationWithContextRegistryForSharedPtr();
   registry.Register("ExternalStreamTableHandle", create);
 }
 
-connector::ConnectorTableHandlePtr ExternalStreamTableHandle::create(
-    const folly::dynamic& obj,
-    void* context) {
+connector::ConnectorTableHandlePtr
+ExternalStreamTableHandle::create(const folly::dynamic &obj, void *context) {
   auto connectorId = obj["connectorId"].asString();
   return std::make_shared<const ExternalStreamTableHandle>(connectorId);
 }
 
 ExternalStreamDataSource::ExternalStreamDataSource(
-    const std::shared_ptr<connector::ConnectorTableHandle>& tableHandle)
+    const std::shared_ptr<connector::ConnectorTableHandle> &tableHandle)
     : DataSource() {
   tableHandle_ =
       std::dynamic_pointer_cast<ExternalStreamTableHandle>(tableHandle);
@@ -101,17 +96,15 @@ ExternalStreamDataSource::ExternalStreamDataSource(
 
 void ExternalStreamDataSource::addSplit(
     std::shared_ptr<connector::ConnectorSplit> split) {
-  VELOX_CHECK(
-      split->connectorId == tableHandle_->connectorId(),
-      "Split's connector ID doesn't match table handle's connector ID");
+  VELOX_CHECK(split->connectorId == tableHandle_->connectorId(),
+              "Split's connector ID doesn't match table handle's connector ID");
   auto esSplit = std::dynamic_pointer_cast<ExternalStreamConnectorSplit>(split);
   auto es = ObjectStore::retrieve<ExternalStream>(esSplit->esId());
   streams_.push(es);
 }
 
-std::optional<RowVectorPtr> ExternalStreamDataSource::next(
-    uint64_t size,
-    ContinueFuture& future) {
+std::optional<RowVectorPtr>
+ExternalStreamDataSource::next(uint64_t size, ContinueFuture &future) {
   // TODO obey batch size.
   while (true) {
     if (current_ == nullptr) {
@@ -135,11 +128,11 @@ std::optional<RowVectorPtr> ExternalStreamDataSource::next(
       // 1. Task A spills task B;
       // 2. Task A tries to grow buffers created by task B, during which spill
       // is requested on task A again.
-      const exec::DriverThreadContext* driverThreadCtx =
+      const exec::DriverThreadContext *driverThreadCtx =
           exec::driverThreadContext();
-      VELOX_CHECK_NOT_NULL(
-          driverThreadCtx,
-          "ExternalStreamDataSource::next() is not called from a driver thread");
+      VELOX_CHECK_NOT_NULL(driverThreadCtx,
+                           "ExternalStreamDataSource::next() is not called "
+                           "from a driver thread");
       SuspendedSection ss(driverThreadCtx->driverCtx()->driver);
       const std::optional<RowVectorPtr> vector = current_->read(future);
       if (vector == nullptr) {
@@ -152,7 +145,7 @@ std::optional<RowVectorPtr> ExternalStreamDataSource::next(
   }
 }
 
-void ExternalStreamDataSource::cancel(){
+void ExternalStreamDataSource::cancel() {
   // Reset the pending streams because it may hold pointer to the resident
   // driver that causes reference cycle eventually.
   // See https://github.com/facebookincubator/velox/pull/12701.
@@ -163,21 +156,19 @@ void ExternalStreamDataSource::cancel(){
 }
 
 ExternalStreamConnector::ExternalStreamConnector(
-    const std::string& id,
-    const std::shared_ptr<const config::ConfigBase>& config)
+    const std::string &id,
+    const std::shared_ptr<const config::ConfigBase> &config)
     : connector::Connector(id), config_(config) {}
 
 std::unique_ptr<connector::DataSource>
 ExternalStreamConnector::createDataSource(
-    const RowTypePtr& outputType,
-    const std::shared_ptr<connector::ConnectorTableHandle>& tableHandle,
+    const RowTypePtr &outputType,
+    const std::shared_ptr<connector::ConnectorTableHandle> &tableHandle,
     const std::unordered_map<
-        std::string,
-        std::shared_ptr<connector::ColumnHandle>>& columnHandles,
-    connector::ConnectorQueryCtx* connectorQueryCtx) {
-  VELOX_CHECK(
-      columnHandles.empty(),
-      "ExternalStreamConnector doesn't accept column handles");
+        std::string, std::shared_ptr<connector::ColumnHandle>> &columnHandles,
+    connector::ConnectorQueryCtx *connectorQueryCtx) {
+  VELOX_CHECK(columnHandles.empty(),
+              "ExternalStreamConnector doesn't accept column handles");
   return std::make_unique<ExternalStreamDataSource>(tableHandle);
 }
 
@@ -186,10 +177,8 @@ ExternalStreamConnectorFactory::ExternalStreamConnectorFactory()
 
 std::shared_ptr<connector::Connector>
 ExternalStreamConnectorFactory::newConnector(
-    const std::string& id,
-    std::shared_ptr<const config::ConfigBase> config,
-    folly::Executor* ioExecutor,
-    folly::Executor* cpuExecutor) {
+    const std::string &id, std::shared_ptr<const config::ConfigBase> config,
+    folly::Executor *ioExecutor, folly::Executor *cpuExecutor) {
   return std::make_shared<ExternalStreamConnector>(id, config);
 }
 } // namespace velox4j

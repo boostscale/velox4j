@@ -1,4 +1,22 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.expression;
+
+import java.util.Collections;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -11,18 +29,18 @@ import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 
-import java.util.Collections;
-
 public class ConstantTypedExpr extends TypedExpr {
   private final Variant value;
   private final String serializedVector;
 
   @JsonCreator
-  public ConstantTypedExpr(@JsonProperty("type") Type returnType,
+  public ConstantTypedExpr(
+      @JsonProperty("type") Type returnType,
       @JsonProperty("value") Variant value,
       @JsonProperty("valueVector") String serializedVector) {
     super(returnType, Collections.emptyList());
-    Preconditions.checkArgument((value == null) != (serializedVector == null),
+    Preconditions.checkArgument(
+        (value == null) != (serializedVector == null),
         "Either a variant value or a serialized value vector should be provided when creating ConstantTypedExpr");
     this.value = value;
     this.serializedVector = serializedVector;

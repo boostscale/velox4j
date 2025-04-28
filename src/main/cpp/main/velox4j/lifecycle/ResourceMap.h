@@ -27,8 +27,7 @@ namespace velox4j {
 using ResourceHandle = uint32_t;
 static_assert(std::numeric_limits<ResourceHandle>::min() == 0);
 
-template <typename T, typename F>
-T safeCast(F f) {
+template <typename T, typename F> T safeCast(F f) {
   VELOX_CHECK(sizeof(T) <= sizeof(F), "Vain safe casting");
   F min = 0;
   F max = static_cast<F>(std::numeric_limits<T>::max());
@@ -42,9 +41,8 @@ T safeCast(F f) {
  * Not thread-safe.
  * @tparam TResource class of the object to hold.
  */
-template <typename TResource>
-class ResourceMap {
- public:
+template <typename TResource> class ResourceMap {
+public:
   ResourceMap() : resourceId_(kInitResourceId) {}
 
   ResourceHandle insert(TResource holder) {
@@ -58,14 +56,17 @@ class ResourceMap {
     const std::lock_guard<std::mutex> lock(mtx_);
     VELOX_CHECK(
         map_.erase(moduleId) == 1,
-        "ResourceHandle not found in resource map when trying to erase: " + std::to_string(moduleId));
+        "ResourceHandle not found in resource map when trying to erase: " +
+            std::to_string(moduleId));
   }
 
   TResource lookup(ResourceHandle moduleId) {
     const std::lock_guard<std::mutex> lock(mtx_);
     auto it = map_.find(moduleId);
     VELOX_CHECK(
-        it != map_.end(), "ResourceHandle not found in resource map when trying to lookup: " + std::to_string(moduleId));
+        it != map_.end(),
+        "ResourceHandle not found in resource map when trying to lookup: " +
+            std::to_string(moduleId));
     return it->second;
   }
 
@@ -79,11 +80,9 @@ class ResourceMap {
     return map_.size();
   }
 
-  size_t nextId() {
-    return resourceId_;
-  }
+  size_t nextId() { return resourceId_; }
 
- private:
+private:
   // Initialize the resource id starting value to a number greater than zero
   // to allow for easier debugging of uninitialized java variables.
   static constexpr size_t kInitResourceId = 4;
@@ -95,4 +94,4 @@ class ResourceMap {
   std::mutex mtx_;
 };
 
-} // namespace gluten
+} // namespace velox4j

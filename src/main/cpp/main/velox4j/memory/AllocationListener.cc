@@ -20,17 +20,13 @@
 namespace velox4j {
 
 class NoopAllocationListener : public AllocationListener {
- public:
+public:
   void allocationChanged(int64_t diff) override {
     // no-op
   }
 
-  const int64_t currentBytes() const override {
-    return 0;
-  }
-  const int64_t peakBytes() const override {
-    return 0;
-  }
+  const int64_t currentBytes() const override { return 0; }
+  const int64_t peakBytes() const override { return 0; }
 };
 
 std::unique_ptr<AllocationListener> AllocationListener::noop() {

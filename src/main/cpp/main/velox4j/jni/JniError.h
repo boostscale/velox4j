@@ -24,10 +24,10 @@
 namespace velox4j {
 
 class JniErrorState {
- public:
+public:
   virtual ~JniErrorState() = default;
 
-  void ensureInitialized(JNIEnv* env);
+  void ensureInitialized(JNIEnv *env);
 
   void assertInitialized() const;
 
@@ -39,8 +39,8 @@ class JniErrorState {
 
   jclass veloxExceptionClass();
 
- private:
-  void initialize(JNIEnv* env);
+private:
+  void initialize(JNIEnv *env);
 
   jclass ioExceptionClass_ = nullptr;
   jclass runtimeExceptionClass_ = nullptr;
@@ -48,13 +48,13 @@ class JniErrorState {
   jclass illegalAccessExceptionClass_ = nullptr;
   jclass illegalArgumentExceptionClass_ = nullptr;
   jclass veloxExceptionClass_ = nullptr;
-  JavaVM* vm_;
+  JavaVM *vm_;
   bool initialized_{false};
   bool closed_{false};
   std::mutex mtx_;
 };
 
-inline JniErrorState* getJniErrorState() {
+inline JniErrorState *getJniErrorState() {
   static JniErrorState jniErrorState;
   return &jniErrorState;
 }

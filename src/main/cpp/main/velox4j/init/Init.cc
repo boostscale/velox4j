@@ -16,6 +16,11 @@
  */
 
 #include "Init.h"
+#include "velox4j/config/Config.h"
+#include "velox4j/connector/ExternalStream.h"
+#include "velox4j/eval/Evaluation.h"
+#include "velox4j/init/Config.h"
+#include "velox4j/query/Query.h"
 #include <velox/common/memory/Memory.h>
 #include <velox/connectors/hive/HiveConnector.h>
 #include <velox/connectors/hive/HiveConnectorSplit.h>
@@ -28,18 +33,13 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
-#include "velox4j/config/Config.h"
-#include "velox4j/connector/ExternalStream.h"
-#include "velox4j/eval/Evaluation.h"
-#include "velox4j/init/Config.h"
-#include "velox4j/query/Query.h"
 
 namespace velox4j {
 
 using namespace facebook::velox;
 
 namespace {
-void init(const std::function<void()>& f) {
+void init(const std::function<void()> &f) {
   static std::atomic<bool> initialized{false};
   bool expected = false;
   if (!initialized.compare_exchange_strong(expected, true)) {
@@ -60,9 +60,7 @@ void initForSpark() {
   parquet::registerParquetWriterFactory();
   functions::sparksql::registerFunctions();
   aggregate::prestosql::registerAllAggregateFunctions(
-      "",
-      true /*registerCompanionFunctions*/,
-      false /*onlyPrestoSignatures*/,
+      "", true /*registerCompanionFunctions*/, false /*onlyPrestoSignatures*/,
       true /*overwrite*/);
   functions::aggregate::sparksql::registerAggregateFunctions(
       "", true /*registerCompanionFunctions*/, true /*overwrite*/);
@@ -102,17 +100,17 @@ void initForSpark() {
 }
 } // namespace
 
-void initialize(const std::shared_ptr<ConfigArray>& configArray) {
+void initialize(const std::shared_ptr<ConfigArray> &configArray) {
   init([&]() -> void {
     auto vConfig = std::make_shared<facebook::velox::config::ConfigBase>(
         configArray->toMap());
     auto preset = vConfig->get(VELOX4J_INIT_PRESET);
     switch (preset) {
-      case SPARK:
-        initForSpark();
-        break;
-      default:
-        VELOX_FAIL("Unknown preset: {}", folly::to<std::string>(preset));
+    case SPARK:
+      initForSpark();
+      break;
+    default:
+      VELOX_FAIL("Unknown preset: {}", folly::to<std::string>(preset));
     }
   });
 }

@@ -20,5 +20,5 @@
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
-void initialize(const std::shared_ptr<ConfigArray>& configArray);
+void initialize(const std::shared_ptr<ConfigArray> &configArray);
 } // namespace velox4j

@@ -1,15 +1,30 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.aggregate;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.Type;
-
-import java.util.List;
 
 public class Aggregate {
   public final CallTypedExpr call;
@@ -20,7 +35,8 @@ public class Aggregate {
   public final boolean distinct;
 
   @JsonCreator
-  public Aggregate(@JsonProperty("call") CallTypedExpr call,
+  public Aggregate(
+      @JsonProperty("call") CallTypedExpr call,
       @JsonProperty("rawInputTypes") List<Type> rawInputTypes,
       @JsonProperty("mask") FieldAccessTypedExpr mask,
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
@@ -33,7 +49,6 @@ public class Aggregate {
     this.sortingOrders = sortingOrders;
     this.distinct = distinct;
   }
-
 
   @JsonGetter("call")
   public CallTypedExpr getCall() {

@@ -18,8 +18,8 @@
 #pragma once
 
 #include <JniHelpers.h>
-#include <jni.h>
 #include <cmath>
+#include <jni.h>
 #include <mutex>
 #include <string>
 
@@ -29,64 +29,53 @@
 #endif
 
 #ifndef JNI_METHOD_END
-#define JNI_METHOD_END(fallback_expr)                                  \
-  }                                                                    \
-  catch (std::exception & e) {                                         \
-    env->ThrowNew(                                                     \
-        velox4j::getJniErrorState()->veloxExceptionClass(), e.what()); \
-    return fallback_expr;                                              \
+#define JNI_METHOD_END(fallback_expr)                                          \
+  }                                                                            \
+  catch (std::exception & e) {                                                 \
+    env->ThrowNew(velox4j::getJniErrorState()->veloxExceptionClass(),          \
+                  e.what());                                                   \
+    return fallback_expr;                                                      \
   }
 // macro ended
 #endif
 
 namespace velox4j {
-void checkException(JNIEnv* env);
-std::string jStringToCString(JNIEnv* env, jstring string);
-jclass createGlobalClassReference(JNIEnv* env, const char* className);
-jclass createGlobalClassReferenceOrError(JNIEnv* env, const char* className);
-jmethodID
-getMethodId(JNIEnv* env, jclass thisClass, const char* name, const char* sig);
-jmethodID getMethodIdOrError(
-    JNIEnv* env,
-    jclass thisClass,
-    const char* name,
-    const char* sig);
-jmethodID getStaticMethodId(
-    JNIEnv* env,
-    jclass thisClass,
-    const char* name,
-    const char* sig);
-jmethodID getStaticMethodIdOrError(
-    JNIEnv* env,
-    jclass thisClass,
-    const char* name,
-    const char* sig);
-JNIEnv* getLocalJNIEnv();
+void checkException(JNIEnv *env);
+std::string jStringToCString(JNIEnv *env, jstring string);
+jclass createGlobalClassReference(JNIEnv *env, const char *className);
+jclass createGlobalClassReferenceOrError(JNIEnv *env, const char *className);
+jmethodID getMethodId(JNIEnv *env, jclass thisClass, const char *name,
+                      const char *sig);
+jmethodID getMethodIdOrError(JNIEnv *env, jclass thisClass, const char *name,
+                             const char *sig);
+jmethodID getStaticMethodId(JNIEnv *env, jclass thisClass, const char *name,
+                            const char *sig);
+jmethodID getStaticMethodIdOrError(JNIEnv *env, jclass thisClass,
+                                   const char *name, const char *sig);
+JNIEnv *getLocalJNIEnv();
 
-template <typename T>
-T* jniCastOrThrow(jlong handle);
-spotify::jni::ClassRegistry* jniClassRegistry();
+template <typename T> T *jniCastOrThrow(jlong handle);
+spotify::jni::ClassRegistry *jniClassRegistry();
 
 #define CONCATENATE(t1, t2, t3) t1##t2##t3
 
-#define DEFINE_PRIMITIVE_ARRAY(                                           \
-    PRIM_TYPE, JAVA_TYPE, JNI_NATIVE_TYPE, NATIVE_TYPE, METHOD_VAR)       \
-  template <>                                                             \
-  struct JniPrimitiveArray<JniPrimitiveArrayType::PRIM_TYPE> {            \
-    using JavaType = JAVA_TYPE;                                           \
-    using JniNativeType = JNI_NATIVE_TYPE;                                \
-    using NativeType = NATIVE_TYPE;                                       \
-                                                                          \
-    static JniNativeType get(JNIEnv* env, JavaType javaArray) {           \
-      return env->CONCATENATE(Get, METHOD_VAR, ArrayElements)(            \
-          javaArray, nullptr);                                            \
-    }                                                                     \
-                                                                          \
-    static void                                                           \
-    release(JNIEnv* env, JavaType javaArray, JniNativeType nativeArray) { \
-      env->CONCATENATE(Release, METHOD_VAR, ArrayElements)(               \
-          javaArray, nativeArray, JNI_ABORT);                             \
-    }                                                                     \
+#define DEFINE_PRIMITIVE_ARRAY(PRIM_TYPE, JAVA_TYPE, JNI_NATIVE_TYPE,          \
+                               NATIVE_TYPE, METHOD_VAR)                        \
+  template <> struct JniPrimitiveArray<JniPrimitiveArrayType::PRIM_TYPE> {     \
+    using JavaType = JAVA_TYPE;                                                \
+    using JniNativeType = JNI_NATIVE_TYPE;                                     \
+    using NativeType = NATIVE_TYPE;                                            \
+                                                                               \
+    static JniNativeType get(JNIEnv *env, JavaType javaArray) {                \
+      return env->CONCATENATE(Get, METHOD_VAR, ArrayElements)(javaArray,       \
+                                                              nullptr);        \
+    }                                                                          \
+                                                                               \
+    static void release(JNIEnv *env, JavaType javaArray,                       \
+                        JniNativeType nativeArray) {                           \
+      env->CONCATENATE(Release, METHOD_VAR,                                    \
+                       ArrayElements)(javaArray, nativeArray, JNI_ABORT);      \
+    }                                                                          \
   };
 
 // Safe version of JNI {Get|Release}<PrimitiveType>ArrayElements routines.
@@ -104,62 +93,56 @@ enum class JniPrimitiveArrayType {
   kDouble = 7
 };
 
-template <JniPrimitiveArrayType TYPE>
-struct JniPrimitiveArray {};
+template <JniPrimitiveArrayType TYPE> struct JniPrimitiveArray {};
 
-DEFINE_PRIMITIVE_ARRAY(kBoolean, jbooleanArray, jboolean*, bool*, Boolean)
-DEFINE_PRIMITIVE_ARRAY(kByte, jbyteArray, jbyte*, uint8_t*, Byte)
-DEFINE_PRIMITIVE_ARRAY(kChar, jcharArray, jchar*, uint16_t*, Char)
-DEFINE_PRIMITIVE_ARRAY(kShort, jshortArray, jshort*, int16_t*, Short)
-DEFINE_PRIMITIVE_ARRAY(kInt, jintArray, jint*, int32_t*, Int)
-DEFINE_PRIMITIVE_ARRAY(kLong, jlongArray, jlong*, int64_t*, Long)
-DEFINE_PRIMITIVE_ARRAY(kFloat, jfloatArray, jfloat*, float_t*, Float)
-DEFINE_PRIMITIVE_ARRAY(kDouble, jdoubleArray, jdouble*, double_t*, Double)
+DEFINE_PRIMITIVE_ARRAY(kBoolean, jbooleanArray, jboolean *, bool *, Boolean)
+DEFINE_PRIMITIVE_ARRAY(kByte, jbyteArray, jbyte *, uint8_t *, Byte)
+DEFINE_PRIMITIVE_ARRAY(kChar, jcharArray, jchar *, uint16_t *, Char)
+DEFINE_PRIMITIVE_ARRAY(kShort, jshortArray, jshort *, int16_t *, Short)
+DEFINE_PRIMITIVE_ARRAY(kInt, jintArray, jint *, int32_t *, Int)
+DEFINE_PRIMITIVE_ARRAY(kLong, jlongArray, jlong *, int64_t *, Long)
+DEFINE_PRIMITIVE_ARRAY(kFloat, jfloatArray, jfloat *, float_t *, Float)
+DEFINE_PRIMITIVE_ARRAY(kDouble, jdoubleArray, jdouble *, double_t *, Double)
 
-template <JniPrimitiveArrayType TYPE>
-class SafeNativeArray {
+template <JniPrimitiveArrayType TYPE> class SafeNativeArray {
   using PrimitiveArray = JniPrimitiveArray<TYPE>;
   using JavaArrayType = typename PrimitiveArray::JavaType;
   using JniNativeArrayType = typename PrimitiveArray::JniNativeType;
   using NativeArrayType = typename PrimitiveArray::NativeType;
 
- public:
+public:
   virtual ~SafeNativeArray() {
     PrimitiveArray::release(env_, javaArray_, nativeArray_);
   }
 
-  SafeNativeArray(const SafeNativeArray&) = delete;
-  SafeNativeArray(SafeNativeArray&&) = delete;
-  SafeNativeArray& operator=(const SafeNativeArray&) = delete;
-  SafeNativeArray& operator=(SafeNativeArray&&) = delete;
+  SafeNativeArray(const SafeNativeArray &) = delete;
+  SafeNativeArray(SafeNativeArray &&) = delete;
+  SafeNativeArray &operator=(const SafeNativeArray &) = delete;
+  SafeNativeArray &operator=(SafeNativeArray &&) = delete;
 
   const NativeArrayType elems() const {
     return reinterpret_cast<const NativeArrayType>(nativeArray_);
   }
 
-  const jsize length() const {
-    return env_->GetArrayLength(javaArray_);
-  }
+  const jsize length() const { return env_->GetArrayLength(javaArray_); }
 
-  static SafeNativeArray<TYPE> get(JNIEnv* env, JavaArrayType javaArray) {
+  static SafeNativeArray<TYPE> get(JNIEnv *env, JavaArrayType javaArray) {
     JniNativeArrayType nativeArray = PrimitiveArray::get(env, javaArray);
     return SafeNativeArray<TYPE>(env, javaArray, nativeArray);
   }
 
- private:
-  SafeNativeArray(
-      JNIEnv* env,
-      JavaArrayType javaArray,
-      JniNativeArrayType nativeArray)
-      : env_(env), javaArray_(javaArray), nativeArray_(nativeArray) {};
+private:
+  SafeNativeArray(JNIEnv *env, JavaArrayType javaArray,
+                  JniNativeArrayType nativeArray)
+      : env_(env), javaArray_(javaArray), nativeArray_(nativeArray){};
 
-  JNIEnv* env_;
+  JNIEnv *env_;
   JavaArrayType javaArray_;
   JniNativeArrayType nativeArray_;
 };
 
-#define DEFINE_SAFE_GET_PRIMITIVE_ARRAY_FUNCTIONS(                             \
-    PRIM_TYPE, JAVA_TYPE, METHOD_VAR)                                          \
+#define DEFINE_SAFE_GET_PRIMITIVE_ARRAY_FUNCTIONS(PRIM_TYPE, JAVA_TYPE,        \
+                                                  METHOD_VAR)                  \
   inline SafeNativeArray<JniPrimitiveArrayType::PRIM_TYPE> CONCATENATE(        \
       get, METHOD_VAR, ArrayElementsSafe)(JNIEnv * env, JAVA_TYPE array) {     \
     return SafeNativeArray<JniPrimitiveArrayType::PRIM_TYPE>::get(env, array); \

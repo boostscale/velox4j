@@ -23,21 +23,19 @@ using namespace facebook::velox;
 
 namespace {
 
-void slice(VectorPtr& in) {
-  auto* rowBase = in->as<RowVector>();
+void slice(VectorPtr &in) {
+  auto *rowBase = in->as<RowVector>();
   if (!rowBase) {
     return;
   }
-  for (auto& child : rowBase->children()) {
+  for (auto &child : rowBase->children()) {
     if (child->size() > rowBase->size()) {
       child = child->slice(0, rowBase->size());
     }
   }
 }
 
-void flatten(VectorPtr& in) {
-  facebook::velox::BaseVector::flattenVector(in);
-}
+void flatten(VectorPtr &in) { facebook::velox::BaseVector::flattenVector(in); }
 
 ArrowOptions makeOptions() {
   ArrowOptions options;
@@ -46,10 +44,8 @@ ArrowOptions makeOptions() {
 }
 } // namespace
 
-void fromBaseVectorToArrow(
-    VectorPtr vector,
-    ArrowSchema* cSchema,
-    ArrowArray* cArray) {
+void fromBaseVectorToArrow(VectorPtr vector, ArrowSchema *cSchema,
+                           ArrowArray *cArray) {
   flatten(vector);
   slice(vector);
   auto options = makeOptions();
@@ -57,10 +53,8 @@ void fromBaseVectorToArrow(
   exportToArrow(vector, *cArray, vector->pool(), options);
 }
 
-VectorPtr fromArrowToBaseVector(
-    memory::MemoryPool* pool,
-    ArrowSchema* cSchema,
-    ArrowArray* cArray) {
+VectorPtr fromArrowToBaseVector(memory::MemoryPool *pool, ArrowSchema *cSchema,
+                                ArrowArray *cArray) {
   auto options = makeOptions();
   return importFromArrowAsOwner(*cSchema, *cArray, pool);
 }

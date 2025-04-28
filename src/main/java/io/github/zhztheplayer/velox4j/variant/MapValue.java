@@ -1,9 +1,20 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.variant;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +25,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+
 public class MapValue extends Variant {
   private final Map<Variant, Variant> map;
 
@@ -22,7 +38,8 @@ public class MapValue extends Variant {
     //  comparatively stable order.
     // TODO: This may cause slow serialization as Variant#toString may be slow.
     //  A better way is to write reliable Variant#compareTo implementations for all variants.
-    final TreeMap<Variant, Variant> builder = new TreeMap<>(Comparator.comparing(Variant::toString));
+    final TreeMap<Variant, Variant> builder =
+        new TreeMap<>(Comparator.comparing(Variant::toString));
     builder.putAll(map);
     this.map = Collections.unmodifiableSortedMap(builder);
   }
@@ -34,8 +51,8 @@ public class MapValue extends Variant {
     for (int i = 0; i < size; i++) {
       builder.put(entries.getKeys().get(i), entries.getValues().get(i));
     }
-    Preconditions.checkArgument(builder.size() == size,
-        "Duplicated keys found in entries while creating MapValue");
+    Preconditions.checkArgument(
+        builder.size() == size, "Duplicated keys found in entries while creating MapValue");
     return new MapValue(builder);
   }
 
@@ -66,9 +83,7 @@ public class MapValue extends Variant {
 
   @Override
   public String toString() {
-    return "MapValue{" +
-        "map=" + map +
-        '}';
+    return "MapValue{" + "map=" + map + '}';
   }
 
   public static class Entries {
@@ -76,10 +91,10 @@ public class MapValue extends Variant {
     private final List<Variant> values;
 
     @JsonCreator
-    private Entries(@JsonProperty("keys") List<Variant> keys,
-        @JsonProperty("values") List<Variant> values) {
-      Preconditions.checkArgument(keys.size() == values.size(),
-          "Entries should have same number of keys and values");
+    private Entries(
+        @JsonProperty("keys") List<Variant> keys, @JsonProperty("values") List<Variant> values) {
+      Preconditions.checkArgument(
+          keys.size() == values.size(), "Entries should have same number of keys and values");
       Variants.checkSameType(keys);
       Variants.checkSameType(values);
       this.keys = Collections.unmodifiableList(keys);

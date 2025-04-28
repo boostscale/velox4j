@@ -20,8 +20,8 @@
 
 namespace velox4j {
 // static
-ResourceMap<ObjectStore*>& ObjectStore::stores() {
-  static ResourceMap<ObjectStore*> stores;
+ResourceMap<ObjectStore *> &ObjectStore::stores() {
+  static ResourceMap<ObjectStore *> stores;
   return stores;
 }
 
@@ -32,8 +32,8 @@ ObjectStore::~ObjectStore() {
     const std::string_view description = (*itr).second;
     ResourceHandle handle = (*itr).first;
     LOG(WARNING)
-        << "Unclosed object ["
-        << "Store ID: " << storeId_ << ", Resource handle ID: " << handle
+        << "Unclosed object [" << "Store ID: " << storeId_
+        << ", Resource handle ID: " << handle
         << ", Description: " << description
         << "] is found when object store is closing. Velox4J will"
            " destroy it automatically but it's recommended to manually close"

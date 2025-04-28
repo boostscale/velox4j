@@ -27,17 +27,17 @@ namespace velox4j {
 
 class SerialTaskStats {
 public:
- SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats);
+  SerialTaskStats(const facebook::velox::exec::TaskStats &taskStats);
 
- folly::dynamic toJson() const;
+  folly::dynamic toJson() const;
 
 private:
- facebook::velox::exec::TaskStats taskStats_;
+  facebook::velox::exec::TaskStats taskStats_;
 };
 
 class SerialTask : public UpIterator {
- public:
-  SerialTask(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+public:
+  SerialTask(MemoryManager *memoryManager, std::shared_ptr<const Query> query);
 
   ~SerialTask() override;
 
@@ -47,22 +47,21 @@ class SerialTask : public UpIterator {
 
   facebook::velox::RowVectorPtr get() override;
 
- void addSplit(
-     const facebook::velox::core::PlanNodeId& planNodeId,
-     int32_t groupId,
-     std::shared_ptr<facebook::velox::connector::ConnectorSplit>
-         connectorSplit);
+  void addSplit(const facebook::velox::core::PlanNodeId &planNodeId,
+                int32_t groupId,
+                std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+                    connectorSplit);
 
- void noMoreSplits(const facebook::velox::core::PlanNodeId& planNodeId);
+  void noMoreSplits(const facebook::velox::core::PlanNodeId &planNodeId);
 
   std::unique_ptr<SerialTaskStats> collectStats();
 
- private:
+private:
   State advance0(bool wait);
 
   void saveDrivers();
 
-  MemoryManager* const memoryManager_;
+  MemoryManager *const memoryManager_;
   std::shared_ptr<const Query> query_;
   std::shared_ptr<facebook::velox::exec::Task> task_;
   std::vector<std::shared_ptr<facebook::velox::exec::Driver>> drivers_{};
@@ -72,13 +71,14 @@ class SerialTask : public UpIterator {
 };
 
 class QueryExecutor {
- public:
-  QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+public:
+  QueryExecutor(MemoryManager *memoryManager,
+                std::shared_ptr<const Query> query);
 
   std::unique_ptr<SerialTask> execute() const;
 
- private:
-  MemoryManager* const memoryManager_;
+private:
+  MemoryManager *const memoryManager_;
   const std::shared_ptr<const Query> query_;
 };
 

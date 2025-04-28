@@ -1,4 +1,22 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.jni;
+
+import java.util.List;
 
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
@@ -10,8 +28,8 @@ import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
-import io.github.zhztheplayer.velox4j.query.SerialTaskStats;
 import io.github.zhztheplayer.velox4j.query.SerialTask;
+import io.github.zhztheplayer.velox4j.query.SerialTaskStats;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -22,8 +40,6 @@ import io.github.zhztheplayer.velox4j.variant.VariantCo;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
-import java.util.List;
-
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();
 
@@ -33,8 +49,7 @@ public class StaticJniApi {
 
   private final StaticJniWrapper jni = StaticJniWrapper.get();
 
-  private StaticJniApi() {
-  }
+  private StaticJniApi() {}
 
   public void initialize(Config globalConf) {
     jni.initialize(Serde.toPrettyJson(globalConf));
@@ -68,8 +83,8 @@ public class StaticJniApi {
     jni.blockingQueueNoMoreInput(queue.id());
   }
 
-  public void serialTaskAddSplit(SerialTask serialTask, String planNodeId, int groupId,
-      ConnectorSplit split) {
+  public void serialTaskAddSplit(
+      SerialTask serialTask, String planNodeId, int groupId, ConnectorSplit split) {
     final String splitJson = Serde.toJson(split);
     jni.serialTaskAddSplit(serialTask.id(), planNodeId, groupId, splitJson);
   }

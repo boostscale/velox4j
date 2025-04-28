@@ -22,12 +22,12 @@ using namespace facebook::velox;
 
 std::string BlockingQueue::stateToString(State state) {
   switch (state) {
-    case OPEN:
-      return "OPEN";
-    case FINISHED:
-      return "FINISHED";
-    case CLOSED:
-      return "CLOSED";
+  case OPEN:
+    return "OPEN";
+  case FINISHED:
+    return "FINISHED";
+  case CLOSED:
+    return "CLOSED";
   }
   VELOX_FAIL("unknown state");
 }
@@ -36,11 +36,9 @@ BlockingQueue::BlockingQueue() {
   waitExecutor_ = std::make_unique<folly::IOThreadPoolExecutor>(1);
 }
 
-BlockingQueue::~BlockingQueue() {
-  close();
-}
+BlockingQueue::~BlockingQueue() { close(); }
 
-std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture& future) {
+std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture &future) {
   {
     std::unique_lock lock(mutex_);
     ensureNotClosed();
@@ -73,33 +71,33 @@ std::optional<RowVectorPtr> BlockingQueue::read(ContinueFuture& future) {
     // Async wait for a new element.
     condVar_.wait(lock, [this]() { return state_ != OPEN || !queue_.empty(); });
     switch (state_) {
-      case OPEN: {
-        VELOX_CHECK(!queue_.empty());
-        // Fall through.
+    case OPEN: {
+      VELOX_CHECK(!queue_.empty());
+      // Fall through.
+    }
+    case FINISHED: {
+      VELOX_CHECK(promises_.size() == 1);
+      for (auto &p : promises_) {
+        p.setValue();
       }
-      case FINISHED: {
+      promises_.clear();
+      break;
+    }
+    case CLOSED: {
+      try {
+        VELOX_FAIL("BlockingQueue was just closed");
+      } catch (const std::exception &e) {
+        // Velox should guarantee the continue future is only requested once
+        // while it's not fulfilled.
         VELOX_CHECK(promises_.size() == 1);
-        for (auto& p : promises_) {
-          p.setValue();
+        for (auto &p : promises_) {
+          p.setException(e);
+          promises_.clear();
+          return;
         }
-        promises_.clear();
-        break;
       }
-      case CLOSED: {
-        try {
-          VELOX_FAIL("BlockingQueue was just closed");
-        } catch (const std::exception& e) {
-          // Velox should guarantee the continue future is only requested once
-          // while it's not fulfilled.
-          VELOX_CHECK(promises_.size() == 1);
-          for (auto& p : promises_) {
-            p.setException(e);
-            promises_.clear();
-            return;
-          }
-        }
-        break;
-      }
+      break;
+    }
     }
   });
 
@@ -132,10 +130,8 @@ bool BlockingQueue::empty() const {
 }
 
 void BlockingQueue::ensureOpen() const {
-  VELOX_CHECK(
-      state_ == OPEN,
-      "Queue is not open. Current state is {}",
-      stateToString(state_));
+  VELOX_CHECK(state_ == OPEN, "Queue is not open. Current state is {}",
+              stateToString(state_));
 }
 
 void BlockingQueue::ensureNotClosed() const {

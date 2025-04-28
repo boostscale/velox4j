@@ -1,14 +1,31 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.serde;
-
-import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
+
 public class SerdeRegistry {
-  private static final Map<Class<? extends NativeBean>, List<KvPair>> CLASS_TO_KVS = new ConcurrentHashMap<>();
+  private static final Map<Class<? extends NativeBean>, List<KvPair>> CLASS_TO_KVS =
+      new ConcurrentHashMap<>();
 
   private final Map<String, SerdeRegistryFactory> subFactories = new HashMap<>();
   private final Map<String, Class<? extends NativeBean>> classes = new HashMap<>();
@@ -39,15 +56,16 @@ public class SerdeRegistry {
   public SerdeRegistryFactory registerFactory(String value) {
     synchronized (this) {
       checkDup(value);
-      final SerdeRegistryFactory factory = new SerdeRegistryFactory(withNewKv(new KvPair(key, value)));
+      final SerdeRegistryFactory factory =
+          new SerdeRegistryFactory(withNewKv(new KvPair(key, value)));
       subFactories.put(value, factory);
       return factory;
     }
   }
 
   public void registerClass(String value, Class<? extends NativeBean> clazz) {
-    Preconditions.checkArgument(!Modifier.isAbstract(clazz.getModifiers()),
-        "Cannot register abstract class: " + clazz);
+    Preconditions.checkArgument(
+        !Modifier.isAbstract(clazz.getModifiers()), "Cannot register abstract class: " + clazz);
     synchronized (this) {
       checkDup(value);
       classes.put(value, clazz);
@@ -78,7 +96,8 @@ public class SerdeRegistry {
   public SerdeRegistryFactory getFactory(String value) {
     synchronized (this) {
       if (!subFactories.containsKey(value)) {
-        throw new VeloxException(String.format("Value %s.%s is not added as a sub-factory: ", prefixAndKey, value));
+        throw new VeloxException(
+            String.format("Value %s.%s is not added as a sub-factory: ", prefixAndKey, value));
       }
       return subFactories.get(value);
     }
@@ -87,7 +106,8 @@ public class SerdeRegistry {
   public Class<?> getClass(String value) {
     synchronized (this) {
       if (!classes.containsKey(value)) {
-        throw new VeloxException(String.format("Value %s.%s is not added as a class: ", prefixAndKey, value));
+        throw new VeloxException(
+            String.format("Value %s.%s is not added as a class: ", prefixAndKey, value));
       }
       return classes.get(value);
     }
@@ -106,10 +126,12 @@ public class SerdeRegistry {
 
   private void checkDup(String value) {
     if (subFactories.containsKey(value)) {
-      throw new VeloxException(String.format("Value %s.%s already added as a sub-factory: ", prefixAndKey, value));
+      throw new VeloxException(
+          String.format("Value %s.%s already added as a sub-factory: ", prefixAndKey, value));
     }
     if (classes.containsKey(value)) {
-      throw new VeloxException(String.format("Value %s.%s already added as a class: ", prefixAndKey, value));
+      throw new VeloxException(
+          String.format("Value %s.%s already added as a class: ", prefixAndKey, value));
     }
   }
 
