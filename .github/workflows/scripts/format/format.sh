@@ -49,10 +49,6 @@ OS_VERSION=24.04
 # Build the Docker image, passing the OS_VERSION build argument.
 docker build --build-arg "OS_VERSION=$OS_VERSION" -t "$IMAGE_NAME:$OS_VERSION" "$SCRIPT_DIR"
 
-# CPP code paths.
-CPP_MAIN_PATH="$SRC_DIR/src/main/cpp/main/velox4j/"
-CPP_TEST_PATH="$SRC_DIR/src/main/cpp/test/velox4j/"
-
 # Determine the clang-format command
 if [[ "$ACTION" == "-check" ]]; then
     FORMAT_COMMAND="clang-format-18 --dry-run --Werror"
@@ -62,13 +58,18 @@ else
     MAVEN_COMMAND="spotless:apply"
 fi
 
+# CPP code path.
+CPP_ROOT="$SRC_DIR/src/main/cpp/"
+CPP_MAIN_DIR="main/velox4j/"
+CPP_TEST_DIR="main/velox4j/"
+
 # 1. Run clang-format-18 on the CPP main code.
-docker run --rm -v "$CPP_MAIN_PATH":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
-    sh -c "find . \( -name '*.h' -o -name '*.cc' -o -name '*.cpp' \) | xargs -r $FORMAT_COMMAND"
+docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
+    sh -c "find $CPP_MAIN_DIR \( -name '*.h' -o -name '*.cc' -o -name '*.cpp' \) | xargs -r $FORMAT_COMMAND"
 
 # 2. Run clang-format-18 on the CPP test code.
-docker run --rm -v "$CPP_TEST_PATH":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
-    sh -c "find . \( -name '*.h' -o -name '*.cc' -o -name '*.cpp' \) | xargs -r $FORMAT_COMMAND"
+docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
+    sh -c "find $CPP_TEST_DIR \( -name '*.h' -o -name '*.cc' -o -name '*.cpp' \) | xargs -r $FORMAT_COMMAND"
 
 # 3. Run Maven Spotless check or apply under the project root.
 (

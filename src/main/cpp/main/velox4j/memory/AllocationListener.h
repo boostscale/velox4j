@@ -24,16 +24,16 @@
 namespace velox4j {
 
 class AllocationListener {
-public:
+ public:
   static std::unique_ptr<AllocationListener> noop();
 
   virtual ~AllocationListener() = default;
 
   // Delete copy/move CTORs.
-  AllocationListener(AllocationListener &&) = delete;
-  AllocationListener(const AllocationListener &) = delete;
-  AllocationListener &operator=(const AllocationListener &) = delete;
-  AllocationListener &operator=(AllocationListener &&) = delete;
+  AllocationListener(AllocationListener&&) = delete;
+  AllocationListener(const AllocationListener&) = delete;
+  AllocationListener& operator=(const AllocationListener&) = delete;
+  AllocationListener& operator=(AllocationListener&&) = delete;
 
   // Value of diff can be either positive or negative
   virtual void allocationChanged(int64_t diff) = 0;
@@ -42,7 +42,7 @@ public:
 
   virtual const int64_t peakBytes() const = 0;
 
-protected:
+ protected:
   AllocationListener() = default;
 };
 
@@ -50,18 +50,23 @@ protected:
 /// delegated listener calls.
 // The class must be thread safe.
 class BlockAllocationListener final : public AllocationListener {
-public:
-  BlockAllocationListener(std::unique_ptr<AllocationListener> delegated,
-                          int64_t blockSize)
+ public:
+  BlockAllocationListener(
+      std::unique_ptr<AllocationListener> delegated,
+      int64_t blockSize)
       : delegated_(std::move(delegated)), blockSize_(blockSize) {}
 
   void allocationChanged(int64_t diff) override;
 
-  const int64_t currentBytes() const override { return reservationBytes_; }
+  const int64_t currentBytes() const override {
+    return reservationBytes_;
+  }
 
-  const int64_t peakBytes() const override { return peakBytes_; }
+  const int64_t peakBytes() const override {
+    return peakBytes_;
+  }
 
-private:
+ private:
   inline int64_t reserve(int64_t diff);
 
   const std::unique_ptr<AllocationListener> delegated_;

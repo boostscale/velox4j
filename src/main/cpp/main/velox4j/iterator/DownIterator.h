@@ -17,47 +17,47 @@
 
 #pragma once
 
-#include "velox4j/connector/ExternalStream.h"
 #include <JniHelpers.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 #include <velox/vector/ComplexVector.h>
+#include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
 class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
-public:
-  explicit DownIteratorJniWrapper(JNIEnv *env) : JavaClass(env) {
+ public:
+  explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
     DownIteratorJniWrapper::initialize(env);
   }
 
   DownIteratorJniWrapper() : JavaClass(){};
 
-  const char *getCanonicalName() const override;
+  const char* getCanonicalName() const override;
 
-  void initialize(JNIEnv *env) override;
+  void initialize(JNIEnv* env) override;
 
   void mapFields() override;
 };
 
 class DownIterator : public ExternalStream {
-public:
+ public:
   enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
 
   // CTOR.
-  DownIterator(JNIEnv *env, jobject ref);
+  DownIterator(JNIEnv* env, jobject ref);
 
   // Delete copy/move CTORs.
-  DownIterator(DownIterator &&) = delete;
-  DownIterator(const DownIterator &) = delete;
-  DownIterator &operator=(const DownIterator &) = delete;
-  DownIterator &operator=(DownIterator &&) = delete;
+  DownIterator(DownIterator&&) = delete;
+  DownIterator(const DownIterator&) = delete;
+  DownIterator& operator=(const DownIterator&) = delete;
+  DownIterator& operator=(DownIterator&&) = delete;
 
   // DTOR.
   ~DownIterator() override;
 
-  std::optional<facebook::velox::RowVectorPtr>
-  read(facebook::velox::ContinueFuture &future) override;
+  std::optional<facebook::velox::RowVectorPtr> read(
+      facebook::velox::ContinueFuture& future) override;
 
-private:
+ private:
   State advance();
   void wait();
   facebook::velox::RowVectorPtr get();

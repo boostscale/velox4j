@@ -17,30 +17,30 @@
 
 #pragma once
 
-#include "velox4j/memory/AllocationListener.h"
 #include <JniHelpers.h>
 #include <atomic>
+#include "velox4j/memory/AllocationListener.h"
 
 namespace velox4j {
 class JavaAllocationListenerJniWrapper final : public spotify::jni::JavaClass {
-public:
-  explicit JavaAllocationListenerJniWrapper(JNIEnv *env) : JavaClass(env) {
+ public:
+  explicit JavaAllocationListenerJniWrapper(JNIEnv* env) : JavaClass(env) {
     JavaAllocationListenerJniWrapper::initialize(env);
   }
 
   JavaAllocationListenerJniWrapper() : JavaClass(){};
 
-  const char *getCanonicalName() const override;
+  const char* getCanonicalName() const override;
 
-  void initialize(JNIEnv *env) override;
+  void initialize(JNIEnv* env) override;
 
   void mapFields() override;
 };
 
 class JavaAllocationListener : public AllocationListener {
-public:
+ public:
   // CTOR.
-  JavaAllocationListener(JNIEnv *env, jobject ref);
+  JavaAllocationListener(JNIEnv* env, jobject ref);
 
   // DTOR.
   ~JavaAllocationListener() override;
@@ -49,7 +49,7 @@ public:
   const int64_t currentBytes() const override;
   const int64_t peakBytes() const override;
 
-private:
+ private:
   jobject ref_;
   std::atomic_int64_t usedBytes_{0L};
   std::atomic_int64_t peakBytes_{0L};

@@ -36,17 +36,17 @@ namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-const char *kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
+const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
-Session *sessionOf(JNIEnv *env, jobject javaThis) {
-  static const auto *clazz = jniClassRegistry()->get(kClassName);
+Session* sessionOf(JNIEnv* env, jobject javaThis) {
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("sessionId");
   const jlong sessionId = env->CallLongMethod(javaThis, methodId);
   checkException(env);
   return ObjectStore::retrieve<Session>(sessionId).get();
 }
 
-jlong createEvaluator(JNIEnv *env, jobject javaThis, jstring evalJson) {
+jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jExprJson{env, evalJson};
@@ -56,8 +56,12 @@ jlong createEvaluator(JNIEnv *env, jobject javaThis, jstring evalJson) {
   JNI_METHOD_END(-1L)
 }
 
-jlong evaluatorEval(JNIEnv *env, jobject javaThis, jlong evaluatorId,
-                    jlong selectivityVectorId, jlong rvId) {
+jlong evaluatorEval(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong evaluatorId,
+    jlong selectivityVectorId,
+    jlong rvId) {
   JNI_METHOD_START
   auto evaluator = ObjectStore::retrieve<Evaluator>(evaluatorId);
   auto selectivityVector =
@@ -69,7 +73,7 @@ jlong evaluatorEval(JNIEnv *env, jobject javaThis, jlong evaluatorId,
   JNI_METHOD_END(-1L)
 }
 
-jlong createQueryExecutor(JNIEnv *env, jobject javaThis, jstring queryJson) {
+jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
@@ -83,8 +87,10 @@ jlong createQueryExecutor(JNIEnv *env, jobject javaThis, jstring queryJson) {
   JNI_METHOD_END(-1L)
 }
 
-jlong queryExecutorExecute(JNIEnv *env, jobject javaThis,
-                           jlong queryExecutorId) {
+jlong queryExecutorExecute(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong queryExecutorId) {
   JNI_METHOD_START
   auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
   return sessionOf(env, javaThis)
@@ -93,29 +99,31 @@ jlong queryExecutorExecute(JNIEnv *env, jobject javaThis,
   JNI_METHOD_END(-1L)
 }
 
-jlong upIteratorGet(JNIEnv *env, jobject javaThis, jlong itrId) {
+jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->get());
   JNI_METHOD_END(-1L)
 }
 
-jlong createExternalStreamFromDownIterator(JNIEnv *env, jobject javaThis,
-                                           jobject itrRef) {
+jlong createExternalStreamFromDownIterator(
+    JNIEnv* env,
+    jobject javaThis,
+    jobject itrRef) {
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
   JNI_METHOD_END(-1L)
 }
 
-jlong createBlockingQueue(JNIEnv *env, jobject javaThis) {
+jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
   auto queue = std::make_shared<BlockingQueue>();
   return sessionOf(env, javaThis)->objectStore()->save(queue);
   JNI_METHOD_END(-1L)
 }
 
-jlong createEmptyBaseVector(JNIEnv *env, jobject javaThis, jstring typeJson) {
+jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
   JNI_METHOD_START
   // TODO Session memory pool.
   auto session = sessionOf(env, javaThis);
@@ -131,22 +139,26 @@ jlong createEmptyBaseVector(JNIEnv *env, jobject javaThis, jstring typeJson) {
   JNI_METHOD_END(-1L)
 }
 
-jlong arrowToBaseVector(JNIEnv *env, jobject javaThis, jlong cSchema,
-                        jlong cArray) {
+jlong arrowToBaseVector(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong cSchema,
+    jlong cArray) {
   JNI_METHOD_START
   // TODO Session memory pool.
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
       "Arrow Import Memory Pool", memory::MemoryPool::Kind::kLeaf);
   auto vector = fromArrowToBaseVector(
-      pool, reinterpret_cast<struct ArrowSchema *>(cSchema),
-      reinterpret_cast<struct ArrowArray *>(cArray));
+      pool,
+      reinterpret_cast<struct ArrowSchema*>(cSchema),
+      reinterpret_cast<struct ArrowArray*>(cArray));
   return session->objectStore()->save(vector);
   JNI_METHOD_END(-1L)
 }
 
-jlongArray baseVectorDeserialize(JNIEnv *env, jobject javaThis,
-                                 jstring serialized) {
+jlongArray
+baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jSerialized{env, serialized};
@@ -156,19 +168,23 @@ jlongArray baseVectorDeserialize(JNIEnv *env, jobject javaThis,
       "Decoding Memory Pool", memory::MemoryPool::Kind::kLeaf);
   std::vector<ObjectHandle> vids{};
   while (dataStream.tellg() < decoded.size()) {
-    const VectorPtr &vector = restoreVector(dataStream, pool);
+    const VectorPtr& vector = restoreVector(dataStream, pool);
     const ObjectHandle vid = session->objectStore()->save(vector);
     vids.push_back(vid);
   }
-  const jsize &len = static_cast<jsize>(vids.size());
-  const jlongArray &out = env->NewLongArray(len);
+  const jsize& len = static_cast<jsize>(vids.size());
+  const jlongArray& out = env->NewLongArray(len);
   env->SetLongArrayRegion(out, 0, len, vids.data());
   return out;
   JNI_METHOD_END(nullptr)
 }
 
-jlong baseVectorWrapInConstant(JNIEnv *env, jobject javaThis, jlong vid,
-                               jint length, jint index) {
+jlong baseVectorWrapInConstant(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jint length,
+    jint index) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto constVector = BaseVector::wrapInConstant(length, index, vector);
@@ -176,8 +192,12 @@ jlong baseVectorWrapInConstant(JNIEnv *env, jobject javaThis, jlong vid,
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorSlice(JNIEnv *env, jobject javaThis, jlong vid, jint offset,
-                      jint length) {
+jlong baseVectorSlice(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jint offset,
+    jint length) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto slicedVector = vector->slice(offset, length);
@@ -185,7 +205,7 @@ jlong baseVectorSlice(JNIEnv *env, jobject javaThis, jlong vid, jint offset,
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorLoadedVector(JNIEnv *env, jobject javaThis, jlong vid) {
+jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto loadedVector = BaseVector::loadedVectorShared(vector);
@@ -193,7 +213,7 @@ jlong baseVectorLoadedVector(JNIEnv *env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(-1)
 }
 
-jlong createSelectivityVector(JNIEnv *env, jobject javaThis, jint length) {
+jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
   auto vector =
       std::make_shared<SelectivityVector>(static_cast<vector_size_t>(length));
@@ -201,9 +221,10 @@ jlong createSelectivityVector(JNIEnv *env, jobject javaThis, jint length) {
   JNI_METHOD_END(-1)
 }
 
-jstring
-tableWriteTraitsOutputTypeWithAggregationNode(JNIEnv *env, jobject javaThis,
-                                              jstring aggregationNodeJson) {
+jstring tableWriteTraitsOutputTypeWithAggregationNode(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring aggregationNodeJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jJson{env, aggregationNodeJson};
@@ -219,7 +240,7 @@ tableWriteTraitsOutputTypeWithAggregationNode(JNIEnv *env, jobject javaThis,
   JNI_METHOD_END(nullptr)
 }
 
-jlong iSerializableAsCpp(JNIEnv *env, jobject javaThis, jstring json) {
+jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto serdePool = session->memoryManager()->getVeloxPool(
@@ -232,7 +253,7 @@ jlong iSerializableAsCpp(JNIEnv *env, jobject javaThis, jstring json) {
   JNI_METHOD_END(-1)
 }
 
-jlong variantAsCpp(JNIEnv *env, jobject javaThis, jstring json) {
+jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jJson{env, json};
@@ -243,8 +264,8 @@ jlong variantAsCpp(JNIEnv *env, jobject javaThis, jstring json) {
 }
 
 class ExternalStreamAsUpIterator : public UpIterator {
-public:
-  explicit ExternalStreamAsUpIterator(const std::shared_ptr<ExternalStream> &es)
+ public:
+  explicit ExternalStreamAsUpIterator(const std::shared_ptr<ExternalStream>& es)
       : es_(es) {}
 
   State advance() override {
@@ -279,13 +300,15 @@ public:
     return out;
   }
 
-private:
+ private:
   const std::shared_ptr<ExternalStream> es_;
   RowVectorPtr pending_{nullptr};
 };
 
-jlong createUpIteratorWithExternalStream(JNIEnv *env, jobject javaThis,
-                                         jlong id) {
+jlong createUpIteratorWithExternalStream(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong id) {
   JNI_METHOD_START
   auto es = ObjectStore::retrieve<ExternalStream>(id);
   return sessionOf(env, javaThis)
@@ -297,52 +320,117 @@ jlong createUpIteratorWithExternalStream(JNIEnv *env, jobject javaThis,
 
 void JniWrapper::mapFields() {}
 
-const char *JniWrapper::getCanonicalName() const { return kClassName; }
+const char* JniWrapper::getCanonicalName() const {
+  return kClassName;
+}
 
-void JniWrapper::initialize(JNIEnv *env) {
+void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "sessionId", kTypeLong, nullptr);
-  addNativeMethod("createEvaluator", (void *)createEvaluator, kTypeLong,
-                  kTypeString, nullptr);
-  addNativeMethod("evaluatorEval", (void *)evaluatorEval, kTypeLong, kTypeLong,
-                  kTypeLong, kTypeLong, nullptr);
-  addNativeMethod("createQueryExecutor", (void *)createQueryExecutor, kTypeLong,
-                  kTypeString, nullptr);
-  addNativeMethod("queryExecutorExecute", (void *)queryExecutorExecute,
-                  kTypeLong, kTypeLong, nullptr);
-  addNativeMethod("upIteratorGet", (void *)upIteratorGet, kTypeLong, kTypeLong,
-                  nullptr);
-  addNativeMethod("createExternalStreamFromDownIterator",
-                  (void *)createExternalStreamFromDownIterator, kTypeLong,
-                  "io/github/zhztheplayer/velox4j/iterator/DownIterator",
-                  nullptr);
-  addNativeMethod("createBlockingQueue", (void *)createBlockingQueue, kTypeLong,
-                  nullptr);
-  addNativeMethod("createEmptyBaseVector", (void *)createEmptyBaseVector,
-                  kTypeLong, kTypeString, nullptr);
-  addNativeMethod("arrowToBaseVector", (void *)arrowToBaseVector, kTypeLong,
-                  kTypeLong, kTypeLong, nullptr);
-  addNativeMethod("baseVectorDeserialize", (void *)baseVectorDeserialize,
-                  kTypeArray(kTypeLong), kTypeString, nullptr);
-  addNativeMethod("baseVectorWrapInConstant", (void *)baseVectorWrapInConstant,
-                  kTypeLong, kTypeLong, kTypeInt, kTypeInt, nullptr);
-  addNativeMethod("baseVectorSlice", (void *)baseVectorSlice, kTypeLong,
-                  kTypeLong, kTypeInt, kTypeInt, nullptr);
-  addNativeMethod("baseVectorLoadedVector", (void *)baseVectorLoadedVector,
-                  kTypeLong, kTypeLong, nullptr);
-  addNativeMethod("createSelectivityVector", (void *)createSelectivityVector,
-                  kTypeLong, kTypeInt, nullptr);
-  addNativeMethod("tableWriteTraitsOutputTypeWithAggregationNode",
-                  (void *)tableWriteTraitsOutputTypeWithAggregationNode,
-                  kTypeString, kTypeString, nullptr);
-  addNativeMethod("iSerializableAsCpp", (void *)iSerializableAsCpp, kTypeLong,
-                  kTypeString, nullptr);
-  addNativeMethod("variantAsCpp", (void *)variantAsCpp, kTypeLong, kTypeString,
-                  nullptr);
-  addNativeMethod("createUpIteratorWithExternalStream",
-                  (void *)createUpIteratorWithExternalStream, kTypeLong,
-                  kTypeLong, nullptr);
+  addNativeMethod(
+      "createEvaluator",
+      (void*)createEvaluator,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "evaluatorEval",
+      (void*)evaluatorEval,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "createQueryExecutor",
+      (void*)createQueryExecutor,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "queryExecutorExecute",
+      (void*)queryExecutorExecute,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
+  addNativeMethod(
+      "createExternalStreamFromDownIterator",
+      (void*)createExternalStreamFromDownIterator,
+      kTypeLong,
+      "io/github/zhztheplayer/velox4j/iterator/DownIterator",
+      nullptr);
+  addNativeMethod(
+      "createBlockingQueue", (void*)createBlockingQueue, kTypeLong, nullptr);
+  addNativeMethod(
+      "createEmptyBaseVector",
+      (void*)createEmptyBaseVector,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "arrowToBaseVector",
+      (void*)arrowToBaseVector,
+      kTypeLong,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorDeserialize",
+      (void*)baseVectorDeserialize,
+      kTypeArray(kTypeLong),
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "baseVectorWrapInConstant",
+      (void*)baseVectorWrapInConstant,
+      kTypeLong,
+      kTypeLong,
+      kTypeInt,
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "baseVectorSlice",
+      (void*)baseVectorSlice,
+      kTypeLong,
+      kTypeLong,
+      kTypeInt,
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "baseVectorLoadedVector",
+      (void*)baseVectorLoadedVector,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "createSelectivityVector",
+      (void*)createSelectivityVector,
+      kTypeLong,
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "tableWriteTraitsOutputTypeWithAggregationNode",
+      (void*)tableWriteTraitsOutputTypeWithAggregationNode,
+      kTypeString,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "iSerializableAsCpp",
+      (void*)iSerializableAsCpp,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
+  addNativeMethod(
+      "createUpIteratorWithExternalStream",
+      (void*)createUpIteratorWithExternalStream,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
 
   registerNativeMethods(env);
 }

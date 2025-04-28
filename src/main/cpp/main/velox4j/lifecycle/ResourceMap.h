@@ -17,17 +17,18 @@
 
 #pragma once
 
+#include <velox/common/base/Exceptions.h>
 #include <atomic>
 #include <limits>
 #include <mutex>
 #include <unordered_map>
-#include <velox/common/base/Exceptions.h>
 
 namespace velox4j {
 using ResourceHandle = uint32_t;
 static_assert(std::numeric_limits<ResourceHandle>::min() == 0);
 
-template <typename T, typename F> T safeCast(F f) {
+template <typename T, typename F>
+T safeCast(F f) {
   VELOX_CHECK(sizeof(T) <= sizeof(F), "Vain safe casting");
   F min = 0;
   F max = static_cast<F>(std::numeric_limits<T>::max());
@@ -41,8 +42,9 @@ template <typename T, typename F> T safeCast(F f) {
  * Not thread-safe.
  * @tparam TResource class of the object to hold.
  */
-template <typename TResource> class ResourceMap {
-public:
+template <typename TResource>
+class ResourceMap {
+ public:
   ResourceMap() : resourceId_(kInitResourceId) {}
 
   ResourceHandle insert(TResource holder) {
@@ -80,9 +82,11 @@ public:
     return map_.size();
   }
 
-  size_t nextId() { return resourceId_; }
+  size_t nextId() {
+    return resourceId_;
+  }
 
-private:
+ private:
   // Initialize the resource id starting value to a number greater than zero
   // to allow for easier debugging of uninitialized java variables.
   static constexpr size_t kInitResourceId = 4;

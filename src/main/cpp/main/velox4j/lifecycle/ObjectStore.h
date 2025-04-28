@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "ResourceMap.h"
 #include <map>
+#include "ResourceMap.h"
 
 namespace velox4j {
 
@@ -40,8 +40,8 @@ constexpr static ObjectHandle kInvalidObjectHandle = -1;
 // shared-ptr's lifecycle to a Java-side object or some kind of resource
 // manager.
 class ObjectStore {
-public:
-  static ObjectStore *global() {
+ public:
+  static ObjectStore* global() {
     static std::unique_ptr<ObjectStore> globalStore = create();
     return globalStore.get();
   }
@@ -52,8 +52,8 @@ public:
     StoreHandle nextId = safeCast<StoreHandle>(stores().nextId());
     auto store = std::unique_ptr<ObjectStore>(new ObjectStore(nextId));
     StoreHandle storeId = safeCast<StoreHandle>(stores().insert(store.get()));
-    VELOX_CHECK(storeId == nextId,
-                "Store ID mismatched, this should not happen");
+    VELOX_CHECK(
+        storeId == nextId, "Store ID mismatched, this should not happen");
     return store;
   }
 
@@ -78,9 +78,12 @@ public:
 
   virtual ~ObjectStore();
 
-  StoreHandle id() const { return storeId_; }
+  StoreHandle id() const {
+    return storeId_;
+  }
 
-  template <typename T> ObjectHandle save(std::shared_ptr<T> obj) {
+  template <typename T>
+  ObjectHandle save(std::shared_ptr<T> obj) {
     const std::lock_guard<std::mutex> lock(mtx_);
     const std::string_view description = typeid(T).name();
     ResourceHandle handle = store_.insert(std::move(obj));
@@ -88,12 +91,12 @@ public:
     return toObjHandle(handle);
   }
 
-private:
-  static ResourceMap<ObjectStore *> &stores();
+ private:
+  static ResourceMap<ObjectStore*>& stores();
 
   ObjectHandle toObjHandle(ResourceHandle rh) const {
     ObjectHandle prefix = static_cast<ObjectHandle>(storeId_)
-                          << (sizeof(ResourceHandle) * 8);
+        << (sizeof(ResourceHandle) * 8);
     ObjectHandle objHandle = prefix + rh;
     return objHandle;
   }

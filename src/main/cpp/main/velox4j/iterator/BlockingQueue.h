@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "velox4j/connector/ExternalStream.h"
 #include <folly/executors/IOThreadPoolExecutor.h>
+#include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
 
 class BlockingQueue : public ExternalStream {
-public:
+ public:
   enum State { OPEN = 0, FINISHED = 1, CLOSED = 2 };
 
   static std::string stateToString(State state);
@@ -32,16 +32,16 @@ public:
   BlockingQueue();
 
   // Delete copy/move CTORs.
-  BlockingQueue(BlockingQueue &&) = delete;
-  BlockingQueue(const BlockingQueue &) = delete;
-  BlockingQueue &operator=(const BlockingQueue &) = delete;
-  BlockingQueue &operator=(BlockingQueue &&) = delete;
+  BlockingQueue(BlockingQueue&&) = delete;
+  BlockingQueue(const BlockingQueue&) = delete;
+  BlockingQueue& operator=(const BlockingQueue&) = delete;
+  BlockingQueue& operator=(BlockingQueue&&) = delete;
 
   // DTOR.
   ~BlockingQueue() override;
 
-  std::optional<facebook::velox::RowVectorPtr>
-  read(facebook::velox::ContinueFuture &future) override;
+  std::optional<facebook::velox::RowVectorPtr> read(
+      facebook::velox::ContinueFuture& future) override;
 
   void put(facebook::velox::RowVectorPtr rowVector);
 
@@ -49,7 +49,7 @@ public:
 
   bool empty() const;
 
-private:
+ private:
   void ensureOpen() const;
 
   void ensureNotClosed() const;

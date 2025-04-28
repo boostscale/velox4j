@@ -20,8 +20,8 @@
 
 namespace velox4j {
 // static
-ResourceMap<ObjectStore *> &ObjectStore::stores() {
-  static ResourceMap<ObjectStore *> stores;
+ResourceMap<ObjectStore*>& ObjectStore::stores() {
+  static ResourceMap<ObjectStore*> stores;
   return stores;
 }
 

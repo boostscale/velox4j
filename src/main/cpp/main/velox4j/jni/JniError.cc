@@ -17,7 +17,7 @@
 #include "JniError.h"
 #include <velox/common/base/Exceptions.h>
 
-void velox4j::JniErrorState::ensureInitialized(JNIEnv *env) {
+void velox4j::JniErrorState::ensureInitialized(JNIEnv* env) {
   std::lock_guard<std::mutex> lockGuard(mtx_);
   if (initialized_) {
     return;
@@ -28,8 +28,9 @@ void velox4j::JniErrorState::ensureInitialized(JNIEnv *env) {
 
 void velox4j::JniErrorState::assertInitialized() const {
   if (!initialized_) {
-    VELOX_FAIL("Fatal: JniErrorState::Initialize(...) was not called before "
-               "using the utility");
+    VELOX_FAIL(
+        "Fatal: JniErrorState::Initialize(...) was not called before "
+        "using the utility");
   }
 }
 
@@ -48,7 +49,7 @@ jclass velox4j::JniErrorState::veloxExceptionClass() {
   return veloxExceptionClass_;
 }
 
-void velox4j::JniErrorState::initialize(JNIEnv *env) {
+void velox4j::JniErrorState::initialize(JNIEnv* env) {
   veloxExceptionClass_ = createGlobalClassReference(
       env, "Lio/github/zhztheplayer/velox4j/exception/VeloxException;");
   ioExceptionClass_ = createGlobalClassReference(env, "Ljava/io/IOException;");
@@ -60,7 +61,7 @@ void velox4j::JniErrorState::initialize(JNIEnv *env) {
       createGlobalClassReference(env, "Ljava/lang/IllegalAccessException;");
   illegalArgumentExceptionClass_ =
       createGlobalClassReference(env, "Ljava/lang/IllegalArgumentException;");
-  JavaVM *vm;
+  JavaVM* vm;
   if (env->GetJavaVM(&vm) != JNI_OK) {
     VELOX_FAIL("Unable to get JavaVM instance");
   }
@@ -72,7 +73,7 @@ void velox4j::JniErrorState::close() {
   if (closed_) {
     return;
   }
-  JNIEnv *env = getLocalJNIEnv();
+  JNIEnv* env = getLocalJNIEnv();
   env->DeleteGlobalRef(veloxExceptionClass_);
   env->DeleteGlobalRef(ioExceptionClass_);
   env->DeleteGlobalRef(runtimeExceptionClass_);
