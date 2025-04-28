@@ -253,7 +253,7 @@
               <include>src/test/java/**/*.java</include>
             </includes>
             <googleJavaFormat>
-              <version>1.8</version>
+              <version>1.10.0</version>
               <style>GOOGLE</style>
             </googleJavaFormat>
             <removeUnusedImports></removeUnusedImports>
