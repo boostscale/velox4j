@@ -14,6 +14,7 @@ set(VELOX4J_SOURCES
         velox4j/query/Query.cc
         velox4j/query/QueryExecutor.cc
         velox4j/connector/ExternalStream.cc
+        velox4j/numeric/Numeric.cc
         velox4j/memory/AllocationListener.cc
         velox4j/memory/JavaAllocationListener.cc
         velox4j/memory/MemoryManager.cc
