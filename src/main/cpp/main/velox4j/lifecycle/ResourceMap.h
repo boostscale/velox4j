@@ -22,11 +22,20 @@
 #include <mutex>
 #include <unordered_map>
 #include <velox/common/base/Exceptions.h>
-#include "velox4j/numeric/Numeric.h"
 
 namespace velox4j {
 using ResourceHandle = uint32_t;
 static_assert(std::numeric_limits<ResourceHandle>::min() == 0);
+
+template <typename T, typename F>
+T safeCast(F f) {
+  VELOX_CHECK(sizeof(T) <= sizeof(F), "Vain safe casting");
+  F min = 0;
+  F max = static_cast<F>(std::numeric_limits<T>::max());
+  VELOX_CHECK(f >= min, "Safe casting a negative number");
+  VELOX_CHECK(f <= max, "Number overflow");
+  return static_cast<T>(f);
+}
 
 /**
  * An utility class that map resource handle to its shared pointers.

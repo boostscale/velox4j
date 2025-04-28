@@ -17,7 +17,6 @@
 
 #include "MemoryManager.h"
 #include "ArrowMemoryPool.h"
-#include "velox4j/numeric/Numeric.h"
 
 namespace velox4j {
 using namespace facebook;
@@ -171,10 +170,10 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
     auto neededBytes = velox::bits::roundUp(
         bytes - reclaimedFreeBytes, memoryPoolTransferCapacity_);
     try {
-      listener_->allocationChanged(safeCast<int64_t>(neededBytes));
+      listener_->allocationChanged(neededBytes);
     } catch (const std::exception& e) {
       // if allocationChanged failed, we need to free the reclaimed bytes
-      listener_->allocationChanged(safeCast<int64_t>(-reclaimedFreeBytes));
+      listener_->allocationChanged(-reclaimedFreeBytes);
       throw;
     }
     auto ret = growPool(pool, reclaimedFreeBytes + neededBytes, bytes);
@@ -190,7 +189,7 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
       velox::memory::MemoryPool* pool,
       uint64_t bytes) {
     uint64_t freeBytes = shrinkPool(pool, bytes);
-    listener_->allocationChanged(safeCast<int64_t>(-freeBytes));
+    listener_->allocationChanged(-freeBytes);
     return freeBytes;
   }
 
