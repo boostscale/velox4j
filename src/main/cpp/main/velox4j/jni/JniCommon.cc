@@ -50,8 +50,8 @@ void checkException(JNIEnv* env) {
         (jstring)env->CallStaticObjectMethod(
             describerClass, describeMethod, t));
     if (env->ExceptionCheck()) {
-      LOG(WARNING)
-          << "Fatal: Uncaught Java exception during calling the Java exception describer method! ";
+      LOG(WARNING) << "Fatal: Uncaught Java exception during calling the Java "
+                      "exception describer method! ";
     }
     VELOX_FAIL(
         "Error during calling Java code from native code: " + description);

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "velox4j/query/Query.h"
 #include <velox/vector/ComplexVector.h>
+#include "velox4j/query/Query.h"
 
 namespace velox4j {
 

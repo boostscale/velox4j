@@ -47,9 +47,9 @@ JavaAllocationListener::~JavaAllocationListener() {
   try {
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
-    LOG(WARNING)
-        << "Unable to destroy the global reference to the Java side allocation listener: "
-        << ex.what();
+    LOG(WARNING) << "Unable to destroy the global reference to the Java side "
+                    "allocation listener: "
+                 << ex.what();
   }
 }
 

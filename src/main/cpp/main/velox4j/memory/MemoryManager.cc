@@ -133,7 +133,9 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
       pool = candidates_.begin()->first;
     }
     pool->reclaim(
-        targetBytes, memoryReclaimMaxWaitMs_, status); // ignore the output
+        targetBytes,
+        memoryReclaimMaxWaitMs_,
+        status); // ignore the output
     return shrinkCapacityInternal(pool, 0);
   }
 
@@ -294,8 +296,8 @@ bool MemoryManager::tryDestruct() {
   // Velox memory manager considered safe to destruct when no alive pools.
   if (veloxMemoryManager_) {
     if (veloxMemoryManager_->numPools() > 3) {
-      LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
-                 << "There are " << veloxMemoryManager_->numPools()
+      LOG(ERROR) << "[Velox4J MemoryManager DTOR] " << "There are "
+                 << veloxMemoryManager_->numPools()
                  << " outstanding Velox memory pools.";
       leakFound = true;
     }
@@ -353,9 +355,9 @@ MemoryManager::~MemoryManager() {
                << " Error occurred: " << ex.what();
   }
   if (!succeeded) {
-    LOG(ERROR)
-        << "[Velox4J MemoryManager DTOR] "
-        << "Fatal: Memory leak found, aborting the destruction of MemoryManager. This could cause the process to crash.";
+    LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
+               << "Fatal: Memory leak found, aborting the destruction of "
+                  "MemoryManager. This could cause the process to crash.";
     VELOX_FAIL("Memory leak found during destruction of MemoryManager");
   }
 }

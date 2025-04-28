@@ -25,7 +25,8 @@ SuspendedSection::SuspendedSection(facebook::velox::exec::Driver* driver)
   if (driver_->task()->enterSuspended(driver_->state()) !=
       facebook::velox::exec::StopReason::kNone) {
     VELOX_FAIL(
-        "Terminate detected when entering suspended section for driver {} from task {}",
+        "Terminate detected when entering suspended section for driver "
+        "{} from task {}",
         driver_->driverCtx()->driverId,
         driver_->task()->taskId());
   }
@@ -139,7 +140,8 @@ std::optional<RowVectorPtr> ExternalStreamDataSource::next(
           exec::driverThreadContext();
       VELOX_CHECK_NOT_NULL(
           driverThreadCtx,
-          "ExternalStreamDataSource::next() is not called from a driver thread");
+          "ExternalStreamDataSource::next() is not called "
+          "from a driver thread");
       SuspendedSection ss(driverThreadCtx->driverCtx()->driver);
       const std::optional<RowVectorPtr> vector = current_->read(future);
       if (vector == nullptr) {
@@ -152,7 +154,7 @@ std::optional<RowVectorPtr> ExternalStreamDataSource::next(
   }
 }
 
-void ExternalStreamDataSource::cancel(){
+void ExternalStreamDataSource::cancel() {
   // Reset the pending streams because it may hold pointer to the resident
   // driver that causes reference cycle eventually.
   // See https://github.com/facebookincubator/velox/pull/12701.

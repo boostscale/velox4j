@@ -26,10 +26,10 @@
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/config/Config.h"
 #include "velox4j/init/Init.h"
+#include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"
-#include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/query/QueryExecutor.h"
 
 namespace velox4j {
@@ -83,7 +83,11 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END()
 }
 
-void blockingQueuePut(JNIEnv* env, jobject javaThis, jlong queueId, jlong rvId) {
+void blockingQueuePut(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong queueId,
+    jlong rvId) {
   JNI_METHOD_START
   auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
   auto rv = ObjectStore::retrieve<RowVector>(rvId);
@@ -300,9 +304,18 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
-      "blockingQueuePut", (void*)blockingQueuePut, kTypeVoid, kTypeLong, kTypeLong, nullptr);
+      "blockingQueuePut",
+      (void*)blockingQueuePut,
+      kTypeVoid,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
-      "blockingQueueNoMoreInput", (void*)blockingQueueNoMoreInput, kTypeVoid, kTypeLong, nullptr);
+      "blockingQueueNoMoreInput",
+      (void*)blockingQueueNoMoreInput,
+      kTypeVoid,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "serialTaskAddSplit",
       (void*)serialTaskAddSplit,

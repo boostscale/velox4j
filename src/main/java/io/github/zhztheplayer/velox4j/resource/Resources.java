@@ -1,7 +1,20 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.resource;
-
-import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,17 +33,21 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import com.google.common.base.Preconditions;
+
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
+
 public class Resources {
 
   /**
    * Get a collection of resource paths by the input RegEx pattern in a certain container folder.
-   * <p>
-   * Code is copied from <a
+   *
+   * <p>Code is copied from <a
    * href="https://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory">here</a>
    * and then modified for Velox4J's use.
    *
    * @param container The container folder. E.g., `META-INF`. Should not be left empty, because
-   * Classloader requires for at a meaningful file name to search inside the loaded jar files.
+   *     Classloader requires for at a meaningful file name to search inside the loaded jar files.
    * @param pattern The pattern to match on the file names.
    * @return The relative resource paths in the order they are found.
    */
@@ -56,7 +73,9 @@ public class Resources {
   }
 
   private static void getResources(
-      final String container, final URL containerUrl, final Pattern pattern,
+      final String container,
+      final URL containerUrl,
+      final Pattern pattern,
       final List<ResourceFile> buffer) {
     final String protocol = containerUrl.getProtocol();
     switch (protocol) {
@@ -88,7 +107,11 @@ public class Resources {
   }
 
   private static void getResourcesFromJarFile(
-      final String container, final File jarFile, final String dir, final Pattern pattern, final List<ResourceFile> buffer) {
+      final String container,
+      final File jarFile,
+      final String dir,
+      final Pattern pattern,
+      final List<ResourceFile> buffer) {
     final ZipFile zf;
     try {
       zf = new ZipFile(jarFile);
@@ -119,7 +142,11 @@ public class Resources {
   }
 
   private static void getResourcesFromDirectory(
-      final String container, final File root, final File directory, final Pattern pattern, final List<ResourceFile> buffer) {
+      final String container,
+      final File root,
+      final File directory,
+      final Pattern pattern,
+      final List<ResourceFile> buffer) {
     final File[] fileList = directory.listFiles();
     for (final File file : fileList) {
       if (file.isDirectory()) {
@@ -137,8 +164,10 @@ public class Resources {
   public static void copyResource(String fromPath, File toFile) {
     Preconditions.checkArgument(!toFile.isDirectory(), "File %s is not a file", toFile);
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    try (final InputStream is = new BufferedInputStream(
-        Preconditions.checkNotNull(classloader.getResourceAsStream(fromPath), "Resource %s not found", fromPath))) {
+    try (final InputStream is =
+        new BufferedInputStream(
+            Preconditions.checkNotNull(
+                classloader.getResourceAsStream(fromPath), "Resource %s not found", fromPath))) {
       final BufferedOutputStream o = new BufferedOutputStream(new FileOutputStream(toFile));
       while (true) {
         int b = is.read();

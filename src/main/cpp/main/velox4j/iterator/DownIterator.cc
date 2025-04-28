@@ -53,9 +53,9 @@ DownIterator::~DownIterator() {
     close();
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
-    LOG(WARNING)
-        << "Unable to destroy the global reference to the Java side down iterator: "
-        << ex.what();
+    LOG(WARNING) << "Unable to destroy the global reference to the Java side "
+                    "down iterator: "
+                 << ex.what();
   }
 }
 
@@ -65,7 +65,8 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
     std::lock_guard l(mutex_);
     VELOX_CHECK(
         promises_.empty(),
-        "DownIterator::read is called while the last read operation is awaiting. Aborting.");
+        "DownIterator::read is called while the last read operation is "
+        "awaiting. Aborting.");
   }
   const State state = advance();
   switch (state) {

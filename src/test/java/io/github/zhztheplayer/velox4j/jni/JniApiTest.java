@@ -1,21 +1,32 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.jni;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
@@ -41,17 +52,6 @@ import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.variant.DoubleValue;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
-import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.FieldVector;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
-
-import java.util.Collections;
-import java.util.List;
 
 public class JniApiTest {
   private static MemoryManager memoryManager;
@@ -85,12 +85,14 @@ public class JniApiTest {
   public void testCloseTwice() {
     final LocalSession session = createLocalSession(memoryManager);
     session.close();
-    Assert.assertThrows(VeloxException.class, new ThrowingRunnable() {
-      @Override
-      public void run() {
-        session.close();
-      }
-    });
+    Assert.assertThrows(
+        VeloxException.class,
+        new ThrowingRunnable() {
+          @Override
+          public void run() {
+            session.close();
+          }
+        });
   }
 
   @Test
@@ -159,7 +161,6 @@ public class JniApiTest {
     ;
   }
 
-
   @Test
   public void testVectorSerdeMultiple() {
     final LocalSession session = createLocalSession(memoryManager);
@@ -193,9 +194,11 @@ public class JniApiTest {
 
   @Test
   public void testVariantInferType() {
-    Assert.assertTrue(StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(
+        StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
     Assert.assertTrue(StaticJniApi.get().variantInferType(new RealValue(4.6f)) instanceof RealType);
-    Assert.assertTrue(StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
+    Assert.assertTrue(
+        StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
   }
 
   @Test
@@ -222,12 +225,14 @@ public class JniApiTest {
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
-    final Thread thread = TestThreads.newTestThread(new Runnable() {
-      @Override
-      public void run() {
-        SampleQueryTests.assertIterator(up);
-      }
-    });
+    final Thread thread =
+        TestThreads.newTestThread(
+            new Runnable() {
+              @Override
+              public void run() {
+                SampleQueryTests.assertIterator(up);
+              }
+            });
     thread.start();
     thread.join();
     session.close();

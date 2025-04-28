@@ -102,7 +102,8 @@ RowVectorPtr SerialTask::get() {
   VELOX_CHECK(!hasPendingState_);
   VELOX_CHECK_NOT_NULL(
       pending_,
-      "SerialTask: No pending row vector to return. Make sure the iterator is available via member function advance() first");
+      "SerialTask: No pending row vector to return. Make sure the "
+      "iterator is available via member function advance() first");
   const auto out = pending_;
   pending_ = nullptr;
   return out;
@@ -142,10 +143,10 @@ UpIterator::State SerialTask::advance0(bool wait) {
       return State::BLOCKED;
     }
     // Wait for Velox task to respond.
-    VLOG(2)
-        << "Velox task " << task_->taskId()
-        << " is busy when ::next() is called. Will wait and try again. Task state: "
-        << taskStateString(task_->state());
+    VLOG(2) << "Velox task " << task_->taskId()
+            << " is busy when ::next() is called. Will wait and try again. "
+               "Task state: "
+            << taskStateString(task_->state());
     VELOX_CHECK_NULL(
         out, "Expected to wait but still got non-null output from Velox task");
     // Avoid waiting forever because Velox doesn't propagate

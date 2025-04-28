@@ -1,8 +1,29 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.serde;
+
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.ComparisonFailure;
+
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.connector.*;
@@ -12,13 +33,13 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.jni.JniApiTests;
 import io.github.zhztheplayer.velox4j.jni.LocalSession;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
-import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
+import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
+import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
@@ -30,13 +51,9 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
-import org.junit.Assert;
-import org.junit.ComparisonFailure;
-
-import java.util.*;
 
 public final class SerdeTests {
-private static void assertJsonEquals(String expected, String actual) {
+  private static void assertJsonEquals(String expected, String actual) {
     final JsonNode expectedTree = Serde.parseTree(expected);
     final JsonNode actualTree = Serde.parseTree(actual);
     if (!actualTree.equals(expectedTree)) {
@@ -44,7 +61,8 @@ private static void assertJsonEquals(String expected, String actual) {
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(T inObj) {
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(
+      T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
@@ -64,8 +82,8 @@ private static void assertJsonEquals(String expected, String actual) {
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(String inJson,
-      Class<? extends T> valueType) {
+  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(
+      String inJson, Class<? extends T> valueType) {
     final T inObj = Serde.fromJson(inJson, valueType);
     return SerdeTests.testISerializableRoundTrip(inObj);
   }
@@ -109,16 +127,19 @@ private static void assertJsonEquals(String expected, String actual) {
   }
 
   public static HiveColumnHandle newSampleHiveColumnHandle() {
-    final Type dataType = ArrayType.create(
-        MapType.create(
-            new VarCharType(),
-            new RowType(List.of("id", "description"),
-                List.of(new BigIntType(),
-                    new VarCharType()))));
-    final HiveColumnHandle handle = new HiveColumnHandle("complex_type",
-        ColumnType.REGULAR, dataType, dataType, List.of(
-        "complex_type[1][\"foo\"].id",
-        "complex_type[2][\"foo\"].id"));
+    final Type dataType =
+        ArrayType.create(
+            MapType.create(
+                new VarCharType(),
+                new RowType(
+                    List.of("id", "description"), List.of(new BigIntType(), new VarCharType()))));
+    final HiveColumnHandle handle =
+        new HiveColumnHandle(
+            "complex_type",
+            ColumnType.REGULAR,
+            dataType,
+            dataType,
+            List.of("complex_type[1][\"foo\"].id", "complex_type[2][\"foo\"].id"));
     return handle;
   }
 
@@ -133,12 +154,17 @@ private static void assertJsonEquals(String expected, String actual) {
         100,
         Map.of("key", Optional.of("value")),
         OptionalInt.of(1),
-        Optional.of(new HiveBucketConversion(
-            1, 1,
-            List.of(
-                new HiveColumnHandle(
-                    "t", ColumnType.REGULAR,
-                    new IntegerType(), new IntegerType(), Collections.emptyList())))),
+        Optional.of(
+            new HiveBucketConversion(
+                1,
+                1,
+                List.of(
+                    new HiveColumnHandle(
+                        "t",
+                        ColumnType.REGULAR,
+                        new IntegerType(),
+                        new IntegerType(),
+                        Collections.emptyList())))),
         Map.of("sk", "sv"),
         Optional.of("extra"),
         Map.of("serde_key", "serde_value"),
@@ -159,12 +185,17 @@ private static void assertJsonEquals(String expected, String actual) {
         100,
         Map.of("key", Optional.of("value")),
         OptionalInt.of(1),
-        Optional.of(new HiveBucketConversion(
-            1, 1,
-            List.of(
-                new HiveColumnHandle(
-                    "t", ColumnType.REGULAR,
-                    new IntegerType(), new IntegerType(), Collections.emptyList())))),
+        Optional.of(
+            new HiveBucketConversion(
+                1,
+                1,
+                List.of(
+                    new HiveColumnHandle(
+                        "t",
+                        ColumnType.REGULAR,
+                        new IntegerType(),
+                        new IntegerType(),
+                        Collections.emptyList())))),
         Map.of("sk", "sv"),
         Optional.empty(),
         Map.of("serde_key", "serde_value"),
@@ -175,21 +206,24 @@ private static void assertJsonEquals(String expected, String actual) {
   }
 
   public static ConnectorTableHandle newSampleHiveTableHandle(RowType outputType) {
-    final ConnectorTableHandle handle = new HiveTableHandle(
-        "connector-1",
-        "tab-1",
-        true,
-        List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
-        new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
-        outputType,
-        Map.of("tk", "tv")
-    );
+    final ConnectorTableHandle handle =
+        new HiveTableHandle(
+            "connector-1",
+            "tab-1",
+            true,
+            List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
+            new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
+            outputType,
+            Map.of("tk", "tv"));
     return handle;
   }
 
   public static LocationHandle newSampleLocationHandle() {
-    return new LocationHandle("/tmp/target-path",
-        "/tmp/write-path", LocationHandle.TableType.EXISTING, "target-file-name");
+    return new LocationHandle(
+        "/tmp/target-path",
+        "/tmp/write-path",
+        LocationHandle.TableType.EXISTING,
+        "target-file-name");
   }
 
   public static HiveBucketProperty newSampleHiveBucketProperty() {
@@ -200,9 +234,7 @@ private static void assertJsonEquals(String expected, String actual) {
         List.of(new IntegerType(), new VarCharType()),
         List.of(
             new HiveSortingColumn("foo", new SortOrder(true, true)),
-            new HiveSortingColumn("bar", new SortOrder(false, false))
-        )
-    );
+            new HiveSortingColumn("bar", new SortOrder(false, false))));
   }
 
   public static HiveInsertTableHandle newSampleHiveInsertTableHandle() {
@@ -214,45 +246,47 @@ private static void assertJsonEquals(String expected, String actual) {
         CompressionKind.ZLIB,
         Map.of("serde_key", "serde_value"),
         false,
-        new HiveInsertFileNameGenerator()
-    );
+        new HiveInsertFileNameGenerator());
   }
 
   public static Aggregate newSampleAggregate() {
-    final Aggregate aggregate = new Aggregate(
-        new CallTypedExpr(new IntegerType(),
-            Collections.singletonList(FieldAccessTypedExpr.create(
-                new IntegerType(), "foo")), "sum"),
-        List.of(new IntegerType()),
-        FieldAccessTypedExpr.create(new IntegerType(), "foo"),
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of(new SortOrder(true, true)), true);
+    final Aggregate aggregate =
+        new Aggregate(
+            new CallTypedExpr(
+                new IntegerType(),
+                Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+                "sum"),
+            List.of(new IntegerType()),
+            FieldAccessTypedExpr.create(new IntegerType(), "foo"),
+            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            List.of(new SortOrder(true, true)),
+            true);
     return aggregate;
   }
 
   public static PlanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
     final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(outputType);
-    final PlanNode scan = new TableScanNode(planNodeId, outputType,
-        handle, Collections.emptyList());
+    final PlanNode scan =
+        new TableScanNode(planNodeId, outputType, handle, Collections.emptyList());
     return scan;
   }
 
   public static AggregationNode newSampleAggregationNode(String aggNodeId, String scanNodeId) {
-    final PlanNode scan = SerdeTests.newSampleTableScanNode(scanNodeId,
-        SerdeTests.newSampleOutputType());
+    final PlanNode scan =
+        SerdeTests.newSampleTableScanNode(scanNodeId, SerdeTests.newSampleOutputType());
     final Aggregate aggregate = SerdeTests.newSampleAggregate();
-    final AggregationNode aggregationNode = new AggregationNode(
-        aggNodeId,
-        AggregateStep.PARTIAL,
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of("sum"),
-        List.of(aggregate),
-        true,
-        List.of(scan),
-        FieldAccessTypedExpr.create(new IntegerType(), "foo"),
-        List.of(0)
-    );
+    final AggregationNode aggregationNode =
+        new AggregationNode(
+            aggNodeId,
+            AggregateStep.PARTIAL,
+            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            List.of("sum"),
+            List.of(aggregate),
+            true,
+            List.of(scan),
+            FieldAccessTypedExpr.create(new IntegerType(), "foo"),
+            List.of(0));
     return aggregationNode;
   }
 

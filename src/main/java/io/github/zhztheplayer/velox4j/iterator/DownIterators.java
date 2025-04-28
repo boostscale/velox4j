@@ -1,8 +1,24 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.iterator;
 
-import io.github.zhztheplayer.velox4j.data.RowVector;
-
 import java.util.Iterator;
+
+import io.github.zhztheplayer.velox4j.data.RowVector;
 
 public final class DownIterators {
   public static DownIterator fromJavaIterator(Iterator<RowVector> itr) {
@@ -35,14 +51,11 @@ public final class DownIterators {
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
   }
 
-  private static abstract class BaseDownIterator implements DownIterator {
-    protected BaseDownIterator() {
-    }
+  private abstract static class BaseDownIterator implements DownIterator {
+    protected BaseDownIterator() {}
 
     @Override
     public final int advance() {
@@ -55,6 +68,7 @@ public final class DownIterators {
     }
 
     protected abstract DownIterator.State advance0();
+
     protected abstract RowVector get0();
   }
 }

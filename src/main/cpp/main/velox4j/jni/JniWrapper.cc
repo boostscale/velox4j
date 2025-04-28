@@ -27,10 +27,10 @@
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/eval/Evaluator.h"
+#include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
-#include "velox4j/iterator/BlockingQueue.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -93,7 +93,9 @@ jlong queryExecutorExecute(
     jlong queryExecutorId) {
   JNI_METHOD_START
   auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
-  return sessionOf(env, javaThis)->objectStore()->save<SerialTask>(exec->execute());
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save<SerialTask>(exec->execute());
   JNI_METHOD_END(-1L)
 }
 
@@ -104,7 +106,10 @@ jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jlong createExternalStreamFromDownIterator(JNIEnv* env, jobject javaThis, jobject itrRef) {
+jlong createExternalStreamFromDownIterator(
+    JNIEnv* env,
+    jobject javaThis,
+    jobject itrRef) {
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
@@ -288,7 +293,8 @@ class ExternalStreamAsUpIterator : public UpIterator {
   RowVectorPtr get() override {
     VELOX_CHECK_NOT_NULL(
         pending_,
-        "ExternalStreamAsUpIterator: No pending row vector to return. Make sure the iterator is available via member function advance() first");
+        "ExternalStreamAsUpIterator: No pending row vector to return. Make "
+        "sure the iterator is available via member function advance() first");
     auto out = pending_;
     pending_ = nullptr;
     return out;
@@ -357,10 +363,7 @@ void JniWrapper::initialize(JNIEnv* env) {
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
       nullptr);
   addNativeMethod(
-      "createBlockingQueue",
-      (void*)createBlockingQueue,
-      kTypeLong,
-      nullptr);
+      "createBlockingQueue", (void*)createBlockingQueue, kTypeLong, nullptr);
   addNativeMethod(
       "createEmptyBaseVector",
       (void*)createEmptyBaseVector,

@@ -24,13 +24,9 @@ namespace velox4j {
 
 class BlockingQueue : public ExternalStream {
  public:
-  enum State {
-   OPEN = 0,
-   FINISHED = 1,
-   CLOSED = 2
-  };
+  enum State { OPEN = 0, FINISHED = 1, CLOSED = 2 };
 
- static std::string stateToString(State state);
+  static std::string stateToString(State state);
 
   // CTOR.
   BlockingQueue();

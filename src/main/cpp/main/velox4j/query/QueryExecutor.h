@@ -26,13 +26,13 @@
 namespace velox4j {
 
 class SerialTaskStats {
-public:
- SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats);
+ public:
+  SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats);
 
- folly::dynamic toJson() const;
+  folly::dynamic toJson() const;
 
-private:
- facebook::velox::exec::TaskStats taskStats_;
+ private:
+  facebook::velox::exec::TaskStats taskStats_;
 };
 
 class SerialTask : public UpIterator {
@@ -47,13 +47,13 @@ class SerialTask : public UpIterator {
 
   facebook::velox::RowVectorPtr get() override;
 
- void addSplit(
-     const facebook::velox::core::PlanNodeId& planNodeId,
-     int32_t groupId,
-     std::shared_ptr<facebook::velox::connector::ConnectorSplit>
-         connectorSplit);
+  void addSplit(
+      const facebook::velox::core::PlanNodeId& planNodeId,
+      int32_t groupId,
+      std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+          connectorSplit);
 
- void noMoreSplits(const facebook::velox::core::PlanNodeId& planNodeId);
+  void noMoreSplits(const facebook::velox::core::PlanNodeId& planNodeId);
 
   std::unique_ptr<SerialTaskStats> collectStats();
 
@@ -73,7 +73,9 @@ class SerialTask : public UpIterator {
 
 class QueryExecutor {
  public:
-  QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+  QueryExecutor(
+      MemoryManager* memoryManager,
+      std::shared_ptr<const Query> query);
 
   std::unique_ptr<SerialTask> execute() const;
 

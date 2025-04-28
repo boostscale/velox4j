@@ -28,7 +28,7 @@ class JavaAllocationListenerJniWrapper final : public spotify::jni::JavaClass {
     JavaAllocationListenerJniWrapper::initialize(env);
   }
 
-  JavaAllocationListenerJniWrapper() : JavaClass() {};
+  JavaAllocationListenerJniWrapper() : JavaClass(){};
 
   const char* getCanonicalName() const override;
 

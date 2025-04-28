@@ -95,9 +95,8 @@ class ExternalStreamDataSource : public facebook::velox::connector::DataSource {
       const std::shared_ptr<facebook::velox::connector::ConnectorTableHandle>&
           tableHandle);
 
-  void addSplit(
-      std::shared_ptr<facebook::velox::connector::ConnectorSplit> split)
-      override;
+  void addSplit(std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+                    split) override;
 
   std::optional<facebook::velox::RowVectorPtr> next(
       uint64_t size,

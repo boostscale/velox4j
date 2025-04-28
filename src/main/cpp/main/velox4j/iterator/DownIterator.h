@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <folly/executors/IOThreadPoolExecutor.h>
 #include <JniHelpers.h>
+#include <folly/executors/IOThreadPoolExecutor.h>
 #include <velox/vector/ComplexVector.h>
 #include "velox4j/connector/ExternalStream.h"
 
@@ -29,7 +29,7 @@ class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
     DownIteratorJniWrapper::initialize(env);
   }
 
-  DownIteratorJniWrapper() : JavaClass() {};
+  DownIteratorJniWrapper() : JavaClass(){};
 
   const char* getCanonicalName() const override;
 

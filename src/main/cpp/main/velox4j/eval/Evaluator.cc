@@ -47,7 +47,8 @@ Evaluator::Evaluator(MemoryManager* memoryManager, std::string exprJson)
   ee_ = std::make_unique<exec::SimpleExpressionEvaluator>(
       queryCtx_.get(),
       memoryManager_->getVeloxPool(
-          fmt::format("Evaluator Leaf Memory Pool - EID {}", std::to_string(eid)),
+          fmt::format(
+              "Evaluator Leaf Memory Pool - EID {}", std::to_string(eid)),
           memory::MemoryPool::Kind::kLeaf));
   exprSet_ = ee_->compile(expr->expr());
 }

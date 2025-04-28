@@ -1,4 +1,22 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.write;
+
+import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
@@ -9,7 +27,6 @@ import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.RowType;
-import org.junit.*;
 
 public class TableWriteTraitsTest {
   private static MemoryManager memoryManager;
@@ -41,18 +58,18 @@ public class TableWriteTraitsTest {
     final RowType type = TableWriteTraits.outputType();
     Assert.assertEquals(
         ResourceTests.readResourceAsString("table-write-traits/output-type-1.json"),
-        Serde.toPrettyJson(type)
-    );
+        Serde.toPrettyJson(type));
   }
 
   @Test
   public void testOutputTypeWithAggregationNode() {
-    final RowType type = session.tableWriteTraitsOps().outputType(
-        SerdeTests.newSampleAggregationNode("id-2", "id-1")
-    );
+    final RowType type =
+        session
+            .tableWriteTraitsOps()
+            .outputType(SerdeTests.newSampleAggregationNode("id-2", "id-1"));
     Assert.assertEquals(
-        ResourceTests.readResourceAsString("table-write-traits/output-type-with-aggregation-node-1.json"),
-        Serde.toPrettyJson(type)
-    );
+        ResourceTests.readResourceAsString(
+            "table-write-traits/output-type-with-aggregation-node-1.json"),
+        Serde.toPrettyJson(type));
   }
 }

@@ -18,9 +18,9 @@
 #pragma once
 
 #include <velox/common/memory/Memory.h>
+#include <velox/expression/Expr.h>
 #include <velox/vector/BaseVector.h>
 #include <velox/vector/ComplexVector.h>
-#include <velox/expression/Expr.h>
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {

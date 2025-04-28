@@ -25,7 +25,7 @@ namespace velox4j {
 class Session {
  public:
   Session(MemoryManager* memoryManager)
-      : memoryManager_(memoryManager), objectStore_(ObjectStore::create()) {};
+      : memoryManager_(memoryManager), objectStore_(ObjectStore::create()){};
   virtual ~Session() = default;
 
   MemoryManager* memoryManager() {

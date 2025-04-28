@@ -1,3 +1,19 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.iterator;
 
 import io.github.zhztheplayer.velox4j.data.RowVector;
@@ -67,7 +83,8 @@ public final class UpIterators {
           isAvailable = true;
           return true;
         case FINISHED:
-          throw new VeloxException("InfiniteIterator reaches FINISHED state, which is not supposed to happen");
+          throw new VeloxException(
+              "InfiniteIterator reaches FINISHED state, which is not supposed to happen");
         default:
           throw new IllegalStateException("Unknown state: " + state);
       }
@@ -87,7 +104,8 @@ public final class UpIterators {
           isAvailable = true;
           return;
         case FINISHED:
-          throw new VeloxException("InfiniteIterator reaches FINISHED state, which is not supposed to happen");
+          throw new VeloxException(
+              "InfiniteIterator reaches FINISHED state, which is not supposed to happen");
         default:
           throw new IllegalStateException("Unknown state: " + state);
       }
@@ -96,7 +114,8 @@ public final class UpIterators {
     @Override
     public RowVector get() {
       if (!isAvailable) {
-        throw new VeloxException("AsInfiniteIterator#get can only be called after #available() returns true");
+        throw new VeloxException(
+            "AsInfiniteIterator#get can only be called after #available() returns true");
       }
       final RowVector rv = upIterator.get();
       isAvailable = false;

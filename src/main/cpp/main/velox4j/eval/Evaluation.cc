@@ -36,7 +36,8 @@ const std::shared_ptr<const ConfigArray>& Evaluation::queryConfig() const {
   return queryConfig_;
 }
 
-const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig() const {
+const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig()
+    const {
   return connectorConfig_;
 }
 
