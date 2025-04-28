@@ -233,7 +233,7 @@ private static List<Assignment> toAssignments(RowType rowType) {
 
 ## Coding Style
 
-Velox4J's code conform to Java coding style from Google Java format and C++ coding style from Velox.
+Velox4J's code conforms to Java coding style from Google Java format and C++ coding style from Velox.
 
 You can run the following command to fix all the code style issues during development, including both
 the C++ code and Java code:
