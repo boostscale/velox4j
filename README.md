@@ -121,7 +121,7 @@ NOTE:
 
 ## Build From Source
 
-```bash
+```shell
 mvn clean install -Dgpg.skip
 ```
 
@@ -229,6 +229,25 @@ private static List<Assignment> toAssignments(RowType rowType) {
   }
   return list;
 }
+```
+
+## Coding Style
+
+Velox4J's code conform to Java coding style from Google Java format and C++ coding style from Velox.
+
+You can run the following command to fix all the code style issues during development, including both
+the C++ code and Java code:
+
+```shell
+bash .github/workflows/scripts/format/format.sh -fix
+```
+
+Note, Docker environment is required to run the script.
+
+If you only need to check the code format without fixing them, use the subcommand`-check` instead:
+
+```shell
+bash .github/workflows/scripts/format/format.sh -check
 ```
 
 ## License
