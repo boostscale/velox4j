@@ -1,57 +1,57 @@
 # Variables.
 set(VELOX4J_SOURCES
-        velox4j/init/Init.cc
-        velox4j/jni/JniCommon.cc
-        velox4j/jni/JniError.cc
-        velox4j/jni/JniLoader.cc
-        velox4j/jni/JniWrapper.cc
-        velox4j/jni/StaticJniWrapper.cc
-        velox4j/iterator/UpIterator.cc
-        velox4j/iterator/DownIterator.cc
-        velox4j/lifecycle/ObjectStore.cc
-        velox4j/lifecycle/Session.cc
-        velox4j/arrow/Arrow.cc
-        velox4j/query/Query.cc
-        velox4j/query/QueryExecutor.cc
-        velox4j/connector/ExternalStream.cc
-        velox4j/memory/AllocationListener.cc
-        velox4j/memory/JavaAllocationListener.cc
-        velox4j/memory/MemoryManager.cc
-        velox4j/memory/ArrowMemoryPool.cc
-        velox4j/config/Config.cc
-        velox4j/init/Config.cc
-        velox4j/eval/Evaluation.cc
-        velox4j/eval/Evaluator.cc
-        velox4j/iterator/BlockingQueue.cc
-)
-set(VELOX4J_INCLUDES
-        ${CMAKE_CURRENT_LIST_DIR}
-        ${velox_SOURCE_DIR}
-        ${JniHelpersLib_SOURCE_DIR})
-set(VELOX4J_DEPENDENCIES
-        velox
-        JniHelpers
-        JNI::JNI)
+    velox4j/init/Init.cc
+    velox4j/jni/JniCommon.cc
+    velox4j/jni/JniError.cc
+    velox4j/jni/JniLoader.cc
+    velox4j/jni/JniWrapper.cc
+    velox4j/jni/StaticJniWrapper.cc
+    velox4j/iterator/UpIterator.cc
+    velox4j/iterator/DownIterator.cc
+    velox4j/lifecycle/ObjectStore.cc
+    velox4j/lifecycle/Session.cc
+    velox4j/arrow/Arrow.cc
+    velox4j/query/Query.cc
+    velox4j/query/QueryExecutor.cc
+    velox4j/connector/ExternalStream.cc
+    velox4j/memory/AllocationListener.cc
+    velox4j/memory/JavaAllocationListener.cc
+    velox4j/memory/MemoryManager.cc
+    velox4j/memory/ArrowMemoryPool.cc
+    velox4j/config/Config.cc
+    velox4j/init/Config.cc
+    velox4j/eval/Evaluation.cc
+    velox4j/eval/Evaluator.cc
+    velox4j/iterator/BlockingQueue.cc)
+set(VELOX4J_INCLUDES ${CMAKE_CURRENT_LIST_DIR} ${velox_SOURCE_DIR}
+                     ${JniHelpersLib_SOURCE_DIR})
+set(VELOX4J_DEPENDENCIES velox JniHelpers JNI::JNI)
 
 # The output library.
 add_library(velox4j_shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j_shared PUBLIC ${VELOX4J_INCLUDES})
-target_link_libraries(velox4j_shared PUBLIC ${VELOX4J_DEPENDENCIES})
-set_target_properties(velox4j_shared PROPERTIES OUTPUT_NAME velox4j
-        LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-        ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+target_link_libraries(
+  velox4j_shared
+  PUBLIC ${VELOX4J_DEPENDENCIES})
+set_target_properties(
+  velox4j_shared
+  PROPERTIES
+    OUTPUT_NAME velox4j
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 set(VELOX4J_3RD_EXCLUSIONS
-        "libc\\.so\\.[0-9]+"
-        "libstdc\\+\\+\\.so\\.[0-9]+"
-        "libgcc_s\\.so\\.[0-9]+"
-        "libm\\.so\\.[0-9]+"
-        "linux-vdso\\.so\\.[0-9]+"
-        "ld-linux-x86-64\\.so\\.[0-9]+"
-        "libdl\\.so\\.[0-9]+"
-        "libpthread\\.so\\.[0-9]+")
+    "libc\\.so\\.[0-9]+"
+    "libstdc\\+\\+\\.so\\.[0-9]+"
+    "libgcc_s\\.so\\.[0-9]+"
+    "libm\\.so\\.[0-9]+"
+    "linux-vdso\\.so\\.[0-9]+"
+    "ld-linux-x86-64\\.so\\.[0-9]+"
+    "libdl\\.so\\.[0-9]+"
+    "libpthread\\.so\\.[0-9]+")
 
-install(CODE "
+install(
+  CODE "
     file(GET_RUNTIME_DEPENDENCIES
             RESOLVED_DEPENDENCIES_VAR 3rd_deps
             LIBRARIES $<TARGET_FILE:velox4j_shared>
@@ -67,4 +67,5 @@ install(CODE "
     endforeach()
     message(\"Installing main velox4j library...\")
     file(INSTALL DESTINATION ${VELOX4J_INSTALL_DESTINATION} TYPE FILE FILES $<TARGET_FILE:velox4j_shared>)
-" COMPONENT velox4j)
+"
+  COMPONENT velox4j)
