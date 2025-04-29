@@ -52,11 +52,11 @@ docker build --build-arg "OS_VERSION=$OS_VERSION" -t "$IMAGE_NAME:$OS_VERSION" "
 # Determine the clang-format command
 if [[ "$ACTION" == "-check" ]]; then
     FORMAT_COMMAND="clang-format-18 --dry-run --Werror"
-    CMAKE_FORMAT_COMMAND="cmake-format --check"
+    CMAKE_FORMAT_COMMAND="cmake-format --first-comment-is-literal True --check"
     MAVEN_COMMAND="spotless:check"
 else
     FORMAT_COMMAND="clang-format-18 -i"
-    CMAKE_FORMAT_COMMAND="cmake-format -i"
+    CMAKE_FORMAT_COMMAND="cmake-format --first-comment-is-literal True -i"
     MAVEN_COMMAND="spotless:apply"
 fi
 
