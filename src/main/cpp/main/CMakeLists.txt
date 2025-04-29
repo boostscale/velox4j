@@ -30,12 +30,15 @@ set(VELOX4J_DEPENDENCIES velox JniHelpers JNI::JNI)
 # The output library.
 add_library(velox4j_shared SHARED ${VELOX4J_SOURCES})
 target_include_directories(velox4j_shared PUBLIC ${VELOX4J_INCLUDES})
-target_link_libraries(velox4j_shared PUBLIC ${VELOX4J_DEPENDENCIES})
+target_link_libraries(
+  velox4j_shared
+  PUBLIC ${VELOX4J_DEPENDENCIES})
 set_target_properties(
   velox4j_shared
-  PROPERTIES OUTPUT_NAME velox4j
-             LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-             ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+  PROPERTIES
+    OUTPUT_NAME velox4j
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 set(VELOX4J_3RD_EXCLUSIONS
     "libc\\.so\\.[0-9]+"

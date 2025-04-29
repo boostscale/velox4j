@@ -63,8 +63,13 @@ file(STRINGS ${VELOX_REF_FILE} VELOX_REF)
 file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
 set(VELOX_SOURCE_URL
     "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-cpmaddpackage(NAME velox URL ${VELOX_SOURCE_URL} URL_HASH
-              MD5=${VELOX_SOURCE_URL_MD5})
+cpmaddpackage(
+  NAME
+  velox
+  URL
+  ${VELOX_SOURCE_URL}
+  URL_HASH
+  MD5=${VELOX_SOURCE_URL_MD5})
 
 # Import JniHelpers.
 set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)
@@ -72,9 +77,16 @@ set(JNI_HELPERS_REF 7c58a9a24c87758fe94f33bec6a4463971af1e23)
 set(JNI_HELPERS_SOURCE_URL_MD5 3f168384670e0f21a2e2281f91cfb2e1)
 set(JNI_HELPERS_SOURCE_URL
     "https://github.com/${JNI_HELPERS_REPO}/archive/${JNI_HELPERS_REF}.zip")
-cpmaddpackage(NAME JniHelpersLib URL ${JNI_HELPERS_SOURCE_URL} URL_HASH
-              MD5=${JNI_HELPERS_SOURCE_URL_MD5})
-target_link_libraries(JniHelpers PRIVATE JNI::JNI)
+cpmaddpackage(
+  NAME
+  JniHelpersLib
+  URL
+  ${JNI_HELPERS_SOURCE_URL}
+  URL_HASH
+  MD5=${JNI_HELPERS_SOURCE_URL_MD5})
+target_link_libraries(
+  JniHelpers
+  PRIVATE JNI::JNI)
 
 # Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
