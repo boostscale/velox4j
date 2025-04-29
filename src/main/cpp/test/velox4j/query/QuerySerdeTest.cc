@@ -15,19 +15,21 @@
  * limitations under the License.
  */
 
-#include "velox4j/query/Query.h"
-#include "velox4j/test/Init.h"
 #include <gtest/gtest.h>
 #include <velox/exec/tests/utils/HiveConnectorTestBase.h>
 #include <velox/exec/tests/utils/PlanBuilder.h>
+#include "velox4j/query/Query.h"
+#include "velox4j/test/Init.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 using namespace facebook::velox::exec::test;
 
 class QuerySerdeTest : public testing::Test, public test::VectorTestBase {
-protected:
-  static void SetUpTestCase() { testingEnsureInitializedForSpark(); }
+ protected:
+  static void SetUpTestCase() {
+    testingEnsureInitializedForSpark();
+  }
 
   QuerySerdeTest() {
     data_ = {makeRowVector({
@@ -37,7 +39,7 @@ protected:
     })};
   }
 
-  void testSerde(const Query *query) {
+  void testSerde(const Query* query) {
     auto serialized = query->serialize();
     auto copy = ISerializable::deserialize<Query>(serialized, pool());
     ASSERT_EQ(query->toString(), copy->toString());

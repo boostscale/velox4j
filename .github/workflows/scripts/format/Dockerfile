@@ -21,7 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install clang-format-18.
 RUN apt-get update && \
-    apt-get install -y clang-format-18
+    apt-get install -y clang-format-18 cmake-format
 
 # Set the default command.
 CMD ["echo", "This is the docker image of Velox4J's code formatter."]

@@ -52,16 +52,18 @@ docker build --build-arg "OS_VERSION=$OS_VERSION" -t "$IMAGE_NAME:$OS_VERSION" "
 # Determine the clang-format command
 if [[ "$ACTION" == "-check" ]]; then
     FORMAT_COMMAND="clang-format-18 --dry-run --Werror"
+    CMAKE_FORMAT_COMMAND="cmake-format --check"
     MAVEN_COMMAND="spotless:check"
 else
     FORMAT_COMMAND="clang-format-18 -i"
+    CMAKE_FORMAT_COMMAND="cmake-format -i"
     MAVEN_COMMAND="spotless:apply"
 fi
 
 # CPP code path.
 CPP_ROOT="$SRC_DIR/src/main/cpp/"
-CPP_MAIN_DIR="main/velox4j/"
-CPP_TEST_DIR="main/velox4j/"
+CPP_MAIN_DIR="main/"
+CPP_TEST_DIR="test/"
 
 # 1. Run clang-format-18 on the CPP main code.
 docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
@@ -71,7 +73,19 @@ docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION
 docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
     sh -c "find $CPP_TEST_DIR \( -name '*.h' -o -name '*.cc' -o -name '*.cpp' \) | xargs -r $FORMAT_COMMAND"
 
-# 3. Run Maven Spotless check or apply under the project root.
+# 3. Run cmake-format on root CMakeLists.txt.
+docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
+    sh -c "$CMAKE_FORMAT_COMMAND CMakeLists.txt"
+
+# 4. Run cmake-format on CPP main code.
+docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
+    sh -c "find $CPP_MAIN_DIR \( -name 'CMakeLists.txt' -o -name '*.cmake' \) | xargs -r $CMAKE_FORMAT_COMMAND"
+
+# 5. Run cmake-format on CPP test code.
+docker run --rm -v "$CPP_ROOT":/workspace -w /workspace "$IMAGE_NAME:$OS_VERSION" \
+    sh -c "find $CPP_TEST_DIR \( -name 'CMakeLists.txt' -o -name '*.cmake' \) | xargs -r $CMAKE_FORMAT_COMMAND"
+
+# 6. Run Maven Spotless check or apply under the project root.
 (
     cd "$SRC_DIR"
     mvn "$MAVEN_COMMAND"

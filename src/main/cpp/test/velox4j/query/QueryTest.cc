@@ -16,10 +16,10 @@
  */
 
 #include "velox4j/query/Query.h"
-#include "velox4j/query/QueryExecutor.h"
 #include <gtest/gtest.h>
 #include <velox/exec/tests/utils/HiveConnectorTestBase.h>
 #include <velox/exec/tests/utils/PlanBuilder.h>
+#include "velox4j/query/QueryExecutor.h"
 
 #include <velox/connectors/fuzzer/tests/FuzzerConnectorTestBase.h>
 #include <velox4j/test/Init.h>
@@ -28,10 +28,12 @@ namespace velox4j {
 using namespace facebook::velox;
 using namespace facebook::velox::exec::test;
 class QueryTest : public testing::Test, public test::VectorTestBase {
-protected:
+ protected:
   const std::string kFuzzerConnectorId = "test-fuzzer";
 
-  static void SetUpTestCase() { testingEnsureInitializedForSpark(); }
+  static void SetUpTestCase() {
+    testingEnsureInitializedForSpark();
+  }
 
   void SetUp() override {
     Test::SetUp();
@@ -57,21 +59,21 @@ protected:
         std::make_shared<MemoryManager>(AllocationListener::noop());
   }
 
-  std::vector<RowVectorPtr> collect(UpIterator &itr) {
+  std::vector<RowVectorPtr> collect(UpIterator& itr) {
     std::vector<RowVectorPtr> out{};
     while (true) {
       const UpIterator::State state = itr.advance();
       switch (state) {
-      case UpIterator::State::AVAILABLE: {
-        const auto rv = itr.get();
-        out.push_back(std::dynamic_pointer_cast<RowVector>(
-            RowVector::loadedVectorShared(rv)));
-        break;
-      }
-      case UpIterator::State::BLOCKED:
-        continue;
-      case UpIterator::State::FINISHED:
-        goto OUT;
+        case UpIterator::State::AVAILABLE: {
+          const auto rv = itr.get();
+          out.push_back(std::dynamic_pointer_cast<RowVector>(
+              RowVector::loadedVectorShared(rv)));
+          break;
+        }
+        case UpIterator::State::BLOCKED:
+          continue;
+        case UpIterator::State::FINISHED:
+          goto OUT;
       }
     }
   OUT:
@@ -84,8 +86,9 @@ protected:
             kFuzzerConnectorId, numRows));
   }
 
-  std::vector<exec::Split> makeFuzzerSplits(size_t rowsPerSplit,
-                                            size_t numSplits) const {
+  std::vector<exec::Split> makeFuzzerSplits(
+      size_t rowsPerSplit,
+      size_t numSplits) const {
     std::vector<exec::Split> splits;
     splits.reserve(numSplits);
 
@@ -95,8 +98,8 @@ protected:
     return splits;
   }
 
-  std::shared_ptr<connector::fuzzer::FuzzerTableHandle>
-  makeFuzzerTableHandle(size_t fuzzerSeed = 0) const {
+  std::shared_ptr<connector::fuzzer::FuzzerTableHandle> makeFuzzerTableHandle(
+      size_t fuzzerSeed = 0) const {
     return std::make_shared<connector::fuzzer::FuzzerTableHandle>(
         kFuzzerConnectorId, VectorFuzzer::Options{}, fuzzerSeed);
   }
@@ -128,7 +131,7 @@ TEST_F(QueryTest, fuzzer) {
   auto serialTask = executor->execute();
 
   const auto fuzzerSplits = makeFuzzerSplits(rowsPerSplit, numSplits);
-  for (const auto &s : fuzzerSplits) {
+  for (const auto& s : fuzzerSplits) {
     serialTask->addSplit(plan->id(), s.groupId, s.connectorSplit);
   }
   serialTask->noMoreSplits(plan->id());
@@ -136,7 +139,7 @@ TEST_F(QueryTest, fuzzer) {
   auto vectors = collect(*serialTask);
 
   size_t actualRows = 0;
-  for (const auto &v : vectors) {
+  for (const auto& v : vectors) {
     actualRows += v->size();
   }
   ASSERT_EQ(actualRows, rowsPerSplit * numSplits);
