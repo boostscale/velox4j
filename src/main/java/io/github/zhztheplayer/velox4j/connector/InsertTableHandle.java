@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class InsertTableHandle {
+import java.io.Serializable;
+
+public class InsertTableHandle implements Serializable {
   private final String connectorId;
   private final ConnectorInsertTableHandle connectorInsertTableHandle;
 
