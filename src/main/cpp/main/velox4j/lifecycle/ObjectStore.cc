@@ -19,7 +19,21 @@
 #include <glog/logging.h>
 
 namespace velox4j {
-// static
+ObjectStore* ObjectStore::global() {
+  static std::unique_ptr<ObjectStore> globalStore = create();
+  return globalStore.get();
+}
+
+std::unique_ptr<ObjectStore> ObjectStore::create() {
+  static std::mutex mtx;
+  std::lock_guard<std::mutex> lock(mtx);
+  StoreHandle nextId = safeCast<StoreHandle>(stores().nextId());
+  auto store = std::unique_ptr<ObjectStore>(new ObjectStore(nextId));
+  StoreHandle storeId = safeCast<StoreHandle>(stores().insert(store.get()));
+  VELOX_CHECK(storeId == nextId, "Store ID mismatched, this should not happen");
+  return store;
+}
+
 ResourceMap<ObjectStore*>& ObjectStore::stores() {
   static ResourceMap<ObjectStore*> stores;
   return stores;
