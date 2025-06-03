@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ArrayValue extends Variant {
@@ -29,11 +30,16 @@ public class ArrayValue extends Variant {
 
   @JsonCreator
   public ArrayValue(@JsonProperty("value") List<Variant> array) {
+    if (array == null) {
+      this.array = null;
+      return;
+    }
     Variants.checkSameType(array);
     this.array = Collections.unmodifiableList(array);
   }
 
   @JsonGetter("value")
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public List<Variant> getArray() {
     return array;
   }
