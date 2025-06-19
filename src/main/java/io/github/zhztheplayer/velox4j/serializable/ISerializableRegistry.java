@@ -163,7 +163,7 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("Function", Function.class);
   }
 
-  private static void retisterConfig() {
+  private static void registerConfig() {
     NAME_REGISTRY.registerClass("velox4j.Config", Config.class);
     NAME_REGISTRY.registerClass("velox4j.ConnectorConfig", ConnectorConfig.class);
   }

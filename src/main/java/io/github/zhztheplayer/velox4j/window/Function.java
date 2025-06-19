@@ -18,6 +18,7 @@ package io.github.zhztheplayer.velox4j.window;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
