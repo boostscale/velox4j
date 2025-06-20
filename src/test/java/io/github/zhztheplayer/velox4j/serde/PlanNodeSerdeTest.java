@@ -16,8 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
+import java.util.Collections;
 import java.util.List;
 
+import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
+import io.github.zhztheplayer.velox4j.plan.WindowNode;
+import io.github.zhztheplayer.velox4j.window.BoundType;
+import io.github.zhztheplayer.velox4j.window.Frame;
+import io.github.zhztheplayer.velox4j.window.Function;
+import io.github.zhztheplayer.velox4j.window.WindowType;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -203,5 +210,39 @@ public class PlanNodeSerdeTest {
             CommitStrategy.TASK_COMMIT,
             List.of(scan));
     SerdeTests.testISerializableRoundTrip(tableWriteNode);
+  }
+
+  @Test
+  public void testWindowType() {
+    SerdeTests.testJavaBeanRoundTrip(WindowType.ROWS);
+  }
+
+  @Test
+  public void testBoundType() {
+    SerdeTests.testJavaBeanRoundTrip(BoundType.CURRENTROW);
+  }
+
+  @Test
+  public void testWindowNode() {
+    final RowType rowType = SerdeTests.newSampleOutputType();
+    final PlanNode scan =
+        SerdeTests.newSampleTableScanNode("id-1", rowType);
+    final CallTypedExpr call = new CallTypedExpr(
+        new IntegerType(),
+        Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        "sum");
+    final Frame frame =
+        new Frame(WindowType.RANGE, BoundType.PRECEDING, null, BoundType.FOLLOWING, null);
+    final WindowNode windowNode =
+        new WindowNode(
+            "id-2",
+            List.of(call),
+            List.of(call),
+            List.of(new SortOrder(true, false)),
+            rowType.getNames(),
+            List.of(new Function(call, frame, true)),
+            true,
+            List.of(scan));
+    SerdeTests.testJavaBeanRoundTrip(windowNode);
   }
 }

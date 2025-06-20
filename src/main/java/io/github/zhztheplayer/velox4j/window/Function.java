@@ -43,7 +43,7 @@ public class Function extends ISerializable {
   }
 
   @JsonProperty("frame")
-  public Frame GetFrame() {
+  public Frame getFrame() {
     return frame;
   }
 

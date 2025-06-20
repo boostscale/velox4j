@@ -19,8 +19,8 @@ package io.github.zhztheplayer.velox4j.window;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum WindowType {
-  KRANGE("RANGE"),
-  KROWS("ROWS");
+  RANGE("RANGE"),
+  ROWS("ROWS");
 
   private final String value;
 
