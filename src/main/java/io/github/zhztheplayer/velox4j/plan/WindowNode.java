@@ -24,14 +24,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.window.Function;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
 
 public class WindowNode extends PlanNode {
   private final List<FieldAccessTypedExpr> partitionKeys;
   private final List<FieldAccessTypedExpr> sortingKeys;
   private final List<SortOrder> sortingOrders;
   private final List<String> windowColumnNames;
-  private final List<Function> windowFunctions;
+  private final List<WindowFunction> windowFunctions;
   private final boolean inputsSorted;
 
   private final List<PlanNode> sources;
@@ -43,7 +43,7 @@ public class WindowNode extends PlanNode {
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
       @JsonProperty("sortingOrders") List<SortOrder> sortingOrders,
       @JsonProperty("names") List<String> windowColumnNames,
-      @JsonProperty("functions") List<Function> windowFunctions,
+      @JsonProperty("functions") List<WindowFunction> windowFunctions,
       @JsonProperty("inputsSorted") boolean inputsSorted,
       @JsonProperty("sources") List<PlanNode> sources) {
     super(id);
@@ -87,7 +87,7 @@ public class WindowNode extends PlanNode {
   }
 
   @JsonGetter("functions")
-  public List<Function> getWindowFunctions() {
+  public List<WindowFunction> getWindowFunctions() {
     return windowFunctions;
   }
 }

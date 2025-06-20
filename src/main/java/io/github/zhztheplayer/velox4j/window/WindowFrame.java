@@ -17,12 +17,13 @@
 package io.github.zhztheplayer.velox4j.window;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public class Frame extends ISerializable {
+public class WindowFrame extends ISerializable {
   private final WindowType type;
   private final BoundType startType;
   private final TypedExpr startValue;
@@ -30,7 +31,7 @@ public class Frame extends ISerializable {
   private final TypedExpr endValue;
 
   @JsonCreator
-  public Frame(
+  public WindowFrame(
       @JsonProperty("type") WindowType type,
       @JsonProperty("startType") BoundType startType,
       @JsonProperty("startValue") TypedExpr startValue,
@@ -43,27 +44,27 @@ public class Frame extends ISerializable {
     this.endValue = endValue;
   }
 
-  @JsonProperty("type")
+  @JsonGetter("type")
   public WindowType getType() {
     return type;
   }
 
-  @JsonProperty("startType")
+  @JsonGetter("startType")
   public BoundType getStartType() {
     return startType;
   }
 
-  @JsonProperty("startValue")
+  @JsonGetter("startValue")
   public TypedExpr getStartValue() {
     return startValue;
   }
 
-  @JsonProperty("endType")
+  @JsonGetter("endType")
   public BoundType getEndType() {
     return endType;
   }
 
-  @JsonProperty("endValue")
+  @JsonGetter("endValue")
   public TypedExpr getEndValue() {
     return endValue;
   }

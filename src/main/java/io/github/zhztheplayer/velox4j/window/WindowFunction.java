@@ -17,37 +17,38 @@
 package io.github.zhztheplayer.velox4j.window;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public class Function extends ISerializable {
+public class WindowFunction extends ISerializable {
   private final CallTypedExpr functionCall;
-  private final Frame frame;
+  private final WindowFrame frame;
   private final boolean ignoreNulls;
 
   @JsonCreator
-  public Function(
+  public WindowFunction(
       @JsonProperty("functionCall") CallTypedExpr functionCall,
-      @JsonProperty("frame") Frame frame,
+      @JsonProperty("frame") WindowFrame frame,
       @JsonProperty("ignoreNulls") boolean ignoreNulls) {
     this.functionCall = functionCall;
     this.frame = frame;
     this.ignoreNulls = ignoreNulls;
   }
 
-  @JsonProperty("functionCall")
+  @JsonGetter("functionCall")
   public CallTypedExpr getFunctionCall() {
     return functionCall;
   }
 
-  @JsonProperty("frame")
-  public Frame getFrame() {
+  @JsonGetter("frame")
+  public WindowFrame getFrame() {
     return frame;
   }
 
-  @JsonProperty("ignoreNulls")
+  @JsonGetter("ignoreNulls")
   public boolean isIgnoreNulls() {
     return ignoreNulls;
   }

@@ -49,8 +49,8 @@ import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
 import io.github.zhztheplayer.velox4j.window.BoundType;
-import io.github.zhztheplayer.velox4j.window.Frame;
-import io.github.zhztheplayer.velox4j.window.Function;
+import io.github.zhztheplayer.velox4j.window.WindowFrame;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
 import io.github.zhztheplayer.velox4j.window.WindowType;
 
 public class PlanNodeSerdeTest {
@@ -231,8 +231,8 @@ public class PlanNodeSerdeTest {
             new IntegerType(),
             Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
             "sum");
-    final Frame frame =
-        new Frame(WindowType.RANGE, BoundType.PRECEDING, null, BoundType.FOLLOWING, null);
+    final WindowFrame frame =
+        new WindowFrame(WindowType.RANGE, BoundType.PRECEDING, null, BoundType.FOLLOWING, null);
     final WindowNode windowNode =
         new WindowNode(
             "id-2",
@@ -240,7 +240,7 @@ public class PlanNodeSerdeTest {
             List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
             List.of(new SortOrder(true, false)),
             List.of("foo"),
-            List.of(new Function(call, frame, true)),
+            List.of(new WindowFunction(call, frame, true)),
             true,
             List.of(scan));
     SerdeTests.testISerializableRoundTrip(windowNode);
