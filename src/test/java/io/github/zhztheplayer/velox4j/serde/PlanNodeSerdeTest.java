@@ -243,6 +243,6 @@ public class PlanNodeSerdeTest {
             List.of(new Function(call, frame, true)),
             true,
             List.of(scan));
-    SerdeTests.testJavaBeanRoundTrip(windowNode);
+    SerdeTests.testISerializableRoundTrip(windowNode);
   }
 }
