@@ -239,7 +239,7 @@ public class PlanNodeSerdeTest {
             List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
             List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
             List.of(new SortOrder(true, false)),
-            rowType.getNames(),
+            List.of("foo"),
             List.of(new Function(call, frame, true)),
             true,
             List.of(scan));
