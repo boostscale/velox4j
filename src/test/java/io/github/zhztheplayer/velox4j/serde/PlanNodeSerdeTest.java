@@ -236,7 +236,7 @@ public class PlanNodeSerdeTest {
     final WindowNode windowNode =
         new WindowNode(
             "id-2",
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
+            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
             List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
             List.of(new SortOrder(true, false)),
             List.of("foo"),
