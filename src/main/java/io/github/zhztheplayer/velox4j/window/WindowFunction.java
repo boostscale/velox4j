@@ -21,9 +21,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
-import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public class WindowFunction extends ISerializable {
+public class WindowFunction {
   private final CallTypedExpr functionCall;
   private final WindowFrame frame;
   private final boolean ignoreNulls;

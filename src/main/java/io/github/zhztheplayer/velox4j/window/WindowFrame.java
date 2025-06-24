@@ -21,9 +21,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
-import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-public class WindowFrame extends ISerializable {
+public class WindowFrame {
   private final WindowType type;
   private final BoundType startType;
   private final TypedExpr startValue;

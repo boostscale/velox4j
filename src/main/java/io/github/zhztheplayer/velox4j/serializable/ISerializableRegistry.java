@@ -64,8 +64,6 @@ import io.github.zhztheplayer.velox4j.type.TinyIntType;
 import io.github.zhztheplayer.velox4j.type.UnknownType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.type.VarbinaryType;
-import io.github.zhztheplayer.velox4j.window.WindowFrame;
-import io.github.zhztheplayer.velox4j.window.WindowFunction;
 
 public final class ISerializableRegistry {
   private static final SerdeRegistry NAME_REGISTRY =
@@ -80,7 +78,6 @@ public final class ISerializableRegistry {
     registerConnectors();
     registerFilters();
     registerPlanNodes();
-    registerWindow();
     registerConfig();
     registerEvaluation();
     registerQuery();
@@ -156,11 +153,6 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("LimitNode", LimitNode.class);
     NAME_REGISTRY.registerClass("TableWriteNode", TableWriteNode.class);
     NAME_REGISTRY.registerClass("WindowNode", WindowNode.class);
-  }
-
-  private static void registerWindow() {
-    NAME_REGISTRY.registerClass("Frame", WindowFrame.class);
-    NAME_REGISTRY.registerClass("Function", WindowFunction.class);
   }
 
   private static void registerConfig() {
