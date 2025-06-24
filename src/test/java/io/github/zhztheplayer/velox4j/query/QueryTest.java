@@ -47,13 +47,13 @@ import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.*;
-import io.github.zhztheplayer.velox4j.type.BigIntType;
-import io.github.zhztheplayer.velox4j.type.BooleanType;
-import io.github.zhztheplayer.velox4j.type.RowType;
-import io.github.zhztheplayer.velox4j.type.Type;
-import io.github.zhztheplayer.velox4j.type.VarCharType;
+import io.github.zhztheplayer.velox4j.type.*;
 import io.github.zhztheplayer.velox4j.variant.BigIntValue;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
+import io.github.zhztheplayer.velox4j.window.BoundType;
+import io.github.zhztheplayer.velox4j.window.WindowFrame;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
+import io.github.zhztheplayer.velox4j.window.WindowType;
 import io.github.zhztheplayer.velox4j.write.TableWriteTraits;
 
 public class QueryTest {
@@ -812,6 +812,45 @@ public class QueryTest {
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
+        .run();
+  }
+
+  @Test
+  public void testWindow() {
+
+    final File file = TpchTests.Table.NATION.file();
+    final RowType outputType = TpchTests.Table.NATION.schema();
+    final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
+    final ConnectorSplit split = newSampleSplit(file);
+
+    final WindowNode windowNode =
+        new WindowNode(
+            "id-2",
+            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
+            List.of(new SortOrder(false, true)),
+            List.of("row_num"),
+            List.of(
+                new WindowFunction(
+                    new CallTypedExpr(new IntegerType(), List.of(), "row_number"),
+                    new WindowFrame(
+                        WindowType.RANGE,
+                        BoundType.UNBOUNDED_PRECEDING,
+                        null,
+                        BoundType.CURRENT_ROW,
+                        null),
+                    false)),
+            false,
+            List.of(scanNode));
+
+    final Query query = new Query(windowNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task)
+        .assertNumRowVectors(1)
+        .assertRowVectorToString(
+            0, ResourceTests.readResourceAsString("query-output/tpch-window-1.tsv"))
         .run();
   }
 

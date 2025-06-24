@@ -39,12 +39,18 @@ import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
 import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
+import io.github.zhztheplayer.velox4j.plan.WindowNode;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
+import io.github.zhztheplayer.velox4j.variant.IntegerValue;
+import io.github.zhztheplayer.velox4j.window.BoundType;
+import io.github.zhztheplayer.velox4j.window.WindowFrame;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
+import io.github.zhztheplayer.velox4j.window.WindowType;
 
 public class PlanNodeSerdeTest {
   private static MemoryManager memoryManager;
@@ -203,5 +209,39 @@ public class PlanNodeSerdeTest {
             CommitStrategy.TASK_COMMIT,
             List.of(scan));
     SerdeTests.testISerializableRoundTrip(tableWriteNode);
+  }
+
+  @Test
+  public void testWindowType() {
+    SerdeTests.testJavaBeanRoundTrip(WindowType.ROWS);
+  }
+
+  @Test
+  public void testBoundType() {
+    SerdeTests.testJavaBeanRoundTrip(BoundType.CURRENT_ROW);
+  }
+
+  @Test
+  public void testWindowFrame() {
+    final WindowFrame frame =
+        new WindowFrame(
+            WindowType.ROWS,
+            BoundType.UNBOUNDED_PRECEDING,
+            ConstantTypedExpr.create(new IntegerValue(100)),
+            BoundType.CURRENT_ROW,
+            ConstantTypedExpr.create(new IntegerValue(200)));
+    SerdeTests.testJavaBeanRoundTrip(frame);
+  }
+
+  @Test
+  public void testWindowFunction() {
+    final WindowFunction windowFunction = SerdeTests.newSampleWindowFunction();
+    SerdeTests.testJavaBeanRoundTrip(windowFunction);
+  }
+
+  @Test
+  public void testWindowNode() {
+    final WindowNode windowNode = SerdeTests.newSampleWindowNode("id-1", "id-2");
+    SerdeTests.testISerializableRoundTrip(windowNode);
   }
 }

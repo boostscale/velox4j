@@ -38,6 +38,7 @@ import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.PlanNode;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
+import io.github.zhztheplayer.velox4j.plan.WindowNode;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
@@ -51,6 +52,10 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
+import io.github.zhztheplayer.velox4j.window.BoundType;
+import io.github.zhztheplayer.velox4j.window.WindowFrame;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
+import io.github.zhztheplayer.velox4j.window.WindowType;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {
@@ -247,6 +252,17 @@ public final class SerdeTests {
         new HiveInsertFileNameGenerator());
   }
 
+  public static RowType newSampleOutputType() {
+    return new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new IntegerType()));
+  }
+
+  public static PlanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
+    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(outputType);
+    final PlanNode scan =
+        new TableScanNode(planNodeId, outputType, handle, Collections.emptyList());
+    return scan;
+  }
+
   public static Aggregate newSampleAggregate() {
     final Aggregate aggregate =
         new Aggregate(
@@ -260,13 +276,6 @@ public final class SerdeTests {
             List.of(new SortOrder(true, true)),
             true);
     return aggregate;
-  }
-
-  public static PlanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
-    final ConnectorTableHandle handle = SerdeTests.newSampleHiveTableHandle(outputType);
-    final PlanNode scan =
-        new TableScanNode(planNodeId, outputType, handle, Collections.emptyList());
-    return scan;
   }
 
   public static AggregationNode newSampleAggregationNode(String aggNodeId, String scanNodeId) {
@@ -288,8 +297,37 @@ public final class SerdeTests {
     return aggregationNode;
   }
 
-  public static RowType newSampleOutputType() {
-    return new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new IntegerType()));
+  public static WindowFunction newSampleWindowFunction() {
+    final CallTypedExpr call =
+        new CallTypedExpr(
+            new IntegerType(),
+            Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            "sum");
+    final WindowFrame frame =
+        new WindowFrame(
+            WindowType.ROWS, BoundType.UNBOUNDED_PRECEDING, null, BoundType.CURRENT_ROW, null);
+    return new WindowFunction(call, frame, true);
+  }
+
+  public static WindowNode newSampleWindowNode(String windowNodeId, String scanNodeId) {
+    final RowType rowType = SerdeTests.newSampleOutputType();
+    final PlanNode scan = SerdeTests.newSampleTableScanNode(scanNodeId, rowType);
+    final CallTypedExpr call =
+        new CallTypedExpr(
+            new IntegerType(),
+            Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            "sum");
+    final WindowFrame frame =
+        new WindowFrame(WindowType.RANGE, BoundType.PRECEDING, null, BoundType.FOLLOWING, null);
+    return new WindowNode(
+        windowNodeId,
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "bar")),
+        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        List.of(new SortOrder(true, false)),
+        List.of("sum_out"),
+        List.of(new WindowFunction(call, frame, true)),
+        true,
+        List.of(scan));
   }
 
   public static class ObjectAndJson<T> {
