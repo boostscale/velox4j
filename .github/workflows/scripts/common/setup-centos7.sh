@@ -112,8 +112,8 @@ fi
 cd /tmp
 mkdir patchelf
 cd patchelf
-wget https://github.com/NixOS/patchelf/releases/download/0.18.0/patchelf-0.18.0-aarch64.tar.gz
-tar -xvf patchelf-0.18.0-aarch64.tar.gz
+wget https://github.com/NixOS/patchelf/releases/download/0.18.0/patchelf-0.18.0-x86_64.tar.gz
+tar -xvf patchelf-0.18.0-x86_64.tar.gz
 ln -s /tmp/patchelf/bin/patchelf /usr/local/bin/patchelf
 patchelf --version
 
