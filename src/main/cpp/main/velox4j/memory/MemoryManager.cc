@@ -308,7 +308,7 @@ bool MemoryManager::tryDestruct() {
     int32_t spillPoolCount = 0;
     int32_t cachePoolCount = 0;
     int32_t tracePoolCount = 0;
-    veloxMemoryManager_->testingDefaultRoot().visitChildren(
+    veloxMemoryManager_->deprecatedSysRootPool().visitChildren(
         [&](velox::memory::MemoryPool* child) -> bool {
           if (child == veloxMemoryManager_->spillPool()) {
             spillPoolCount++;
