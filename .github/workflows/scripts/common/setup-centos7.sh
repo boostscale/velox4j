@@ -22,7 +22,7 @@ yum -y install wget curl tar zip unzip which patch sudo
 yum -y install ninja-build perl-IPC-Cmd autoconf autoconf-archive automake libtool
 yum -y install devtoolset-11 python3 pip dnf
 yum -y install bison java-1.8.0-openjdk java-1.8.0-openjdk-devel
-yum -y install ccache patchelf
+yum -y install ccache
 yum -y install lz4-devel lzo-devel libzstd-devel snappy-devel double-conversion-devel
 yum -y install libevent-devel
 
@@ -107,3 +107,12 @@ if [ -z "$(which mvn)" ]; then
   mv apache-maven-$MAVEN_VERSION "${MAVEN_INSTALL_DIR}"
   ln -s "${MAVEN_INSTALL_DIR}/bin/mvn" /usr/local/bin/mvn
 fi
+
+# Install patchelf.
+cd /tmp
+mkdir patchelf
+cd patchelf
+wget https://github.com/NixOS/patchelf/releases/download/0.17.2/patchelf-0.17.2-x86_64.tar.gz
+tar -xvf patchelf-0.17.2-x86_64.tar.gz
+ln -s /tmp/patchelf/bin/patchelf /usr/local/bin/patchelf
+patchelf --version
