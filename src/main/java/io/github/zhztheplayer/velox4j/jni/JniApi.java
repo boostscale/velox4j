@@ -109,8 +109,8 @@ public final class JniApi {
     jni.snapshotState(itr.id(), context);
   }
 
-  public void notifyCheckpointComplete(UpIterator itr, long checkpointId) {
-    jni.notifyCheckpointComplete(itr.id(), checkpointId);
+  public String[] notifyCheckpointComplete(UpIterator itr, long checkpointId) {
+    return jni.notifyCheckpointComplete(itr.id(), checkpointId);
   }
 
   public void notifyCheckpointAborted(UpIterator itr, long checkpointId) {

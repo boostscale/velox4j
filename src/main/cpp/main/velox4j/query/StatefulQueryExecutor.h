@@ -47,7 +47,7 @@ class StatefulSerialTask : public UpIterator {
 
   void snapshotState(long checkpointId);
 
-  void notifyCheckpointComplete(long checkpointId);
+  std::vector<std::string> notifyCheckpointComplete(long checkpointId);
 
   void notifyCheckpointAborted(long checkpointId);
 
