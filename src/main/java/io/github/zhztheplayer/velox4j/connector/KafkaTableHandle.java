@@ -16,41 +16,27 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
 public class KafkaTableHandle extends ConnectorTableHandle {
   private String tableName;
-  private final boolean filterPushdownEnabled;
-  private final List<SubfieldFilter> subfieldFilters;
-  private final TypedExpr remainingFilter;
   private final RowType dataColumns;
-  private final RowType projectedDataColumns;
   private final Map<String, String> tableParameters;
 
   @JsonCreator
   public KafkaTableHandle(
       @JsonProperty("connectorId") String connectorId,
       @JsonProperty("tableName") String tableName,
-      @JsonProperty("filterPushdownEnabled") boolean filterPushdownEnabled,
-      @JsonProperty("subfieldFilters") List<SubfieldFilter> subfieldFilters,
-      @JsonProperty("remainingFilter") TypedExpr remainingFilter,
       @JsonProperty("dataColumns") RowType dataColumns,
-      @JsonProperty("projectedDataColumns") RowType projectedDataColumns,
       @JsonProperty("tableParameters") Map<String, String> tableParameters) {
     super(connectorId);
     this.tableName = tableName;
-    this.filterPushdownEnabled = filterPushdownEnabled;
-    this.subfieldFilters = subfieldFilters;
-    this.remainingFilter = remainingFilter;
     this.dataColumns = dataColumns;
-    this.projectedDataColumns = projectedDataColumns;
     this.tableParameters = tableParameters;
   }
 
@@ -59,29 +45,9 @@ public class KafkaTableHandle extends ConnectorTableHandle {
     return this.tableName;
   }
 
-  @JsonProperty("filterPushdownEnabled")
-  public boolean getFilterPushdownEnabled() {
-    return this.filterPushdownEnabled;
-  }
-
-  @JsonProperty("subfieldFilters")
-  public List<SubfieldFilter> getSubfieldFilters() {
-    return this.subfieldFilters;
-  }
-
-  @JsonProperty("remainingFilter")
-  public TypedExpr getReaminingFilter() {
-    return this.remainingFilter;
-  }
-
   @JsonProperty("dataColumns")
   public RowType getDataColumns() {
     return this.dataColumns;
-  }
-
-  @JsonProperty("projectedDataColumns")
-  public RowType getProjectedDataColumns() {
-    return this.projectedDataColumns;
   }
 
   @JsonProperty("tableParameters")
