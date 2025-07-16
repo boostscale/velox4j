@@ -28,6 +28,9 @@ import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 public class Config extends ISerializable {
   private static final Config EMPTY = new Config(List.of());
+  public static final String VELOX4J_INIT_PRESET = "velox4j.init.preset";
+  public static final String VELOX4J_INIT_PRESET_SPARK = "0";
+  public static final String VELOX4J_INIT_PRESET_FLINK = "1";
 
   public static Config empty() {
     return EMPTY;
