@@ -20,7 +20,7 @@
 #include <velox/common/config/Config.h>
 
 namespace velox4j {
-enum Preset { SPARK = 0 };
+enum Preset { SPARK = 0, FLINK = 1 };
 
 extern facebook::velox::config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET;
 } // namespace velox4j
