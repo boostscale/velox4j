@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(velox4jcpp)
 
-# Include CPM.cmake.
-include(cmake/CPM.cmake)
+include(FetchContent)
 
 # Preconditions.
 if(NOT UNIX)
@@ -63,30 +62,21 @@ file(STRINGS ${VELOX_REF_FILE} VELOX_REF)
 file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
 set(VELOX_SOURCE_URL
     "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
-cpmaddpackage(
-  NAME
+FetchContent_Declare(
   velox
-  URL
-  ${VELOX_SOURCE_URL}
-  URL_HASH
-  MD5=${VELOX_SOURCE_URL_MD5})
+  URL ${VELOX_SOURCE_URL}
+  URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
+FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
-set(JNI_HELPERS_REPO zhztheplayer/JniHelpersCpp)
-set(JNI_HELPERS_REF 7c58a9a24c87758fe94f33bec6a4463971af1e23)
-set(JNI_HELPERS_SOURCE_URL_MD5 3f168384670e0f21a2e2281f91cfb2e1)
-set(JNI_HELPERS_SOURCE_URL
-    "https://github.com/${JNI_HELPERS_REPO}/archive/${JNI_HELPERS_REF}.zip")
-cpmaddpackage(
-  NAME
-  JniHelpersLib
-  URL
-  ${JNI_HELPERS_SOURCE_URL}
-  URL_HASH
-  MD5=${JNI_HELPERS_SOURCE_URL_MD5})
-target_link_libraries(
+set(JNI_HELPERS_REPO spotify/JniHelpers)
+set(JNI_HELPERS_REF 956649eb352252ff6c43362d9b9c526f9241e480)
+FetchContent_Declare(
   JniHelpers
-  PRIVATE JNI::JNI)
+  GIT_REPOSITORY https://github.com/${JNI_HELPERS_REPO}.git
+  GIT_TAG ${JNI_HELPERS_REF} # release-1.10.0
+)
+FetchContent_MakeAvailable(JniHelpers)
 
 # Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
