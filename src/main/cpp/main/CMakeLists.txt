@@ -41,14 +41,14 @@ set_target_properties(
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 set(VELOX4J_3RD_EXCLUSIONS
-    "libc\\.so\\.[0-9]+"
-    "libstdc\\+\\+\\.so\\.[0-9]+"
-    "libgcc_s\\.so\\.[0-9]+"
-    "libm\\.so\\.[0-9]+"
-    "linux-vdso\\.so\\.[0-9]+"
-    "ld-linux-x86-64\\.so\\.[0-9]+"
-    "libdl\\.so\\.[0-9]+"
-    "libpthread\\.so\\.[0-9]+")
+    "libc\\\\.so\\\\.[0-9]+"
+    "libstdc\\\\+\\\\+\\\\.so\\\\.[0-9]+"
+    "libgcc_s\\\\.so\\\\.[0-9]+"
+    "libm\\\\.so\\\\.[0-9]+"
+    "linux-vdso\\\\.so\\\\.[0-9]+"
+    "ld-linux-x86-64\\\\.so\\\\.[0-9]+"
+    "libdl\\\\.so\\\\.[0-9]+"
+    "libpthread\\\\.so\\\\.[0-9]+")
 
 install(
   CODE "
