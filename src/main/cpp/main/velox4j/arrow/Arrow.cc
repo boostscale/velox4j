@@ -30,6 +30,10 @@ void slice(VectorPtr& in) {
   }
   for (auto& child : rowBase->children()) {
     if (child->size() > rowBase->size()) {
+      // Some Velox operations (E.g., Limit) could result in a
+      // RowVector whose children have larger size than itself.
+      // So we perform a slice to keep only the data that is
+      // in real use.
       child = child->slice(0, rowBase->size());
     }
   }
