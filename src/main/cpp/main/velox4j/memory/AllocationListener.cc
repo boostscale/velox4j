@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AllocationListener.h"
+#include "velox4j/memory/AllocationListener.h"
 
 namespace velox4j {
 

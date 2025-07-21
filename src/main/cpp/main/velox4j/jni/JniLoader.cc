@@ -18,11 +18,11 @@
 #include <JniHelpers.h>
 #include <glog/logging.h>
 #include <jni.h>
-#include "JniWrapper.h"
-#include "StaticJniWrapper.h"
 #include "velox4j/iterator/DownIterator.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/jni/JniError.h"
+#include "velox4j/jni/JniWrapper.h"
+#include "velox4j/jni/StaticJniWrapper.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {

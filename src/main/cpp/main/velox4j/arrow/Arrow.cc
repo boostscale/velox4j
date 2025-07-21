@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Arrow.h"
+#include "velox4j/arrow/Arrow.h"
 #include <velox/vector/arrow/Bridge.h>
 
 namespace velox4j {

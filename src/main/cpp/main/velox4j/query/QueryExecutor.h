@@ -19,9 +19,9 @@
 
 #include <velox/exec/TaskStats.h>
 
-#include "Query.h"
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/memory/MemoryManager.h"
+#include "velox4j/query/Query.h"
 
 namespace velox4j {
 

@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-#include "JniWrapper.h"
+#include "velox4j/jni/JniWrapper.h"
 #include <velox/common/encode/Base64.h>
 #include <velox/common/memory/Memory.h>
 #include <velox/core/PlanNode.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
 
-#include "JniCommon.h"
-#include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/eval/Evaluator.h"
 #include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/DownIterator.h"
+#include "velox4j/jni/JniCommon.h"
+#include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
 

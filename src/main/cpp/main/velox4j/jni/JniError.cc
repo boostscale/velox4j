@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "JniError.h"
+#include "velox4j/jni/JniError.h"
 #include <velox/common/base/Exceptions.h>
 
 namespace velox4j {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BlockingQueue.h"
+#include "velox4j/iterator/BlockingQueue.h"
 
 namespace velox4j {
 using namespace facebook::velox;

@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include "StaticJniWrapper.h"
+#include "velox4j/jni/StaticJniWrapper.h"
 #include <folly/json/json.h>
 #include <velox/common/encode/Base64.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
 
-#include "JniCommon.h"
-#include "JniError.h"
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/config/Config.h"
 #include "velox4j/init/Init.h"
 #include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/UpIterator.h"
+#include "velox4j/jni/JniCommon.h"
+#include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 #include "velox4j/query/QueryExecutor.h"

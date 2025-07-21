@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include "Evaluator.h"
-#include "Evaluation.h"
+#include "velox4j/eval/Evaluator.h"
+#include "velox4j/eval/Evaluation.h"
 
 namespace velox4j {
 using namespace facebook::velox;

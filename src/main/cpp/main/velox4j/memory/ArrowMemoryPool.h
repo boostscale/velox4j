@@ -18,7 +18,7 @@
 #pragma once
 
 #include <arrow/memory_pool.h>
-#include "AllocationListener.h"
+#include "velox4j/memory/AllocationListener.h"
 
 namespace velox4j {
 class MemoryAllocator {

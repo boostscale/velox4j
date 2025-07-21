@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ObjectStore.h"
+#include "velox4j/lifecycle/ObjectStore.h"
 #include <glog/logging.h>
 
 namespace velox4j {

@@ -21,8 +21,8 @@
 #include <velox/common/config/Config.h>
 #include <velox/common/memory/Memory.h>
 #include <memory>
-#include "AllocationListener.h"
-#include "ArrowMemoryPool.h"
+#include "velox4j/memory/AllocationListener.h"
+#include "velox4j/memory/ArrowMemoryPool.h"
 
 namespace velox4j {
 
