@@ -69,7 +69,7 @@ jclass createGlobalClassReferenceOrError(JNIEnv* env, const char* className) {
   jclass globalClass = createGlobalClassReference(env, className);
   if (globalClass == nullptr) {
     std::string errorMessage =
-        "Unable to CreateGlobalClassReferenceOrError for" +
+        "Unable to CreateGlobalClassReferenceOrError for " +
         std::string(className);
     VELOX_FAIL(errorMessage);
   }
