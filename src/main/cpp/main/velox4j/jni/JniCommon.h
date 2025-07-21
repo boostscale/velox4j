@@ -40,6 +40,8 @@
 #endif
 
 namespace velox4j {
+/// Checks whether an exception was thrown from Java to C++. If yes, rethrows
+/// it as a C++ exception.
 void checkException(JNIEnv* env);
 std::string jStringToCString(JNIEnv* env, jstring string);
 jclass createGlobalClassReference(JNIEnv* env, const char* className);
@@ -66,6 +68,10 @@ JNIEnv* getLocalJNIEnv();
 template <typename T>
 T* jniCastOrThrow(jlong handle);
 spotify::jni::ClassRegistry* jniClassRegistry();
+
+// Code for implementing safe version of JNI
+// {Get|Release}<PrimitiveType>ArrayElements routines. SafeNativeArray would
+// release the managed array elements automatically during destruction.
 
 #define CONCATENATE(t1, t2, t3) t1##t2##t3
 
@@ -104,6 +110,7 @@ enum class JniPrimitiveArrayType {
   kDouble = 7
 };
 
+/// A safe native array that handles JNI array releasing in the RAII style.
 template <JniPrimitiveArrayType TYPE>
 struct JniPrimitiveArray {};
 

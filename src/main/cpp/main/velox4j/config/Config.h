@@ -21,6 +21,9 @@
 #include <velox/core/QueryConfig.h>
 
 namespace velox4j {
+/// A JSON-able class that stores a generic configuration array.
+/// The configuration array is represented in string-to-string key
+/// value pairs.
 class ConfigArray : public facebook::velox::ISerializable {
  public:
   explicit ConfigArray(
@@ -41,6 +44,7 @@ class ConfigArray : public facebook::velox::ISerializable {
   const std::vector<std::pair<std::string, std::string>> values_;
 };
 
+// A JSON-able class that stores a connector config.
 class ConnectorConfigArray : public facebook::velox::ISerializable {
  public:
   explicit ConnectorConfigArray(

@@ -23,6 +23,8 @@
 
 namespace velox4j {
 
+// A state structure that provides utility APIs in relation
+// to the Java exception types used by Velox4J.
 class JniErrorState {
  public:
   virtual ~JniErrorState() = default;

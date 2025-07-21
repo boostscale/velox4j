@@ -25,6 +25,7 @@
 #include "velox4j/jni/StaticJniWrapper.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 
+// The JNI entrypoint.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   LOG(INFO) << "Initializing Velox4J...";
   JNIEnv* env = jniHelpersInitialize(jvm);

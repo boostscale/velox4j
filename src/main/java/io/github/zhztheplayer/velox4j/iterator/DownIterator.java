@@ -18,6 +18,10 @@ package io.github.zhztheplayer.velox4j.iterator;
 
 import io.github.zhztheplayer.velox4j.jni.CalledFromNative;
 
+/**
+ * An ExternalStream that is backed by a down-iterator. What is down-iterator: A down-iterator is an
+ * iterator passed From Java to C++ for Velox to read data from Java.
+ */
 public interface DownIterator {
   enum State {
     AVAILABLE(0),
@@ -35,15 +39,22 @@ public interface DownIterator {
     }
   }
 
+  /** Gets the next state. */
   @CalledFromNative
   int advance();
 
+  /**
+   * Called once `advance` returns `BLOCKED` state to wait until the state gets refreshed, either by
+   * the next row-vector is ready for reading or by end of stream.
+   */
   @CalledFromNative
   void waitFor() throws InterruptedException;
 
+  /** Called to close the iterator. */
   @CalledFromNative
   long get();
 
+  /** Closes the down-iterator. */
   @CalledFromNative
   void close();
 }

@@ -22,6 +22,8 @@
 
 namespace velox4j {
 
+// An ExternalStream implementation that is backed by
+// a concurrent blocking queue.
 class BlockingQueue : public ExternalStream {
  public:
   enum State { OPEN = 0, FINISHED = 1, CLOSED = 2 };
@@ -43,6 +45,7 @@ class BlockingQueue : public ExternalStream {
   std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) override;
 
+  // Add a row-vector to the blocking queue.
   void put(facebook::velox::RowVectorPtr rowVector);
 
   void noMoreInput();

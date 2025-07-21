@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.query;
 import io.github.zhztheplayer.velox4j.jni.CppObject;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 
+/** An API for executing a Velox query plan. */
 public class QueryExecutor implements CppObject {
   private final JniApi jniApi;
   private final long id;

@@ -21,6 +21,11 @@
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
+
+/// A JSON-able immutable struct that represents an evaluation process.
+/// An evaluation is built with a Velox expression and being
+/// used for creating an Evaluator that evaluates the expression
+/// for input vectors.
 class Evaluation : public facebook::velox::ISerializable {
  public:
   Evaluation(

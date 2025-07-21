@@ -22,6 +22,8 @@
 
 namespace velox4j {
 
+/// An up-iterator is the opposite of down-iterator. It transmits data
+/// that is output from Velox pipeline from C++ to Java.
 class UpIterator {
  public:
   enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
@@ -38,9 +40,16 @@ class UpIterator {
   // DTOR.
   virtual ~UpIterator() = default;
 
-  // Iteration control.
+  // Gets the next state.
   virtual State advance() = 0;
+
+  /// Called once `advance` returns `BLOCKED` state to wait until
+  /// the state gets refreshed, either by the next row-vector
+  /// is ready for reading or by end of stream.
   virtual void wait() = 0;
+
+  // Called once `advance` returns `AVAILABLE` state to get
+  // the next row-vector from the stream.
   virtual facebook::velox::RowVectorPtr get() = 0;
 };
 } // namespace velox4j
