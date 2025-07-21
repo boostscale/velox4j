@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <arrow/api.h>
-#include <arrow/c/abi.h>
 #include <velox/vector/ComplexVector.h>
+
+struct ArrowArray;
+struct ArrowSchema;
 
 namespace velox4j {
 void fromBaseVectorToArrow(
