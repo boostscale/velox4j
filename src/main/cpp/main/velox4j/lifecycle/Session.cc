@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 
-#include "Session.h"
+#include "velox4j/lifecycle/Session.h"
 
 namespace velox4j {}

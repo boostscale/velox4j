@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "JniCommon.h"
+#include "velox4j/jni/JniCommon.h"
 #include <arrow/ipc/reader.h>
 #include <arrow/ipc/writer.h>
 #include <execinfo.h>

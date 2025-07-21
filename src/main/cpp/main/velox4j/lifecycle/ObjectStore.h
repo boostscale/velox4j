@@ -18,7 +18,7 @@
 #pragma once
 
 #include <map>
-#include "ResourceMap.h"
+#include "velox4j/lifecycle/ResourceMap.h"
 
 namespace velox4j {
 

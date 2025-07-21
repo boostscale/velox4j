@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "JniCommon.h"
+#include "velox4j/jni/JniCommon.h"
 
 namespace velox4j {
 

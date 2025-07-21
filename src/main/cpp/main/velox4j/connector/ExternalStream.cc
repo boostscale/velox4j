@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ExternalStream.h"
+#include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
 using namespace facebook::velox;

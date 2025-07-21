@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Config.h"
+#include "velox4j/config/Config.h"
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

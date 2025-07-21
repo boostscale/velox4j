@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DownIterator.h"
+#include "velox4j/iterator/DownIterator.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/lifecycle/ObjectStore.h"
 

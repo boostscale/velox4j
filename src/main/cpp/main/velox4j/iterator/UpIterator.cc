@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-#include "UpIterator.h"
+#include "velox4j/iterator/UpIterator.h"

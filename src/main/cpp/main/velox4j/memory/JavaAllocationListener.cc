@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "JavaAllocationListener.h"
+#include "velox4j/memory/JavaAllocationListener.h"
 #include <glog/logging.h>
 #include "velox4j/jni/JniCommon.h"
 

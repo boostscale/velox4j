@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Init.h"
+#include "velox4j/init/Init.h"
 #include <velox/common/memory/Memory.h>
 #include <velox/connectors/hive/HiveConnector.h>
 #include <velox/connectors/hive/HiveConnectorSplit.h>

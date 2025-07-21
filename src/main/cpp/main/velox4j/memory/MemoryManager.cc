@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include "MemoryManager.h"
-#include "ArrowMemoryPool.h"
+#include "velox4j/memory/MemoryManager.h"
+#include "velox4j/memory/ArrowMemoryPool.h"
 
 namespace velox4j {
 using namespace facebook;

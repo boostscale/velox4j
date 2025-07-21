@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Query.h"
+#include "velox4j/query/Query.h"
 
 #include <velox/exec/PlanNodeStats.h>
 

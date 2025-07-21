@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ArrowMemoryPool.h"
+#include "velox4j/memory/ArrowMemoryPool.h"
 #include <arrow/type_fwd.h>
 #include <velox/common/base/Exceptions.h>
 

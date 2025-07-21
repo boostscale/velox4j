@@ -18,7 +18,7 @@
 #pragma once
 
 #include <memory>
-#include "ObjectStore.h"
+#include "velox4j/lifecycle/ObjectStore.h"
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
