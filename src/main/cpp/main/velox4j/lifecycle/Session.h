@@ -22,6 +22,7 @@
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
+/// A JNI session that is bound to a JniWrapper.
 class Session {
  public:
   Session(MemoryManager* memoryManager)

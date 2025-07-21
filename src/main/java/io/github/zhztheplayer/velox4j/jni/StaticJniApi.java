@@ -41,6 +41,7 @@ import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
 
+/** The higher-level JNI-based API over {@link StaticJniWrapper}. */
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();
 

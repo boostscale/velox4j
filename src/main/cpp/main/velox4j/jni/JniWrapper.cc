@@ -38,6 +38,8 @@ using namespace facebook::velox;
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
+/// Get the Velox4J session object that is associated with the current
+/// JniWrapper.
 Session* sessionOf(JNIEnv* env, jobject javaThis) {
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("sessionId");

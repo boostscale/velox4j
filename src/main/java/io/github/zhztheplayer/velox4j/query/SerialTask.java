@@ -22,6 +22,9 @@ import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 
+/**
+ * An up-iterator implementation that is backed by a Velox task that runs in serial execution mode.
+ */
 public class SerialTask implements UpIterator {
   private final JniApi jniApi;
   private final long id;

@@ -21,6 +21,7 @@ import java.util.Iterator;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 
 public final class DownIterators {
+  /** Creates a down-iterator instance from a given Java iterator. */
   public static DownIterator fromJavaIterator(Iterator<RowVector> itr) {
     return new FromJavaIterator(itr);
   }

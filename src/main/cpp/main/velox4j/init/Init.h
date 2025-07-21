@@ -20,5 +20,8 @@
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
+// Initializes Velox4J with a given configuration array.
+// Should only be called once in the same process.
+// Once called, further calls will be aborted by throwing an Exception.
 void initialize(const std::shared_ptr<ConfigArray>& configArray);
 } // namespace velox4j
