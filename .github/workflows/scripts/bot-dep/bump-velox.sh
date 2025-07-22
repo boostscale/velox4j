@@ -36,7 +36,7 @@ echo "$VELOX_SRC_MD5" > "$VELOX_REF_HASH_FILE"
 
 rm "$VELOX_SRC_FILENAME"
 
-# Export values for GitHub Actions
+# Export PR description for GitHub Actions.
 echo "BUMP_VELOX_DESCRIPTION=\"Update Velox to latest. Diff: https://github.com/$VELOX_UPSTREAM_REPO/compare/$OLD_COMMIT_HASH...$LATEST_COMMIT_HASH\"" >> "$GITHUB_ENV"
 
 echo "Successfully updated velox-ref.txt and velox-ref-hash.txt"
