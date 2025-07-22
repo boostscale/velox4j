@@ -12,7 +12,7 @@ VELOX_REF_FILE="$VELOX_CPP_ROOT/velox-ref.txt"
 VELOX_REF_HASH_FILE="$VELOX_CPP_ROOT/velox-ref-hash.txt"
 GITHUB_ENV=${GITHUB_ENV:-$BASE_DIR/github-env.txt}
 
-# Read old commit hash if it exists
+# Read old commit hash.
 if [[ -f "$VELOX_REF_FILE" ]]; then
   OLD_COMMIT_HASH="$(cat "$VELOX_REF_FILE")"
 else
