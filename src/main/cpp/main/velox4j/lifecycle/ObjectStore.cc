@@ -41,19 +41,27 @@ ResourceMap<ObjectStore*>& ObjectStore::stores() {
 
 ObjectStore::~ObjectStore() {
   // destructing in reversed order (the last added object destructed first)
-  const std::lock_guard<std::mutex> lock(mtx_);
-  for (auto itr = aliveObjects_.rbegin(); itr != aliveObjects_.rend(); ++itr) {
-    const std::string_view description = (*itr).second;
-    ResourceHandle handle = (*itr).first;
-    LOG(WARNING)
-        << "Unclosed object [" << "Store ID: " << storeId_
-        << ", Resource handle ID: " << handle
-        << ", Description: " << description
-        << "] is found when object store is closing. Velox4J will"
-           " destroy it automatically but it's recommended to manually close"
-           " the object through the Java API CppObject#close() after use,"
-           " to minimize peak memory pressure of the application.";
-    store_.erase(handle);
+  while (!aliveObjects_.empty()) {
+    std::shared_ptr<void> tempObj;
+    {
+      const std::lock_guard<std::mutex> lock(mtx_);
+      // destructing in reversed order (the last added object destructed first)
+      auto itr = aliveObjects_.rbegin();
+      const ResourceHandle handle = (*itr).first;
+      const std::string_view description = (*itr).second;
+      VLOG(2)
+          << "Unclosed object [" << "Store ID: " << storeId_
+          << ", Resource handle ID: " << handle
+          << ", Description: " << description
+          << "] is found when object store is closing. Velox4J will"
+             " destroy it automatically but it's recommended to manually close"
+             " the object through the Java API CppObject#close() after use,"
+             " to minimize peak memory pressure of the application.";
+      tempObj = store_.lookup(handle);
+      store_.erase(handle);
+      aliveObjects_.erase(handle);
+    }
+    tempObj.reset(); // this will call the destructor of the object
   }
   stores().erase(storeId_);
 }
