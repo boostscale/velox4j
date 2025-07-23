@@ -9,7 +9,7 @@ VELOX_UPSTREAM_REPO=facebookincubator/velox
 VELOX_UPSTREAM_BRANCH=main
 VELOX_CPP_ROOT="$BASE_DIR/../../../../src/main/cpp"
 VELOX_REF_FILE="$VELOX_CPP_ROOT/velox-ref.txt"
-VELOX_REF_HASH_FILE="$VELOX_CPP_ROOT/velox-ref-hash.txt"
+VELOX_REF_MD5_FILE="$VELOX_CPP_ROOT/velox-ref-md5.txt"
 GITHUB_ENV=${GITHUB_ENV:-$BASE_DIR/github-env.txt}
 
 # Read old commit hash.
@@ -32,11 +32,11 @@ VELOX_SRC_MD5="$(md5sum "$VELOX_SRC_FILENAME" | awk '{print $1}')"
 echo "The MD5 HASH for $VELOX_SRC_FILENAME is $VELOX_SRC_MD5"
 
 echo "$LATEST_COMMIT_HASH" > "$VELOX_REF_FILE"
-echo "$VELOX_SRC_MD5" > "$VELOX_REF_HASH_FILE"
+echo "$VELOX_SRC_MD5" > "$VELOX_REF_MD5_FILE"
 
 rm "$VELOX_SRC_FILENAME"
 
 # Export PR description for GitHub Actions.
 echo "BUMP_VELOX_DESCRIPTION=\"Update Velox to latest. Diff: https://github.com/$VELOX_UPSTREAM_REPO/compare/$OLD_COMMIT_HASH...$LATEST_COMMIT_HASH\"" >> "$GITHUB_ENV"
 
-echo "Successfully updated velox-ref.txt and velox-ref-hash.txt"
+echo "Successfully updated velox-ref.txt and velox-ref-md5.txt"

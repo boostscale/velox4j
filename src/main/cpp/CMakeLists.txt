@@ -56,10 +56,10 @@ endif()
 # Import Velox.
 set(VELOX_PATCH_DIR ${CMAKE_CURRENT_LIST_DIR}/cmake/patches/velox)
 set(VELOX_REF_FILE ${CMAKE_CURRENT_LIST_DIR}/velox-ref.txt)
-set(VELOX_REF_HASH_FILE ${CMAKE_CURRENT_LIST_DIR}/velox-ref-hash.txt)
+set(VELOX_REF_MD5_FILE ${CMAKE_CURRENT_LIST_DIR}/velox-ref-md5.txt)
 set(VELOX_REPO facebookincubator/velox)
 file(STRINGS ${VELOX_REF_FILE} VELOX_REF)
-file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
+file(STRINGS ${VELOX_REF_MD5_FILE} VELOX_SOURCE_URL_MD5)
 set(VELOX_SOURCE_URL
     "https://github.com/${VELOX_REPO}/archive/${VELOX_REF}.zip")
 FetchContent_Declare(
