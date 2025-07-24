@@ -40,7 +40,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.iterator.*;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.join.JoinType;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.*;
 import io.github.zhztheplayer.velox4j.serde.Serde;
@@ -63,13 +63,15 @@ public class QueryTest {
   private static final String HIVE_CONNECTOR_ID = "connector-hive";
   private static TestDataFile NATION_FILE;
   private static TestDataFile REGION_FILE;
+  private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
   private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
-    memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    allocationListener = new BytesAllocationListener();
+    memoryManager = MemoryManager.create(allocationListener);
     NATION_FILE = TpchDatasets.get().get(TpchTableName.NATION);
     REGION_FILE = TpchDatasets.get().get(TpchTableName.REGION);
   }
@@ -77,6 +79,7 @@ public class QueryTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
   @Before

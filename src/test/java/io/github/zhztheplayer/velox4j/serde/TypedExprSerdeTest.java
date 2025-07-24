@@ -33,7 +33,7 @@ import io.github.zhztheplayer.velox4j.expression.DereferenceTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
@@ -45,18 +45,21 @@ import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 
 public class TypedExprSerdeTest {
+  private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
   private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
-    memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    allocationListener = new BytesAllocationListener();
+    memoryManager = MemoryManager.create(allocationListener);
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
   @Before

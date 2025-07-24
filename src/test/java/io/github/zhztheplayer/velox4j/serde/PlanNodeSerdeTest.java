@@ -28,7 +28,7 @@ import io.github.zhztheplayer.velox4j.data.BaseVectorTests;
 import io.github.zhztheplayer.velox4j.expression.ConstantTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.join.JoinType;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
@@ -53,18 +53,21 @@ import io.github.zhztheplayer.velox4j.window.WindowFunction;
 import io.github.zhztheplayer.velox4j.window.WindowType;
 
 public class PlanNodeSerdeTest {
+  private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
   private static Session session;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
-    memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    allocationListener = new BytesAllocationListener();
+    memoryManager = MemoryManager.create(allocationListener);
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
   @Before
