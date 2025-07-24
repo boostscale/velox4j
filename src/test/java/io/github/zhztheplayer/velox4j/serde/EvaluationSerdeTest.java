@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import java.util.Collections;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,23 +27,26 @@ import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 
 public class EvaluationSerdeTest {
+  private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
-    memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    allocationListener = new BytesAllocationListener();
+    memoryManager = MemoryManager.create(allocationListener);
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
   @Test
