@@ -76,8 +76,6 @@ CPMAddPackage(
         NAME velox
         GIT_REPOSITORY ${VELOX_SOURCE_URL}
         GIT_TAG gluten
-        PATCHES
-        "${VELOX_PATCH_DIR}/0003-fix-Add-a-patch-to-fix-table-scan-return-emptyrow-kafka.patch"
 )
 #CPMAddPackage(
 #        NAME velox
