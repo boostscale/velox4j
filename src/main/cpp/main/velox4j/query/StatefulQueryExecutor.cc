@@ -34,7 +34,6 @@ StatefulSerialTask::StatefulSerialTask(
   const uint32_t eid = executionId++;
   core::PlanFragment planFragment{
       query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
-  std::cout << "Stateful velox plan is " << query_->plan()->toString(true, true) << std::endl;
   std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
       nullptr,
       core::QueryConfig{query_->queryConfig()->toMap()},
@@ -54,7 +53,7 @@ StatefulSerialTask::StatefulSerialTask(
       std::move(queryCtx));
 
   task_ = task;
-  task_->initOperators();
+  task_->init();
 }
 
 StatefulSerialTask::~StatefulSerialTask() {

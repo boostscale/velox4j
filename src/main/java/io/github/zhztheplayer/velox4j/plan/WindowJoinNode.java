@@ -20,20 +20,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-
 import io.github.zhztheplayer.velox4j.type.RowType;
 
 import java.util.List;
 
-public class StreamJoinNode extends PlanNode{
+public class WindowJoinNode extends PlanNode{
   private final List<PlanNode> sources;
   private final PartitionFunctionSpec leftPartFuncSpec;
   private final PartitionFunctionSpec rightPartFuncSpec;
   private final NestedLoopJoinNode probe;
   private final RowType outputType;
   private final int numPartitions;
+  private final int leftWindowEndIndex;
+  private final int rightWindowEndIndex;
 
-  public StreamJoinNode(
+  public WindowJoinNode(
       String id,
       PlanNode leftInput,
       PlanNode rightInput,
@@ -41,7 +42,9 @@ public class StreamJoinNode extends PlanNode{
       PartitionFunctionSpec rightPartFuncSpec,
       NestedLoopJoinNode probe,
       RowType outputType,
-      int numPartitions) {
+      int numPartitions,
+      int leftWindowEndIndex,
+      int rightWindowEndIndex) {
     super(id);
     this.sources = List.of(leftInput, rightInput);
     this.leftPartFuncSpec = leftPartFuncSpec;
@@ -49,20 +52,24 @@ public class StreamJoinNode extends PlanNode{
     this.probe = probe;
     this.outputType = outputType;
     this.numPartitions = numPartitions;
+    this.leftWindowEndIndex = leftWindowEndIndex;
+    this.rightWindowEndIndex = rightWindowEndIndex;
   }
 
   @JsonCreator
-  private static StreamJoinNode create(
+  private static WindowJoinNode create(
       @JsonProperty("id") String id,
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("leftPartFuncSpec") PartitionFunctionSpec leftPartFuncSpec,
       @JsonProperty("rightPartFuncSpec") PartitionFunctionSpec rightPartFuncSpec,
       @JsonProperty("probe") NestedLoopJoinNode probe,
       @JsonProperty("outputType") RowType outputType,
-      @JsonProperty("numPartitions") int numPartitions) {
+      @JsonProperty("numPartitions") int numPartitions,
+      @JsonProperty("leftWindowEndIndex") int leftWindowEndIndex,
+      @JsonProperty("rightWindowEndIndex") int rightWindowEndIndex) {
     Preconditions.checkArgument(
         sources.size() == 2, "NestedLoopJoinNode should have 2 sources, but has %s", sources.size());
-    return new StreamJoinNode(
+    return new WindowJoinNode(
         id,
         sources.get(0),
         sources.get(1),
@@ -70,7 +77,9 @@ public class StreamJoinNode extends PlanNode{
         rightPartFuncSpec,
         probe,
         outputType,
-        numPartitions);
+        numPartitions,
+        leftWindowEndIndex,
+        rightWindowEndIndex);
   }
 
   @Override
@@ -101,5 +110,15 @@ public class StreamJoinNode extends PlanNode{
   @JsonGetter("numPartitions")
   public int getNumPartitions() {
     return numPartitions;
+  }
+
+  @JsonGetter("leftWindowEndIndex")
+  public int getLeftWindowEndIndex() {
+    return leftWindowEndIndex;
+  }
+
+  @JsonGetter("rightWindowEndIndex")
+  public int getRightWindowEndIndex() {
+    return rightWindowEndIndex;
   }
 }

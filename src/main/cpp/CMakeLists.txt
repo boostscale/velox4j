@@ -74,7 +74,7 @@ set(VELOX_SOURCE_URL "https://github.com/bigo-sg/velox.git")
 CPMAddPackage(
         NAME velox
         GIT_REPOSITORY ${VELOX_SOURCE_URL}
-        GIT_TAG 7c75e0d179c87048ca47ae3ea449a57e167adc36
+        GIT_TAG 10c7b53736f079c4033e1c48b9298bf90c3c78be
 )
 #set(VELOX_SOURCE_URL ${CMAKE_CURRENT_LIST_DIR}/build/_deps/velox-src)
 #CPMAddPackage(
