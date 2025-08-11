@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <velox/exec/Driver.h>
 #include <velox/exec/TaskStats.h>
 
 #include "velox4j/iterator/UpIterator.h"
