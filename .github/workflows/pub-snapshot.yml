@@ -37,7 +37,7 @@ jobs:
           key: ut-java-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-centos7-ccache-
-      - name: Run setup script / Build and run UTs
+      - name: Run setup script / Build
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
