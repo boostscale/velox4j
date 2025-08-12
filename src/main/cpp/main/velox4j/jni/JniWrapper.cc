@@ -222,10 +222,15 @@ jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(-1)
 }
 
-jlongArray rowVectorPartitionByKeys(JNIEnv* env, jobject javaThis, jlong vid, jintArray jKeyChannels) {
+jlongArray rowVectorPartitionByKeys(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jintArray jKeyChannels) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  auto pool = session->memoryManager()->getVeloxPool("Partition By Keys Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Partition By Keys Memory Pool", memory::MemoryPool::Kind::kLeaf);
   const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
   const auto inputNumRows = inputRowVector->size();
 
@@ -236,14 +241,15 @@ jlongArray rowVectorPartitionByKeys(JNIEnv* env, jobject javaThis, jlong vid, ji
   }
 
   connector::hive::PartitionIdGenerator idGen{
-    asRowType(inputRowVector->type()), keyChannels, 128,
-    pool,
-    false};
+      asRowType(inputRowVector->type()), keyChannels, 128, pool, false};
 
   raw_vector<uint64_t> partitionIds{};
   idGen.run(inputRowVector, partitionIds);
   const auto numPartitions = idGen.numPartitions();
-  VELOX_CHECK_EQ(partitionIds.size(), inputRowVector->size(), "Mismatched number of partition ids");
+  VELOX_CHECK_EQ(
+      partitionIds.size(),
+      inputRowVector->size(),
+      "Mismatched number of partition ids");
 
   std::vector<vector_size_t> partitionSizes(numPartitions);
   std::vector<BufferPtr> partitionRows(numPartitions);
@@ -256,8 +262,10 @@ jlongArray rowVectorPartitionByKeys(JNIEnv* env, jobject javaThis, jlong vid, ji
   }
 
   for (int partitionId = 0; partitionId < numPartitions; ++partitionId) {
-    partitionRows[partitionId] = allocateIndices(partitionSizes[partitionId], pool);
-    rawPartitionRows[partitionId] = partitionRows[partitionId]->asMutable<vector_size_t>();
+    partitionRows[partitionId] =
+        allocateIndices(partitionSizes[partitionId], pool);
+    rawPartitionRows[partitionId] =
+        partitionRows[partitionId]->asMutable<vector_size_t>();
   }
 
   std::vector<vector_size_t> partitionNextRowOffset(numPartitions);
