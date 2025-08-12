@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.github.zhztheplayer.velox4j.data.*;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
+import io.github.zhztheplayer.velox4j.data.*;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
@@ -118,7 +118,9 @@ public final class JniApi {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
     final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray);
     return Arrays.stream(vids)
-        .mapToObj(this::baseVectorWrap).map(BaseVector::asRowVector).collect(Collectors.toList());
+        .mapToObj(this::baseVectorWrap)
+        .map(BaseVector::asRowVector)
+        .collect(Collectors.toList());
   }
 
   public BaseVector loadedVector(BaseVector vector) {

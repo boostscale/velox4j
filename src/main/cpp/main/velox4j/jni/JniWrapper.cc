@@ -290,7 +290,7 @@ jlongArray rowVectorPartitionByKeys(
     outVector[partitionId] = session->objectStore()->save(rowVector);
   }
 
-  const jlongArray& out = env->NewLongArray(outVector.size());
+  const jlongArray out = env->NewLongArray(outVector.size());
   env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
   return out;
 
