@@ -44,6 +44,7 @@ jobs:
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
             bash .github/workflows/scripts/ut-java/setup-centos7.sh
+            mvn generate-resources
           "
       - name: Set up Java / Maven environment
         uses: actions/setup-java@v4
