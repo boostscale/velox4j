@@ -17,15 +17,14 @@
 
 package io.github.zhztheplayer.velox4j.data;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.session.Session;
+import io.github.zhztheplayer.velox4j.test.ResourceTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,12 +47,38 @@ public class RowVectorTest {
     Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
+  @Before
+  public void setUp() throws Exception {
+    session = Velox4j.newSession(memoryManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    session.close();
+  }
+
   @Test
   public void testPartitionByKeysSinglePartitionKey() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(3, input.getSize());
     final List<RowVector> out0 = session.rowVectorOps().partitionByKeys(input, List.of(0));
     Assert.assertEquals(3, out0.size());
-    // TODO
+    Assert.assertEquals(
+        ResourceTests.readResourceAsString("vector-output/partition-by-keys-1.txt"), BaseVectors.toString(out0));
+
+    final List<RowVector> out1 = session.rowVectorOps().partitionByKeys(input, List.of(1));
+    Assert.assertEquals(1, out1.size());
+    Assert.assertEquals(
+        ResourceTests.readResourceAsString("vector-output/partition-by-keys-2.txt"), BaseVectors.toString(out1));
+  }
+
+  @Test
+  public void testPartitionByKeysMultiplePartitionKeys() {
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    Assert.assertEquals(3, input.getSize());
+    final List<RowVector> out0 = session.rowVectorOps().partitionByKeys(input, List.of(1, 2));
+    Assert.assertEquals(3, out0.size());
+    Assert.assertEquals(
+        ResourceTests.readResourceAsString("vector-output/partition-by-keys-3.txt"), BaseVectors.toString(out0));
   }
 }

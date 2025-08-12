@@ -279,7 +279,7 @@ jlongArray rowVectorPartitionByKeys(JNIEnv* env, jobject javaThis, jlong vid, ji
     const RowVectorPtr rowVector = partitionSize == inputNumRows
         ? inputRowVector
         : exec::wrap(partitionSize, partitionRows[partitionId], inputRowVector);
-    outVector.push_back(session->objectStore()->save(rowVector));
+    outVector[partitionId] = session->objectStore()->save(rowVector);
   }
 
   const jlongArray& out = env->NewLongArray(outVector.size());
@@ -486,13 +486,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)rowVectorPartitionByKeys,
       kTypeArray(kTypeLong),
       kTypeLong,
+      kTypeArray(kTypeInt),
       nullptr);
   addNativeMethod(
       "createSelectivityVector",
       (void*)createSelectivityVector,
       kTypeLong,
       kTypeInt,
-      kTypeArray(kTypeInt),
       nullptr);
   addNativeMethod(
       "tableWriteTraitsOutputTypeWithAggregationNode",

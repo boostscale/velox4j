@@ -116,7 +116,7 @@ public final class JniApi {
 
   public List<RowVector> rowVectorPartitionByKeys(RowVector vector, List<Integer> keyChannels) {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
-    final long[] vids = jni.rowVectorPartitionByKeys(keyChannelArray);
+    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray);
     return Arrays.stream(vids)
         .mapToObj(this::baseVectorWrap).map(BaseVector::asRowVector).collect(Collectors.toList());
   }
