@@ -16,12 +16,13 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HiveBucketConversion {
+public class HiveBucketConversion implements Serializable {
   private final int tableBucketCount;
   private final int partitionBucketCount;
   private final List<HiveColumnHandle> bucketColumnHandles;

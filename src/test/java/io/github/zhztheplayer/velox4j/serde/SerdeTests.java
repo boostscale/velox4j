@@ -16,10 +16,10 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.io.Serializable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
