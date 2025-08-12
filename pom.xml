@@ -37,6 +37,7 @@
   </issueManagement>
 
   <properties>
+    <skip.cpp.build>false</skip.cpp.build>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
     <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
@@ -173,6 +174,7 @@
             <configuration>
               <executable>bash</executable>
               <commandlineArgs>${project.basedir}/src/main/cpp/build.sh</commandlineArgs>
+              <skip>${skip.cpp.build}</skip>
             </configuration>
           </execution>
         </executions>
