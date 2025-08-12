@@ -16,7 +16,9 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -151,25 +153,24 @@ public final class SerdeTests {
         FileFormat.ORC,
         1,
         100,
-        Map.of("key", Optional.of("value")),
-        OptionalInt.of(1),
-        Optional.of(
-            new HiveBucketConversion(
-                1,
-                1,
-                List.of(
-                    new HiveColumnHandle(
-                        "t",
-                        ColumnType.REGULAR,
-                        new IntegerType(),
-                        new IntegerType(),
-                        Collections.emptyList())))),
+        Map.of("key", "value"),
+        1,
+        new HiveBucketConversion(
+            1,
+            1,
+            List.of(
+                new HiveColumnHandle(
+                    "t",
+                    ColumnType.REGULAR,
+                    new IntegerType(),
+                    new IntegerType(),
+                    Collections.emptyList()))),
         Map.of("sk", "sv"),
-        Optional.of("extra"),
+        "extra",
         Map.of("serde_key", "serde_value"),
         Map.of("info_key", "info_value"),
-        Optional.of(new FileProperties(OptionalLong.of(100), OptionalLong.of(50))),
-        Optional.of(new RowIdProperties(5, 10, "UUID-100")));
+        new FileProperties(100L, 50L),
+        new RowIdProperties(5, 10, "UUID-100"));
   }
 
   public static HiveConnectorSplit newSampleHiveSplitWithMissingFields() {
@@ -181,25 +182,24 @@ public final class SerdeTests {
         FileFormat.ORC,
         1,
         100,
-        Map.of("key", Optional.of("value")),
-        OptionalInt.of(1),
-        Optional.of(
-            new HiveBucketConversion(
-                1,
-                1,
-                List.of(
-                    new HiveColumnHandle(
-                        "t",
-                        ColumnType.REGULAR,
-                        new IntegerType(),
-                        new IntegerType(),
-                        Collections.emptyList())))),
+        Map.of("key", "value"),
+        1,
+        new HiveBucketConversion(
+            1,
+            1,
+            List.of(
+                new HiveColumnHandle(
+                    "t",
+                    ColumnType.REGULAR,
+                    new IntegerType(),
+                    new IntegerType(),
+                    Collections.emptyList()))),
         Map.of("sk", "sv"),
-        Optional.empty(),
+        null,
         Map.of("serde_key", "serde_value"),
         Map.of("info_key", "info_value"),
-        Optional.of(new FileProperties(OptionalLong.empty(), OptionalLong.of(50))),
-        Optional.of(new RowIdProperties(5, 10, "UUID-100")));
+        new FileProperties(null, 50L),
+        new RowIdProperties(5, 10, "UUID-100"));
   }
 
   public static ConnectorTableHandle newSampleHiveTableHandle(RowType outputType) {

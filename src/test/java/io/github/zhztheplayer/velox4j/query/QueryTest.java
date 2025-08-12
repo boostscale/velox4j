@@ -18,7 +18,10 @@ package io.github.zhztheplayer.velox4j.query;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -928,14 +931,14 @@ public class QueryTest {
         0,
         file.length(),
         Map.of(),
-        OptionalInt.empty(),
-        Optional.empty(),
+        null,
+        null,
         Map.of(),
-        Optional.empty(),
+        null,
         Map.of(),
         Map.of(),
-        Optional.empty(),
-        Optional.empty());
+        null,
+        null);
   }
 
   private static TableScanNode newSampleTableScanNode(String planNodeId, RowType outputType) {

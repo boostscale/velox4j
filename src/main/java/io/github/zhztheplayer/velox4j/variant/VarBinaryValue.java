@@ -42,8 +42,8 @@ public class VarBinaryValue extends Variant {
     return new VarBinaryValue(null);
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public String getBase64() {
     return base64;
   }

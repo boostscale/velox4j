@@ -51,8 +51,8 @@ public class MapValue extends Variant {
     return new MapValue(builder);
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public Entries getEntries() {
     if (map == null) {
       return null;

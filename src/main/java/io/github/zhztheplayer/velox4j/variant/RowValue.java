@@ -37,8 +37,8 @@ public class RowValue extends Variant {
     this.row = Collections.unmodifiableList(row);
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public List<Variant> getRow() {
     return row;
   }

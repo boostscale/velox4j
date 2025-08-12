@@ -31,8 +31,8 @@ public class BigIntValue extends Variant {
     this.value = value;
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public Long getValue() {
     return value;
   }
