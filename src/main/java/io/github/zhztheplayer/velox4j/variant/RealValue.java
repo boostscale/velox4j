@@ -31,8 +31,8 @@ public class RealValue extends Variant {
     this.value = value;
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public Float getValue() {
     return value;
   }

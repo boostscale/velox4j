@@ -38,8 +38,8 @@ public class ArrayValue extends Variant {
     this.array = Collections.unmodifiableList(array);
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public List<Variant> getArray() {
     return array;
   }

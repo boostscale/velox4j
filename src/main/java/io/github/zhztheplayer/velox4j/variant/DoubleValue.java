@@ -31,8 +31,8 @@ public class DoubleValue extends Variant {
     this.value = value;
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public Double getValue() {
     return value;
   }

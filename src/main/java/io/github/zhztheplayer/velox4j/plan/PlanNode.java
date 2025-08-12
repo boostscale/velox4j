@@ -35,7 +35,7 @@ public abstract class PlanNode extends ISerializable {
     return id;
   }
 
-  @JsonGetter("sources")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  @JsonGetter("sources")
   protected abstract List<PlanNode> getSources();
 }

@@ -52,8 +52,8 @@ public class TimestampValue extends Variant {
     return new TimestampValue(null, 0, 0);
   }
 
-  @JsonGetter("value")
   @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("value")
   public Integer getValue() {
     return value;
   }

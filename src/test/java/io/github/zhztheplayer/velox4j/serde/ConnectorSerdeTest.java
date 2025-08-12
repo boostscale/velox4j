@@ -16,8 +16,6 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.util.OptionalLong;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,13 +39,13 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testProperties() {
-    final FileProperties in = new FileProperties(OptionalLong.of(100), OptionalLong.of(50));
+    final FileProperties in = new FileProperties(100L, 50L);
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 
   @Test
   public void testPropertiesWithMissingFields() {
-    final FileProperties in = new FileProperties(OptionalLong.of(100), OptionalLong.empty());
+    final FileProperties in = new FileProperties(100L, null);
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 

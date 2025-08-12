@@ -16,31 +16,34 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
-import java.util.OptionalLong;
+import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class FileProperties {
-  private final OptionalLong fileSize;
-  private final OptionalLong modificationTime;
+public class FileProperties implements Serializable {
+  private final Long fileSize;
+  private final Long modificationTime;
 
   @JsonCreator
   public FileProperties(
-      @JsonProperty("fileSize") OptionalLong fileSize,
-      @JsonProperty("modificationTime") OptionalLong modificationTime) {
+      @JsonProperty("fileSize") Long fileSize,
+      @JsonProperty("modificationTime") Long modificationTime) {
     this.fileSize = fileSize;
     this.modificationTime = modificationTime;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("fileSize")
-  public OptionalLong getFileSize() {
+  public Long getFileSize() {
     return fileSize;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("modificationTime")
-  public OptionalLong getModificationTime() {
+  public Long getModificationTime() {
     return modificationTime;
   }
 }

@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
@@ -53,7 +52,6 @@ public final class Serde {
     jsonMapper.disable(MapperFeature.AUTO_DETECT_CREATORS);
     jsonMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     jsonMapper.disable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
-    jsonMapper.addModule(new Jdk8Module());
     jsonMapper.addModule(new SimpleModule().setDeserializerModifier(deserializerModifier));
     jsonMapper.addModule(new SimpleModule().setSerializerModifier(serializerModifier));
     return jsonMapper.build();

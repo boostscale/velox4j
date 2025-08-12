@@ -186,15 +186,15 @@ public static void main(String[] args) {
       0,
       file.length(),
       Map.of(),
-      OptionalInt.empty(),
-      Optional.empty(),
+      null,
+      null,
       Map.of(),
-      Optional.empty(),
+      null,
       Map.of(),
       Map.of(),
       Map.of(),
-      Optional.empty(),
-      Optional.empty()
+      null,
+      null
   );
   task.addSplit(scanNode.getId(), split);
   task.noMoreSplits(scanNode.getId());
