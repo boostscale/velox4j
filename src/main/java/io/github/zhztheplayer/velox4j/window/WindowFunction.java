@@ -16,13 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.window;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 
-public class WindowFunction {
+public class WindowFunction implements Serializable {
   private final CallTypedExpr functionCall;
   private final WindowFrame frame;
   private final boolean ignoreNulls;

@@ -16,12 +16,14 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
-public class RowIdProperties {
+public class RowIdProperties implements Serializable {
   private final long metadataVersion;
   private final long partitionId;
   private final String tableGuid;

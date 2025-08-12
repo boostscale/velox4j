@@ -16,6 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.config;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class ConnectorConfig extends ISerializable {
     return values;
   }
 
-  public static class Entry {
+  public static class Entry implements Serializable {
     private final String connectorId;
     private final Config config;
 

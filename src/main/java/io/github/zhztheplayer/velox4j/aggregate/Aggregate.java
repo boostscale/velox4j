@@ -16,6 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.aggregate;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,7 +28,7 @@ import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.type.Type;
 
-public class Aggregate {
+public class Aggregate implements Serializable {
   public final CallTypedExpr call;
   public final List<Type> rawInputTypes;
   public final FieldAccessTypedExpr mask;

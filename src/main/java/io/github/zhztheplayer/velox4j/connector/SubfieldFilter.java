@@ -16,13 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.filter.Filter;
 
-public class SubfieldFilter {
+public class SubfieldFilter implements Serializable {
   private final String subfield;
   private final Filter filter;
 

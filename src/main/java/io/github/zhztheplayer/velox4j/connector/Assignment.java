@@ -16,11 +16,13 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Assignment {
+public class Assignment implements Serializable {
   private final String assign;
   private final ColumnHandle columnHandle;
 
