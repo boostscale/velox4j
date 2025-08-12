@@ -53,4 +53,13 @@ public class BaseVectors {
   public List<BaseVector> deserializeAll(String serialized) {
     return jniApi.baseVectorDeserialize(serialized);
   }
+
+  public static String toString(List<? extends BaseVector> vectors) {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < vectors.size(); i++) {
+      sb.append("Vector #").append(i).append(System.lineSeparator());
+      sb.append(vectors.get(i).toString()).append(System.lineSeparator());
+    }
+    return sb.toString();
+  }
 }

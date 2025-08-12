@@ -16,6 +16,8 @@
 */
 package io.github.zhztheplayer.velox4j.data;
 
+import java.util.List;
+
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 
 public class RowVectors {
@@ -23,5 +25,13 @@ public class RowVectors {
 
   public RowVectors(JniApi jniApi) {
     this.jniApi = jniApi;
+  }
+
+  /**
+   * Partitions the input RowVector into a list of RowVectors where each one has the same keys
+   * defined by the key indices of `keyChannels`.
+   */
+  public List<RowVector> partitionByKeys(RowVector rowVector, List<Integer> keyChannels) {
+    return jniApi.rowVectorPartitionByKeys(rowVector, keyChannels);
   }
 }
