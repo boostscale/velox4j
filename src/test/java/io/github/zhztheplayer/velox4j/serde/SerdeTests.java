@@ -87,12 +87,6 @@ public final class SerdeTests {
     }
   }
 
-  public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(
-      String inJson, Class<? extends T> valueType) {
-    final T inObj = Serde.fromJson(inJson, valueType);
-    return SerdeTests.testISerializableRoundTrip(inObj);
-  }
-
   public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
