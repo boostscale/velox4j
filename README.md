@@ -192,7 +192,6 @@ public static void main(String[] args) {
       null,
       Map.of(),
       Map.of(),
-      Map.of(),
       null,
       null
   );
