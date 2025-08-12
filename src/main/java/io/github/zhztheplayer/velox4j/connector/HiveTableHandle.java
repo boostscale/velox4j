@@ -19,7 +19,6 @@ package io.github.zhztheplayer.velox4j.connector;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -55,7 +54,7 @@ public class HiveTableHandle extends ConnectorTableHandle {
     this.tableParameters =
         tableParameters == null
             ? Collections.emptyMap()
-            : Collections.unmodifiableSortedMap(new TreeMap<>(tableParameters));
+            : Collections.unmodifiableMap(tableParameters);
   }
 
   @JsonGetter("tableName")

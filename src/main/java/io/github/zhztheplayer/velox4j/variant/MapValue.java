@@ -16,14 +16,8 @@
 */
 package io.github.zhztheplayer.velox4j.variant;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -39,14 +33,7 @@ public class MapValue extends Variant {
       this.map = null;
       return;
     }
-    // The following is basically for test code, to write the map values into JSON with a
-    //  comparatively stable order.
-    // TODO: This may cause slow serialization as Variant#toString may be slow.
-    //  A better way is to write reliable Variant#compareTo implementations for all variants.
-    final TreeMap<Variant, Variant> builder =
-        new TreeMap<>(Comparator.comparing(Variant::toString));
-    builder.putAll(map);
-    this.map = Collections.unmodifiableSortedMap(builder);
+    this.map = Collections.unmodifiableMap(map);
   }
 
   @JsonCreator
@@ -73,7 +60,17 @@ public class MapValue extends Variant {
     final int size = map.size();
     final List<Variant> keys = new ArrayList<>(size);
     final List<Variant> values = new ArrayList<>(size);
-    for (Map.Entry<Variant, Variant> entry : map.entrySet()) {
+
+    // The following is basically for test code, to write the map values into JSON with a
+    //  comparatively stable order.
+    // TODO: This may cause slow serialization as Variant#toString may be slow.
+    //  A better way is to write reliable Variant#compareTo implementations for all variants.
+    final List<Map.Entry<Variant, Variant>> sortedEntries =
+        map.entrySet().stream()
+            .sorted(Comparator.comparing(entry -> entry.getKey().toString()))
+            .collect(Collectors.toList());
+
+    for (Map.Entry<Variant, Variant> entry : sortedEntries) {
       keys.add(entry.getKey());
       values.add(entry.getValue());
     }
