@@ -19,10 +19,12 @@ package io.github.zhztheplayer.velox4j.serde;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.io.Serializable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 
@@ -75,6 +77,13 @@ public final class SerdeTests {
       final String inJson = Serde.toPrettyJson(inObj);
 
       {
+        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
+        final ISerializable javaDeserialized = SerializationUtils.deserialize(serialized);
+        final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
+        assertJsonEquals(inJson, javaDeserializedJson);
+      }
+
+      {
         final ISerializable javaOutObj = Serde.fromJson(inJson, ISerializable.class);
         final String javaOutJson = Serde.toPrettyJson(javaOutObj);
         assertJsonEquals(inJson, javaOutJson);
@@ -93,6 +102,13 @@ public final class SerdeTests {
     try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
+
+      {
+        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
+        final Variant javaDeserialized = SerializationUtils.deserialize(serialized);
+        final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
+        assertJsonEquals(inJson, javaDeserializedJson);
+      }
 
       {
         final Variant javaOutObj = Serde.fromJson(inJson, Variant.class);
@@ -115,9 +131,17 @@ public final class SerdeTests {
       if (inObj instanceof NativeBean) {
         throw new VeloxException("Cannot round trip NativeBean");
       }
-      final Class<?> clazz = inObj.getClass();
       final ObjectMapper jsonMapper = Serde.jsonMapper();
       final String inJson = jsonMapper.writeValueAsString(inObj);
+
+      {
+        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
+        final Object javaDeserialized = SerializationUtils.deserialize(serialized);
+        final String javaDeserializedJson = jsonMapper.writeValueAsString(javaDeserialized);
+        assertJsonEquals(inJson, javaDeserializedJson);
+      }
+
+      final Class<?> clazz = inObj.getClass();
       final Object outObj = jsonMapper.readValue(inJson, clazz);
       final String outJson = jsonMapper.writeValueAsString(outObj);
       assertJsonEquals(inJson, outJson);
