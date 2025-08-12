@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 
-public class WindowFrame {
+import java.io.Serializable;
+
+public class WindowFrame implements Serializable {
   private final WindowType type;
   private final BoundType startType;
   private final TypedExpr startValue;

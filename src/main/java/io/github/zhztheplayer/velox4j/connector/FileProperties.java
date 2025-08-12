@@ -17,6 +17,7 @@
 package io.github.zhztheplayer.velox4j.connector;
 
 import java.io.Serializable;
+import java.util.OptionalLong;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;

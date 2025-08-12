@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.filter.Filter;
 
-public class SubfieldFilter {
+import java.io.Serializable;
+
+public class SubfieldFilter implements Serializable {
   private final String subfield;
   private final Filter filter;
 

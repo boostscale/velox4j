@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Assignment {
+import java.io.Serializable;
+
+public class Assignment implements Serializable {
   private final String assign;
   private final ColumnHandle columnHandle;
 

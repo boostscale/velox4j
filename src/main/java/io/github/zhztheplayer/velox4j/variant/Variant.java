@@ -18,11 +18,13 @@ package io.github.zhztheplayer.velox4j.variant;
 
 import io.github.zhztheplayer.velox4j.serde.NativeBean;
 
+import java.io.Serializable;
+
 /**
  * Java binding of Velox's variant API. A Variant can be serialized to JSON and deserialized from
  * JSON.
  */
-public abstract class Variant implements NativeBean {
+public abstract class Variant implements NativeBean, Serializable {
   @Override
   public abstract boolean equals(Object obj);
 

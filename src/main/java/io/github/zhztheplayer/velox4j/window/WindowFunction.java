@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 
-public class WindowFunction {
+import java.io.Serializable;
+
+public class WindowFunction implements Serializable {
   private final CallTypedExpr functionCall;
   private final WindowFrame frame;
   private final boolean ignoreNulls;

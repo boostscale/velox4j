@@ -19,7 +19,9 @@ package io.github.zhztheplayer.velox4j.sort;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SortOrder {
+import java.io.Serializable;
+
+public class SortOrder implements Serializable {
   private final boolean ascending;
   private final boolean nullsFirst;
 

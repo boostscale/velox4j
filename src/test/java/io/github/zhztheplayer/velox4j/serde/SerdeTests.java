@@ -77,7 +77,7 @@ public final class SerdeTests {
       final String inJson = Serde.toPrettyJson(inObj);
 
       {
-        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
+        final byte[] serialized = SerializationUtils.serialize(inObj);
         final ISerializable javaDeserialized = SerializationUtils.deserialize(serialized);
         final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
         assertJsonEquals(inJson, javaDeserializedJson);
@@ -104,7 +104,7 @@ public final class SerdeTests {
       final String inJson = Serde.toPrettyJson(inObj);
 
       {
-        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
+        final byte[] serialized = SerializationUtils.serialize(inObj);
         final Variant javaDeserialized = SerializationUtils.deserialize(serialized);
         final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
         assertJsonEquals(inJson, javaDeserializedJson);
