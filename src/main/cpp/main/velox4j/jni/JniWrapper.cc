@@ -18,7 +18,9 @@
 #include "velox4j/jni/JniWrapper.h"
 #include <velox/common/encode/Base64.h>
 #include <velox/common/memory/Memory.h>
+#include <velox/connectors/hive/PartitionIdGenerator.h>
 #include <velox/core/PlanNode.h>
+#include <velox/exec/OperatorUtils.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
 
@@ -220,6 +222,73 @@ jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_END(-1)
 }
 
+jlongArray rowVectorPartitionByKeys(JNIEnv* env, jobject javaThis, jlong vid, jintArray jKeyChannels) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto pool = session->memoryManager()->getVeloxPool("Partition By Keys Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  const auto inputNumRows = inputRowVector->size();
+
+  auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
+  std::vector<column_index_t> keyChannels(safeArray.length());
+  for (jsize i = 0; i < safeArray.length(); ++i) {
+    keyChannels[i] = safeArray.elems()[i];
+  }
+
+  connector::hive::PartitionIdGenerator idGen{
+    asRowType(inputRowVector->type()), keyChannels, 128,
+    pool,
+    false};
+
+  raw_vector<uint64_t> partitionIds{};
+  idGen.run(inputRowVector, partitionIds);
+  const auto numPartitions = idGen.numPartitions();
+  VELOX_CHECK_EQ(partitionIds.size(), inputRowVector->size(), "Mismatched number of partition ids");
+
+  std::vector<vector_size_t> partitionSizes(numPartitions);
+  std::vector<BufferPtr> partitionRows(numPartitions);
+  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
+  std::fill(partitionSizes.begin(), partitionSizes.end(), 0);
+
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto partitionId = partitionIds[row];
+    ++partitionSizes[partitionId];
+  }
+
+  for (int partitionId = 0; partitionId < numPartitions; ++partitionId) {
+    partitionRows[partitionId] = allocateIndices(partitionSizes[partitionId], pool);
+    rawPartitionRows[partitionId] = partitionRows[partitionId]->asMutable<vector_size_t>();
+  }
+
+  std::vector<vector_size_t> partitionNextRowOffset(numPartitions);
+  std::fill(partitionNextRowOffset.begin(), partitionNextRowOffset.end(), 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto partitionId = partitionIds[row];
+    rawPartitionRows[partitionId][partitionNextRowOffset[partitionId]] = row;
+    ++partitionNextRowOffset[partitionId];
+  }
+
+  std::vector<jlong> outVector(numPartitions);
+
+  for (int partitionId = 0; partitionId < numPartitions; ++partitionId) {
+    const vector_size_t partitionSize = partitionSizes[partitionId];
+    if (partitionSize == 0) {
+      continue;
+    }
+
+    const RowVectorPtr rowVector = partitionSize == inputNumRows
+        ? inputRowVector
+        : exec::wrap(partitionSize, partitionRows[partitionId], inputRowVector);
+    outVector.push_back(session->objectStore()->save(rowVector));
+  }
+
+  const jlongArray& out = env->NewLongArray(outVector.size());
+  env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
+  return out;
+
+  JNI_METHOD_END(nullptr)
+}
+
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
   auto vector =
@@ -413,10 +482,17 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
+      "rowVectorPartitionByKeys",
+      (void*)rowVectorPartitionByKeys,
+      kTypeArray(kTypeLong),
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
       "createSelectivityVector",
       (void*)createSelectivityVector,
       kTypeLong,
       kTypeInt,
+      kTypeArray(kTypeInt),
       nullptr);
   addNativeMethod(
       "tableWriteTraitsOutputTypeWithAggregationNode",

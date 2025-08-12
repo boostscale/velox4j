@@ -21,15 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.data.*;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
-import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.data.SelectivityVector;
-import io.github.zhztheplayer.velox4j.data.VectorEncoding;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
@@ -115,6 +112,13 @@ public final class JniApi {
 
   public BaseVector baseVectorSlice(BaseVector vector, int offset, int length) {
     return baseVectorWrap(jni.baseVectorSlice(vector.id(), offset, length));
+  }
+
+  public List<RowVector> rowVectorPartitionByKeys(RowVector vector, List<Integer> keyChannels) {
+    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
+    final long[] vids = jni.rowVectorPartitionByKeys(keyChannelArray);
+    return Arrays.stream(vids)
+        .mapToObj(this::baseVectorWrap).map(BaseVector::asRowVector).collect(Collectors.toList());
   }
 
   public BaseVector loadedVector(BaseVector vector) {

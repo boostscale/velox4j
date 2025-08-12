@@ -70,6 +70,8 @@ final class JniWrapper {
 
   native long baseVectorLoadedVector(long id);
 
+  native long[] rowVectorPartitionByKeys(int[] keyChannels);
+
   native long createSelectivityVector(int length);
 
   // For TableWrite.
