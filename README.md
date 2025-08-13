@@ -122,7 +122,7 @@ NOTE:
 ## Build From Source
 
 ```shell
-mvn clean install -Dgpg.skip
+mvn clean install
 ```
 
 ## Get Started
