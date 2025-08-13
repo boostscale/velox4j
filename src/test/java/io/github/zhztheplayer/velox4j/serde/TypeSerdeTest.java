@@ -16,8 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -121,13 +120,16 @@ public class TypeSerdeTest {
   @Test
   public void testRowType() {
     SerdeTests.testISerializableRoundTrip(
-        new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new VarCharType())));
+        new RowType(
+            ImmutableList.of("foo", "bar"),
+            ImmutableList.of(new IntegerType(), new VarCharType())));
   }
 
   @Test
   public void testFunctionType() {
     SerdeTests.testISerializableRoundTrip(
-        FunctionType.create(List.of(new IntegerType(), new VarCharType()), new VarbinaryType()));
+        FunctionType.create(
+            ImmutableList.of(new IntegerType(), new VarCharType()), new VarbinaryType()));
   }
 
   @Test

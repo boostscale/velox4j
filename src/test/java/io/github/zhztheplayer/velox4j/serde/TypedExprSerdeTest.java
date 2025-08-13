@@ -17,8 +17,8 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import java.util.Collections;
-import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -92,7 +92,7 @@ public class TypedExprSerdeTest {
     final CallTypedExpr input2 =
         new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     SerdeTests.testISerializableRoundTrip(
-        ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2)));
+        ConcatTypedExpr.create(ImmutableList.of("foo", "bar"), ImmutableList.of(input1, input2)));
   }
 
   // Ignored by https://github.com/velox4j/velox4j/issues/104.
@@ -123,7 +123,7 @@ public class TypedExprSerdeTest {
     final CallTypedExpr input2 =
         new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     final ConcatTypedExpr concat =
-        ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
+        ConcatTypedExpr.create(ImmutableList.of("foo", "bar"), ImmutableList.of(input1, input2));
     final DereferenceTypedExpr dereference = DereferenceTypedExpr.create(concat, 1);
     Assert.assertEquals(RealType.class, dereference.getReturnType().getClass());
     SerdeTests.testISerializableRoundTrip(dereference);
@@ -136,7 +136,7 @@ public class TypedExprSerdeTest {
     final CallTypedExpr input2 =
         new CallTypedExpr(new RealType(), Collections.emptyList(), "random_real");
     final ConcatTypedExpr concat =
-        ConcatTypedExpr.create(List.of("foo", "bar"), List.of(input1, input2));
+        ConcatTypedExpr.create(ImmutableList.of("foo", "bar"), ImmutableList.of(input1, input2));
     final FieldAccessTypedExpr fieldAccess = FieldAccessTypedExpr.create(concat, "bar");
     Assert.assertEquals(RealType.class, fieldAccess.getReturnType().getClass());
     SerdeTests.testISerializableRoundTrip(fieldAccess);
@@ -150,7 +150,8 @@ public class TypedExprSerdeTest {
   @Test
   public void testLambdaTypedExpr() {
     final RowType signature =
-        new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new VarCharType()));
+        new RowType(
+            ImmutableList.of("foo", "bar"), ImmutableList.of(new IntegerType(), new VarCharType()));
     final LambdaTypedExpr lambdaTypedExpr =
         LambdaTypedExpr.create(signature, FieldAccessTypedExpr.create(new IntegerType(), "foo"));
     SerdeTests.testISerializableRoundTrip(lambdaTypedExpr);

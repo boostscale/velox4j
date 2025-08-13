@@ -17,9 +17,9 @@
 package io.github.zhztheplayer.velox4j.serde;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -137,9 +137,9 @@ public class VariantSerdeTest {
   @Test
   public void testArrayValue() {
     SerdeTests.testVariantRoundTrip(
-        new ArrayValue(List.of(new IntegerValue(100), new IntegerValue(500))));
+        new ArrayValue(ImmutableList.of(new IntegerValue(100), new IntegerValue(500))));
     SerdeTests.testVariantRoundTrip(
-        new ArrayValue(List.of(new BooleanValue(false), new BooleanValue(true))));
+        new ArrayValue(ImmutableList.of(new BooleanValue(false), new BooleanValue(true))));
     SerdeTests.testVariantRoundTrip(new ArrayValue(null));
   }
 
@@ -147,7 +147,7 @@ public class VariantSerdeTest {
   public void testMapValue() {
     SerdeTests.testVariantRoundTrip(
         new MapValue(
-            Map.of(
+            ImmutableMap.of(
                 new IntegerValue(100), new BooleanValue(false),
                 new IntegerValue(1000), new BooleanValue(true),
                 new IntegerValue(400), new BooleanValue(false),
@@ -160,9 +160,9 @@ public class VariantSerdeTest {
   @Test
   public void testRowValue() {
     SerdeTests.testVariantRoundTrip(
-        new RowValue(List.of(new IntegerValue(100), new BooleanValue(true))));
+        new RowValue(ImmutableList.of(new IntegerValue(100), new BooleanValue(true))));
     SerdeTests.testVariantRoundTrip(
-        new RowValue(List.of(new IntegerValue(500), new BooleanValue(false))));
+        new RowValue(ImmutableList.of(new IntegerValue(500), new BooleanValue(false))));
     SerdeTests.testVariantRoundTrip(new RowValue(null));
   }
 }

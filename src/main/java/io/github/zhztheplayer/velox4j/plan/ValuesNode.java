@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.data.RowVector;
@@ -65,6 +66,6 @@ public class ValuesNode extends PlanNode {
 
   @Override
   protected List<PlanNode> getSources() {
-    return List.of();
+    return ImmutableList.of();
   }
 }

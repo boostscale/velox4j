@@ -16,8 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -107,7 +106,8 @@ public class PlanNodeSerdeTest {
   public void testValuesNode() {
     // The case fails in debug build. Should investigate.
     final PlanNode values =
-        ValuesNode.create("id-1", List.of(BaseVectorTests.newSampleRowVector(session)), true, 1);
+        ValuesNode.create(
+            "id-1", ImmutableList.of(BaseVectorTests.newSampleRowVector(session)), true, 1);
     SerdeTests.testISerializableRoundTrip(values);
   }
 
@@ -131,9 +131,9 @@ public class PlanNodeSerdeTest {
     final ProjectNode projectNode =
         new ProjectNode(
             "id-2",
-            List.of(scan),
-            List.of("foo"),
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
+            ImmutableList.of(scan),
+            ImmutableList.of("foo"),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")));
     SerdeTests.testISerializableRoundTrip(projectNode);
   }
 
@@ -142,7 +142,8 @@ public class PlanNodeSerdeTest {
     final PlanNode scan =
         SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
     final FilterNode filterNode =
-        new FilterNode("id-2", List.of(scan), ConstantTypedExpr.create(new BooleanValue(true)));
+        new FilterNode(
+            "id-2", ImmutableList.of(scan), ConstantTypedExpr.create(new BooleanValue(true)));
     SerdeTests.testISerializableRoundTrip(filterNode);
   }
 
@@ -151,23 +152,27 @@ public class PlanNodeSerdeTest {
     final PlanNode scan1 =
         SerdeTests.newSampleTableScanNode(
             "id-1",
-            new RowType(List.of("foo1", "bar1"), List.of(new IntegerType(), new IntegerType())));
+            new RowType(
+                ImmutableList.of("foo1", "bar1"),
+                ImmutableList.of(new IntegerType(), new IntegerType())));
     final PlanNode scan2 =
         SerdeTests.newSampleTableScanNode(
             "id-2",
-            new RowType(List.of("foo2", "bar2"), List.of(new IntegerType(), new IntegerType())));
+            new RowType(
+                ImmutableList.of("foo2", "bar2"),
+                ImmutableList.of(new IntegerType(), new IntegerType())));
     final PlanNode joinNode =
         new HashJoinNode(
             "id-3",
             JoinType.INNER,
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
             ConstantTypedExpr.create(new BooleanValue(true)),
             scan1,
             scan2,
             new RowType(
-                List.of("foo1", "bar1", "foo2", "bar2"),
-                List.of(
+                ImmutableList.of("foo1", "bar1", "foo2", "bar2"),
+                ImmutableList.of(
                     new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
             false);
     SerdeTests.testISerializableRoundTrip(joinNode);
@@ -180,9 +185,9 @@ public class PlanNodeSerdeTest {
     final OrderByNode orderByNode =
         new OrderByNode(
             "id-2",
-            List.of(scan),
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
-            List.of(new SortOrder(true, false)),
+            ImmutableList.of(scan),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
+            ImmutableList.of(new SortOrder(true, false)),
             false);
     SerdeTests.testISerializableRoundTrip(orderByNode);
   }
@@ -191,7 +196,7 @@ public class PlanNodeSerdeTest {
   public void testLimitNode() {
     final PlanNode scan =
         SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
-    final LimitNode limitNode = new LimitNode("id-2", List.of(scan), 5, 3, false);
+    final LimitNode limitNode = new LimitNode("id-2", ImmutableList.of(scan), 5, 3, false);
     SerdeTests.testISerializableRoundTrip(limitNode);
   }
 
@@ -210,7 +215,7 @@ public class PlanNodeSerdeTest {
             true,
             rowType,
             CommitStrategy.TASK_COMMIT,
-            List.of(scan));
+            ImmutableList.of(scan));
     SerdeTests.testISerializableRoundTrip(tableWriteNode);
   }
 

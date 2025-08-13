@@ -16,7 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.test.dataset.tpch;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.DecimalType;
@@ -27,13 +27,13 @@ public enum TpchTableName {
   REGION(
       "region/region.parquet",
       new RowType(
-          List.of("r_regionkey", "r_name", "r_comment"),
-          List.of(new BigIntType(), new VarCharType(), new VarCharType()))),
+          ImmutableList.of("r_regionkey", "r_name", "r_comment"),
+          ImmutableList.of(new BigIntType(), new VarCharType(), new VarCharType()))),
 
   CUSTOMER(
       "customer/customer.parquet",
       new RowType(
-          List.of(
+          ImmutableList.of(
               "s_suppkey",
               "s_name",
               "s_address",
@@ -41,7 +41,7 @@ public enum TpchTableName {
               "s_phone",
               "s_acctbal",
               "s_comment"),
-          List.of(
+          ImmutableList.of(
               new BigIntType(),
               new VarCharType(),
               new VarCharType(),
@@ -53,8 +53,9 @@ public enum TpchTableName {
   NATION(
       "nation/nation.parquet",
       new RowType(
-          List.of("n_nationkey", "n_name", "n_regionkey", "n_comment"),
-          List.of(new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())));
+          ImmutableList.of("n_nationkey", "n_name", "n_regionkey", "n_comment"),
+          ImmutableList.of(
+              new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())));
 
   private final String relativePath;
   private final RowType schema;

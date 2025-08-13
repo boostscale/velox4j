@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.plan;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.google.common.collect.ImmutableList;
 
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
@@ -43,7 +44,7 @@ public abstract class AbstractJoinNode extends PlanNode {
       PlanNode right,
       RowType outputType) {
     super(id);
-    this.sources = List.of(left, right);
+    this.sources = ImmutableList.of(left, right);
     this.joinType = joinType;
     this.leftKeys = leftKeys;
     this.rightKeys = rightKeys;

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 public class MapType extends Type {
   private final List<Type> children;
@@ -34,7 +35,7 @@ public class MapType extends Type {
   }
 
   public static MapType create(Type keyType, Type valueType) {
-    return new MapType(List.of(keyType, valueType));
+    return new MapType(ImmutableList.of(keyType, valueType));
   }
 
   @JsonGetter("cTypes")

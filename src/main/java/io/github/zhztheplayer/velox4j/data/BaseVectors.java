@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.data;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
@@ -36,7 +37,7 @@ public class BaseVectors {
   }
 
   public static String serializeOne(BaseVector vector) {
-    return StaticJniApi.get().baseVectorSerialize(List.of(vector));
+    return StaticJniApi.get().baseVectorSerialize(ImmutableList.of(vector));
   }
 
   public BaseVector deserializeOne(String serialized) {

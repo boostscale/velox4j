@@ -18,6 +18,7 @@ package io.github.zhztheplayer.velox4j.data;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -59,13 +60,13 @@ public class RowVectorTest {
   public void testPartitionByKeysSinglePartitionKey() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(3, input.getSize());
-    final List<RowVector> out0 = session.rowVectorOps().partitionByKeys(input, List.of(0));
+    final List<RowVector> out0 = session.rowVectorOps().partitionByKeys(input, ImmutableList.of(0));
     Assert.assertEquals(3, out0.size());
     Assert.assertEquals(
         ResourceTests.readResourceAsString("vector-output/partition-by-keys-1.txt"),
         BaseVectors.toString(out0));
 
-    final List<RowVector> out1 = session.rowVectorOps().partitionByKeys(input, List.of(1));
+    final List<RowVector> out1 = session.rowVectorOps().partitionByKeys(input, ImmutableList.of(1));
     Assert.assertEquals(1, out1.size());
     Assert.assertEquals(
         ResourceTests.readResourceAsString("vector-output/partition-by-keys-2.txt"),
@@ -76,7 +77,8 @@ public class RowVectorTest {
   public void testPartitionByKeysMultiplePartitionKeys() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     Assert.assertEquals(3, input.getSize());
-    final List<RowVector> out0 = session.rowVectorOps().partitionByKeys(input, List.of(1, 2));
+    final List<RowVector> out0 =
+        session.rowVectorOps().partitionByKeys(input, ImmutableList.of(1, 2));
     Assert.assertEquals(3, out0.size());
     Assert.assertEquals(
         ResourceTests.readResourceAsString("vector-output/partition-by-keys-3.txt"),

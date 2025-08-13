@@ -18,12 +18,12 @@ package io.github.zhztheplayer.velox4j.serde;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
@@ -157,14 +157,15 @@ public final class SerdeTests {
             MapType.create(
                 new VarCharType(),
                 new RowType(
-                    List.of("id", "description"), List.of(new BigIntType(), new VarCharType()))));
+                    ImmutableList.of("id", "description"),
+                    ImmutableList.of(new BigIntType(), new VarCharType()))));
     final HiveColumnHandle handle =
         new HiveColumnHandle(
             "complex_type",
             ColumnType.REGULAR,
             dataType,
             dataType,
-            List.of("complex_type[1][\"foo\"].id", "complex_type[2][\"foo\"].id"));
+            ImmutableList.of("complex_type[1][\"foo\"].id", "complex_type[2][\"foo\"].id"));
     return handle;
   }
 
@@ -177,22 +178,22 @@ public final class SerdeTests {
         FileFormat.ORC,
         1,
         100,
-        Map.of("key", "value"),
+        ImmutableMap.of("key", "value"),
         1,
         new HiveBucketConversion(
             1,
             1,
-            List.of(
+            ImmutableList.of(
                 new HiveColumnHandle(
                     "t",
                     ColumnType.REGULAR,
                     new IntegerType(),
                     new IntegerType(),
                     Collections.emptyList()))),
-        Map.of("sk", "sv"),
+        ImmutableMap.of("sk", "sv"),
         "extra",
-        Map.of("serde_key", "serde_value"),
-        Map.of("info_key", "info_value"),
+        ImmutableMap.of("serde_key", "serde_value"),
+        ImmutableMap.of("info_key", "info_value"),
         new FileProperties(100L, 50L),
         new RowIdProperties(5, 10, "UUID-100"));
   }
@@ -206,22 +207,22 @@ public final class SerdeTests {
         FileFormat.ORC,
         1,
         100,
-        Map.of("key", "value"),
+        ImmutableMap.of("key", "value"),
         1,
         new HiveBucketConversion(
             1,
             1,
-            List.of(
+            ImmutableList.of(
                 new HiveColumnHandle(
                     "t",
                     ColumnType.REGULAR,
                     new IntegerType(),
                     new IntegerType(),
                     Collections.emptyList()))),
-        Map.of("sk", "sv"),
+        ImmutableMap.of("sk", "sv"),
         null,
-        Map.of("serde_key", "serde_value"),
-        Map.of("info_key", "info_value"),
+        ImmutableMap.of("serde_key", "serde_value"),
+        ImmutableMap.of("info_key", "info_value"),
         new FileProperties(null, 50L),
         new RowIdProperties(5, 10, "UUID-100"));
   }
@@ -232,10 +233,10 @@ public final class SerdeTests {
             "connector-1",
             "tab-1",
             true,
-            List.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
+            ImmutableList.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
             new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
             outputType,
-            Map.of("tk", "tv"));
+            ImmutableMap.of("tk", "tv"));
     return handle;
   }
 
@@ -251,27 +252,28 @@ public final class SerdeTests {
     return new HiveBucketProperty(
         HiveBucketProperty.Kind.PRESTO_NATIVE,
         10,
-        List.of("foo", "bar"),
-        List.of(new IntegerType(), new VarCharType()),
-        List.of(
+        ImmutableList.of("foo", "bar"),
+        ImmutableList.of(new IntegerType(), new VarCharType()),
+        ImmutableList.of(
             new HiveSortingColumn("foo", new SortOrder(true, true)),
             new HiveSortingColumn("bar", new SortOrder(false, false))));
   }
 
   public static HiveInsertTableHandle newSampleHiveInsertTableHandle() {
     return new HiveInsertTableHandle(
-        List.of(newSampleHiveColumnHandle()),
+        ImmutableList.of(newSampleHiveColumnHandle()),
         newSampleLocationHandle(),
         FileFormat.PARQUET,
         newSampleHiveBucketProperty(),
         CompressionKind.ZLIB,
-        Map.of("serde_key", "serde_value"),
+        ImmutableMap.of("serde_key", "serde_value"),
         false,
         new HiveInsertFileNameGenerator());
   }
 
   public static RowType newSampleOutputType() {
-    return new RowType(List.of("foo", "bar"), List.of(new IntegerType(), new IntegerType()));
+    return new RowType(
+        ImmutableList.of("foo", "bar"), ImmutableList.of(new IntegerType(), new IntegerType()));
   }
 
   public static PlanNode newSampleTableScanNode(String planNodeId, RowType outputType) {
@@ -288,10 +290,10 @@ public final class SerdeTests {
                 new IntegerType(),
                 Collections.singletonList(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
                 "sum"),
-            List.of(new IntegerType()),
+            ImmutableList.of(new IntegerType()),
             FieldAccessTypedExpr.create(new IntegerType(), "foo"),
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-            List.of(new SortOrder(true, true)),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            ImmutableList.of(new SortOrder(true, true)),
             true);
     return aggregate;
   }
@@ -304,14 +306,14 @@ public final class SerdeTests {
         new AggregationNode(
             aggNodeId,
             AggregateStep.PARTIAL,
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-            List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-            List.of("sum"),
-            List.of(aggregate),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+            ImmutableList.of("sum"),
+            ImmutableList.of(aggregate),
             true,
-            List.of(scan),
+            ImmutableList.of(scan),
             FieldAccessTypedExpr.create(new IntegerType(), "foo"),
-            List.of(0));
+            ImmutableList.of(0));
     return aggregationNode;
   }
 
@@ -339,13 +341,13 @@ public final class SerdeTests {
         new WindowFrame(WindowType.RANGE, BoundType.PRECEDING, null, BoundType.FOLLOWING, null);
     return new WindowNode(
         windowNodeId,
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "bar")),
-        List.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
-        List.of(new SortOrder(true, false)),
-        List.of("sum_out"),
-        List.of(new WindowFunction(call, frame, true)),
+        ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "bar")),
+        ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        ImmutableList.of(new SortOrder(true, false)),
+        ImmutableList.of("sum_out"),
+        ImmutableList.of(new WindowFunction(call, frame, true)),
         true,
-        List.of(scan));
+        ImmutableList.of(scan));
   }
 
   public static class ObjectAndJson<T> {

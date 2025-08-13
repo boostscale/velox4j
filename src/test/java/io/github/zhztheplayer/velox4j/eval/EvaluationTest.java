@@ -16,8 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.eval;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -109,7 +108,7 @@ public class EvaluationTest {
         new Evaluation(
             new CallTypedExpr(
                 new BigIntType(),
-                List.of(
+                ImmutableList.of(
                     FieldAccessTypedExpr.create(new BigIntType(), "c0"),
                     FieldAccessTypedExpr.create(new BigIntType(), "a1")),
                 "multiply"),

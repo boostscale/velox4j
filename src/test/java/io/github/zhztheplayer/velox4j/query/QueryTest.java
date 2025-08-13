@@ -20,11 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -98,7 +99,8 @@ public class QueryTest {
   @Test
   public void testValuesWith2Steps() {
     final PlanNode values =
-        ValuesNode.create("id-1", List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
+        ValuesNode.create(
+            "id-1", ImmutableList.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
     final Query query = new Query(values, Config.empty(), ConnectorConfig.empty());
     final QueryExecutor exec = session.queryOps().createQueryExecutor(query);
     final SerialTask task = exec.execute();
@@ -108,7 +110,8 @@ public class QueryTest {
   @Test
   public void testValues() {
     final PlanNode values =
-        ValuesNode.create("id-1", List.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
+        ValuesNode.create(
+            "id-1", ImmutableList.of(BaseVectorTests.newSampleRowVector(session)), true, 5);
     final Query query = new Query(values, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
     SampleQueryTests.assertIterator(task, 5);
@@ -158,7 +161,8 @@ public class QueryTest {
     final Query query =
         new Query(
             scanNode,
-            Config.create(Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
+            Config.create(
+                ImmutableMap.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
             ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
@@ -191,7 +195,8 @@ public class QueryTest {
     final Query query =
         new Query(
             scanNode,
-            Config.create(Map.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
+            Config.create(
+                ImmutableMap.of("max_output_batch_rows", String.format("%d", maxOutputBatchRows))),
             ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
@@ -271,7 +276,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     ;
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", es.id());
@@ -290,7 +295,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -339,7 +344,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -382,7 +387,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -419,7 +424,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -495,7 +500,7 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -606,10 +611,10 @@ public class QueryTest {
             "id-1",
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
-            List.of());
+            ImmutableList.of());
     final FilterNode filterNode =
         new FilterNode(
-            "id-2", List.of(scanNode), ConstantTypedExpr.create(new BooleanValue(false)));
+            "id-2", ImmutableList.of(scanNode), ConstantTypedExpr.create(new BooleanValue(false)));
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
@@ -646,9 +651,9 @@ public class QueryTest {
     final ProjectNode projectNode =
         new ProjectNode(
             "id-2",
-            List.of(scanNode),
-            List.of("n_nationkey", "n_comment"),
-            List.of(
+            ImmutableList.of(scanNode),
+            ImmutableList.of("n_nationkey", "n_comment"),
+            ImmutableList.of(
                 FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey"),
                 FieldAccessTypedExpr.create(new VarCharType(), "n_comment")));
     final Query query = new Query(projectNode, Config.empty(), ConnectorConfig.empty());
@@ -671,10 +676,10 @@ public class QueryTest {
     final FilterNode filterNode =
         new FilterNode(
             "id-2",
-            List.of(scanNode),
+            ImmutableList.of(scanNode),
             new CallTypedExpr(
                 new BooleanType(),
-                List.of(
+                ImmutableList.of(
                     FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
                     ConstantTypedExpr.create(new BigIntValue(3L))),
                 "greaterthanorequal"));
@@ -703,14 +708,15 @@ public class QueryTest {
         new HashJoinNode(
             "id-3",
             JoinType.LEFT,
-            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
-            List.of(FieldAccessTypedExpr.create(new BigIntType(), "r_regionkey")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new BigIntType(), "r_regionkey")),
             null,
             nationScanNode,
             regionScanNode,
             new RowType(
-                List.of("n_nationkey", "n_name", "r_regionkey", "r_name"),
-                List.of(new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
+                ImmutableList.of("n_nationkey", "n_name", "r_regionkey", "r_name"),
+                ImmutableList.of(
+                    new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
             false);
     final Query query = new Query(hashJoinNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
@@ -734,11 +740,11 @@ public class QueryTest {
     final OrderByNode orderByNode =
         new OrderByNode(
             "id-2",
-            List.of(scanNode),
-            List.of(
+            ImmutableList.of(scanNode),
+            ImmutableList.of(
                 FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
                 FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
-            List.of(new SortOrder(true, false), new SortOrder(false, false)),
+            ImmutableList.of(new SortOrder(true, false), new SortOrder(false, false)),
             false);
     final Query query = new Query(orderByNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
@@ -757,7 +763,7 @@ public class QueryTest {
     final RowType outputType = NATION_FILE.schema();
     final TableScanNode scanNode = newSampleTableScanNode("id-1", outputType);
     final ConnectorSplit split = newSampleSplit(file);
-    final LimitNode limitNode = new LimitNode("id-2", List.of(scanNode), 5, 3, false);
+    final LimitNode limitNode = new LimitNode("id-2", ImmutableList.of(scanNode), 5, 3, false);
     final Query query = new Query(limitNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
@@ -839,13 +845,13 @@ public class QueryTest {
     final WindowNode windowNode =
         new WindowNode(
             "id-2",
-            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
-            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
-            List.of(new SortOrder(false, true)),
-            List.of("row_num"),
-            List.of(
+            ImmutableList.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+            ImmutableList.of(FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
+            ImmutableList.of(new SortOrder(false, true)),
+            ImmutableList.of("row_num"),
+            ImmutableList.of(
                 new WindowFunction(
-                    new CallTypedExpr(new IntegerType(), List.of(), "row_number"),
+                    new CallTypedExpr(new IntegerType(), ImmutableList.of(), "row_number"),
                     new WindowFrame(
                         WindowType.RANGE,
                         BoundType.UNBOUNDED_PRECEDING,
@@ -854,7 +860,7 @@ public class QueryTest {
                         null),
                     false)),
             false,
-            List.of(scanNode));
+            ImmutableList.of(scanNode));
 
     final Query query = new Query(windowNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
@@ -880,7 +886,7 @@ public class QueryTest {
             FileFormat.PARQUET,
             null,
             CompressionKind.GZIP,
-            Map.of(),
+            ImmutableMap.of(),
             true,
             new HiveInsertFileNameGenerator());
     final RowType outputType = TableWriteTraits.outputType();
@@ -895,7 +901,7 @@ public class QueryTest {
             false,
             outputType,
             CommitStrategy.NO_COMMIT,
-            List.of(scanNode));
+            ImmutableList.of(scanNode));
     return tableWriteNode;
   }
 
@@ -906,7 +912,8 @@ public class QueryTest {
       final Type type = rowType.getChildren().get(i);
       list.add(
           new Assignment(
-              name, new HiveColumnHandle(name, ColumnType.REGULAR, type, type, List.of())));
+              name,
+              new HiveColumnHandle(name, ColumnType.REGULAR, type, type, ImmutableList.of())));
     }
     return list;
   }
@@ -916,7 +923,7 @@ public class QueryTest {
     for (int i = 0; i < rowType.size(); i++) {
       final String name = rowType.getNames().get(i);
       final Type type = rowType.getChildren().get(i);
-      list.add(new HiveColumnHandle(name, ColumnType.REGULAR, type, type, List.of()));
+      list.add(new HiveColumnHandle(name, ColumnType.REGULAR, type, type, ImmutableList.of()));
     }
     return list;
   }
@@ -930,13 +937,13 @@ public class QueryTest {
         FileFormat.PARQUET,
         0,
         file.length(),
-        Map.of(),
+        ImmutableMap.of(),
         null,
         null,
-        Map.of(),
+        ImmutableMap.of(),
         null,
-        Map.of(),
-        Map.of(),
+        ImmutableMap.of(),
+        ImmutableMap.of(),
         null,
         null);
   }
@@ -947,7 +954,13 @@ public class QueryTest {
             planNodeId,
             outputType,
             new HiveTableHandle(
-                "connector-hive", "tab-1", false, List.of(), null, outputType, Map.of()),
+                "connector-hive",
+                "tab-1",
+                false,
+                ImmutableList.of(),
+                null,
+                outputType,
+                ImmutableMap.of()),
             toAssignments(outputType));
     return scanNode;
   }
@@ -958,24 +971,25 @@ public class QueryTest {
         new AggregationNode(
             planNodeId,
             AggregateStep.SINGLE,
-            List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
-            List.of(),
-            List.of("cnt"),
-            List.of(
+            ImmutableList.of(FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey")),
+            ImmutableList.of(),
+            ImmutableList.of("cnt"),
+            ImmutableList.of(
                 new Aggregate(
                     new CallTypedExpr(
                         new BigIntType(),
-                        List.of(FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
+                        ImmutableList.of(
+                            FieldAccessTypedExpr.create(new BigIntType(), "n_nationkey")),
                         "sum"),
-                    List.of(new BigIntType()),
+                    ImmutableList.of(new BigIntType()),
                     null,
-                    List.of(),
-                    List.of(),
+                    ImmutableList.of(),
+                    ImmutableList.of(),
                     false)),
             false,
-            List.of(source),
+            ImmutableList.of(source),
             null,
-            List.of());
+            ImmutableList.of());
     return aggregationNode;
   }
 }
