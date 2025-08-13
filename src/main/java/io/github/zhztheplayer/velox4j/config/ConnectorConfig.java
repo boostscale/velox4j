@@ -24,11 +24,12 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 public class ConnectorConfig extends ISerializable {
-  private static final ConnectorConfig EMPTY = new ConnectorConfig(List.of());
+  private static final ConnectorConfig EMPTY = new ConnectorConfig(ImmutableList.of());
 
   public static ConnectorConfig empty() {
     return EMPTY;

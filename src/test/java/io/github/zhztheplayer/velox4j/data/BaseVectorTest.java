@@ -16,8 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.data;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -71,7 +70,9 @@ public class BaseVectorTest {
   @Test
   public void testCreateEmpty2() {
     final Type type =
-        new RowType(List.of("foo2", "bar2"), List.of(new IntegerType(), new IntegerType()));
+        new RowType(
+            ImmutableList.of("foo2", "bar2"),
+            ImmutableList.of(new IntegerType(), new IntegerType()));
     final BaseVector vector = session.baseVectorOps().createEmpty(type);
     Assert.assertEquals(Serde.toPrettyJson(type), Serde.toPrettyJson(vector.getType()));
     Assert.assertEquals(0, vector.getSize());

@@ -129,7 +129,7 @@ public class PolymorphicDeserializer {
           return bd.withByNameInclusion(
               SerdeRegistry.findKvPairs(beanClass).stream()
                   .map(SerdeRegistry.KvPair::getKey)
-                  .collect(Collectors.toUnmodifiableSet()),
+                  .collect(Collectors.toSet()),
               null);
         }
       }

@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.jni;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
@@ -156,7 +157,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final List<RowVector> vectors = List.of(vector);
+    final List<RowVector> vectors = ImmutableList.of(vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);
@@ -172,7 +173,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final List<RowVector> vectors = List.of(vector, vector);
+    final List<RowVector> vectors = ImmutableList.of(vector, vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);

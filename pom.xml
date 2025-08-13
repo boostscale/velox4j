@@ -40,10 +40,7 @@
     <skip.cpp.build>false</skip.cpp.build>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
-    <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.release>11</maven.compiler.release>
+    <java.version>8</java.version>
     <junit.version>4.13.1</junit.version>
     <arrow.version>18.1.0</arrow.version>
     <guava.version>33.4.0-jre</guava.version>
@@ -150,6 +147,14 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.0</version>
+        <configuration>
+          <release>${java.version}</release>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
