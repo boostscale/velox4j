@@ -80,7 +80,7 @@ of Velox4J at the time. But certainly, contributions are always welcomed if anyo
 The minimum toolchain versions for building Velox4J:
 
 - GCC 11
-- JDK 11
+- JDK 8
 
 ## Releases
 
