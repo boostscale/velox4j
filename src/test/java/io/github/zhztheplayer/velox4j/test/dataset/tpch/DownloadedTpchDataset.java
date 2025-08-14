@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 
@@ -135,7 +135,7 @@ class DownloadedTpchDataset implements TpchDataset {
   private void extractTarGz(Path archive, Path destDir) throws IOException {
     try (GZIPInputStream gis = new GZIPInputStream(Files.newInputStream(archive));
         TarArchiveInputStream tis = new TarArchiveInputStream(gis)) {
-      ArchiveEntry entry;
+      TarArchiveEntry entry;
       while ((entry = tis.getNextEntry()) != null) {
         final Path outPath = destDir.resolve(entry.getName());
         if (entry.isDirectory()) {

@@ -42,11 +42,11 @@
     <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
     <java.version>8</java.version>
     <junit.version>4.13.1</junit.version>
-    <arrow.version>14.0.2</arrow.version>
-    <guava.version>14.0.1</guava.version>
-    <jackson.version>2.13.4</jackson.version>
-    <commons-io.version>2.11.0</commons-io.version>
-    <commons-compress.version>1.21</commons-compress.version>
+    <arrow.version>18.1.0</arrow.version>
+    <guava.version>33.4.0-jre</guava.version>
+    <commons-io.version>2.18.0</commons-io.version>
+    <jackson.version>2.18.0</jackson.version>
+    <commons-compress.version>1.27.1</commons-compress.version>
   </properties>
 
   <dependencies>
@@ -70,6 +70,10 @@
         <exclusion>
           <groupId>com.fasterxml.jackson.datatype</groupId>
           <artifactId>jackson-datatype-jsr310</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-common</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -254,23 +258,7 @@
 
   <profiles>
     <profile>
-      <id>with-newer-deps</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <arrow.version>18.1.0</arrow.version>
-        <guava.version>33.4.0-jre</guava.version>
-        <jackson.version>2.18.0</jackson.version>
-        <commons-io.version>2.18.0</commons-io.version>
-        <commons-compress.version>1.27.1</commons-compress.version>
-      </properties>
-    </profile>
-    <profile>
       <id>release</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
       <build>
         <plugins>
           <plugin>
