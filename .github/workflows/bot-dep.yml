@@ -41,7 +41,7 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: '[BOT] Bump Velox version'
-          title: '[BOT] Bump velox version'
+          title: '[BOT] Bump Velox version'
           body: |
             ${{ env.BUMP_VELOX_DESCRIPTION }}
           branch: bump-velox-${{ github.run_number }}
