@@ -63,6 +63,9 @@ public class StaticJniWrapper {
   // For Variant.
   native String variantInferType(String json);
 
+  // For Type.
+  native String arrowToType(long cSchema);
+
   // For BaseVector / RowVector / SelectivityVector.
   native void baseVectorToArrow(long rvid, long cSchema, long cArray);
 

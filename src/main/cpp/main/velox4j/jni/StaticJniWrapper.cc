@@ -155,6 +155,15 @@ jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(nullptr);
 }
 
+jstring arrowToType(JNIEnv* env, jobject javaThis, jlong cSchema) {
+  JNI_METHOD_START
+  auto type = fromArrowToType(reinterpret_cast<struct ArrowSchema*>(cSchema));
+  auto serializedDynamic = type->serialize();
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 void baseVectorToArrow(
     JNIEnv* env,
     jobject javaThis,
@@ -344,6 +353,8 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       kTypeString,
       nullptr);
+  addNativeMethod(
+      "arrowToType", (void*)arrowToType, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
       "baseVectorToArrow",
       (void*)baseVectorToArrow,

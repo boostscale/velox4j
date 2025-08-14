@@ -45,10 +45,25 @@ void flatten(VectorPtr& in) {
 
 ArrowOptions makeOptions() {
   ArrowOptions options;
+  // TODO: Make the timestamp unit configurable or included in presets.
   options.timestampUnit = static_cast<TimestampUnit>(6);
   return options;
 }
 } // namespace
+
+void fromTypeToArrow(
+    memory::MemoryPool* pool,
+    TypePtr type,
+    ArrowSchema* cSchema) {
+  auto options = makeOptions();
+  auto emptyVector = BaseVector::create(type, 0, pool);
+  exportToArrow(emptyVector, *cSchema, options);
+}
+
+TypePtr fromArrowToType(ArrowSchema* cSchema) {
+  auto options = makeOptions();
+  return importFromArrow(*cSchema);
+}
 
 void fromBaseVectorToArrow(
     VectorPtr vector,
