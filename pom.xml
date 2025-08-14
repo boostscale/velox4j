@@ -44,8 +44,8 @@
     <junit.version>4.13.1</junit.version>
     <arrow.version>18.1.0</arrow.version>
     <guava.version>33.4.0-jre</guava.version>
-    <commons-io.version>2.18.0</commons-io.version>
     <jackson.version>2.18.0</jackson.version>
+    <commons-io.version>2.18.0</commons-io.version>
     <commons-compress.version>1.27.1</commons-compress.version>
   </properties>
 
@@ -121,6 +121,7 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${commons-io.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
