@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.StandardSystemProperty;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.resource.ResourceFile;
@@ -34,8 +33,7 @@ public class JniLibLoader {
 
   private static final String LIB_CONTAINER =
       String.format(
-          "velox4j-lib/%s/%s",
-          StandardSystemProperty.OS_NAME.value(), StandardSystemProperty.OS_ARCH.value());
+          "velox4j-lib/%s/%s", System.getProperty("os.name"), System.getProperty("os.arch"));
   private static final Pattern LIB_PATTERN = Pattern.compile("^.+$");
   private static final String VELOX4J_LIB_NAME = "libvelox4j.so";
 

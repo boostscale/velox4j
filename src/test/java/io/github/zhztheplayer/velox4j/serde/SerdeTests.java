@@ -16,15 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.serde;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.Collections;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 
@@ -77,8 +77,8 @@ public final class SerdeTests {
       final String inJson = Serde.toPrettyJson(inObj);
 
       {
-        final byte[] serialized = SerializationUtils.serialize(inObj);
-        final ISerializable javaDeserialized = SerializationUtils.deserialize(serialized);
+        final byte[] serialized = serialize(inObj);
+        final ISerializable javaDeserialized = deserialize(serialized);
         final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
         assertJsonEquals(inJson, javaDeserializedJson);
       }
@@ -104,8 +104,8 @@ public final class SerdeTests {
       final String inJson = Serde.toPrettyJson(inObj);
 
       {
-        final byte[] serialized = SerializationUtils.serialize(inObj);
-        final Variant javaDeserialized = SerializationUtils.deserialize(serialized);
+        final byte[] serialized = serialize(inObj);
+        final Variant javaDeserialized = deserialize(serialized);
         final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
         assertJsonEquals(inJson, javaDeserializedJson);
       }
@@ -135,8 +135,8 @@ public final class SerdeTests {
       final String inJson = jsonMapper.writeValueAsString(inObj);
 
       {
-        final byte[] serialized = SerializationUtils.serialize((Serializable) inObj);
-        final Object javaDeserialized = SerializationUtils.deserialize(serialized);
+        final byte[] serialized = serialize((Serializable) inObj);
+        final Object javaDeserialized = deserialize(serialized);
         final String javaDeserializedJson = jsonMapper.writeValueAsString(javaDeserialized);
         assertJsonEquals(inJson, javaDeserializedJson);
       }
@@ -365,6 +365,27 @@ public final class SerdeTests {
 
     public String getJson() {
       return json;
+    }
+  }
+
+  private static byte[] serialize(final Serializable obj) {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+    try (ObjectOutputStream out = new ObjectOutputStream(baos)) {
+      out.writeObject(obj);
+    } catch (IOException e) {
+      throw new VeloxException(e);
+    }
+    return baos.toByteArray();
+  }
+
+  private static <T> T deserialize(final byte[] objectData) {
+    Preconditions.checkNotNull(objectData, "objectData");
+    try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(objectData))) {
+      @SuppressWarnings("unchecked")
+      final T obj = (T) in.readObject();
+      return obj;
+    } catch (final ClassNotFoundException | IOException | NegativeArraySizeException ex) {
+      throw new VeloxException(ex);
     }
   }
 }
