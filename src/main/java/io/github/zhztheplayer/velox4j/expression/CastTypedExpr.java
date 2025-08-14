@@ -36,7 +36,8 @@ public class CastTypedExpr extends TypedExpr {
       @JsonProperty("isTryCast") boolean isTryCast) {
     super(returnType, inputs);
     Preconditions.checkArgument(
-        inputs.size() == 1, "CastTypedExpr should have 1 input, but has %s", inputs.size());
+        inputs.size() == 1,
+        String.format("CastTypedExpr should have 1 input, but has %s", inputs.size()));
     this.isTryCast = isTryCast;
   }
 
