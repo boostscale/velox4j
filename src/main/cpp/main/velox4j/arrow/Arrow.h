@@ -23,6 +23,16 @@ struct ArrowArray;
 struct ArrowSchema;
 
 namespace velox4j {
+
+// Exports the input Velox type to Arrow C schema.
+void fromTypeToArrow(
+    facebook::velox::memory::MemoryPool* pool,
+    facebook::velox::TypePtr type,
+    ArrowSchema* cSchema);
+
+// Imports the given Arrow C schema into a Velox type, then returns it.
+facebook::velox::TypePtr fromArrowToType(ArrowSchema* cSchema);
+
 // Exports the input base vector to Arrow ABI structs.
 void fromBaseVectorToArrow(
     facebook::velox::VectorPtr vector,

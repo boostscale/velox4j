@@ -91,6 +91,11 @@ public final class JniApi {
     return new ExternalStreams.BlockingQueue(jni.createBlockingQueue());
   }
 
+  public void typeToArrow(Type type, ArrowSchema schema) {
+    final String typeJson = Serde.toJson(type);
+    jni.typeToArrow(typeJson, schema.memoryAddress());
+  }
+
   public BaseVector createEmptyBaseVector(Type type) {
     final String typeJson = Serde.toJson(type);
     return baseVectorWrap(jni.createEmptyBaseVector(typeJson));

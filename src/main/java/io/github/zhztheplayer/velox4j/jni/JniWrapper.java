@@ -57,6 +57,9 @@ final class JniWrapper {
 
   native long createBlockingQueue();
 
+  // For Type.
+  native void typeToArrow(String typeJson, long cSchema);
+
   // For BaseVector / RowVector / SelectivityVector.
   native long createEmptyBaseVector(String typeJson);
 

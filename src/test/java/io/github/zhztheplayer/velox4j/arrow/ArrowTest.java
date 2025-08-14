@@ -16,10 +16,13 @@
 */
 package io.github.zhztheplayer.velox4j.arrow;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.table.Table;
+import org.apache.arrow.vector.types.pojo.Field;
+import org.apache.arrow.vector.types.pojo.Schema;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -29,7 +32,9 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.session.Session;
+import io.github.zhztheplayer.velox4j.test.TypeTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.type.*;
 
 public class ArrowTest {
   private static BytesAllocationListener allocationListener;
@@ -61,7 +66,7 @@ public class ArrowTest {
 
   @Test
   public void testBaseVectorRoundTrip() {
-    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    final BaseVector input = BaseVectorTests.newSampleIntVector(session);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final FieldVector arrowVector = Arrow.toArrowVector(alloc, input);
     final BaseVector imported = session.arrowOps().fromArrowVector(alloc, arrowVector);
@@ -70,12 +75,57 @@ public class ArrowTest {
   }
 
   @Test
-  public void testRowVectorRoundTrip() {
+  public void testRowVectorRoundTrip1() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
     final Table arrowTable = Arrow.toArrowTable(alloc, input);
     final RowVector imported = session.arrowOps().fromArrowTable(alloc, arrowTable);
     BaseVectorTests.assertEquals(input, imported);
     arrowTable.close();
+  }
+
+  @Test
+  public void testRowVectorRoundTrip2() {
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
+    final Table arrowTable = Arrow.toArrowTable(alloc, input);
+    final RowVector imported = session.arrowOps().fromArrowTable(alloc, arrowTable);
+    BaseVectorTests.assertEquals(input, imported);
+    arrowTable.close();
+  }
+
+  @Test
+  public void testPrimitiveTypeRoundTrip() {
+    final Type type = new DecimalType(10, 7);
+    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
+    final Field arrowField = session.arrowOps().toArrowField(alloc, type);
+    final Type imported = Arrow.fromArrowField(alloc, arrowField);
+    TypeTests.assertEquals(type, imported);
+  }
+
+  @Test
+  public void testRowTypeRoundTrip1() {
+    final RowType type =
+        new RowType(
+            ImmutableList.of("a", "B", "c", "D"),
+            ImmutableList.of(
+                new IntegerType(), new VarCharType(), new DecimalType(10, 7), new TimestampType()));
+    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
+    final Field arrowField = session.arrowOps().toArrowField(alloc, type);
+    final Type imported = Arrow.fromArrowField(alloc, arrowField);
+    TypeTests.assertEquals(type, imported);
+  }
+
+  @Test
+  public void testRowTypeRoundTrip2() {
+    final RowType type =
+        new RowType(
+            ImmutableList.of("a", "B", "c", "D"),
+            ImmutableList.of(
+                new IntegerType(), new VarCharType(), new DecimalType(10, 7), new TimestampType()));
+    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
+    final Schema arrowSchema = session.arrowOps().toArrowSchema(alloc, type);
+    final RowType imported = Arrow.fromArrowSchema(alloc, arrowSchema);
+    TypeTests.assertEquals(type, imported);
   }
 }

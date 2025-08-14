@@ -106,6 +106,11 @@ public class StaticJniApi {
     return Serde.fromJson(typeJson, Type.class);
   }
 
+  public Type arrowToRowType(ArrowSchema schema) {
+    final String typeJson = jni.arrowToType(schema.memoryAddress());
+    return Serde.fromJson(typeJson, Type.class);
+  }
+
   public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
     jni.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
   }

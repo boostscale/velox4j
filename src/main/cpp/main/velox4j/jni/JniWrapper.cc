@@ -132,9 +132,27 @@ jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_END(-1L)
 }
 
+void typeToArrow(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jlong cSchema) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto serdePool = session->memoryManager()->getVeloxPool(
+      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  auto dynamic = folly::parseJson(jTypeJson.get());
+  auto type = ISerializable::deserialize<Type>(dynamic, serdePool);
+  auto typePool = session->memoryManager()->getVeloxPool(
+      "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  fromTypeToArrow(
+      typePool, type, reinterpret_cast<struct ArrowSchema*>(cSchema));
+  JNI_METHOD_END()
+}
+
 jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
   JNI_METHOD_START
-  // TODO Session memory pool.
   auto session = sessionOf(env, javaThis);
   auto serdePool = session->memoryManager()->getVeloxPool(
       "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
@@ -453,6 +471,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)createEmptyBaseVector,
       kTypeLong,
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "typeToArrow",
+      (void*)typeToArrow,
+      kTypeVoid,
+      kTypeString,
+      kTypeLong,
       nullptr);
   addNativeMethod(
       "arrowToBaseVector",
