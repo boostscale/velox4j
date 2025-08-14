@@ -14,32 +14,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
+import java.util.List;
 
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
-
+public class PartitionFunctionSpec extends ISerializable {
   @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  public PartitionFunctionSpec() {
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
-  }
-
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
-  }
 }

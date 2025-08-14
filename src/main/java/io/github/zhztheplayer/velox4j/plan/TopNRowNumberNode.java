@@ -14,57 +14,51 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.aggregate;
-
-import java.util.List;
+package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
-import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.type.Type;
 
-public class Aggregate extends ISerializable {
-  public final CallTypedExpr call;
-  public final List<Type> rawInputTypes;
-  public final FieldAccessTypedExpr mask;
-  public final List<FieldAccessTypedExpr> sortingKeys;
-  public final List<SortOrder> sortingOrders;
-  public final boolean distinct;
+import java.util.List;
+
+public class TopNRowNumberNode extends PlanNode {
+  private final List<FieldAccessTypedExpr> partitionKeys;
+  private final List<FieldAccessTypedExpr> sortingKeys;
+  private final List<SortOrder> sortingOrders;
+  private final List<String> rowNumberColumnName;
+  private final int limit;
+
+  private final List<PlanNode> sources;
 
   @JsonCreator
-  public Aggregate(
-      @JsonProperty("call") CallTypedExpr call,
-      @JsonProperty("rawInputTypes") List<Type> rawInputTypes,
-      @JsonProperty("mask") FieldAccessTypedExpr mask,
+  public TopNRowNumberNode(
+      @JsonProperty("id") String id,
+      @JsonProperty("partitionKeys") List<FieldAccessTypedExpr> partitionKeys,
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
       @JsonProperty("sortingOrders") List<SortOrder> sortingOrders,
-      @JsonProperty("distinct") boolean distinct) {
-    this.call = call;
-    this.rawInputTypes = rawInputTypes;
-    this.mask = mask;
+      @JsonProperty("rowNumberColumnName") List<String> rowNumberColumnName,
+      @JsonProperty("limit") int limit,
+      @JsonProperty("sources") List<PlanNode> sources) {
+    super(id);
+    this.partitionKeys = partitionKeys;
     this.sortingKeys = sortingKeys;
     this.sortingOrders = sortingOrders;
-    this.distinct = distinct;
+    this.rowNumberColumnName = rowNumberColumnName;
+    this.limit = limit;
+    this.sources = sources;
   }
 
-  @JsonGetter("call")
-  public CallTypedExpr getCall() {
-    return call;
+  @Override
+  public List<PlanNode> getSources() {
+    return sources;
   }
 
-  @JsonGetter("rawInputTypes")
-  public List<Type> getRawInputTypes() {
-    return rawInputTypes;
-  }
-
-  @JsonGetter("mask")
-  public FieldAccessTypedExpr getMask() {
-    return mask;
+  @JsonGetter("partitionKeys")
+  public List<FieldAccessTypedExpr> getPartitionKeys() {
+    return partitionKeys;
   }
 
   @JsonGetter("sortingKeys")
@@ -72,13 +66,18 @@ public class Aggregate extends ISerializable {
     return sortingKeys;
   }
 
+  @JsonGetter("rowNumberColumnName")
+  public List<String> getRowNumberColumnName() {
+    return rowNumberColumnName;
+  }
+
   @JsonGetter("sortingOrders")
   public List<SortOrder> getSortingOrders() {
     return sortingOrders;
   }
 
-  @JsonGetter("distinct")
-  public boolean isDistinct() {
-    return distinct;
+  @JsonGetter("limit")
+  public int getLimit() {
+    return limit;
   }
 }

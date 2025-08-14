@@ -20,6 +20,7 @@
 #include <string>
 #include "Query.h"
 #include <velox/experimental/stateful/StatefulTask.h>
+#include <velox/experimental/stateful/StreamElement.h>
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/memory/MemoryManager.h"
 #include "velox4j/query/QueryExecutor.h"
@@ -38,6 +39,10 @@ class StatefulSerialTask : public UpIterator {
 
   facebook::velox::RowVectorPtr get() override;
 
+  facebook::velox::stateful::StreamElementPtr statefulGet();
+
+  void notifyWatermark(long watermark, int index);
+
   void addSplit(
       const facebook::velox::core::PlanNodeId& planNodeId,
       int32_t groupId,
@@ -54,7 +59,8 @@ class StatefulSerialTask : public UpIterator {
   MemoryManager* const memoryManager_;
   std::shared_ptr<const Query> query_;
   std::shared_ptr<facebook::velox::stateful::StatefulTask> task_;
-  facebook::velox::RowVectorPtr pending_{nullptr};
+  facebook::velox::stateful::StreamElementPtr pending_{nullptr};
+  std::string outNodeId_;
 };
 
 class StatefulQueryExecutor {

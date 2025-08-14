@@ -71,12 +71,12 @@ file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
 #  URL_HASH
 #  MD5=${VELOX_SOURCE_URL_MD5})
 set(VELOX_SOURCE_URL "https://github.com/bigo-sg/velox.git")
-#set(VELOX_SOURCE_URL ${CMAKE_CURRENT_LIST_DIR}/build/_deps/velox-src)
 CPMAddPackage(
         NAME velox
         GIT_REPOSITORY ${VELOX_SOURCE_URL}
-        GIT_TAG gluten
+        GIT_TAG 10c7b53736f079c4033e1c48b9298bf90c3c78be
 )
+#set(VELOX_SOURCE_URL ${CMAKE_CURRENT_LIST_DIR}/build/_deps/velox-src)
 #CPMAddPackage(
 #        NAME velox
 #        SOURCE_DIR  ${VELOX_SOURCE_URL}

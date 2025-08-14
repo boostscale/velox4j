@@ -131,7 +131,7 @@ void initForSpark() {
           std::unordered_map<std::string, std::string>()),
       nullptr));
   core::PlanNode::registerSerDe();
-  stateful::WatermarkAssignerNode::registerSerDe();
+  stateful::StatefulPlanNode::registerSerDe();
   core::ITypedExpr::registerSerDe();
   exec::registerPartitionFunctionSerDe();
 }

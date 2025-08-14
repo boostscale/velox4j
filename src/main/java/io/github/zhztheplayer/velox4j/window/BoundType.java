@@ -14,32 +14,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.window;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
+public enum BoundType {
+  KUNBOUNDEDPRECEDING("UNBOUNDED PRECEDING"),
+  KPRECEDING("PRECEDING"),
+  KCURRENTROW("CURRENT ROW"),
+  KFOLLOWING("FOLLOWING"),
+  KUNBOUNDEDFOLLOWING("UNBOUNDED FOLLOWING");
 
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
+  private final String value;
 
-  @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  BoundType(String value) {
+    this.value = value;
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
-  }
-
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  @JsonValue
+  public String toValue() {
+    return value;
   }
 }

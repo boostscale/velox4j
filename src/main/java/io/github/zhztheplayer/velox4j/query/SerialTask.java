@@ -21,6 +21,7 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.stateful.StatefulElement;
 
 public class SerialTask implements UpIterator {
   private final JniApi jniApi;
@@ -44,6 +45,16 @@ public class SerialTask implements UpIterator {
   @Override
   public RowVector get() {
     return jniApi.upIteratorGet(this);
+  }
+
+  // This method is for Flink
+  public StatefulElement statefulGet() {
+    return jniApi.statefulTaskGet(this);
+  }
+
+  // This method is for Flink
+  public void notifyWatermark(long watermark, int index) {
+    jniApi.notifyWatermark(this, watermark, index);
   }
 
   @Override
