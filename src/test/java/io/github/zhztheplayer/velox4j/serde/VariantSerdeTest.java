@@ -26,20 +26,7 @@ import org.junit.Test;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
-import io.github.zhztheplayer.velox4j.variant.ArrayValue;
-import io.github.zhztheplayer.velox4j.variant.BigIntValue;
-import io.github.zhztheplayer.velox4j.variant.BooleanValue;
-import io.github.zhztheplayer.velox4j.variant.DoubleValue;
-import io.github.zhztheplayer.velox4j.variant.HugeIntValue;
-import io.github.zhztheplayer.velox4j.variant.IntegerValue;
-import io.github.zhztheplayer.velox4j.variant.MapValue;
-import io.github.zhztheplayer.velox4j.variant.RealValue;
-import io.github.zhztheplayer.velox4j.variant.RowValue;
-import io.github.zhztheplayer.velox4j.variant.SmallIntValue;
-import io.github.zhztheplayer.velox4j.variant.TimestampValue;
-import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
-import io.github.zhztheplayer.velox4j.variant.VarBinaryValue;
-import io.github.zhztheplayer.velox4j.variant.VarCharValue;
+import io.github.zhztheplayer.velox4j.variant.*;
 
 public class VariantSerdeTest {
   @BeforeClass
@@ -147,13 +134,14 @@ public class VariantSerdeTest {
   public void testMapValue() {
     SerdeTests.testVariantRoundTrip(
         new MapValue(
-            ImmutableMap.of(
-                new IntegerValue(100), new BooleanValue(false),
-                new IntegerValue(1000), new BooleanValue(true),
-                new IntegerValue(400), new BooleanValue(false),
-                new IntegerValue(800), new BooleanValue(false),
-                new IntegerValue(200), new BooleanValue(true),
-                new IntegerValue(500), new BooleanValue(true))));
+            ImmutableMap.<Variant, Variant>builder()
+                .put(new IntegerValue(100), new BooleanValue(false))
+                .put(new IntegerValue(1000), new BooleanValue(true))
+                .put(new IntegerValue(400), new BooleanValue(false))
+                .put(new IntegerValue(800), new BooleanValue(false))
+                .put(new IntegerValue(200), new BooleanValue(true))
+                .put(new IntegerValue(500), new BooleanValue(true))
+                .build()));
     SerdeTests.testVariantRoundTrip(new MapValue(null));
   }
 

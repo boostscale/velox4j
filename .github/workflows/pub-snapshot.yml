@@ -37,7 +37,7 @@ jobs:
           key: ut-java-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-centos7-ccache-
-      - name: Run setup script / Build
+      - name: Run setup script / Build and run UTs
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
@@ -45,6 +45,8 @@ jobs:
             cd /velox4j
             bash .github/workflows/scripts/ut-java/setup-centos7.sh
             mvn generate-resources
+            mvn clean test -Dskip.cpp.build=true
+            mvn -P with-newer-deps clean test -Dskip.cpp.build=true
           "
       - name: Set up Java / Maven environment
         uses: actions/setup-java@v4
@@ -57,7 +59,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package
-        run: mvn -P release --batch-mode deploy -Dskip.cpp.build=true
+        run: mvn -P release --batch-mode clean deploy -Dskip.cpp.build=true
         env:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
