@@ -30,7 +30,9 @@ public class ArrayType extends Type {
   @JsonCreator
   private ArrayType(@JsonProperty("cTypes") List<Type> children) {
     Preconditions.checkArgument(
-        children.size() == 1, "ArrayType should have 1 child, but has %s", children.size());
+        children.size() == 1,
+        "ArrayType should have 1 child, but has %s",
+        new Object[] {children.size()});
     this.children = children;
   }
 

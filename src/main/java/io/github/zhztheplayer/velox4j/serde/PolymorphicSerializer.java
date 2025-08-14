@@ -93,7 +93,7 @@ public final class PolymorphicSerializer {
               "Class %s is an interface which is not currently supported by PolymorphicSerializer",
               clazz));
       Preconditions.checkArgument(
-          !baseClasses.contains(clazz), "Base class already registered: %s", clazz);
+          !baseClasses.contains(clazz), "Base class already registered: %s", new Object[] {clazz});
       baseClasses.add(clazz);
     }
   }

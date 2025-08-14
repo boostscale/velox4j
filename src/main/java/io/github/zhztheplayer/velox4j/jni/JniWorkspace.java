@@ -73,8 +73,9 @@ public class JniWorkspace {
 
   private static void mkdirs(File dir) {
     if (!dir.exists()) {
-      Preconditions.checkState(dir.mkdirs(), "Failed to create directory %s", dir);
+      Preconditions.checkState(dir.mkdirs(), "Failed to create directory %s", new Object[] {dir});
     }
-    Preconditions.checkArgument(dir.isDirectory(), "File %s is not a directory", dir);
+    Preconditions.checkArgument(
+        dir.isDirectory(), "File %s is not a directory", new Object[] {dir});
   }
 }

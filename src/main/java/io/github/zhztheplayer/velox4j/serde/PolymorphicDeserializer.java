@@ -70,8 +70,7 @@ public class PolymorphicDeserializer {
       Preconditions.checkArgument(
           registry.contains(value),
           "Value %s not registered in registry: %s",
-          value,
-          registry.prefixAndKey());
+          new Object[] {value, registry.prefixAndKey()});
       if (registry.isFactory(value)) {
         final SerdeRegistryFactory rf = registry.getFactory(value);
         final SerdeRegistry nextRegistry = findRegistry(rf, objectNode);
@@ -143,7 +142,7 @@ public class PolymorphicDeserializer {
               "Class %s is an interface which is not currently supported by PolymorphicDeserializer",
               clazz));
       Preconditions.checkArgument(
-          !baseClasses.contains(clazz), "Base class already registered: %s", clazz);
+          !baseClasses.contains(clazz), "Base class already registered: %s", new Object[] {clazz});
       baseClasses.add(clazz);
     }
   }

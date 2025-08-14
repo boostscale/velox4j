@@ -31,7 +31,7 @@ public final class ResourceTests {
   public static String readResourceAsString(String path) {
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
     try (final InputStream is = classloader.getResourceAsStream(path)) {
-      Preconditions.checkArgument(is != null, "Resource %s not found", path);
+      Preconditions.checkArgument(is != null, "Resource %s not found", new Object[] {path});
       final ByteArrayOutputStream o = new ByteArrayOutputStream();
       while (true) {
         int b = is.read();

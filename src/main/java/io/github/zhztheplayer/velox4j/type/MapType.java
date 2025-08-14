@@ -30,7 +30,9 @@ public class MapType extends Type {
   @JsonCreator
   private MapType(@JsonProperty("cTypes") List<Type> children) {
     Preconditions.checkArgument(
-        children.size() == 2, "MapType should have 2 children, but has %s", children.size());
+        children.size() == 2,
+        "MapType should have 2 children, but has %s",
+        new Object[] {children.size()});
     this.children = children;
   }
 
