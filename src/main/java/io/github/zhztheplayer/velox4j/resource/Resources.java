@@ -19,18 +19,14 @@ package io.github.zhztheplayer.velox4j.resource;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import com.google.common.base.Preconditions;
@@ -116,8 +112,6 @@ public class Resources {
     final ZipFile zf;
     try {
       zf = new ZipFile(jarFile);
-    } catch (final ZipException e) {
-      throw new RuntimeException(e);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -149,7 +143,7 @@ public class Resources {
       final Pattern pattern,
       final List<ResourceFile> buffer) {
     final File[] fileList = directory.listFiles();
-    for (final File file : fileList) {
+    for (final File file : Preconditions.checkNotNull(fileList)) {
       if (file.isDirectory()) {
         getResourcesFromDirectory(container, root, file, pattern, buffer);
       } else {
@@ -169,8 +163,10 @@ public class Resources {
     try (final InputStream is =
         new BufferedInputStream(
             Preconditions.checkNotNull(
-                classloader.getResourceAsStream(fromPath), "Resource %s not found", fromPath))) {
-      final BufferedOutputStream o = new BufferedOutputStream(new FileOutputStream(toFile));
+                classloader.getResourceAsStream(fromPath),
+                String.format("Resource %s not found", fromPath)))) {
+      final BufferedOutputStream o =
+          new BufferedOutputStream(Files.newOutputStream(toFile.toPath()));
       while (true) {
         int b = is.read();
         if (b == -1) {
