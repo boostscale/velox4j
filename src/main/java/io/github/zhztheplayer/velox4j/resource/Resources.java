@@ -83,8 +83,8 @@ public class Resources {
         final File fileContainer = new File(containerUrl.getPath());
         Preconditions.checkState(
             fileContainer.exists() && fileContainer.isDirectory(),
-            "Specified file container %s is not a directory or not a file",
-            new Object[] {containerUrl});
+            String.format(
+                "Specified file container %s is not a directory or not a file", containerUrl));
         getResourcesFromDirectory(container, fileContainer, fileContainer, pattern, buffer);
         break;
       case "jar":
@@ -98,8 +98,7 @@ public class Resources {
         final File jarFile = new File(jarPath);
         Preconditions.checkState(
             jarFile.exists() && jarFile.isFile(),
-            "Specified Jar container %s is not a Jar file",
-            new Object[] {containerUrl});
+            String.format("Specified Jar container %s is not a Jar file", containerUrl));
         final String dir = m.group(2);
         getResourcesFromJarFile(container, jarFile, dir, pattern, buffer);
         break;
@@ -165,7 +164,7 @@ public class Resources {
 
   public static void copyResource(String fromPath, File toFile) {
     Preconditions.checkArgument(
-        !toFile.isDirectory(), "File %s is not a file", new Object[] {toFile});
+        !toFile.isDirectory(), String.format("File %s is not a file", toFile));
     final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
     try (final InputStream is =
         new BufferedInputStream(

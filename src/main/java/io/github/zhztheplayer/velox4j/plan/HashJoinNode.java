@@ -57,8 +57,7 @@ public class HashJoinNode extends AbstractJoinNode {
       @JsonProperty("nullAware") boolean nullAware) {
     Preconditions.checkArgument(
         sources.size() == 2,
-        "HashJoinNode should have 2 sources, but has %s",
-        new Object[] {sources.size()});
+        String.format("HashJoinNode should have 2 sources, but has %s", sources.size()));
     return new HashJoinNode(
         id,
         joinType,

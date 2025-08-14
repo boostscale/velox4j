@@ -44,7 +44,7 @@ public interface UpIterator extends CppObject {
 
     public static State get(int id) {
       Preconditions.checkArgument(
-          STATE_ID_LOOKUP.containsKey(id), "ID not found: %d", new Object[] {id});
+          STATE_ID_LOOKUP.containsKey(id), String.format("ID not found: %d", id));
       return STATE_ID_LOOKUP.get(id);
     }
 

@@ -39,8 +39,8 @@ public class FieldAccessTypedExpr extends TypedExpr {
     this.fieldName = fieldName;
     Preconditions.checkArgument(
         getInputs().size() <= 1,
-        "FieldAccessTypedExpr should have 0 or 1 input, but has %s",
-        new Object[] {getInputs().size()});
+        String.format(
+            "FieldAccessTypedExpr should have 0 or 1 input, but has %s", getInputs().size()));
   }
 
   public static FieldAccessTypedExpr create(Type returnType, String fieldName) {

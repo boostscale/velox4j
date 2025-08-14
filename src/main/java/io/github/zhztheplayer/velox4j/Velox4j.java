@@ -46,7 +46,7 @@ public class Velox4j {
    */
   public static void configure(String key, String value) {
     Preconditions.checkNotNull(key, "Key cannot be null");
-    Preconditions.checkNotNull(value, "Value of key %s cannot be null", new Object[] {key});
+    Preconditions.checkNotNull(value, String.format("Value of key %s cannot be null", key));
     synchronized (globalConfMap) {
       if (globalConfMap.containsKey(key)) {
         final String oldValue = Preconditions.checkNotNull(globalConfMap.get(key));

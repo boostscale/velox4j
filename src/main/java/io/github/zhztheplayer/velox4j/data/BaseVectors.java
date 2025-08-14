@@ -43,7 +43,7 @@ public class BaseVectors {
   public BaseVector deserializeOne(String serialized) {
     final List<BaseVector> vectors = jniApi.baseVectorDeserialize(serialized);
     Preconditions.checkState(
-        vectors.size() == 1, "Expected one vector, but got %s", new Object[] {vectors.size()});
+        vectors.size() == 1, String.format("Expected one vector, but got %s", vectors.size()));
     return vectors.get(0);
   }
 

@@ -39,8 +39,7 @@ public class DereferenceTypedExpr extends TypedExpr {
     this.index = index;
     Preconditions.checkArgument(
         inputs.size() == 1,
-        "DereferenceTypedExpr should have 1 input, but has %s",
-        new Object[] {inputs.size()});
+        String.format("DereferenceTypedExpr should have 1 input, but has %s", inputs.size()));
     Preconditions.checkArgument(
         inputs.get(0).getReturnType() instanceof RowType,
         "DereferenceTypedExpr input should be RowType");

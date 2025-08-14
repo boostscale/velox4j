@@ -42,7 +42,7 @@ public class JniLibLoader {
       throw new VeloxException("Libraries were already loaded");
     }
     Preconditions.checkArgument(
-        workDir.isDirectory(), "Work directory %s is not a directory", new Object[] {workDir});
+        workDir.isDirectory(), String.format("Work directory %s is not a directory", workDir));
     final List<ResourceFile> libFiles = Resources.getResources(LIB_CONTAINER, LIB_PATTERN);
     if (libFiles.isEmpty()) {
       throw new VeloxException(

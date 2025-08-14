@@ -37,8 +37,7 @@ public class CastTypedExpr extends TypedExpr {
     super(returnType, inputs);
     Preconditions.checkArgument(
         inputs.size() == 1,
-        "CastTypedExpr should have 1 input, but has %s",
-        new Object[] {inputs.size()});
+        String.format("CastTypedExpr should have 1 input, but has %s", inputs.size()));
     this.isTryCast = isTryCast;
   }
 
