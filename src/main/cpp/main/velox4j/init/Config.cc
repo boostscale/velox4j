@@ -27,4 +27,9 @@ using namespace facebook::velox;
 config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET(
     "velox4j.init.preset",
     Preset::SPARK);
+
+/// The glog verbose level.
+config::ConfigBase::Entry<int32_t> VELOX4J_INIT_LOGGING_VERBOSE_LEVEL(
+    "velox4j.init.logging.verboseLevel",
+    0);
 } // namespace velox4j

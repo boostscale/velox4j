@@ -172,6 +172,7 @@ void initialize(const std::shared_ptr<ConfigArray>& configArray) {
       default:
         VELOX_FAIL("Unknown preset: {}", folly::to<std::string>(preset));
     }
+    FLAGS_v = vConfig->get(VELOX4J_INIT_LOGGING_VERBOSE_LEVEL);
   });
 }
 } // namespace velox4j
