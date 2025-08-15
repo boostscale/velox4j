@@ -76,8 +76,8 @@ public class BaseVector implements CppObject {
     StaticJniApi.get().baseVectorAppend(this, toAppend);
   }
 
-  public BaseVector loadedVector() {
-    return jniApi.loadedVector(this);
+  public BaseVector flattenedVector() {
+    return jniApi.flattenVector(this);
   }
 
   public String serialize() {

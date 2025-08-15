@@ -71,7 +71,7 @@ final class JniWrapper {
 
   native long baseVectorSlice(long id, int offset, int length);
 
-  native long baseVectorLoadedVector(long id);
+  native long baseVectorFlatten(long id);
 
   native long[] rowVectorPartitionByKeys(long id, int[] keyChannels);
 

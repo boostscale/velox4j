@@ -17,58 +17,13 @@
 
 #include "velox4j/arrow/Arrow.h"
 #include <arrow/c/helpers.h>
-#include <velox/vector/LazyVector.h>
 #include <velox/vector/arrow/Bridge.h>
+#include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-// A customized version of `BaseVector::flattenVector`,
-// mainly to workaround https://github.com/facebookincubator/velox/issues/14492.
-// We also truncate all vectors at `targetSize`, because some Velox operations
-// (E.g., Limit) could result in a RowVector whose children have larger size
-// than itself. So we perform a slice to keep only the data that is
-// in real use.
-void flatten(VectorPtr& vector, size_t targetSize) {
-  if (!vector) {
-    return;
-  }
-  switch (vector->encoding()) {
-    case VectorEncoding::Simple::FLAT:
-      break;
-    case VectorEncoding::Simple::ROW: {
-      auto* rowVector = vector->asUnchecked<RowVector>();
-      for (auto& child : rowVector->children()) {
-        flatten(child, targetSize);
-      }
-      break;
-    }
-    case VectorEncoding::Simple::ARRAY: {
-      auto* arrayVector = vector->asUnchecked<ArrayVector>();
-      flatten(arrayVector->elements(), targetSize);
-      break;
-    }
-    case VectorEncoding::Simple::MAP: {
-      auto* mapVector = vector->asUnchecked<MapVector>();
-      flatten(mapVector->mapKeys(), targetSize);
-      flatten(mapVector->mapValues(), targetSize);
-      break;
-    }
-    case VectorEncoding::Simple::LAZY: {
-      vector = vector->asUnchecked<LazyVector>()->loadedVectorShared();
-      flatten(vector, targetSize);
-      break;
-    }
-    default:
-      BaseVector::ensureWritable(
-          SelectivityVector::empty(), vector->type(), vector->pool(), vector);
-  }
-  VELOX_CHECK_GE(vector->size(), targetSize);
-  if (vector->size() > targetSize) {
-    vector = vector->slice(0, targetSize);
-  }
-}
 
 ArrowOptions makeOptions() {
   ArrowOptions options;
@@ -98,7 +53,7 @@ void fromBaseVectorToArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
-  flatten(vector, vector->size());
+  flattenVector(vector, vector->size());
   auto options = makeOptions();
   exportToArrow(vector, *cSchema, options);
   exportToArrow(vector, *cArray, vector->pool(), options);

@@ -33,6 +33,7 @@
 #include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
+#include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -232,11 +233,11 @@ jlong baseVectorSlice(
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
+jlong baseVectorFlatten(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  auto loadedVector = BaseVector::loadedVectorShared(vector);
-  return sessionOf(env, javaThis)->objectStore()->save(loadedVector);
+  flattenVector(vector, vector->size());
+  return sessionOf(env, javaThis)->objectStore()->save(vector);
   JNI_METHOD_END(-1)
 }
 
@@ -509,8 +510,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "baseVectorLoadedVector",
-      (void*)baseVectorLoadedVector,
+      "baseVectorFlatten",
+      (void*)baseVectorFlatten,
       kTypeLong,
       kTypeLong,
       nullptr);
