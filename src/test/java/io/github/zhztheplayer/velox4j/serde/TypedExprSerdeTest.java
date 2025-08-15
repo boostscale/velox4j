@@ -19,6 +19,8 @@ package io.github.zhztheplayer.velox4j.serde;
 import java.util.Collections;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
 import org.junit.*;
 
 import io.github.zhztheplayer.velox4j.Velox4j;
@@ -45,6 +47,7 @@ import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 
 public class TypedExprSerdeTest {
+  private static BufferAllocator arrowAlloc;
   private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
   private static Session session;
@@ -52,6 +55,7 @@ public class TypedExprSerdeTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
+    arrowAlloc = new RootAllocator(Long.MAX_VALUE);
     allocationListener = new BytesAllocationListener();
     memoryManager = Velox4j.newMemoryManager(allocationListener);
   }
@@ -59,6 +63,7 @@ public class TypedExprSerdeTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    arrowAlloc.close();
     Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
@@ -98,7 +103,7 @@ public class TypedExprSerdeTest {
   // Ignored by https://github.com/velox4j/velox4j/issues/104.
   @Ignore
   public void testConstantTypedExprWithVector() {
-    final BaseVector intVector = BaseVectorTests.newSampleIntVector(session);
+    final BaseVector intVector = BaseVectorTests.newSampleIntVector(session, arrowAlloc);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testISerializableRoundTrip(expr1);
     final ConstantTypedExpr expr2 =

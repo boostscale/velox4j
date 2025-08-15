@@ -55,12 +55,14 @@ import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
 
 public class JniApiTest {
+  private static BufferAllocator arrowAlloc;
   private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
+    arrowAlloc = new RootAllocator(Long.MAX_VALUE);
     allocationListener = new BytesAllocationListener();
     memoryManager = StaticJniApi.get().createMemoryManager(allocationListener);
   }
@@ -68,6 +70,7 @@ public class JniApiTest {
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    arrowAlloc.close();
     Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
@@ -188,9 +191,8 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
-    final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
-    final BaseVector imported = session.arrowOps().fromArrowVector(alloc, arrowVector);
+    final FieldVector arrowVector = Arrow.toArrowVector(arrowAlloc, vector);
+    final BaseVector imported = session.arrowOps().fromArrowVector(arrowAlloc, arrowVector);
     BaseVectorTests.assertEquals(vector, imported);
     arrowVector.close();
     session.close();
