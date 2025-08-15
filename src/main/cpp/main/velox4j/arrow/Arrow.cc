@@ -16,6 +16,7 @@
  */
 
 #include "velox4j/arrow/Arrow.h"
+#include <arrow/c/helpers.h>
 #include <velox/vector/arrow/Bridge.h>
 
 namespace velox4j {
@@ -62,7 +63,9 @@ void fromTypeToArrow(
 
 TypePtr fromArrowToType(ArrowSchema* cSchema) {
   auto options = makeOptions();
-  return importFromArrow(*cSchema);
+  auto type = importFromArrow(*cSchema);
+  ArrowSchemaRelease(cSchema);
+  return type;
 }
 
 void fromBaseVectorToArrow(
@@ -81,6 +84,9 @@ VectorPtr fromArrowToBaseVector(
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
   auto options = makeOptions();
-  return importFromArrowAsOwner(*cSchema, *cArray, pool);
+  auto vector = importFromArrowAsOwner(*cSchema, *cArray, pool);
+  ArrowSchemaRelease(cSchema);
+  ArrowArrayRelease(cArray);
+  return vector;
 }
 } // namespace velox4j

@@ -102,7 +102,12 @@ public final class JniApi {
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    try {
+      return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    } finally {
+      schema.close();
+      array.close();
+    }
   }
 
   public List<BaseVector> baseVectorDeserialize(String serialized) {

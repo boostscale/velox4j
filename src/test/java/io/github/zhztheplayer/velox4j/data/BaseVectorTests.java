@@ -19,7 +19,6 @@ package io.github.zhztheplayer.velox4j.data;
 import java.util.List;
 
 import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.IntVector;
 import org.junit.Assert;
 
@@ -46,8 +45,7 @@ public final class BaseVectorTests {
     }
   }
 
-  public static BaseVector newSampleIntVector(Session session) {
-    final BufferAllocator alloc = new RootAllocator();
+  public static BaseVector newSampleIntVector(Session session, BufferAllocator alloc) {
     final IntVector arrowVector = new IntVector("foo", alloc);
     arrowVector.setValueCount(1);
     arrowVector.set(0, 15);
