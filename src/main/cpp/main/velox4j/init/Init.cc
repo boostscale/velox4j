@@ -88,8 +88,19 @@ void initForSpark() {
   connector::hive::HiveInsertFileNameGenerator::registerSerDe();
   connector::registerConnector(std::make_shared<connector::hive::HiveConnector>(
       "connector-hive",
-      std::make_shared<facebook::velox::config::ConfigBase>(
-          std::unordered_map<std::string, std::string>()),
+      std::make_shared<
+          config::ConfigBase>(std::unordered_map<std::string, std::string>{
+          {connector::hive::HiveConfig::kReadTimestampPartitionValueAsLocalTime,
+           "false"},
+          {connector::hive::HiveConfig::kParquetUseColumnNames, "true"},
+          {connector::hive::HiveConfig::kOrcUseColumnNames, "true"},
+          {connector::hive::HiveConfig::kEnableFileHandleCache, "false"},
+          {connector::hive::HiveConfig::kMaxCoalescedBytes, "67108864"},
+          {connector::hive::HiveConfig::kMaxCoalescedDistance, "512KB"},
+          {connector::hive::HiveConfig::kPrefetchRowGroups, "1"},
+          {connector::hive::HiveConfig::kLoadQuantum, "268435456"},
+          {connector::hive::HiveConfig::kFooterEstimatedSize, "32768"},
+          {connector::hive::HiveConfig::kFilePreloadThreshold, "1048576"}}),
       nullptr));
   ExternalStreamConnectorSplit::registerSerDe();
   ExternalStreamTableHandle::registerSerDe();
