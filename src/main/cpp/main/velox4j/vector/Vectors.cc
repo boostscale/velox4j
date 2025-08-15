@@ -39,13 +39,15 @@ void flattenVector(VectorPtr& vector, size_t targetSize) {
     }
     case VectorEncoding::Simple::ARRAY: {
       auto* arrayVector = vector->asUnchecked<ArrayVector>();
-      flattenVector(arrayVector->elements(), targetSize);
+      auto targetSizeInElements = arrayVector->offsetAt(targetSize);
+      flattenVector(arrayVector->elements(), targetSizeInElements);
       break;
     }
     case VectorEncoding::Simple::MAP: {
       auto* mapVector = vector->asUnchecked<MapVector>();
-      flattenVector(mapVector->mapKeys(), targetSize);
-      flattenVector(mapVector->mapValues(), targetSize);
+      auto targetSizeInElements = mapVector->offsetAt(targetSize);
+      flattenVector(mapVector->mapKeys(), targetSizeInElements);
+      flattenVector(mapVector->mapValues(), targetSizeInElements);
       break;
     }
     case VectorEncoding::Simple::LAZY: {
