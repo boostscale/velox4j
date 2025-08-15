@@ -37,10 +37,6 @@ public class Evaluator implements CppObject {
     this.id = id;
   }
 
-  public JniApi jniApi() {
-    return jniApi;
-  }
-
   @Override
   public long id() {
     return id;
