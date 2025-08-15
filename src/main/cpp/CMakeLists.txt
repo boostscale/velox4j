@@ -77,6 +77,8 @@ FetchContent_Declare(
   GIT_TAG ${JNI_HELPERS_REF} # release-1.10.0
 )
 FetchContent_MakeAvailable(JniHelpers)
+set_property(TARGET JniHelpers PROPERTY CXX_STANDARD 17)
+set_property(TARGET JniHelpersTest PROPERTY CXX_STANDARD 17)
 
 # Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
