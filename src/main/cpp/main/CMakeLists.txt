@@ -47,6 +47,7 @@ set(VELOX4J_3RD_EXCLUSIONS
     "libm\\\\.so\\\\.[0-9]+"
     "linux-vdso\\\\.so\\\\.[0-9]+"
     "ld-linux-x86-64\\\\.so\\\\.[0-9]+"
+    "ld-linux-aarch64\\\\.so\\\\.[0-9]+"
     "libdl\\\\.so\\\\.[0-9]+"
     "libpthread\\\\.so\\\\.[0-9]+")
 
