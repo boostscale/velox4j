@@ -62,7 +62,7 @@ public class JniApiTest {
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
     allocationListener = new BytesAllocationListener();
-    memoryManager = MemoryManager.create(allocationListener);
+    memoryManager = StaticJniApi.get().createMemoryManager(allocationListener);
   }
 
   @AfterClass

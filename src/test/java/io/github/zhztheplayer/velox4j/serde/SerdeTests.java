@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.aggregate.AggregateStep;
 import io.github.zhztheplayer.velox4j.connector.*;
@@ -72,7 +73,7 @@ public final class SerdeTests {
 
   public static <T extends ISerializable> ObjectAndJson<ISerializable> testISerializableRoundTrip(
       T inObj) {
-    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    try (final MemoryManager memoryManager = Velox4j.newMemoryManager(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
 
@@ -99,7 +100,7 @@ public final class SerdeTests {
   }
 
   public static <T extends Variant> ObjectAndJson<Variant> testVariantRoundTrip(T inObj) {
-    try (final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    try (final MemoryManager memoryManager = Velox4j.newMemoryManager(AllocationListener.NOOP);
         final LocalSession session = JniApiTests.createLocalSession(memoryManager)) {
       final String inJson = Serde.toPrettyJson(inObj);
 

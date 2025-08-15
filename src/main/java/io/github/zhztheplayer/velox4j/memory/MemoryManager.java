@@ -17,7 +17,6 @@
 package io.github.zhztheplayer.velox4j.memory;
 
 import io.github.zhztheplayer.velox4j.jni.CppObject;
-import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
 
 /**
  * A memory manager for Velox4J. One memory manager can be bound to different Velox4J sessions or to
@@ -29,15 +28,6 @@ import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
  * closed without any leakage. Error will be thrown otherwise.
  */
 public class MemoryManager implements CppObject {
-
-  /**
-   * Creates a memory manager instance with a given {@link AllocationListener}. The listener will
-   * listen on all the native memory allocations.
-   */
-  public static MemoryManager create(AllocationListener listener) {
-    return StaticJniApi.get().createMemoryManager(listener);
-  }
-
   private final long id;
 
   public MemoryManager(long id) {

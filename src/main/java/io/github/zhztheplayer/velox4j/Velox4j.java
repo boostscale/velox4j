@@ -28,6 +28,7 @@ import io.github.zhztheplayer.velox4j.exception.VeloxException;
 import io.github.zhztheplayer.velox4j.jni.JniLibLoader;
 import io.github.zhztheplayer.velox4j.jni.JniWorkspace;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.memory.AllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableRegistry;
 import io.github.zhztheplayer.velox4j.session.Session;
@@ -74,6 +75,14 @@ public class Velox4j {
       throw new VeloxException("Velox4J has already been initialized");
     }
     initialize0();
+  }
+
+  /**
+   * Creates a memory manager instance with a given {@link AllocationListener}. The listener will
+   * listen on all the native memory allocations.
+   */
+  public static MemoryManager newMemoryManager(AllocationListener listener) {
+    return StaticJniApi.get().createMemoryManager(listener);
   }
 
   /** Creates a new Velox4J session. */

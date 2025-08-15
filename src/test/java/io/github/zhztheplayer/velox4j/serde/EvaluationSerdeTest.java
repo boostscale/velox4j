@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
@@ -40,7 +41,7 @@ public class EvaluationSerdeTest {
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
     allocationListener = new BytesAllocationListener();
-    memoryManager = MemoryManager.create(allocationListener);
+    memoryManager = Velox4j.newMemoryManager(allocationListener);
   }
 
   @AfterClass
