@@ -168,7 +168,7 @@ public static void main(String[] args) {
   final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
 
   // 5. Create a Velox4J session.
-  final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
+  final MemoryManager memoryManager = Velox4j.newMemoryManager(AllocationListener.NOOP);
   final Session session = Velox4j.newSession(memoryManager);
 
   // 6. Execute the query. A Velox serial task will be returned.

@@ -53,7 +53,7 @@ public class TypedExprSerdeTest {
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
     allocationListener = new BytesAllocationListener();
-    memoryManager = MemoryManager.create(allocationListener);
+    memoryManager = Velox4j.newMemoryManager(allocationListener);
   }
 
   @AfterClass

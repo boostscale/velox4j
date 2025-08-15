@@ -75,7 +75,7 @@ public class QueryTest {
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
     allocationListener = new BytesAllocationListener();
-    memoryManager = MemoryManager.create(allocationListener);
+    memoryManager = Velox4j.newMemoryManager(allocationListener);
     NATION_FILE = TpchDatasets.get().get(TpchTableName.NATION);
     REGION_FILE = TpchDatasets.get().get(TpchTableName.REGION);
   }
