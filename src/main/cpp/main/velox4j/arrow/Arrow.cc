@@ -18,31 +18,12 @@
 #include "velox4j/arrow/Arrow.h"
 #include <arrow/c/helpers.h>
 #include <velox/vector/arrow/Bridge.h>
+#include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-
-void slice(VectorPtr& in) {
-  auto* rowBase = in->as<RowVector>();
-  if (!rowBase) {
-    return;
-  }
-  for (auto& child : rowBase->children()) {
-    if (child->size() > rowBase->size()) {
-      // Some Velox operations (E.g., Limit) could result in a
-      // RowVector whose children have larger size than itself.
-      // So we perform a slice to keep only the data that is
-      // in real use.
-      child = child->slice(0, rowBase->size());
-    }
-  }
-}
-
-void flatten(VectorPtr& in) {
-  facebook::velox::BaseVector::flattenVector(in);
-}
 
 ArrowOptions makeOptions() {
   ArrowOptions options;
@@ -72,8 +53,7 @@ void fromBaseVectorToArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
-  flatten(vector);
-  slice(vector);
+  flattenVector(vector, vector->size());
   auto options = makeOptions();
   exportToArrow(vector, *cSchema, options);
   exportToArrow(vector, *cArray, vector->pool(), options);

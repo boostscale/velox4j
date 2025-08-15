@@ -22,7 +22,8 @@ set(VELOX4J_SOURCES
     velox4j/init/Config.cc
     velox4j/eval/Evaluation.cc
     velox4j/eval/Evaluator.cc
-    velox4j/iterator/BlockingQueue.cc)
+    velox4j/iterator/BlockingQueue.cc
+    velox4j/vector/Vectors.cc)
 set(VELOX4J_INCLUDES ${CMAKE_CURRENT_LIST_DIR} ${velox_SOURCE_DIR}
                      ${JniHelpersLib_SOURCE_DIR})
 set(VELOX4J_DEPENDENCIES velox JniHelpers JNI::JNI)

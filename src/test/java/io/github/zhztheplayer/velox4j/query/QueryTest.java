@@ -169,7 +169,7 @@ public class QueryTest {
     task.noMoreSplits(scanNode.getId());
     final List<RowVector> allRvs =
         Streams.fromIterator(UpIterators.asJavaIterator(task))
-            .map(v -> v.loadedVector().asRowVector())
+            .map(v -> v.flattenedVector().asRowVector())
             .collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
     for (RowVector rv : allRvs) {
@@ -209,10 +209,10 @@ public class QueryTest {
       Assert.assertTrue(rv.getSize() <= maxOutputBatchRows);
       if (i != allRvs.size() - 1) {
         // Vectors except the last one should throw when loading.
-        Assert.assertThrows(VeloxException.class, rv::loadedVector);
+        Assert.assertThrows(VeloxException.class, rv::flattenedVector);
       } else {
         // The last vector can be loaded without errors.
-        rv.loadedVector();
+        rv.flattenedVector();
       }
     }
   }

@@ -133,8 +133,8 @@ public final class JniApi {
         .collect(Collectors.toList());
   }
 
-  public BaseVector loadedVector(BaseVector vector) {
-    return baseVectorWrap(jni.baseVectorLoadedVector(vector.id()));
+  public BaseVector flattenVector(BaseVector vector) {
+    return baseVectorWrap(jni.baseVectorFlatten(vector.id()));
   }
 
   public SelectivityVector createSelectivityVector(int length) {
