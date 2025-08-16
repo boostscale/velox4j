@@ -23,7 +23,19 @@
 namespace velox4j {
 using namespace facebook::velox;
 
-void flattenVector(VectorPtr& vector, size_t targetSize) {
+namespace {
+vector_size_t getTargetSizeInElements(
+    const ArrayVectorBase* vector,
+    size_t targetSize) {
+  VELOX_CHECK_NOT_NULL(vector);
+  if (targetSize == 0) {
+    return 0;
+  }
+  return vector->offsetAt(targetSize - 1) + vector->sizeAt(targetSize - 1);
+}
+} // namespace
+
+void flattenVector(VectorPtr& vector, vector_size_t targetSize) {
   if (!vector) {
     return;
   }
@@ -39,13 +51,15 @@ void flattenVector(VectorPtr& vector, size_t targetSize) {
     }
     case VectorEncoding::Simple::ARRAY: {
       auto* arrayVector = vector->asUnchecked<ArrayVector>();
-      auto targetSizeInElements = arrayVector->offsetAt(targetSize);
+      auto targetSizeInElements =
+          getTargetSizeInElements(arrayVector, targetSize);
       flattenVector(arrayVector->elements(), targetSizeInElements);
       break;
     }
     case VectorEncoding::Simple::MAP: {
       auto* mapVector = vector->asUnchecked<MapVector>();
-      auto targetSizeInElements = mapVector->offsetAt(targetSize);
+      auto targetSizeInElements =
+          getTargetSizeInElements(mapVector, targetSize);
       flattenVector(mapVector->mapKeys(), targetSizeInElements);
       flattenVector(mapVector->mapValues(), targetSizeInElements);
       break;
