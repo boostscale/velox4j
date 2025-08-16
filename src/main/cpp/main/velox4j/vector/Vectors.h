@@ -27,5 +27,7 @@ namespace velox4j {
 /// all vectors at `targetSize`, because some Velox operations (E.g., Limit)
 /// could result in a RowVector whose children have larger size than itself. So
 /// we perform a slice to keep only the data that is in real use.
-void flattenVector(facebook::velox::VectorPtr& vector, size_t targetSize);
+void flattenVector(
+    facebook::velox::VectorPtr& vector,
+    facebook::velox::vector_size_t targetSize);
 } // namespace velox4j
