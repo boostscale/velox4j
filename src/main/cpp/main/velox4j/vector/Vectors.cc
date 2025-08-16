@@ -29,7 +29,7 @@ vector_size_t getTargetSizeInElements(
     size_t targetSize) {
   VELOX_CHECK_NOT_NULL(vector);
   if (targetSize == 0) {
-    return 0;
+    return vector->offsetAt(0);
   }
   return vector->offsetAt(targetSize - 1) + vector->sizeAt(targetSize - 1);
 }
