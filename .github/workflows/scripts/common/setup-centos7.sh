@@ -45,9 +45,9 @@ case "$(git --version)" in "git version 2."*)
   true
   ;;
   *)
-  [ -f /etc/yum.repos.d/ius.repo ] || yum -y install https://repo.ius.io/ius-release-el7.rpm
+  yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
   yum -y remove git
-  yum -y install git236
+  yum -y install git-2.36.0-1.ep7
   ;;
 esac
 
