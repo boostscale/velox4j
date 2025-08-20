@@ -186,9 +186,9 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("WindowNode", WindowNode.class);
     NAME_REGISTRY.registerClass("RowNumberNode", RowNumberNode.class);
     NAME_REGISTRY.registerClass("TopNRowNumberNode", TopNRowNumberNode.class);
-    NAME_REGISTRY.registerClass("WindowJoinNode", StreamWindowJoinNode.class);
-    NAME_REGISTRY.registerClass("WindowAggregationNode", StreamWindowAggregationNode.class);
-    NAME_REGISTRY.registerClass("WindowPartitionFunctionSpec", StreamWindowPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass("StreamWindowJoinNode", StreamWindowJoinNode.class);
+    NAME_REGISTRY.registerClass("StreamWindowAggregationNode", StreamWindowAggregationNode.class);
+    NAME_REGISTRY.registerClass("StreamWindowPartitionFunctionSpec", StreamWindowPartitionFunctionSpec.class);
   }
 
   private static void registerWindow() {
