@@ -34,7 +34,7 @@ import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.plan.EmptyNode;
 import io.github.zhztheplayer.velox4j.plan.HashPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.plan.LocalPartitionNode;
-import io.github.zhztheplayer.velox4j.plan.WindowAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowAggregationNode;
 import io.github.zhztheplayer.velox4j.plan.NestedLoopJoinNode;
 import io.github.zhztheplayer.velox4j.plan.RowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.StreamPartitionNode;
@@ -50,9 +50,9 @@ import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.plan.TopNRowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.plan.WatermarkAssignerNode;
-import io.github.zhztheplayer.velox4j.plan.WindowJoinNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowJoinNode;
 import io.github.zhztheplayer.velox4j.plan.WindowNode;
-import io.github.zhztheplayer.velox4j.plan.WindowPartitionFunctionSpec;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
@@ -186,9 +186,9 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("WindowNode", WindowNode.class);
     NAME_REGISTRY.registerClass("RowNumberNode", RowNumberNode.class);
     NAME_REGISTRY.registerClass("TopNRowNumberNode", TopNRowNumberNode.class);
-    NAME_REGISTRY.registerClass("WindowJoinNode", WindowJoinNode.class);
-    NAME_REGISTRY.registerClass("WindowAggregationNode", WindowAggregationNode.class);
-    NAME_REGISTRY.registerClass("WindowPartitionFunctionSpec", WindowPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass("WindowJoinNode", StreamWindowJoinNode.class);
+    NAME_REGISTRY.registerClass("WindowAggregationNode", StreamWindowAggregationNode.class);
+    NAME_REGISTRY.registerClass("WindowPartitionFunctionSpec", StreamWindowPartitionFunctionSpec.class);
   }
 
   private static void registerWindow() {

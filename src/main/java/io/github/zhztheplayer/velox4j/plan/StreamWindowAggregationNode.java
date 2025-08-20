@@ -23,7 +23,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 
 import java.util.List;
 
-public class WindowAggregationNode extends PlanNode {
+public class StreamWindowAggregationNode extends PlanNode {
   private final PlanNode aggregation;
   private final PlanNode localAgg;
   private final PartitionFunctionSpec keySelectorSpec;
@@ -38,7 +38,7 @@ public class WindowAggregationNode extends PlanNode {
   private final RowType outputType;
 
   @JsonCreator
-  public WindowAggregationNode(
+  public StreamWindowAggregationNode(
           @JsonProperty("id") String id,
           @JsonProperty("aggregation") PlanNode aggregation,
           @JsonProperty("localAgg") PlanNode localAgg,

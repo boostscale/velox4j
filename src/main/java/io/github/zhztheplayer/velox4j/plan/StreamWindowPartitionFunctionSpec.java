@@ -19,12 +19,9 @@ package io.github.zhztheplayer.velox4j.plan;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-import java.util.List;
-
-public class WindowPartitionFunctionSpec extends PartitionFunctionSpec {
+public class StreamWindowPartitionFunctionSpec extends PartitionFunctionSpec {
   private final RowType inputType;
   private final Integer rowtimeIndex;
   private final Long size;
@@ -33,7 +30,7 @@ public class WindowPartitionFunctionSpec extends PartitionFunctionSpec {
   private final Integer windowType;
 
   @JsonCreator
-  public WindowPartitionFunctionSpec(
+  public StreamWindowPartitionFunctionSpec(
       @JsonProperty("inputType") RowType inputType,
       @JsonProperty("rowtimeIndex") Integer rowtimeIndex,
       @JsonProperty("size") Long size,
