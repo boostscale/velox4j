@@ -24,7 +24,7 @@ yum -y install devtoolset-11 python3 pip dnf
 yum -y install bison java-1.8.0-openjdk java-1.8.0-openjdk-devel
 yum -y install ccache
 yum -y install lz4-devel lzo-devel libzstd-devel snappy-devel double-conversion-devel
-yum -y install libevent-devel
+yum -y install libevent-devel devtoolset-11-libatomic-devel
 
 # Link cc / c++ to the ones in devtoolset.
 rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld
