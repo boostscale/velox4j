@@ -24,7 +24,7 @@ public class VectorConnectorSplit extends ConnectorSplit {
     private String data;
 
     @JsonCreator
-    protected VectorConnectorSplit(
+    public VectorConnectorSplit(
         @JsonProperty("connectorId") String connectorId,
         @JsonProperty("splitWeight") long splitWeight,
         @JsonProperty("cacheable") boolean cacheable,
