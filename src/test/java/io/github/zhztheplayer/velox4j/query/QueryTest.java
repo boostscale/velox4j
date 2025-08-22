@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.query;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -277,7 +278,6 @@ public class QueryTest {
             SampleQueryTests.getSchema(),
             new ExternalStreamTableHandle("connector-external-stream"),
             ImmutableList.of());
-    ;
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", es.id());
     final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
@@ -288,7 +288,26 @@ public class QueryTest {
   }
 
   @Test
-  public void testBlockingQueue() throws InterruptedException {
+  public void testExternalStreamFromEmptyJavaIterator() {
+    final DownIterator down = DownIterators.fromJavaIterator(Collections.emptyIterator());
+    final ExternalStream es = session.externalStreamOps().bind(down);
+    final TableScanNode scanNode =
+        new TableScanNode(
+            "id-1",
+            SampleQueryTests.getSchema(),
+            new ExternalStreamTableHandle("connector-external-stream"),
+            ImmutableList.of());
+    final ConnectorSplit split =
+        new ExternalStreamConnectorSplit("connector-external-stream", es.id());
+    final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode.getId(), split);
+    task.noMoreSplits(scanNode.getId());
+    UpIteratorTests.assertIterator(task).assertNumRowVectors(0).run();
+  }
+
+  @Test
+  public void testBlockingQueue() {
     final ExternalStreams.BlockingQueue queue = session.externalStreamOps().newBlockingQueue();
     final TableScanNode scanNode =
         new TableScanNode(

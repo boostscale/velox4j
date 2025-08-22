@@ -172,7 +172,6 @@ void SerialTask::saveDrivers() {
     task_->testingVisitDrivers([&](exec::Driver* driver) -> void {
       drivers_.push_back(driver->shared_from_this());
     });
-    VELOX_CHECK(!drivers_.empty());
   }
 }
 
