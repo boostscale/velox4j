@@ -42,6 +42,7 @@ import io.github.zhztheplayer.velox4j.plan.WindowNode;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.type.BooleanType;
 import io.github.zhztheplayer.velox4j.type.IntegerType;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.variant.BooleanValue;
@@ -143,7 +144,9 @@ public class PlanNodeSerdeTest {
         SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
     final FilterNode filterNode =
         new FilterNode(
-            "id-2", ImmutableList.of(scan), ConstantTypedExpr.create(new BooleanValue(true)));
+            "id-2",
+            ImmutableList.of(scan),
+            ConstantTypedExpr.create(new BooleanType(), new BooleanValue(true)));
     SerdeTests.testISerializableRoundTrip(filterNode);
   }
 
@@ -167,7 +170,7 @@ public class PlanNodeSerdeTest {
             JoinType.INNER,
             ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
             ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
-            ConstantTypedExpr.create(new BooleanValue(true)),
+            ConstantTypedExpr.create(new BooleanType(), new BooleanValue(true)),
             scan1,
             scan2,
             new RowType(
@@ -235,9 +238,9 @@ public class PlanNodeSerdeTest {
         new WindowFrame(
             WindowType.ROWS,
             BoundType.UNBOUNDED_PRECEDING,
-            ConstantTypedExpr.create(new IntegerValue(100)),
+            ConstantTypedExpr.create(new IntegerType(), new IntegerValue(100)),
             BoundType.CURRENT_ROW,
-            ConstantTypedExpr.create(new IntegerValue(200)));
+            ConstantTypedExpr.create(new IntegerType(), new IntegerValue(200)));
     SerdeTests.testJavaBeanRoundTrip(frame);
   }
 

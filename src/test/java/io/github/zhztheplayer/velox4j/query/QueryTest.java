@@ -633,7 +633,9 @@ public class QueryTest {
             ImmutableList.of());
     final FilterNode filterNode =
         new FilterNode(
-            "id-2", ImmutableList.of(scanNode), ConstantTypedExpr.create(new BooleanValue(false)));
+            "id-2",
+            ImmutableList.of(scanNode),
+            ConstantTypedExpr.create(new BooleanType(), new BooleanValue(false)));
     final ConnectorSplit split =
         new ExternalStreamConnectorSplit("connector-external-stream", queue.id());
     final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
@@ -700,7 +702,7 @@ public class QueryTest {
                 new BooleanType(),
                 ImmutableList.of(
                     FieldAccessTypedExpr.create(new BigIntType(), "n_regionkey"),
-                    ConstantTypedExpr.create(new BigIntValue(3L))),
+                    ConstantTypedExpr.create(new BigIntType(), new BigIntValue(3L))),
                 "greaterthanorequal"));
     final Query query = new Query(filterNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
