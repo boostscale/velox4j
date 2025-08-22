@@ -18,7 +18,10 @@ package io.github.zhztheplayer.velox4j.variant;
 
 import java.util.List;
 
+import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
+import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.type.Type;
 
 public class Variants {
   private final JniApi jniApi;
@@ -29,6 +32,14 @@ public class Variants {
 
   public VariantCo asCpp(Variant variant) {
     return jniApi.variantAsCpp(variant);
+  }
+
+  public BaseVector toVector(Type type, Variant variant) {
+    return jniApi.variantToVector(type, variant);
+  }
+
+  public Type inferType(Variant variant) {
+    return StaticJniApi.get().variantInferType(variant);
   }
 
   public static void checkSameType(List<Variant> variants) {

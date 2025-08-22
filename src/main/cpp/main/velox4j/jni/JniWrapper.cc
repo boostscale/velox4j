@@ -22,6 +22,7 @@
 #include <velox/core/PlanNode.h>
 #include <velox/exec/OperatorUtils.h>
 #include <velox/exec/TableWriter.h>
+#include <velox/vector/VariantToVector.h>
 #include <velox/vector/VectorSaver.h>
 
 #include "velox4j/arrow/Arrow.h"
@@ -140,11 +141,9 @@ void typeToArrow(
     jlong cSchema) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  auto serdePool = session->memoryManager()->getVeloxPool(
-      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jTypeJson{env, typeJson};
   auto dynamic = folly::parseJson(jTypeJson.get());
-  auto type = ISerializable::deserialize<Type>(dynamic, serdePool);
+  auto type = Type::create(dynamic);
   auto typePool = session->memoryManager()->getVeloxPool(
       "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
   fromTypeToArrow(
@@ -155,11 +154,9 @@ void typeToArrow(
 jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  auto serdePool = session->memoryManager()->getVeloxPool(
-      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jTypeJson{env, typeJson};
   auto dynamic = folly::parseJson(jTypeJson.get());
-  auto type = ISerializable::deserialize<Type>(dynamic, serdePool);
+  auto type = Type::create(dynamic);
   auto vectorPool = session->memoryManager()->getVeloxPool(
       "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
   auto vector = BaseVector::create(type, 0, vectorPool);
@@ -366,6 +363,25 @@ jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(-1)
 }
 
+jlong variantToVector(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jstring variantJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto vectorPool = session->memoryManager()->getVeloxPool(
+      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  spotify::jni::JavaString jVariantJson{env, variantJson};
+  auto type = Type::create(folly::parseJson(jTypeJson.get()));
+  auto variant = variant::create(folly::parseJson(jVariantJson.get()));
+  auto variantVector =
+      facebook::velox::variantToVector(type, variant, vectorPool);
+  return session->objectStore()->save(variantVector);
+  JNI_METHOD_END(-1)
+}
+
 class ExternalStreamAsUpIterator : public UpIterator {
  public:
   explicit ExternalStreamAsUpIterator(const std::shared_ptr<ExternalStream>& es)
@@ -542,6 +558,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
   addNativeMethod(
       "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
+  addNativeMethod(
+      "variantToVector",
+      (void*)variantToVector,
+      kTypeLong,
+      kTypeString,
+      kTypeString,
+      nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",
       (void*)createUpIteratorWithExternalStream,

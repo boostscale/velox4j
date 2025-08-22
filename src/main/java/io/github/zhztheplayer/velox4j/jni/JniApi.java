@@ -158,6 +158,12 @@ public final class JniApi {
     return new VariantCo(jni.variantAsCpp(json));
   }
 
+  public BaseVector variantToVector(Type type, Variant variant) {
+    final String typeJson = Serde.toJson(type);
+    final String variantJson = Serde.toPrettyJson(variant);
+    return baseVectorWrap(jni.variantToVector(typeJson, variantJson));
+  }
+
   @VisibleForTesting
   public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
     return new GenericUpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
