@@ -85,6 +85,8 @@ final class JniWrapper {
 
   native long variantAsCpp(String json);
 
+  native long variantToVector(String typeJson, String variantJson);
+
   @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);
 }
