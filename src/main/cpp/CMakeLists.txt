@@ -67,7 +67,9 @@ FetchContent_Declare(
   URL ${VELOX_SOURCE_URL}
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
   PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
-                "${VELOX_PATCH_DIR}/velox-14504.patch")
+                "${VELOX_PATCH_DIR}/velox-14504.patch"
+  COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
+        "${VELOX_PATCH_DIR}/staging-save-variant-to-vector.patch")
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
