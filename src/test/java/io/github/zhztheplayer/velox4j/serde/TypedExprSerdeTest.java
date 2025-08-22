@@ -26,7 +26,6 @@ import org.junit.*;
 import io.github.zhztheplayer.velox4j.Velox4j;
 import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.BaseVectorTests;
-import io.github.zhztheplayer.velox4j.data.BaseVectors;
 import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.CastTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.ConcatTypedExpr;
@@ -106,18 +105,17 @@ public class TypedExprSerdeTest {
     final BaseVector intVector = BaseVectorTests.newSampleIntVector(session, arrowAlloc);
     final ConstantTypedExpr expr1 = ConstantTypedExpr.create(intVector);
     SerdeTests.testISerializableRoundTrip(expr1);
-    final ConstantTypedExpr expr2 =
-        new ConstantTypedExpr(
-            new IntegerType(), null, BaseVectors.serializeOne(intVector.wrapInConstant(1, 0)));
+    final ConstantTypedExpr expr2 = ConstantTypedExpr.create(intVector.wrapInConstant(1, 0));
     SerdeTests.testISerializableRoundTrip(expr2);
   }
 
   @Test
   public void testConstantTypedExprWithVariant() {
-    final ConstantTypedExpr expr1 = ConstantTypedExpr.create(new IntegerValue(15));
+    final ConstantTypedExpr expr1 =
+        ConstantTypedExpr.create(new IntegerType(), new IntegerValue(15));
     SerdeTests.testISerializableRoundTrip(expr1);
     final ConstantTypedExpr expr2 =
-        new ConstantTypedExpr(new IntegerType(), new IntegerValue(15), null);
+        ConstantTypedExpr.create(new IntegerType(), new IntegerValue(15));
     SerdeTests.testISerializableRoundTrip(expr2);
   }
 
