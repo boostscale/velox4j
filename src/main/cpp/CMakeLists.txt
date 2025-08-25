@@ -69,8 +69,7 @@ FetchContent_Declare(
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
     "${VELOX_PATCH_DIR}/pr-5962.patch" COMMAND ${CMAKE_COMMAND} -E chdir
-    <SOURCE_DIR> patch -p1 -i
-    "${VELOX_PATCH_DIR}/pr-14586.patch")
+    <SOURCE_DIR> patch -p1 -i "${VELOX_PATCH_DIR}/pr-14586.patch")
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
