@@ -19,23 +19,13 @@ package io.github.zhztheplayer.velox4j.connector;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class VectorConnectorSplit extends ConnectorSplit {
+public class FromElementsConnectorSplit extends ConnectorSplit {
 
-    private String data;
-
-    @JsonCreator
-    public VectorConnectorSplit(
-        @JsonProperty("connectorId") String connectorId,
-        @JsonProperty("splitWeight") long splitWeight,
-        @JsonProperty("cacheable") boolean cacheable,
-        @JsonProperty("data") String data) {
-        super(connectorId, splitWeight, cacheable);
-        this.data = data;
-    }
-    
-    @JsonProperty("data")
-    public String getData() {
-        return this.data;
-    }
-    
+  @JsonCreator
+  public FromElementsConnectorSplit(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("splitWeight") long splitWeight,
+      @JsonProperty("cacheable") boolean cacheable) {
+    super(connectorId, splitWeight, cacheable);
+  }
 }

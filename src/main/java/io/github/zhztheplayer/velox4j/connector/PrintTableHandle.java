@@ -21,41 +21,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-public class PrintTableHandle extends ConnectorInsertTableHandle{
+public class PrintTableHandle extends ConnectorInsertTableHandle {
 
-    private String tableName;
-    private RowType dataColumns;
-    private String path;
+  private String tableName;
+  private RowType dataColumns;
+  private String path;
 
-    @JsonCreator
-    public PrintTableHandle(
-        @JsonProperty("tableName") String tableName,
-        @JsonProperty("dataColumns") RowType dataColumns,
-        @JsonProperty("path") String path
-    ) {
-        this.tableName = tableName;
-        this.dataColumns = dataColumns;
-        this.path = path;
-    }
+  @JsonCreator
+  public PrintTableHandle(
+      @JsonProperty("tableName") String tableName,
+      @JsonProperty("dataColumns") RowType dataColumns,
+      @JsonProperty("path") String path) {
+    this.tableName = tableName;
+    this.dataColumns = dataColumns;
+    this.path = path;
+  }
 
-    @Override
-    public boolean supportsMultiThreading() {
-        return false;
-    }
+  @Override
+  public boolean supportsMultiThreading() {
+    return false;
+  }
 
-    @JsonProperty("tableName")
-    public String getTableName() {
-        return tableName;
-    }
+  @JsonProperty("tableName")
+  public String getTableName() {
+    return tableName;
+  }
 
-    @JsonProperty("dataColumns")
-    public RowType geDataColumns() {
-        return dataColumns;
-    }
+  @JsonProperty("dataColumns")
+  public RowType geDataColumns() {
+    return dataColumns;
+  }
 
-    @JsonProperty("path")
-    public String getPath() {
-        return path;
-    }
-    
+  @JsonProperty("path")
+  public String getPath() {
+    return path;
+  }
 }

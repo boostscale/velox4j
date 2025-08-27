@@ -27,9 +27,9 @@
 #include <velox/connectors/nexmark/NexmarkConnectorSplit.h>
 #include <velox/connectors/print/PrintConnector.h>
 #include <velox/connectors/print/PrintTableHandle.h>
-#include <velox/connectors/vector/VectorConnector.h>
-#include <velox/connectors/vector/VectorConnectorSplit.h>
-#include <velox/connectors/vector/VectorTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnector.h>
+#include <velox/connectors/from_elements/FromElementsTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnectorSplit.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
 #include <velox/dwio/text/RegisterTextWriter.h>
@@ -134,10 +134,10 @@ void initForSpark() {
           std::unordered_map<std::string, std::string>()),
         nullptr
       ));
-  connector::vector::VectorTableHandle::registerSerDe();
-  connector::vector::VectorConnectorSplit::registerSerDe();
-  connector::registerConnector(std::make_shared<connector::vector::VectorConnector>(
-      "connector-vector",
+  connector::from_elements::FromElementsTableHandle::registerSerDe();
+  connector::from_elements::FromElementsConnectorSplit::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::from_elements::FromElementsConnector>(
+      "connector-from-elements",
       std::make_shared<facebook::velox::config::ConfigBase>(
           std::unordered_map<std::string, std::string>()),
         nullptr
