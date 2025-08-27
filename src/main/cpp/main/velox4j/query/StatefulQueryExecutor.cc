@@ -94,6 +94,22 @@ void StatefulSerialTask::notifyWatermark(long watermark, int index) {
   task_->notifyWatermark(watermark, index);
 }
 
+void StatefulSerialTask::initializeState(long checkpointId) {
+  task_->initializeState();
+}
+
+void StatefulSerialTask::snapshotState(long checkpointId) {
+  task_->snapshotState();
+}
+
+void StatefulSerialTask::notifyCheckpointComplete(long checkpointId) {
+  task_->notifyCheckpointComplete(checkpointId);
+}
+
+void StatefulSerialTask::notifyCheckpointAborted(long checkpointId) {
+  task_->notifyCheckpointAborted(checkpointId);
+}
+
 void StatefulSerialTask::addSplit(
     const core::PlanNodeId& planNodeId,
     int32_t groupId,
