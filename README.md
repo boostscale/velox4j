@@ -204,7 +204,7 @@ public static void main(String[] args) {
   // 9. Collect and print results.
   while (itr.hasNext()) {
     final RowVector rowVector = itr.next(); // 9.1. Get next RowVector returned by Velox.
-    final VectorSchemaRoot vsr = Arrow.toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 9.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
+    final VectorSchemaRoot vsr = Arrow.toArrowVectorSchemaRoot(new RootAllocator(), rowVector); // 9.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
     System.out.println(vsr.contentToTSVString()); // 9.3. Print the arrow table to stdout.
     vsr.close(); // 9.4. Release the Arrow VectorSchemaRoot.
   }
