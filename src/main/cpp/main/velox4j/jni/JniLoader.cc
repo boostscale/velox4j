@@ -31,7 +31,7 @@ void JNI_OnUnload_Shaded_Arrow_C(JavaVM* jvm, void* reserved);
 // The JNI entrypoint.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
   // Initializes the shaded Arrow C data interface.
-  if (JNI_OnLoad_Shaded_Arrow_C(jvm, reserved) != JNI_OK) {
+  if (JNI_OnLoad_Shaded_Arrow_C(jvm, reserved) == JNI_ERR) {
     return JNI_ERR;
   }
 
