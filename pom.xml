@@ -82,6 +82,16 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.apache.arrow</groupId>
+      <artifactId>arrow-c-data</artifactId>
+      <version>${arrow.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.arrow</groupId>
+      <artifactId>arrow-memory-unsafe</artifactId>
+      <version>${arrow.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version}</version>
@@ -105,16 +115,6 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jdk8</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.arrow</groupId>
-      <artifactId>arrow-c-data</artifactId>
-      <version>${arrow.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.arrow</groupId>
-      <artifactId>arrow-memory-unsafe</artifactId>
-      <version>${arrow.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -314,7 +314,7 @@
             <configuration>
               <artifactSet>
                 <excludes>
-                  <exclude>org.apache.arrow:arrow-vector</exclude>
+                  <exclude>org.apache.arrow:*</exclude>
                 </excludes>
               </artifactSet>
               <!-- replace the main jar; no extra classifier -->
