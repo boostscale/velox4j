@@ -30,7 +30,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   LOG(INFO) << "Initializing Velox4J...";
   JNIEnv* env = jniHelpersInitialize(jvm);
   if (env == nullptr) {
-    return -1;
+    return JNI_ERR;
   }
 
   velox4j::getJniErrorState()->ensureInitialized(env);
