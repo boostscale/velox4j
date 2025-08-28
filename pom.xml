@@ -42,7 +42,7 @@
     <surefire.add-opens.argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
     <java.version>8</java.version>
     <junit.version>4.13.1</junit.version>
-    <arrow.version>18.1.0</arrow.version>
+    <arrow.version>17.0.0</arrow.version>
     <guava.version>33.4.0-jre</guava.version>
     <jackson.version>2.18.0</jackson.version>
     <commons-io.version>2.18.0</commons-io.version>
