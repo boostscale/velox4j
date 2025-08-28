@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
-import org.apache.arrow.vector.table.Table;
+import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.types.pojo.Schema;
 import org.junit.*;
@@ -68,7 +68,7 @@ public class ArrowTest {
   }
 
   @Test
-  public void testBaseVectorRoundTrip() {
+  public void testBaseVectorRoundTrip1() {
     final BaseVector input = BaseVectorTests.newSampleIntVector(session, arrowAlloc);
     final FieldVector arrowVector = Arrow.toArrowVector(arrowAlloc, input);
     final BaseVector imported = session.arrowOps().fromArrowVector(arrowAlloc, arrowVector);
@@ -79,19 +79,10 @@ public class ArrowTest {
   @Test
   public void testRowVectorRoundTrip1() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
-    final Table arrowTable = Arrow.toArrowTable(arrowAlloc, input);
-    final RowVector imported = session.arrowOps().fromArrowTable(arrowAlloc, arrowTable);
+    final VectorSchemaRoot vsr = Arrow.toArrowVectorSchemaRoot(arrowAlloc, input);
+    final RowVector imported = session.arrowOps().fromVectorSchemaRoot(arrowAlloc, vsr);
     BaseVectorTests.assertEquals(input, imported);
-    arrowTable.close();
-  }
-
-  @Test
-  public void testRowVectorRoundTrip2() {
-    final RowVector input = BaseVectorTests.newSampleRowVector(session);
-    final Table arrowTable = Arrow.toArrowTable(arrowAlloc, input);
-    final RowVector imported = session.arrowOps().fromArrowTable(arrowAlloc, arrowTable);
-    BaseVectorTests.assertEquals(input, imported);
-    arrowTable.close();
+    vsr.close();
   }
 
   @Test

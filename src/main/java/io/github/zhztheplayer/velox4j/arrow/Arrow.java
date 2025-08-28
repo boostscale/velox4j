@@ -22,7 +22,6 @@ import org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
-import org.apache.arrow.vector.table.Table;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.types.pojo.Schema;
 
@@ -90,19 +89,18 @@ public class Arrow {
     }
   }
 
-  public static Table toArrowTable(BufferAllocator alloc, RowVector vector) {
+  public static VectorSchemaRoot toArrowVectorSchemaRoot(BufferAllocator alloc, RowVector vector) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
       StaticJniApi.get().baseVectorToArrow(vector, cSchema, cArray);
       final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, cArray, cSchema, null);
-      return new Table(vsr);
+      return vsr;
     }
   }
 
-  public RowVector fromArrowTable(BufferAllocator alloc, Table table) {
+  public RowVector fromVectorSchemaRoot(BufferAllocator alloc, VectorSchemaRoot vsr) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
-        final ArrowArray cArray = ArrowArray.allocateNew(alloc);
-        final VectorSchemaRoot vsr = table.toVectorSchemaRoot()) {
+        final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
       Data.exportVectorSchemaRoot(alloc, vsr, null, cArray, cSchema);
       final BaseVector imported = jniApi.arrowToBaseVector(cSchema, cArray);
       return imported.asRowVector();
