@@ -1,4 +1,4 @@
-# The source package `java.io.github.zhztheplayer.velox4j.shaded`
+# The Java source package `java.io.github.zhztheplayer.velox4j.shaded`
 
 This special package is for storing 3rd source code which cannot be correctly handled by the default Maven shader.
 
