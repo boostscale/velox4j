@@ -23,51 +23,39 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 
 import java.util.List;
 
-public class StreamWindowAggregationNode extends PlanNode {
+public class GroupWindowAggregationNode extends PlanNode {
   private final PlanNode aggregation;
-  private final PlanNode localAgg;
   private final PartitionFunctionSpec keySelectorSpec;
   private final PartitionFunctionSpec sliceAssignerSpec;
-  private final Long windowInterval;
-  private final boolean useDayLightSaving;
-  private final boolean isLocalAgg;
-  private final Long size;
-  private final Long step;
-  private final Long offset;
+  private final Long allowedLateness;
+  private final boolean produceUpdates;
+  private final Integer rowtimeIndex;
+  private final boolean isEventTime;
   private final Integer windowType;
   private final RowType outputType;
-  private final Integer rowtimeIndex;
 
   @JsonCreator
-  public StreamWindowAggregationNode(
+  public GroupWindowAggregationNode(
           @JsonProperty("id") String id,
           @JsonProperty("aggregation") PlanNode aggregation,
-          @JsonProperty("localAgg") PlanNode localAgg,
           @JsonProperty("keySelectorSpec") PartitionFunctionSpec keySelectorSpec,
           @JsonProperty("sliceAssignerSpec") PartitionFunctionSpec sliceAssignerSpec,
-          @JsonProperty("windowInterval") Long windowInterval,
-          @JsonProperty("useDayLightSaving") boolean useDayLightSaving,
-          @JsonProperty("isLocalAgg") boolean isLocalAgg,
-          @JsonProperty("size") Long size,
-          @JsonProperty("step") Long step,
-          @JsonProperty("offset") Long offset,
+          @JsonProperty("allowedLateness") Long allowedLateness,
+          @JsonProperty("produceUpdates") boolean produceUpdates,
+          @JsonProperty("rowtimeIndex") Integer rowtimeIndex,
+          @JsonProperty("isEventTime") boolean isEventTime,
           @JsonProperty("windowType") Integer windowType,
-          @JsonProperty("outputType") RowType outputType,
-          @JsonProperty("rowtimeIndex") Integer rowtimeIndex) {
+          @JsonProperty("outputType") RowType outputType) {
     super(id);
     this.aggregation = aggregation;
-    this.localAgg = localAgg;
     this.keySelectorSpec = keySelectorSpec;
     this.sliceAssignerSpec = sliceAssignerSpec;
-    this.windowInterval = windowInterval;
-    this.useDayLightSaving = useDayLightSaving;
-    this.isLocalAgg = isLocalAgg;
-    this.size = size;
-    this.step = step;
-    this.offset = offset;
+    this.allowedLateness = allowedLateness;
+    this.produceUpdates = produceUpdates;
+    this.rowtimeIndex = rowtimeIndex;
+    this.isEventTime = isEventTime;
     this.windowType = windowType;
     this.outputType = outputType;
-    this.rowtimeIndex = rowtimeIndex;
   }
 
   @JsonGetter("keySelectorSpec")
@@ -85,39 +73,19 @@ public class StreamWindowAggregationNode extends PlanNode {
     return aggregation;
   }
 
-  @JsonGetter("localAgg")
-  public PlanNode getLocalAgg() {
-    return localAgg;
+  @JsonGetter("allowedLateness")
+  public Long getAllowedLateness() {
+    return allowedLateness;
   }
 
-  @JsonGetter("windowInterval")
-  public Long getWindowInterval() {
-    return windowInterval;
+  @JsonGetter("produceUpdates")
+  public boolean produceUpdates() {
+    return produceUpdates;
   }
 
-  @JsonGetter("useDayLightSaving")
-  public boolean useDayLightSaving() {
-    return useDayLightSaving;
-  }
-
-  @JsonGetter("isLocalAgg")
-  public boolean isLocalAgg() {
-    return isLocalAgg;
-  }
-
-  @JsonGetter("size")
-  public Long getSize() {
-    return size;
-  }
-
-  @JsonGetter("step")
-  public Long getStep() {
-    return step;
-  }
-
-  @JsonGetter("offset")
-  public Long getOffset() {
-    return offset;
+  @JsonGetter("isEventTime")
+  public boolean isEventTime() {
+    return isEventTime;
   }
 
   @JsonGetter("windowType")
