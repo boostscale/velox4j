@@ -14,10 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c;
+package io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c;
 
-import static io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.NativeUtil.NULL;
-import static io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.NativeUtil.addressOrNull;
+import static io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.NativeUtil.NULL;
+import static io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.NativeUtil.addressOrNull;
 import static org.apache.arrow.util.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import org.apache.arrow.vector.dictionary.Dictionary;
 import org.apache.arrow.vector.dictionary.DictionaryProvider;
 import org.apache.arrow.vector.types.pojo.DictionaryEncoding;
 
-import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.jni.JniWrapper;
-import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.jni.PrivateData;
+import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.jni.JniWrapper;
+import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.jni.PrivateData;
 
 /** Exporter for {@link ArrowArray}. */
 final class ArrayExporter {

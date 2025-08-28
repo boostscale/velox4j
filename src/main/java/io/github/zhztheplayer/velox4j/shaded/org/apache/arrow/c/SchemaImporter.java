@@ -14,9 +14,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c;
+package io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c;
 
-import static io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.NativeUtil.NULL;
+import static io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.NativeUtil.NULL;
 import static org.apache.arrow.memory.util.LargeMemoryUtil.checkedCastToInt;
 import static org.apache.arrow.util.Preconditions.checkNotNull;
 import static org.apache.arrow.util.Preconditions.checkState;
