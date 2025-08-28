@@ -18,6 +18,9 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import java.util.List;
 
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
@@ -33,8 +36,6 @@ import io.github.zhztheplayer.velox4j.query.SerialTaskStats;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.ArrowArray;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.ArrowSchema;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;

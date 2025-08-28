@@ -25,21 +25,12 @@
 #include "velox4j/jni/StaticJniWrapper.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 
-jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* jvm, void* reserved);
-void JNI_OnUnload_Shaded_Arrow_C(JavaVM* jvm, void* reserved);
-
 // The JNI entrypoint.
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
-  // Initializes the shaded Arrow C data interface.
-  if (JNI_OnLoad_Shaded_Arrow_C(jvm, reserved) == JNI_ERR) {
-    return JNI_ERR;
-  }
-
-  // Initializes Velox4J.
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   LOG(INFO) << "Initializing Velox4J...";
   JNIEnv* env = jniHelpersInitialize(jvm);
   if (env == nullptr) {
-    return JNI_ERR;
+    return -1;
   }
 
   velox4j::getJniErrorState()->ensureInitialized(env);
@@ -52,8 +43,4 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
 
   LOG(INFO) << "Velox4J initialized.";
   return JAVA_VERSION;
-}
-
-JNIEXPORT void JNI_OnUnload(JavaVM* jvm, void* reserved) {
-  JNI_OnUnload_Shaded_Arrow_C(jvm, reserved);
 }
