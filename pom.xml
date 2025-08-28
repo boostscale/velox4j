@@ -349,10 +349,6 @@
                   <pattern>org.slf4j</pattern>
                   <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.slf4j</shadedPattern>
                 </relocation>
-                <relocation>
-                  <pattern>org.apache.arrow</pattern>
-                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.apache.arrow</shadedPattern>
-                </relocation>
               </relocations>
 
               <!-- be conservative; you can turn this on if you want smaller jars -->
