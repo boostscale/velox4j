@@ -25,6 +25,8 @@
 
 namespace velox4j {
 
+const jint kJniVersion = JNI_VERSION_1_8;
+
 std::string jStringToCString(JNIEnv* env, jstring string) {
   int32_t jlen, clen;
   clen = env->GetStringUTFLength(string);
@@ -33,7 +35,6 @@ std::string jStringToCString(JNIEnv* env, jstring string) {
   env->GetStringUTFRegion(string, 0, jlen, buffer);
   return {buffer, static_cast<uint64_t>(clen)};
 }
-
 void checkException(JNIEnv* env) {
   if (env->ExceptionCheck()) {
     jthrowable t = env->ExceptionOccurred();

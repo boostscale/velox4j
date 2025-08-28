@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "velox4j/vector/Vectors.h"
+#include "Vectors.h"
 
 #include <velox/vector/ComplexVector.h>
 #include <velox/vector/LazyVector.h>
