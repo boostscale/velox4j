@@ -335,6 +335,10 @@ void ArrowArrayStreamRelease(ArrowArrayStream* stream) {
   }
 // macro ended
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
@@ -583,3 +587,7 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
   stream->private_data = new InnerPrivateData(vm, private_data_ref);
   JNI_METHOD_END()
 }
+
+#ifdef __cplusplus
+}
+#endif
