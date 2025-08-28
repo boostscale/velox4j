@@ -280,6 +280,79 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Build an uber (shaded) jar as the main artifact -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>shade-all</id>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <!-- replace the main jar; no extra classifier -->
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+
+              <!-- produce a dep-reduced POM for deployment -->
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+
+              <!-- keep services working and avoid duplicate META-INF noise -->
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                  <addHeader>false</addHeader>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                  <resource>META-INF/INDEX.LIST</resource>
+                </transformer>
+              </transformers>
+
+              <!-- Relocate libs that are NOT part of your public API -->
+              <relocations>
+                <!-- keep Arrow NOT relocated to preserve your API surface -->
+                <relocation>
+                  <pattern>com.google</pattern>
+                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.com.google</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.fasterxml.jackson</pattern>
+                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.com.fasterxml.jackson</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons</pattern>
+                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.apache.commons</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.slf4j</pattern>
+                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.slf4j</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.arrow</pattern>
+                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.apache.arrow</shadedPattern>
+                </relocation>
+              </relocations>
+
+              <!-- be conservative; you can turn this on if you want smaller jars -->
+              <minimizeJar>false</minimizeJar>
+
+              <!-- include everything from this module -->
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <!-- strip sigs from shaded deps to avoid SecurityException -->
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
