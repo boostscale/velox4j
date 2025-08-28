@@ -13,3 +13,7 @@ For clearance for developers, the origins of the shaded code are listed below:
 
 The shaded arrow code is from Arrow release 17.0.0 (the last version that supports Java 8):
 https://github.com/apache/arrow/tree/apache-arrow-17.0.0/java/c.
+
+### Modifications to the OSS Arrow C interface code that are worth to mention:
+
+- Remove JniLoader.java.

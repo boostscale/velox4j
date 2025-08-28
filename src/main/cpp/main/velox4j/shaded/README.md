@@ -8,3 +8,7 @@ All the sources are copied from 3rd and manually shaded for Velox4J's use.
 
 The shaded arrow code is from Arrow release 17.0.0 (the last version that supports Java 8):
 https://github.com/apache/arrow/tree/apache-arrow-17.0.0/java/c.
+
+### Modifications to the OSS Arrow C interface code that are worth to mention:
+
+- Change names JNI entry and exit C function to avoid conflict with the ones defined in Velox4J.

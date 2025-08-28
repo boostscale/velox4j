@@ -335,7 +335,7 @@ void ArrowArrayStreamRelease(ArrowArrayStream* stream) {
   }
 // macro ended
 
-jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
     return JNI_ERR;
@@ -371,7 +371,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
   JNI_METHOD_END(JNI_ERR)
 }
 
-void JNI_OnUnload(JavaVM* vm, void* reserved) {
+void JNI_OnUnload_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION);
   env->DeleteGlobalRef(kObjectClass);
