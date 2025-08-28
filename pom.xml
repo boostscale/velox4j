@@ -312,6 +312,11 @@
             </goals>
             <phase>package</phase>
             <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.apache.arrow:arrow-vector</exclude>
+                </excludes>
+              </artifactSet>
               <!-- replace the main jar; no extra classifier -->
               <shadedArtifactAttached>false</shadedArtifactAttached>
 
