@@ -335,7 +335,7 @@ void ArrowArrayStreamRelease(ArrowArrayStream* stream) {
   }
 // macro ended
 
-jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
+jint JNI_OnLoad_shaded_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
     return JNI_ERR;
@@ -346,13 +346,13 @@ jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
       CreateGlobalClassReference(env, "Ljava/lang/RuntimeException;");
   kPrivateDataClass = CreateGlobalClassReference(
       env,
-      "Lio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/jni/PrivateData;");
+      "Lio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/jni/PrivateData;");
   kCDataExceptionClass = CreateGlobalClassReference(
       env,
-      "Lio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/jni/CDataJniException;");
+      "Lio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/jni/CDataJniException;");
   kStreamPrivateDataClass = CreateGlobalClassReference(
       env,
-      "Lio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/ArrayStreamExporter$ExportedArrayStreamPrivateData;");
+      "Lio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/ArrayStreamExporter$ExportedArrayStreamPrivateData;");
 
   kPrivateDataLastErrorField =
       GetFieldID(env, kStreamPrivateDataClass, "lastError", "[B");
@@ -371,7 +371,7 @@ jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   JNI_METHOD_END(JNI_ERR)
 }
 
-void JNI_OnUnload_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
+void JNI_OnUnload_shaded_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION);
   env->DeleteGlobalRef(kObjectClass);
@@ -387,12 +387,12 @@ extern "C" {
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    releaseSchema
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_releaseSchema(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_releaseSchema(
     JNIEnv* env,
     jobject,
     jlong address) {
@@ -406,12 +406,12 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    releaseArray
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_releaseArray(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_releaseArray(
     JNIEnv* env,
     jobject,
     jlong address) {
@@ -425,12 +425,12 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    getNextArrayStream
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_getNextArrayStream(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_getNextArrayStream(
     JNIEnv* env,
     jobject,
     jlong address,
@@ -456,12 +456,12 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    getSchemaArrayStream
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_getSchemaArrayStream(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_getSchemaArrayStream(
     JNIEnv* env,
     jobject,
     jlong address,
@@ -487,12 +487,12 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    releaseArrayStream
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_releaseArrayStream(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_releaseArrayStream(
     JNIEnv* env,
     jobject,
     jlong address) {
@@ -506,13 +506,13 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    exportSchema
  * Signature:
- * (JLio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/jni/PrivateData;)V
+ * (JLio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/jni/PrivateData;)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_exportSchema(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_exportSchema(
     JNIEnv* env,
     jobject,
     jlong address,
@@ -533,13 +533,13 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    exportArray
  * Signature:
- * (JLio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/jni/PrivateData;)V
+ * (JLio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/jni/PrivateData;)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_exportArray(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_exportArray(
     JNIEnv* env,
     jobject,
     jlong address,
@@ -560,13 +560,13 @@ Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapp
 
 /*
  * Class:
- * io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper
+ * io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper
  * Method:    exportArrayStream
  * Signature:
- * (JLio/github/zhztheplayer/velox4j/shaded/arrow/org/apache/arrow/c/jni/PrivateData;)V
+ * (JLio/github/zhztheplayer/velox4j/shaded/org/apache/arrow/c/jni/PrivateData;)V
  */
 JNIEXPORT void JNICALL
-Java_io_github_zhztheplayer_velox4j_shaded_arrow_org_apache_arrow_c_jni_JniWrapper_exportArrayStream(
+Java_io_github_zhztheplayer_velox4j_shaded_org_apache_arrow_c_jni_JniWrapper_exportArrayStream(
     JNIEnv* env,
     jobject,
     jlong address,

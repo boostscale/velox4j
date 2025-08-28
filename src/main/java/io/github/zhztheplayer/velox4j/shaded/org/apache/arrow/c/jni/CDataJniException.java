@@ -14,25 +14,24 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c;
+package io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.jni;
 
-/** Base interface for C Data Interface structures. */
-public interface BaseStruct extends AutoCloseable {
-  /**
-   * Get memory address.
-   *
-   * @return Memory address
-   */
-  long memoryAddress();
+/** An exception raised by the JNI side of the C Data bridge. */
+public final class CDataJniException extends Exception {
+  private final int errno;
 
-  /**
-   * Call the release callback of an ArrowArray.
-   *
-   * <p>This function must not be called for child arrays.
-   */
-  void release();
+  public CDataJniException(int errno, String message) {
+    super(message);
+    this.errno = errno;
+  }
 
-  /** Close to release the main buffer. */
+  /** The original error code returned from C. */
+  public int getErrno() {
+    return errno;
+  }
+
   @Override
-  void close();
+  public String getMessage() {
+    return "CDataJniException{" + "errno=" + errno + ", message=" + super.getMessage() + '}';
+  }
 }
