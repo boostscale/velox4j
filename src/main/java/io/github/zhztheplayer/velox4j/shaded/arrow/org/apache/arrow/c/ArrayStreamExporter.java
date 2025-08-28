@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c;
+package io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,8 +25,8 @@ import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowReader;
 import org.apache.arrow.vector.types.pojo.Schema;
 
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.jni.JniWrapper;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.jni.PrivateData;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.jni.JniWrapper;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.jni.PrivateData;
 
 /** Utility to export an {@link ArrowReader} as an ArrowArrayStream. */
 final class ArrayStreamExporter {

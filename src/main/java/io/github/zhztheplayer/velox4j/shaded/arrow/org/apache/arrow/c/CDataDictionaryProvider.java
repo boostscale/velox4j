@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c;
+package io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c;
 
 import java.util.HashMap;
 import java.util.Map;

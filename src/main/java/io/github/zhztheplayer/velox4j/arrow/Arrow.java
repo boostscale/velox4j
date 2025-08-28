@@ -27,9 +27,9 @@ import io.github.zhztheplayer.velox4j.data.BaseVector;
 import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.ArrowArray;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.ArrowSchema;
-import io.github.zhztheplayer.velox4j.shaded.org.apache.arrow.c.Data;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowArray;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowSchema;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.Data;
 import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 
