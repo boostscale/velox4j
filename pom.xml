@@ -291,6 +291,11 @@
                   <exclude>org.apache.arrow:*</exclude>
                 </excludes>
               </artifactSet>
+
+              <!-- create shaded source -->
+              <createSourcesJar>true</createSourcesJar>
+              <shadeSourcesContent>true</shadeSourcesContent>
+
               <!-- replace the main jar; no extra classifier -->
               <shadedArtifactAttached>false</shadedArtifactAttached>
 
