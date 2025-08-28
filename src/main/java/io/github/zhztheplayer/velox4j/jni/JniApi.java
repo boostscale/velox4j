@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowArray;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowSchema;
 
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
 import io.github.zhztheplayer.velox4j.connector.ExternalStreams;

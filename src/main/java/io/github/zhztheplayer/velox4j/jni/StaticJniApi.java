@@ -18,8 +18,8 @@ package io.github.zhztheplayer.velox4j.jni;
 
 import java.util.List;
 
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowArray;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowSchema;
 
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.connector.ConnectorSplit;

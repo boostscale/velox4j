@@ -16,9 +16,9 @@
 */
 package io.github.zhztheplayer.velox4j.arrow;
 
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
-import org.apache.arrow.c.Data;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowArray;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.ArrowSchema;
+import io.github.zhztheplayer.velox4j.shaded.arrow.org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
