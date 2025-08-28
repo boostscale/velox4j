@@ -31,13 +31,15 @@ void JNI_OnUnload_Shaded_Arrow_C(JavaVM* jvm, void* reserved);
 // The JNI entrypoint.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved) {
   // Initializes the shaded Arrow C data interface.
-  JNI_OnLoad_Shaded_Arrow_C(jvm, reserved);
+  if (JNI_OnLoad_Shaded_Arrow_C(jvm, reserved) != JNI_OK) {
+    return JNI_ERR;
+  }
 
   // Initializes Velox4J.
   LOG(INFO) << "Initializing Velox4J...";
   JNIEnv* env = jniHelpersInitialize(jvm);
   if (env == nullptr) {
-    return -1;
+    return JNI_ERR;
   }
 
   velox4j::getJniErrorState()->ensureInitialized(env);
