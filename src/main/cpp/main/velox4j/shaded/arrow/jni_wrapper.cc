@@ -335,10 +335,6 @@ void ArrowArrayStreamRelease(ArrowArrayStream* stream) {
   }
 // macro ended
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 jint JNI_OnLoad_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
@@ -384,6 +380,10 @@ void JNI_OnUnload_Shaded_Arrow_C(JavaVM* vm, void* reserved) {
   env->DeleteGlobalRef(kCDataExceptionClass);
   env->DeleteGlobalRef(kStreamPrivateDataClass);
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Class:
