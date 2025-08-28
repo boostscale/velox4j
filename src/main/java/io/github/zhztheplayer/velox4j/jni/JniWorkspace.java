@@ -23,13 +23,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.zhztheplayer.velox4j.exception.VeloxException;
 
 public class JniWorkspace {
-  private static final Logger LOG = LoggerFactory.getLogger(JniWorkspace.class);
   private static final Map<String, JniWorkspace> INSTANCES = new ConcurrentHashMap<>();
 
   private static final String DEFAULT_WORK_DIR;
@@ -51,7 +48,7 @@ public class JniWorkspace {
     try {
       this.workDir = workDir;
       mkdirs(this.workDir);
-      LOG.info("JNI workspace created in directory {}", this.workDir);
+      System.out.printf("JNI workspace created in directory %s.%n", this.workDir);
     } catch (Exception e) {
       throw new VeloxException(e);
     }

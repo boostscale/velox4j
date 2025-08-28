@@ -324,10 +324,6 @@
                   <pattern>org.apache.commons</pattern>
                   <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.apache.commons</shadedPattern>
                 </relocation>
-                <relocation>
-                  <pattern>org.slf4j</pattern>
-                  <shadedPattern>io.github.zhztheplayer.velox4j.shaded.org.slf4j</shadedPattern>
-                </relocation>
               </relocations>
 
               <!-- be conservative; you can turn this on if you want smaller jars -->
