@@ -98,7 +98,7 @@ public class Arrow {
     }
   }
 
-  public RowVector fromVectorSchemaRoot(BufferAllocator alloc, VectorSchemaRoot vsr) {
+  public RowVector fromArrowVectorSchemaRoot(BufferAllocator alloc, VectorSchemaRoot vsr) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
       Data.exportVectorSchemaRoot(alloc, vsr, null, cArray, cSchema);

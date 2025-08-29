@@ -80,7 +80,7 @@ public class ArrowTest {
   public void testRowVectorRoundTrip1() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final VectorSchemaRoot vsr = Arrow.toArrowVectorSchemaRoot(arrowAlloc, input);
-    final RowVector imported = session.arrowOps().fromVectorSchemaRoot(arrowAlloc, vsr);
+    final RowVector imported = session.arrowOps().fromArrowVectorSchemaRoot(arrowAlloc, vsr);
     BaseVectorTests.assertEquals(input, imported);
     vsr.close();
   }
