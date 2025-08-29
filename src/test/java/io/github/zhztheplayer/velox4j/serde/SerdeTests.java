@@ -19,9 +19,7 @@ package io.github.zhztheplayer.velox4j.serde;
 import java.io.*;
 import java.util.Collections;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -61,6 +59,7 @@ import io.github.zhztheplayer.velox4j.window.BoundType;
 import io.github.zhztheplayer.velox4j.window.WindowFrame;
 import io.github.zhztheplayer.velox4j.window.WindowFunction;
 import io.github.zhztheplayer.velox4j.window.WindowType;
+import io.github.zhztheplayer.velox4j.write.ColumnStatsSpec;
 
 public final class SerdeTests {
   private static void assertJsonEquals(String expected, String actual) {
@@ -128,28 +127,23 @@ public final class SerdeTests {
   }
 
   public static <T> ObjectAndJson<Object> testJavaBeanRoundTrip(T inObj) {
-    try {
-      if (inObj instanceof NativeBean) {
-        throw new VeloxException("Cannot round trip NativeBean");
-      }
-      final ObjectMapper jsonMapper = Serde.jsonMapper();
-      final String inJson = jsonMapper.writeValueAsString(inObj);
-
-      {
-        final byte[] serialized = serialize((Serializable) inObj);
-        final Object javaDeserialized = deserialize(serialized);
-        final String javaDeserializedJson = jsonMapper.writeValueAsString(javaDeserialized);
-        assertJsonEquals(inJson, javaDeserializedJson);
-      }
-
-      final Class<?> clazz = inObj.getClass();
-      final Object outObj = jsonMapper.readValue(inJson, clazz);
-      final String outJson = jsonMapper.writeValueAsString(outObj);
-      assertJsonEquals(inJson, outJson);
-      return new ObjectAndJson<>(outObj, outJson);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+    if (inObj instanceof NativeBean) {
+      throw new VeloxException("Cannot round trip NativeBean");
     }
+    final String inJson = Serde.toPrettyJson(inObj);
+
+    {
+      final byte[] serialized = serialize((Serializable) inObj);
+      final Object javaDeserialized = deserialize(serialized);
+      final String javaDeserializedJson = Serde.toPrettyJson(javaDeserialized);
+      assertJsonEquals(inJson, javaDeserializedJson);
+    }
+
+    final Class<?> clazz = inObj.getClass();
+    final Object outObj = Serde.fromJson(inJson, clazz);
+    final String outJson = Serde.toPrettyJson(outObj);
+    assertJsonEquals(inJson, outJson);
+    return new ObjectAndJson<>(outObj, outJson);
   }
 
   public static HiveColumnHandle newSampleHiveColumnHandle() {
@@ -316,6 +310,14 @@ public final class SerdeTests {
             FieldAccessTypedExpr.create(new IntegerType(), "foo"),
             ImmutableList.of(0));
     return aggregationNode;
+  }
+
+  public static ColumnStatsSpec newSampleColumnStatsSpec() {
+    return new ColumnStatsSpec(
+        ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo")),
+        AggregateStep.PARTIAL,
+        ImmutableList.of("sum"),
+        ImmutableList.of(SerdeTests.newSampleAggregate()));
   }
 
   public static WindowFunction newSampleWindowFunction() {

@@ -62,11 +62,7 @@ public final class Serde {
     SER_MOD.registerBaseClass(baseClass);
   }
 
-  static ObjectMapper jsonMapper() {
-    return JSON;
-  }
-
-  public static String toJson(NativeBean bean) {
+  public static String toJson(Object bean) {
     try {
       return JSON.writer().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -74,7 +70,7 @@ public final class Serde {
     }
   }
 
-  public static String toPrettyJson(NativeBean bean) {
+  public static String toPrettyJson(Object bean) {
     try {
       return JSON.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
     } catch (JsonProcessingException e) {
@@ -90,7 +86,7 @@ public final class Serde {
     }
   }
 
-  public static <T extends NativeBean> T fromJson(String json, Class<? extends T> valueType) {
+  public static <T> T fromJson(String json, Class<? extends T> valueType) {
     try {
       return JSON.reader().readValue(json, valueType);
     } catch (IOException e) {

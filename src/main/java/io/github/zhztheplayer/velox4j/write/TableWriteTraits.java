@@ -18,7 +18,6 @@ package io.github.zhztheplayer.velox4j.write;
 
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
 public class TableWriteTraits {
@@ -32,7 +31,7 @@ public class TableWriteTraits {
     return StaticJniApi.get().tableWriteTraitsOutputType();
   }
 
-  public RowType outputType(AggregationNode aggregationNode) {
-    return jniApi.tableWriteTraitsOutputTypeWithAggregationNode(aggregationNode);
+  public RowType outputType(ColumnStatsSpec columnStatsSpec) {
+    return jniApi.tableWriteTraitsOutputTypeFromColumnStatsSpec(columnStatsSpec);
   }
 }

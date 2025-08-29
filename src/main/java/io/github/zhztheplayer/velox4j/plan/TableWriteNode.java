@@ -21,16 +21,18 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 
 import io.github.zhztheplayer.velox4j.connector.CommitStrategy;
 import io.github.zhztheplayer.velox4j.connector.ConnectorInsertTableHandle;
 import io.github.zhztheplayer.velox4j.connector.InsertTableHandle;
 import io.github.zhztheplayer.velox4j.type.RowType;
+import io.github.zhztheplayer.velox4j.write.ColumnStatsSpec;
 
 public class TableWriteNode extends PlanNode {
   private final RowType columns;
   private final List<String> columnNames;
-  private final AggregationNode aggregationNode;
+  private final ColumnStatsSpec columnStatsSpec;
   private final InsertTableHandle insertTableHandle;
   private final boolean hasPartitioningScheme;
   private final RowType outputType;
@@ -42,7 +44,7 @@ public class TableWriteNode extends PlanNode {
       @JsonProperty("id") String id,
       @JsonProperty("columns") RowType columns,
       @JsonProperty("columnNames") List<String> columnNames,
-      @JsonProperty("aggregationNode") AggregationNode aggregationNode,
+      @JsonProperty("aggregationNode") ColumnStatsSpec columnStatsSpec,
       @JsonProperty("connectorId") String connectorId,
       @JsonProperty("connectorInsertTableHandle") ConnectorInsertTableHandle insertTableHandle,
       @JsonProperty("hasPartitioningScheme") boolean hasPartitioningScheme,
@@ -50,14 +52,16 @@ public class TableWriteNode extends PlanNode {
       @JsonProperty("commitStrategy") CommitStrategy commitStrategy,
       @JsonProperty("sources") List<PlanNode> sources) {
     super(id);
-    this.columns = columns;
-    this.columnNames = columnNames;
-    this.aggregationNode = aggregationNode;
-    this.insertTableHandle = new InsertTableHandle(connectorId, insertTableHandle);
+    this.columns = Preconditions.checkNotNull(columns);
+    this.columnNames = Preconditions.checkNotNull(columnNames);
+    this.columnStatsSpec = columnStatsSpec; // Nullable.
+    this.insertTableHandle =
+        new InsertTableHandle(
+            Preconditions.checkNotNull(connectorId), Preconditions.checkNotNull(insertTableHandle));
     this.hasPartitioningScheme = hasPartitioningScheme;
-    this.outputType = outputType;
-    this.commitStrategy = commitStrategy;
-    this.sources = sources;
+    this.outputType = Preconditions.checkNotNull(outputType);
+    this.commitStrategy = Preconditions.checkNotNull(commitStrategy);
+    this.sources = Preconditions.checkNotNull(sources);
   }
 
   @JsonGetter("columns")
@@ -70,9 +74,9 @@ public class TableWriteNode extends PlanNode {
     return columnNames;
   }
 
-  @JsonGetter("aggregationNode")
-  public AggregationNode getAggregationNode() {
-    return aggregationNode;
+  @JsonGetter("columnStatsSpec")
+  public ColumnStatsSpec getColumnStatsSpec() {
+    return columnStatsSpec;
   }
 
   @JsonGetter("connectorId")

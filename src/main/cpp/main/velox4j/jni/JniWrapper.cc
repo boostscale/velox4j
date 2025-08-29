@@ -321,19 +321,18 @@ jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_END(-1)
 }
 
-jstring tableWriteTraitsOutputTypeWithAggregationNode(
+jstring tableWriteTraitsOutputTypeFromColumnStatsSpec(
     JNIEnv* env,
     jobject javaThis,
-    jstring aggregationNodeJson) {
+    jstring columnStatsSpecJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jJson{env, aggregationNodeJson};
+  spotify::jni::JavaString jJson{env, columnStatsSpecJson};
   auto dynamic = folly::parseJson(jJson.get());
   auto serdePool = session->memoryManager()->getVeloxPool(
       "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  auto aggregationNode = std::const_pointer_cast<core::AggregationNode>(
-      ISerializable::deserialize<core::AggregationNode>(dynamic, serdePool));
-  auto type = exec::TableWriteTraits::outputType(aggregationNode);
+  auto columnStatSpec = core::ColumnStatsSpec::create(dynamic, serdePool);
+  auto type = exec::TableWriteTraits::outputType(columnStatSpec);
   auto serializedDynamic = type->serialize();
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());
@@ -545,8 +544,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "tableWriteTraitsOutputTypeWithAggregationNode",
-      (void*)tableWriteTraitsOutputTypeWithAggregationNode,
+      "tableWriteTraitsOutputTypeFromColumnStatsSpec",
+      (void*)tableWriteTraitsOutputTypeFromColumnStatsSpec,
       kTypeString,
       kTypeString,
       nullptr);

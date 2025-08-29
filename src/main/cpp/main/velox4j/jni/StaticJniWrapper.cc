@@ -272,7 +272,7 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
 
 jstring tableWriteTraitsOutputType(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
-  auto type = exec::TableWriteTraits::outputType(nullptr);
+  auto type = exec::TableWriteTraits::outputType(std::nullopt);
   auto serializedDynamic = type->serialize();
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());

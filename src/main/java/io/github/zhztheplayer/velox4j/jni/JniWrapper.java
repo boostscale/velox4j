@@ -78,7 +78,7 @@ final class JniWrapper {
   native long createSelectivityVector(int length);
 
   // For TableWrite.
-  native String tableWriteTraitsOutputTypeWithAggregationNode(String aggregationNodeJson);
+  native String tableWriteTraitsOutputTypeFromColumnStatsSpec(String columnStatsSpecJson);
 
   // For serde.
   native long iSerializableAsCpp(String json);
