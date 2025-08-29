@@ -40,6 +40,12 @@ set_target_properties(
     OUTPUT_NAME velox4j
     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # Fixes Arm64 "/usr/local/include/xsimd/arch/xsimd_scalar.hpp:988:57: note:
+  # parameter passing for argument of type ‘std::pair<double, double>’ when
+  # C++17 is enabled changed to match C++14 in GCC 10.1"
+  target_compile_options(velox4j_shared PRIVATE -Wno-psabi)
+endif()
 
 set(VELOX4J_3RD_EXCLUSIONS
     "libc\\\\.so\\\\.[0-9]+"

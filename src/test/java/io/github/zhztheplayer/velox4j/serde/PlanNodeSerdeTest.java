@@ -212,7 +212,7 @@ public class PlanNodeSerdeTest {
             "id-2",
             rowType,
             rowType.getNames(),
-            SerdeTests.newSampleAggregationNode("id-4", "id-3"),
+            SerdeTests.newSampleColumnStatsSpec(),
             "connector-1",
             SerdeTests.newSampleHiveInsertTableHandle(),
             true,

@@ -66,10 +66,8 @@ public class TableWriteTraitsTest {
 
   @Test
   public void testOutputTypeWithAggregationNode() {
-    final RowType type =
-        session
-            .tableWriteTraitsOps()
-            .outputType(SerdeTests.newSampleAggregationNode("id-2", "id-1"));
+    final ColumnStatsSpec spec = SerdeTests.newSampleColumnStatsSpec();
+    final RowType type = session.tableWriteTraitsOps().outputType(spec);
     Assert.assertEquals(
         ResourceTests.readResourceAsString(
             "table-write-traits/output-type-with-aggregation-node-1.json"),

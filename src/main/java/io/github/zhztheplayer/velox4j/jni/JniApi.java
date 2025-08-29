@@ -32,7 +32,6 @@ import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.GenericUpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.query.QueryExecutor;
 import io.github.zhztheplayer.velox4j.query.SerialTask;
@@ -43,6 +42,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
+import io.github.zhztheplayer.velox4j.write.ColumnStatsSpec;
 
 /**
  * The higher-level JNI-based API over {@link JniWrapper}. The API hides details like native
@@ -141,9 +141,9 @@ public final class JniApi {
     return new SelectivityVector(jni.createSelectivityVector(length));
   }
 
-  public RowType tableWriteTraitsOutputTypeWithAggregationNode(AggregationNode aggregationNode) {
-    final String aggregationNodeJson = Serde.toJson(aggregationNode);
-    final String typeJson = jni.tableWriteTraitsOutputTypeWithAggregationNode(aggregationNodeJson);
+  public RowType tableWriteTraitsOutputTypeFromColumnStatsSpec(ColumnStatsSpec columnStatsSpec) {
+    final String columnStatsSpecJson = Serde.toJson(columnStatsSpec);
+    final String typeJson = jni.tableWriteTraitsOutputTypeFromColumnStatsSpec(columnStatsSpecJson);
     final RowType type = Serde.fromJson(typeJson, RowType.class);
     return type;
   }
