@@ -66,9 +66,7 @@ FetchContent_Declare(
   velox
   URL ${VELOX_SOURCE_URL}
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-  PATCH_COMMAND
-    ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
-    "${VELOX_PATCH_DIR}/pr-5962.patch" COMMAND ${CMAKE_COMMAND} -E chdir
+  PATCH_COMMAND ${CMAKE_COMMAND} -E chdir
     <SOURCE_DIR> patch -p1 -i "${VELOX_PATCH_DIR}/pr-14586.patch")
 FetchContent_MakeAvailable(velox)
 
