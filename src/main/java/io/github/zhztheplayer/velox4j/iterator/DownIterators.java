@@ -1,24 +1,32 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.iterator;
 
-import com.google.common.base.Preconditions;
+import java.util.Iterator;
+
 import io.github.zhztheplayer.velox4j.data.RowVector;
 
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public final class DownIterators {
+  /** Creates a down-iterator instance from a given Java iterator. */
   public static DownIterator fromJavaIterator(Iterator<RowVector> itr) {
     return new FromJavaIterator(itr);
   }
 
-  public static DownIterator fromBlockingQueue(BlockingQueue<RowVector> queue) {
-    return new FromBlockingQueue(queue);
-  }
-
-  private static class FromJavaIterator implements DownIterator {
+  private static class FromJavaIterator extends BaseDownIterator {
     private final Iterator<RowVector> itr;
 
     private FromJavaIterator(Iterator<RowVector> itr) {
@@ -39,63 +47,29 @@ public final class DownIterators {
     }
 
     @Override
-    public long get() {
-      return itr.next().id();
+    public RowVector get0() {
+      return itr.next();
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
   }
 
-  private static class FromBlockingQueue implements DownIterator {
-    private final BlockingQueue<RowVector> queue;
-    private RowVector pending = null;
-    private AtomicBoolean closed = new AtomicBoolean(false);
+  private abstract static class BaseDownIterator implements DownIterator {
+    protected BaseDownIterator() {}
 
-    public FromBlockingQueue(BlockingQueue<RowVector> queue) {
-      this.queue = queue;
+    @Override
+    public final int advance() {
+      return advance0().getId();
     }
 
     @Override
-    public State advance0() {
-      if (pending != null) {
-        return State.AVAILABLE;
-      }
-      if (queue.isEmpty()) {
-        return State.BLOCKED;
-      }
-      return State.AVAILABLE;
+    public final long get() {
+      return get0().id();
     }
 
-    @Override
-    public void waitFor() throws InterruptedException {
-      while (true) {
-        if (pending != null) {
-          return;
-        }
-        if (closed.get()) {
-          Thread.currentThread().interrupt();
-          throw new InterruptedException();
-        }
-        pending = queue.poll(100L, TimeUnit.MILLISECONDS);
-      }
-    }
+    protected abstract DownIterator.State advance0();
 
-    @Override
-    public long get() {
-      if (pending != null) {
-        final RowVector out = pending;
-        pending = null;
-        return out.id();
-      }
-      return queue.remove().id();
-    }
-
-    @Override
-    public void close() {
-      closed.compareAndSet(false, true);
-    }
+    protected abstract RowVector get0();
   }
 }

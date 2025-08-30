@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Evaluation.h"
+#include "velox4j/eval/Evaluation.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -36,7 +36,8 @@ const std::shared_ptr<const ConfigArray>& Evaluation::queryConfig() const {
   return queryConfig_;
 }
 
-const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig() const {
+const std::shared_ptr<const ConnectorConfigArray>& Evaluation::connectorConfig()
+    const {
   return connectorConfig_;
 }
 

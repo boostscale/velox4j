@@ -15,9 +15,21 @@
  * limitations under the License.
  */
 
-#include "Config.h"
+#include "velox4j/init/Config.h"
 
 namespace velox4j {
 using namespace facebook::velox;
-config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET("velox4j.init.preset", Preset::SPARK);
-}
+
+/// The preset used for initializing Velox4J.
+/// The initialization process will involve connector, function, fs
+/// registrations and so on.
+/// Spark is the only preset we support at this moment.
+config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET(
+    "velox4j.init.preset",
+    Preset::SPARK);
+
+/// The glog verbose level.
+config::ConfigBase::Entry<int32_t> VELOX4J_INIT_LOGGING_VERBOSE_LEVEL(
+    "velox4j.init.logging.verboseLevel",
+    0);
+} // namespace velox4j

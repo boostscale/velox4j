@@ -1,28 +1,32 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.serde;
 
-import io.github.zhztheplayer.velox4j.exception.VeloxException;
-import io.github.zhztheplayer.velox4j.test.Velox4jTests;
-import io.github.zhztheplayer.velox4j.variant.ArrayValue;
-import io.github.zhztheplayer.velox4j.variant.BigIntValue;
-import io.github.zhztheplayer.velox4j.variant.BooleanValue;
-import io.github.zhztheplayer.velox4j.variant.DoubleValue;
-import io.github.zhztheplayer.velox4j.variant.HugeIntValue;
-import io.github.zhztheplayer.velox4j.variant.IntegerValue;
-import io.github.zhztheplayer.velox4j.variant.MapValue;
-import io.github.zhztheplayer.velox4j.variant.RealValue;
-import io.github.zhztheplayer.velox4j.variant.RowValue;
-import io.github.zhztheplayer.velox4j.variant.SmallIntValue;
-import io.github.zhztheplayer.velox4j.variant.TimestampValue;
-import io.github.zhztheplayer.velox4j.variant.TinyIntValue;
-import io.github.zhztheplayer.velox4j.variant.VarBinaryValue;
-import io.github.zhztheplayer.velox4j.variant.VarCharValue;
+import java.math.BigInteger;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
+import io.github.zhztheplayer.velox4j.exception.VeloxException;
+import io.github.zhztheplayer.velox4j.test.Velox4jTests;
+import io.github.zhztheplayer.velox4j.variant.*;
 
 public class VariantSerdeTest {
   @BeforeClass
@@ -34,6 +38,7 @@ public class VariantSerdeTest {
   public void testBooleanValue() {
     SerdeTests.testVariantRoundTrip(new BooleanValue(false));
     SerdeTests.testVariantRoundTrip(new BooleanValue(true));
+    SerdeTests.testVariantRoundTrip(new BooleanValue(null));
   }
 
   @Test
@@ -41,6 +46,7 @@ public class VariantSerdeTest {
     SerdeTests.testVariantRoundTrip(new TinyIntValue(-5));
     SerdeTests.testVariantRoundTrip(new TinyIntValue(0));
     SerdeTests.testVariantRoundTrip(new TinyIntValue(5));
+    SerdeTests.testVariantRoundTrip(new TinyIntValue(null));
   }
 
   @Test
@@ -48,6 +54,7 @@ public class VariantSerdeTest {
     SerdeTests.testVariantRoundTrip(new SmallIntValue(-5));
     SerdeTests.testVariantRoundTrip(new SmallIntValue(0));
     SerdeTests.testVariantRoundTrip(new SmallIntValue(5));
+    SerdeTests.testVariantRoundTrip(new SmallIntValue(null));
   }
 
   @Test
@@ -55,6 +62,7 @@ public class VariantSerdeTest {
     SerdeTests.testVariantRoundTrip(new IntegerValue(-5));
     SerdeTests.testVariantRoundTrip(new IntegerValue(0));
     SerdeTests.testVariantRoundTrip(new IntegerValue(5));
+    SerdeTests.testVariantRoundTrip(new IntegerValue(null));
   }
 
   @Test
@@ -63,73 +71,86 @@ public class VariantSerdeTest {
     SerdeTests.testVariantRoundTrip(new BigIntValue(0L));
     SerdeTests.testVariantRoundTrip(new BigIntValue(5L));
     SerdeTests.testVariantRoundTrip(new BigIntValue(Long.MAX_VALUE));
+    SerdeTests.testVariantRoundTrip(new BigIntValue(null));
   }
 
   @Test
   public void testHugeIntValue() {
+    SerdeTests.testVariantRoundTrip(new HugeIntValue(BigInteger.valueOf(0)));
+    SerdeTests.testVariantRoundTrip(new HugeIntValue(null));
     final BigInteger int64Max = BigInteger.valueOf(Long.MAX_VALUE);
     final BigInteger plusOne = int64Max.add(BigInteger.valueOf(1));
     SerdeTests.testVariantRoundTrip(new HugeIntValue(int64Max));
     // FIXME this doesn't work
-    Assert.assertThrows(VeloxException.class,
-        () -> SerdeTests.testVariantRoundTrip(new HugeIntValue(plusOne)));
+    Assert.assertThrows(
+        VeloxException.class, () -> SerdeTests.testVariantRoundTrip(new HugeIntValue(plusOne)));
   }
 
   @Test
   public void testRealValue() {
     SerdeTests.testVariantRoundTrip(new RealValue(-5.5f));
     SerdeTests.testVariantRoundTrip(new RealValue(5.5f));
+    SerdeTests.testVariantRoundTrip(new RealValue(null));
   }
 
   @Test
   public void testDoubleValue() {
     SerdeTests.testVariantRoundTrip(new DoubleValue(-5.5d));
     SerdeTests.testVariantRoundTrip(new DoubleValue(5.5d));
+    SerdeTests.testVariantRoundTrip(new DoubleValue(null));
   }
 
   @Test
   public void testVarCharValue() {
     SerdeTests.testVariantRoundTrip(new VarCharValue("foo"));
+    SerdeTests.testVariantRoundTrip(new VarCharValue(null));
   }
 
   @Test
   public void testVarBinaryValue() {
-    final VarBinaryValue in = VarBinaryValue.create("foo".getBytes());
-    SerdeTests.testVariantRoundTrip(in);
+    SerdeTests.testVariantRoundTrip(VarBinaryValue.create("foo".getBytes()));
+    Assert.assertThrows(NullPointerException.class, () -> VarBinaryValue.create(null));
+    SerdeTests.testVariantRoundTrip(VarBinaryValue.createNull());
   }
 
   @Test
   public void testTimestampValue() {
     long seconds = System.currentTimeMillis() / 1000;
     long nanos = System.nanoTime() % 1_000_000_000L;
-    final TimestampValue in = TimestampValue.create(seconds, nanos);
-    SerdeTests.testVariantRoundTrip(in);
+    SerdeTests.testVariantRoundTrip(TimestampValue.create(seconds, nanos));
+    SerdeTests.testVariantRoundTrip(TimestampValue.createNull());
   }
 
   @Test
   public void testArrayValue() {
-    SerdeTests.testVariantRoundTrip(new ArrayValue(
-        List.of(new IntegerValue(100), new IntegerValue(500))));
-    SerdeTests.testVariantRoundTrip(new ArrayValue(
-        List.of(new BooleanValue(false), new BooleanValue(true))));
+    SerdeTests.testVariantRoundTrip(
+        new ArrayValue(ImmutableList.of(new IntegerValue(100), new IntegerValue(500))));
+    SerdeTests.testVariantRoundTrip(
+        new ArrayValue(ImmutableList.of(new BooleanValue(false), new BooleanValue(true))));
+    SerdeTests.testVariantRoundTrip(new ArrayValue(null));
   }
 
   @Test
   public void testMapValue() {
-    SerdeTests.testVariantRoundTrip(new MapValue(Map.of(
-        new IntegerValue(100), new BooleanValue(false),
-        new IntegerValue(1000), new BooleanValue(true),
-        new IntegerValue(400), new BooleanValue(false),
-        new IntegerValue(800), new BooleanValue(false),
-        new IntegerValue(200), new BooleanValue(true),
-        new IntegerValue(500), new BooleanValue(true))));
+    SerdeTests.testVariantRoundTrip(
+        new MapValue(
+            ImmutableMap.<Variant, Variant>builder()
+                .put(new IntegerValue(100), new BooleanValue(false))
+                .put(new IntegerValue(1000), new BooleanValue(true))
+                .put(new IntegerValue(400), new BooleanValue(false))
+                .put(new IntegerValue(800), new BooleanValue(false))
+                .put(new IntegerValue(200), new BooleanValue(true))
+                .put(new IntegerValue(500), new BooleanValue(true))
+                .build()));
+    SerdeTests.testVariantRoundTrip(new MapValue(null));
   }
 
   @Test
   public void testRowValue() {
-    SerdeTests.testVariantRoundTrip(new RowValue(
-        List.of(new IntegerValue(100), new BooleanValue(true))));
-    SerdeTests.testVariantRoundTrip(new RowValue(
-        List.of(new IntegerValue(500), new BooleanValue(false))));
+    SerdeTests.testVariantRoundTrip(
+        new RowValue(ImmutableList.of(new IntegerValue(100), new BooleanValue(true))));
+    SerdeTests.testVariantRoundTrip(
+        new RowValue(ImmutableList.of(new IntegerValue(500), new BooleanValue(false))));
+    SerdeTests.testVariantRoundTrip(new RowValue(null));
   }
 }

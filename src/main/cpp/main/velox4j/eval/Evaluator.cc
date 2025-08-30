@@ -15,28 +15,23 @@
  * limitations under the License.
  */
 
-#include "Evaluator.h"
-#include "Evaluation.h"
+#include "velox4j/eval/Evaluator.h"
+#include "velox4j/eval/Evaluation.h"
 
 namespace velox4j {
 using namespace facebook::velox;
-
-Evaluator::Evaluator(MemoryManager* memoryManager, std::string exprJson)
-    : memoryManager_(memoryManager), exprJson_(exprJson) {
+Evaluator::Evaluator(
+    MemoryManager* memoryManager,
+    const std::shared_ptr<const Evaluation>& evaluation)
+    : evaluation_(evaluation) {
   static std::atomic<uint32_t> executionId{0};
   const uint32_t eid = executionId++;
-  auto evaluatorSerdePool = memoryManager_->getVeloxPool(
-      fmt::format("Evaluator Serde Memory Pool - EID {}", std::to_string(eid)),
-      memory::MemoryPool::Kind::kLeaf);
-  auto exprDynamic = folly::parseJson(exprJson_);
-  auto expr =
-      ISerializable::deserialize<Evaluation>(exprDynamic, evaluatorSerdePool);
   queryCtx_ = core::QueryCtx::create(
       nullptr,
-      core::QueryConfig{expr->queryConfig()->toMap()},
-      expr->connectorConfig()->toMap(),
+      core::QueryConfig{evaluation_->queryConfig()->toMap()},
+      evaluation_->connectorConfig()->toMap(),
       cache::AsyncDataCache::getInstance(),
-      memoryManager_
+      memoryManager
           ->getVeloxPool(
               fmt::format(
                   "Evaluator Memory Pool - EID {}", std::to_string(eid)),
@@ -46,10 +41,11 @@ Evaluator::Evaluator(MemoryManager* memoryManager, std::string exprJson)
       fmt::format("Evaluator Context - EID {}", std::to_string(eid)));
   ee_ = std::make_unique<exec::SimpleExpressionEvaluator>(
       queryCtx_.get(),
-      memoryManager_->getVeloxPool(
-          fmt::format("Evaluator Leaf Memory Pool - EID {}", std::to_string(eid)),
+      memoryManager->getVeloxPool(
+          fmt::format(
+              "Evaluator Leaf Memory Pool - EID {}", std::to_string(eid)),
           memory::MemoryPool::Kind::kLeaf));
-  exprSet_ = ee_->compile(expr->expr());
+  exprSet_ = ee_->compile(evaluation_->expr());
 }
 
 VectorPtr Evaluator::eval(

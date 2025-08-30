@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#pragma once
 
 #include "velox4j/init/Config.h"
 #include "velox4j/init/Init.h"
 
-#pragma once
-
 namespace velox4j {
-void testingEnsureInitializedForSpark() {
+inline void testingEnsureInitializedForSpark() {
   static std::once_flag flag;
   auto conf = std::make_shared<ConfigArray>(
       std::vector<std::pair<std::string, std::string>>{

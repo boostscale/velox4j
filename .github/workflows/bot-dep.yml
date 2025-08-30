@@ -18,7 +18,7 @@ name: Dependency Bot
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 4 * * *"
 
 jobs:
 
@@ -36,12 +36,20 @@ jobs:
         run: |
           bash .github/workflows/scripts/bot-dep/bump-velox.sh
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: '[BOT] Bump Velox version'
-          title: '[BOT] Bump velox version'
+          title: '[BOT] Bump Velox version'
           body: |
-            Update Velox to latest.
+            ${{ env.BUMP_VELOX_DESCRIPTION }}
           branch: bump-velox-${{ github.run_number }}
           sign-commits: true
+      - name: Enable Pull Request Auto-Merge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash

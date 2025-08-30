@@ -18,21 +18,20 @@
 #pragma once
 
 #include <velox/core/PlanNode.h>
-#include <utility>
-#include "BoundSplit.h"
 #include "velox4j/config/Config.h"
 
 namespace velox4j {
+
+/// An immutable JSON-able object that represents a query that is associated
+/// with a given Velox query plan and the corresponding query configurations.
 class Query : public facebook::velox::ISerializable {
  public:
   Query(
       const std::shared_ptr<const facebook::velox::core::PlanNode>& plan,
-      std::vector<std::shared_ptr<BoundSplit>>&& boundSplits,
       const std::shared_ptr<const ConfigArray>& queryConfig,
       const std::shared_ptr<const ConnectorConfigArray>& connectorConfig);
 
   const std::shared_ptr<const facebook::velox::core::PlanNode>& plan() const;
-  const std::vector<std::shared_ptr<BoundSplit>>& boundSplits() const;
   const std::shared_ptr<const ConfigArray>& queryConfig() const;
   const std::shared_ptr<const ConnectorConfigArray>& connectorConfig() const;
 
@@ -48,7 +47,6 @@ class Query : public facebook::velox::ISerializable {
 
  private:
   const std::shared_ptr<const facebook::velox::core::PlanNode> plan_;
-  const std::vector<std::shared_ptr<BoundSplit>> boundSplits_;
   const std::shared_ptr<const ConfigArray> queryConfig_;
   const std::shared_ptr<const ConnectorConfigArray> connectorConfig_;
 };

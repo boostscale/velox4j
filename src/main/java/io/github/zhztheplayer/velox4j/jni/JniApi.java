@@ -1,18 +1,40 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.jni;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
-import io.github.zhztheplayer.velox4j.data.BaseVector;
-import io.github.zhztheplayer.velox4j.data.RowVector;
-import io.github.zhztheplayer.velox4j.data.SelectivityVector;
-import io.github.zhztheplayer.velox4j.data.VectorEncoding;
+import io.github.zhztheplayer.velox4j.connector.ExternalStreams;
+import io.github.zhztheplayer.velox4j.data.*;
 import io.github.zhztheplayer.velox4j.eval.Evaluation;
 import io.github.zhztheplayer.velox4j.eval.Evaluator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
+import io.github.zhztheplayer.velox4j.iterator.GenericUpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
-import io.github.zhztheplayer.velox4j.plan.AggregationNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.query.QueryExecutor;
+import io.github.zhztheplayer.velox4j.query.SerialTask;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.serializable.ISerializableCo;
@@ -20,17 +42,12 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 import io.github.zhztheplayer.velox4j.type.Type;
 import io.github.zhztheplayer.velox4j.variant.Variant;
 import io.github.zhztheplayer.velox4j.variant.VariantCo;
-import org.apache.arrow.c.ArrowArray;
-import org.apache.arrow.c.ArrowSchema;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.github.zhztheplayer.velox4j.write.ColumnStatsSpec;
 
 /**
- * The higher-level JNI-based API over {@link JniWrapper}. The API hides
- * details like native pointers and serialized data from developers, instead
- * provides objective forms of the required functionalities.
+ * The higher-level JNI-based API over {@link JniWrapper}. The API hides details like native
+ * pointers and serialized data from developers, instead provides objective forms of the required
+ * functionalities.
  */
 public final class JniApi {
   private final JniWrapper jni;
@@ -58,16 +75,25 @@ public final class JniApi {
     return new QueryExecutor(this, jni.createQueryExecutor(queryJson));
   }
 
-  public UpIterator queryExecutorExecute(QueryExecutor executor) {
-    return new UpIterator(this, jni.queryExecutorExecute(executor.id()));
+  public SerialTask queryExecutorExecute(QueryExecutor executor) {
+    return new SerialTask(this, jni.queryExecutorExecute(executor.id()));
   }
 
   public RowVector upIteratorGet(UpIterator itr) {
     return baseVectorWrap(jni.upIteratorGet(itr.id())).asRowVector();
   }
 
-  public ExternalStream newExternalStream(DownIterator itr) {
-    return new ExternalStream(jni.newExternalStream(itr));
+  public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
+    return new ExternalStreams.GenericExternalStream(jni.createExternalStreamFromDownIterator(itr));
+  }
+
+  public ExternalStreams.BlockingQueue createBlockingQueue() {
+    return new ExternalStreams.BlockingQueue(jni.createBlockingQueue());
+  }
+
+  public void typeToArrow(Type type, ArrowSchema schema) {
+    final String typeJson = Serde.toJson(type);
+    jni.typeToArrow(typeJson, schema.memoryAddress());
   }
 
   public BaseVector createEmptyBaseVector(Type type) {
@@ -76,7 +102,12 @@ public final class JniApi {
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
-    return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    try {
+      return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+    } finally {
+      schema.close();
+      array.close();
+    }
   }
 
   public List<BaseVector> baseVectorDeserialize(String serialized) {
@@ -93,17 +124,26 @@ public final class JniApi {
     return baseVectorWrap(jni.baseVectorSlice(vector.id(), offset, length));
   }
 
-  public BaseVector loadedVector(BaseVector vector) {
-    return baseVectorWrap(jni.baseVectorLoadedVector(vector.id()));
+  public List<RowVector> rowVectorPartitionByKeys(RowVector vector, List<Integer> keyChannels) {
+    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
+    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray);
+    return Arrays.stream(vids)
+        .mapToObj(this::baseVectorWrap)
+        .map(BaseVector::asRowVector)
+        .collect(Collectors.toList());
+  }
+
+  public BaseVector flattenVector(BaseVector vector) {
+    return baseVectorWrap(jni.baseVectorFlatten(vector.id()));
   }
 
   public SelectivityVector createSelectivityVector(int length) {
     return new SelectivityVector(jni.createSelectivityVector(length));
   }
 
-  public RowType tableWriteTraitsOutputTypeWithAggregationNode(AggregationNode aggregationNode) {
-    final String aggregationNodeJson = Serde.toJson(aggregationNode);
-    final String typeJson = jni.tableWriteTraitsOutputTypeWithAggregationNode(aggregationNodeJson);
+  public RowType tableWriteTraitsOutputTypeFromColumnStatsSpec(ColumnStatsSpec columnStatsSpec) {
+    final String columnStatsSpecJson = Serde.toJson(columnStatsSpec);
+    final String typeJson = jni.tableWriteTraitsOutputTypeFromColumnStatsSpec(columnStatsSpecJson);
     final RowType type = Serde.fromJson(typeJson, RowType.class);
     return type;
   }
@@ -118,14 +158,20 @@ public final class JniApi {
     return new VariantCo(jni.variantAsCpp(json));
   }
 
+  public BaseVector variantToVector(Type type, Variant variant) {
+    final String typeJson = Serde.toJson(type);
+    final String variantJson = Serde.toPrettyJson(variant);
+    return baseVectorWrap(jni.variantToVector(typeJson, variantJson));
+  }
+
   @VisibleForTesting
   public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
-    return new UpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
+    return new GenericUpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
   }
 
   private BaseVector baseVectorWrap(long id) {
-    final VectorEncoding encoding = VectorEncoding.valueOf(
-        StaticJniWrapper.get().baseVectorGetEncoding(id));
+    final VectorEncoding encoding =
+        VectorEncoding.valueOf(StaticJniWrapper.get().baseVectorGetEncoding(id));
     return BaseVector.wrap(this, id, encoding);
   }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "JniCommon.h"
+#include "velox4j/jni/JniCommon.h"
 #include <arrow/ipc/reader.h>
 #include <arrow/ipc/writer.h>
 #include <execinfo.h>
@@ -50,8 +50,8 @@ void checkException(JNIEnv* env) {
         (jstring)env->CallStaticObjectMethod(
             describerClass, describeMethod, t));
     if (env->ExceptionCheck()) {
-      LOG(WARNING)
-          << "Fatal: Uncaught Java exception during calling the Java exception describer method! ";
+      LOG(WARNING) << "Fatal: Uncaught Java exception during calling the Java "
+                      "exception describer method! ";
     }
     VELOX_FAIL(
         "Error during calling Java code from native code: " + description);
@@ -69,7 +69,7 @@ jclass createGlobalClassReferenceOrError(JNIEnv* env, const char* className) {
   jclass globalClass = createGlobalClassReference(env, className);
   if (globalClass == nullptr) {
     std::string errorMessage =
-        "Unable to CreateGlobalClassReferenceOrError for" +
+        "Unable to CreateGlobalClassReferenceOrError for " +
         std::string(className);
     VELOX_FAIL(errorMessage);
   }

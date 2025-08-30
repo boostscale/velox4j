@@ -15,43 +15,45 @@
  * limitations under the License.
  */
 
-#include "Arrow.h"
+#include "velox4j/arrow/Arrow.h"
+#include <arrow/c/helpers.h>
 #include <velox/vector/arrow/Bridge.h>
+#include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
 
-void slice(VectorPtr& in) {
-  auto* rowBase = in->as<RowVector>();
-  if (!rowBase) {
-    return;
-  }
-  for (auto& child : rowBase->children()) {
-    if (child->size() > rowBase->size()) {
-      child = child->slice(0, rowBase->size());
-    }
-  }
-}
-
-void flatten(VectorPtr& in) {
-  facebook::velox::BaseVector::flattenVector(in);
-}
-
 ArrowOptions makeOptions() {
   ArrowOptions options;
+  // TODO: Make the timestamp unit configurable or included in presets.
   options.timestampUnit = static_cast<TimestampUnit>(6);
   return options;
 }
 } // namespace
 
+void fromTypeToArrow(
+    memory::MemoryPool* pool,
+    TypePtr type,
+    ArrowSchema* cSchema) {
+  auto options = makeOptions();
+  auto emptyVector = BaseVector::create(type, 0, pool);
+  exportToArrow(emptyVector, *cSchema, options);
+}
+
+TypePtr fromArrowToType(ArrowSchema* cSchema) {
+  auto options = makeOptions();
+  auto type = importFromArrow(*cSchema);
+  ArrowSchemaRelease(cSchema);
+  return type;
+}
+
 void fromBaseVectorToArrow(
     VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
-  flatten(vector);
-  slice(vector);
+  flattenVector(vector, vector->size());
   auto options = makeOptions();
   exportToArrow(vector, *cSchema, options);
   exportToArrow(vector, *cArray, vector->pool(), options);
@@ -62,6 +64,9 @@ VectorPtr fromArrowToBaseVector(
     ArrowSchema* cSchema,
     ArrowArray* cArray) {
   auto options = makeOptions();
-  return importFromArrowAsOwner(*cSchema, *cArray, pool);
+  auto vector = importFromArrowAsOwner(*cSchema, *cArray, pool);
+  ArrowSchemaRelease(cSchema);
+  ArrowArrayRelease(cArray);
+  return vector;
 }
 } // namespace velox4j

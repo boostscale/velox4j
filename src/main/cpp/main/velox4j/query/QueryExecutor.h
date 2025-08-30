@@ -17,18 +17,73 @@
 
 #pragma once
 
-#include <string>
-#include "Query.h"
+#include <velox/exec/Driver.h>
+#include <velox/exec/TaskStats.h>
+
 #include "velox4j/iterator/UpIterator.h"
 #include "velox4j/memory/MemoryManager.h"
+#include "velox4j/query/Query.h"
 
 namespace velox4j {
 
+/// SerialTaskStats is a JSON-able object that wraps the task stats
+/// fetched from a Velox task.
+class SerialTaskStats {
+ public:
+  SerialTaskStats(const facebook::velox::exec::TaskStats& taskStats);
+
+  folly::dynamic toJson() const;
+
+ private:
+  facebook::velox::exec::TaskStats taskStats_;
+};
+
+/// An UpIterator implementation that is backed by a Velox task which is
+/// executed in serial execution mode.
+class SerialTask : public UpIterator {
+ public:
+  SerialTask(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+
+  ~SerialTask() override;
+
+  State advance() override;
+
+  void wait() override;
+
+  facebook::velox::RowVectorPtr get() override;
+
+  void addSplit(
+      const facebook::velox::core::PlanNodeId& planNodeId,
+      int32_t groupId,
+      std::shared_ptr<facebook::velox::connector::ConnectorSplit>
+          connectorSplit);
+
+  void noMoreSplits(const facebook::velox::core::PlanNodeId& planNodeId);
+
+  std::unique_ptr<SerialTaskStats> collectStats();
+
+ private:
+  State advance0(bool wait);
+
+  void saveDrivers();
+
+  MemoryManager* const memoryManager_;
+  std::shared_ptr<const Query> query_;
+  std::shared_ptr<facebook::velox::exec::Task> task_;
+  std::vector<std::shared_ptr<facebook::velox::exec::Driver>> drivers_{};
+  bool hasPendingState_{false};
+  State pendingState_{State::BLOCKED};
+  facebook::velox::RowVectorPtr pending_{nullptr};
+};
+
 class QueryExecutor {
  public:
-  QueryExecutor(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
+  QueryExecutor(
+      MemoryManager* memoryManager,
+      std::shared_ptr<const Query> query);
 
-  std::unique_ptr<UpIterator> execute() const;
+  // Executes the query. A SerialTask will be returned.
+  std::unique_ptr<SerialTask> execute() const;
 
  private:
   MemoryManager* const memoryManager_;

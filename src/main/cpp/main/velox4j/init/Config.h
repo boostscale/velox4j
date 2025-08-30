@@ -20,7 +20,9 @@
 #include <velox/common/config/Config.h>
 
 namespace velox4j {
-enum Preset { SPARK = 0 };
+enum Preset { SPARK = 0, FLINK = 1 };
 
 extern facebook::velox::config::ConfigBase::Entry<Preset> VELOX4J_INIT_PRESET;
+extern facebook::velox::config::ConfigBase::Entry<int32_t>
+    VELOX4J_INIT_LOGGING_VERBOSE_LEVEL;
 } // namespace velox4j

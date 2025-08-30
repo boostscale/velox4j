@@ -15,18 +15,31 @@
  * limitations under the License.
  */
 
-#include <arrow/api.h>
-#include <arrow/c/abi.h>
-#include <velox/vector/ComplexVector.h>
-
 #pragma once
 
+#include <velox/vector/ComplexVector.h>
+
+struct ArrowArray;
+struct ArrowSchema;
+
 namespace velox4j {
+
+// Exports the input Velox type to Arrow C schema.
+void fromTypeToArrow(
+    facebook::velox::memory::MemoryPool* pool,
+    facebook::velox::TypePtr type,
+    ArrowSchema* cSchema);
+
+// Imports the given Arrow C schema into a Velox type, then returns it.
+facebook::velox::TypePtr fromArrowToType(ArrowSchema* cSchema);
+
+// Exports the input base vector to Arrow ABI structs.
 void fromBaseVectorToArrow(
     facebook::velox::VectorPtr vector,
     ArrowSchema* cSchema,
     ArrowArray* cArray);
 
+// Imports the given Arrow ABI structs into a base vector, then returns it.
 facebook::velox::VectorPtr fromArrowToBaseVector(
     facebook::velox::memory::MemoryPool* pool,
     ArrowSchema* cSchema,

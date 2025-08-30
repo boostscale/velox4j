@@ -15,27 +15,23 @@
  * limitations under the License.
  */
 
-#include "Query.h"
+#include "velox4j/query/Query.h"
+
+#include <velox/exec/PlanNodeStats.h>
 
 namespace velox4j {
 using namespace facebook::velox;
 
 Query::Query(
     const std::shared_ptr<const core::PlanNode>& plan,
-    std::vector<std::shared_ptr<BoundSplit>>&& boundSplits,
     const std::shared_ptr<const ConfigArray>& queryConfig,
     const std::shared_ptr<const ConnectorConfigArray>& connectorConfig)
     : plan_(plan),
-      boundSplits_(std::move(boundSplits)),
       queryConfig_(queryConfig),
       connectorConfig_(connectorConfig) {}
 
 const std::shared_ptr<const core::PlanNode>& Query::plan() const {
   return plan_;
-}
-
-const std::vector<std::shared_ptr<BoundSplit>>& Query::boundSplits() const {
-  return boundSplits_;
 }
 
 const std::shared_ptr<const ConfigArray>& Query::queryConfig() const {
@@ -48,36 +44,13 @@ const std::shared_ptr<const ConnectorConfigArray>& Query::connectorConfig()
 }
 
 std::string Query::toString() const {
-  std::vector<std::string> boundSplitStrings{};
-  std::transform(
-      boundSplits_.begin(),
-      boundSplits_.end(),
-      boundSplitStrings.begin(),
-      [](std::shared_ptr<BoundSplit> s) -> std::string {
-        return fmt::format(
-            "BoundSplit plan node ID {}, split {}",
-            s->planNodeId(),
-            s->split()->toString());
-      });
-  return fmt::format(
-      "Query: plan {}, splits [{}]",
-      plan_->toString(true, true),
-      folly::join(",", boundSplitStrings));
+  return fmt::format("Query: plan {}", plan_->toString(true, true));
 }
 
 folly::dynamic Query::serialize() const {
   folly::dynamic obj = folly::dynamic::object;
   obj["name"] = "velox4j.Query";
   obj["plan"] = plan_->serialize();
-  folly::dynamic boundSplits = folly::dynamic::array;
-  for (const auto& boundSplit : boundSplits_) {
-    folly::dynamic boundSplitObj = folly::dynamic::object;
-    boundSplitObj["planNodeId"] = boundSplit->planNodeId();
-    boundSplitObj["groupId"] = boundSplit->split()->groupId;
-    boundSplitObj["split"] = boundSplit->split()->connectorSplit->serialize();
-    boundSplits.push_back(boundSplitObj);
-  }
-  obj["boundSplits"] = boundSplits;
   obj["queryConfig"] = queryConfig_->serialize();
   obj["connectorConfig"] = connectorConfig_->serialize();
   return obj;
@@ -86,22 +59,12 @@ folly::dynamic Query::serialize() const {
 std::shared_ptr<Query> Query::create(const folly::dynamic& obj, void* context) {
   auto plan = std::const_pointer_cast<const core::PlanNode>(
       ISerializable::deserialize<core::PlanNode>(obj["plan"], context));
-  std::vector<std::shared_ptr<BoundSplit>> boundSplits{};
-  for (const auto& boundSplit : obj["boundSplits"]) {
-    auto planNodeId = boundSplit["planNodeId"].asString();
-    auto groupId = boundSplit["groupId"].asInt();
-    auto connectorSplit = std::const_pointer_cast<connector::ConnectorSplit>(
-        ISerializable::deserialize<connector::ConnectorSplit>(
-            boundSplit["split"]));
-    std::shared_ptr<exec::Split> split = std::make_shared<exec::Split>(
-        std::move(connectorSplit), static_cast<int32_t>(groupId));
-    boundSplits.push_back(std::make_shared<BoundSplit>(planNodeId, split));
-  }
   auto queryConfig = std::const_pointer_cast<const ConfigArray>(
       ISerializable::deserialize<ConfigArray>(obj["queryConfig"], context));
   auto connectorConfig = std::const_pointer_cast<const ConnectorConfigArray>(
-      ISerializable::deserialize<ConnectorConfigArray>(obj["connectorConfig"], context));
-  return std::make_shared<Query>(plan, std::move(boundSplits), queryConfig, connectorConfig);
+      ISerializable::deserialize<ConnectorConfigArray>(
+          obj["connectorConfig"], context));
+  return std::make_shared<Query>(plan, queryConfig, connectorConfig);
 }
 
 void Query::registerSerDe() {

@@ -18,14 +18,15 @@
 #pragma once
 
 #include <memory>
-#include "ObjectStore.h"
+#include "velox4j/lifecycle/ObjectStore.h"
 #include "velox4j/memory/MemoryManager.h"
 
 namespace velox4j {
+/// A JNI session that is bound to a JniWrapper.
 class Session {
  public:
   Session(MemoryManager* memoryManager)
-      : memoryManager_(memoryManager), objectStore_(ObjectStore::create()) {};
+      : memoryManager_(memoryManager), objectStore_(ObjectStore::create()){};
   virtual ~Session() = default;
 
   MemoryManager* memoryManager() {

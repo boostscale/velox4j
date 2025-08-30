@@ -1,21 +1,33 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.jni;
+
+import java.util.Collections;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import io.github.zhztheplayer.velox4j.arrow.Arrow;
 import io.github.zhztheplayer.velox4j.connector.ExternalStream;
@@ -27,11 +39,12 @@ import io.github.zhztheplayer.velox4j.iterator.DownIterator;
 import io.github.zhztheplayer.velox4j.iterator.DownIterators;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterators;
-import io.github.zhztheplayer.velox4j.memory.AllocationListener;
+import io.github.zhztheplayer.velox4j.memory.BytesAllocationListener;
 import io.github.zhztheplayer.velox4j.memory.MemoryManager;
 import io.github.zhztheplayer.velox4j.query.QueryExecutor;
 import io.github.zhztheplayer.velox4j.session.Session;
 import io.github.zhztheplayer.velox4j.test.SampleQueryTests;
+import io.github.zhztheplayer.velox4j.test.TestThreads;
 import io.github.zhztheplayer.velox4j.test.UpIteratorTests;
 import io.github.zhztheplayer.velox4j.test.Velox4jTests;
 import io.github.zhztheplayer.velox4j.type.DoubleType;
@@ -40,30 +53,25 @@ import io.github.zhztheplayer.velox4j.type.RealType;
 import io.github.zhztheplayer.velox4j.variant.DoubleValue;
 import io.github.zhztheplayer.velox4j.variant.IntegerValue;
 import io.github.zhztheplayer.velox4j.variant.RealValue;
-import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.memory.RootAllocator;
-import org.apache.arrow.vector.FieldVector;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
-
-import java.util.Collections;
-import java.util.List;
 
 public class JniApiTest {
+  private static BufferAllocator arrowAlloc;
+  private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
     Velox4jTests.ensureInitialized();
-    memoryManager = MemoryManager.create(AllocationListener.NOOP);
+    arrowAlloc = new RootAllocator(Long.MAX_VALUE);
+    allocationListener = new BytesAllocationListener();
+    memoryManager = StaticJniApi.get().createMemoryManager(allocationListener);
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
     memoryManager.close();
+    arrowAlloc.close();
+    Assert.assertEquals(0, allocationListener.currentBytes());
   }
 
   @Test
@@ -84,12 +92,14 @@ public class JniApiTest {
   public void testCloseTwice() {
     final LocalSession session = createLocalSession(memoryManager);
     session.close();
-    Assert.assertThrows(VeloxException.class, new ThrowingRunnable() {
-      @Override
-      public void run() {
-        session.close();
-      }
-    });
+    Assert.assertThrows(
+        VeloxException.class,
+        new ThrowingRunnable() {
+          @Override
+          public void run() {
+            session.close();
+          }
+        });
   }
 
   @Test
@@ -150,14 +160,13 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final List<RowVector> vectors = List.of(vector);
+    final List<RowVector> vectors = ImmutableList.of(vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);
     session.close();
     ;
   }
-
 
   @Test
   public void testVectorSerdeMultiple() {
@@ -167,7 +176,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final List<RowVector> vectors = List.of(vector, vector);
+    final List<RowVector> vectors = ImmutableList.of(vector, vector);
     final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);
@@ -182,9 +191,8 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
-    final BufferAllocator alloc = new RootAllocator(Long.MAX_VALUE);
-    final FieldVector arrowVector = Arrow.toArrowVector(alloc, vector);
-    final BaseVector imported = session.arrowOps().fromArrowVector(alloc, arrowVector);
+    final FieldVector arrowVector = Arrow.toArrowVector(arrowAlloc, vector);
+    final BaseVector imported = session.arrowOps().fromArrowVector(arrowAlloc, arrowVector);
     BaseVectorTests.assertEquals(vector, imported);
     arrowVector.close();
     session.close();
@@ -192,9 +200,11 @@ public class JniApiTest {
 
   @Test
   public void testVariantInferType() {
-    Assert.assertTrue(StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(
+        StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
     Assert.assertTrue(StaticJniApi.get().variantInferType(new RealValue(4.6f)) instanceof RealType);
-    Assert.assertTrue(StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
+    Assert.assertTrue(
+        StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
   }
 
   @Test
@@ -205,7 +215,7 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.newExternalStream(down);
+    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
     session.close();
@@ -219,14 +229,16 @@ public class JniApiTest {
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final UpIterator itr = queryExecutor.execute();
     final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.newExternalStream(down);
+    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
     final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
-    final Thread thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        SampleQueryTests.assertIterator(up);
-      }
-    });
+    final Thread thread =
+        TestThreads.newTestThread(
+            new Runnable() {
+              @Override
+              public void run() {
+                SampleQueryTests.assertIterator(up);
+              }
+            });
     thread.start();
     thread.join();
     session.close();

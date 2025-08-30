@@ -80,7 +80,7 @@ of Velox4J at the time. But certainly, contributions are always welcomed if anyo
 The minimum toolchain versions for building Velox4J:
 
 - GCC 11
-- JDK 11
+- JDK 8
 
 ## Releases
 
@@ -121,8 +121,8 @@ NOTE:
 
 ## Build From Source
 
-```bash
-mvn clean install -Dgpg.skip
+```shell
+mvn clean install
 ```
 
 ## Get Started
@@ -130,86 +130,89 @@ mvn clean install -Dgpg.skip
 The following is a brief example of using Velox4J to execute a query:
 
 ```java
-// 1. Initialize Velox4J.
-Velox4j.initialize();
 
-// 2. Define the plan output schema.
-final RowType outputType = new RowType(List.of(
-        "n_nationkey",
-        "n_name",
-        "n_regionkey",
-        "n_comment"
-    ), List.of(
-        new BigIntType(),
-        new VarCharType(),
-        new BigIntType(),
-        new VarCharType()
-    ));
+public static void main(String[] args) {
+  // 1. Initialize Velox4J.
+  Velox4j.initialize();
 
-// 3. Create a table scan node.
-final TableScanNode scanNode = new TableScanNode(
-    "plan-id-1",
-    outputType,
-    new HiveTableHandle(
-        "connector-hive",
-        "table-1",
-        false,
-        List.of(),
-        null,
-        outputType,
-        Map.of()
-    ),
-    toAssignments(outputType)
-);
+  // 2. Define the plan output schema.
+  final RowType outputType = new RowType(List.of(
+      "n_nationkey",
+      "n_name",
+      "n_regionkey",
+      "n_comment"
+  ), List.of(
+      new BigIntType(),
+      new VarCharType(),
+      new BigIntType(),
+      new VarCharType()
+  ));
 
-// 4. Create a split associating with the table scan node, this makes
-// the scan read a local file "/tmp/nation.parquet".
-final File file = new File("/tmp/nation.parquet");
-final BoundSplit split = new BoundSplit(
-    scanNode.getId(),
-    -1,
-    new HiveConnectorSplit(
-        "connector-hive",
-        0,
-        false,
-        file.getAbsolutePath(),
-        FileFormat.PARQUET,
-        0,
-        file.length(),
-        Map.of(),
-        OptionalInt.empty(),
-        Optional.empty(),
-        Map.of(),
-        Optional.empty(),
-        Map.of(),
-        Map.of(),
-        Map.of(),
-        Optional.empty(),
-        Optional.empty()
-    )
-);
+  // 3. Create a table scan node.
+  final TableScanNode scanNode = new TableScanNode(
+      "plan-id-1",
+      outputType,
+      new HiveTableHandle(
+          "connector-hive",
+          "table-1",
+          false,
+          List.of(),
+          null,
+          outputType,
+          Map.of()
+      ),
+      toAssignments(outputType)
+  );
 
-// 5. Build the query.
-final Query query = new Query(scanNode, List.of(split), Config.empty(), ConnectorConfig.empty());
+  // 4. Build the query.
+  final Query query = new Query(scanNode, Config.empty(), ConnectorConfig.empty());
 
-// 6. Create a Velox4J session.
-final MemoryManager memoryManager = MemoryManager.create(AllocationListener.NOOP);
-final Session session = Velox4j.newSession(memoryManager);
+  // 5. Create a Velox4J session.
+  final MemoryManager memoryManager = Velox4j.newMemoryManager(AllocationListener.NOOP);
+  final Session session = Velox4j.newSession(memoryManager);
 
-// 7. Execute the query.
-final Iterator<RowVector> itr = UpIterators.asJavaIterator(session.queryOps().execute(query));
+  // 6. Execute the query. A Velox serial task will be returned.
+  final SerialTask task = session.queryOps().execute(query);
 
-// 8. Collect and print results.
-while (itr.hasNext()) {
-  final RowVector rowVector = itr.next(); // 8.1. Get next RowVector returned by Velox.
-  final VectorSchemaRoot vsr = Arrow.toArrowTable(new RootAllocator(), rowVector).toVectorSchemaRoot(); // 8.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
-  System.out.println(vsr.contentToTSVString()); // 8.3. Print the arrow table to stdout.
-  vsr.close(); // 8.4. Release the Arrow VectorSchemaRoot.
+  // 7. Add a split associating with the table scan node to the task, this makes
+  // the scan read a local file "/tmp/nation.parquet".
+  final File file = new File("/tmp/nation.parquet");
+  final ConnectorSplit split = new HiveConnectorSplit(
+      "connector-hive",
+      0,
+      false,
+      file.getAbsolutePath(),
+      FileFormat.PARQUET,
+      0,
+      file.length(),
+      Map.of(),
+      null,
+      null,
+      Map.of(),
+      null,
+      Map.of(),
+      Map.of(),
+      null,
+      null
+  );
+  task.addSplit(scanNode.getId(), split);
+  task.noMoreSplits(scanNode.getId());
+
+  // 8. Create a Java iterator from the Velox task.
+  final Iterator<RowVector> itr = UpIterators.asJavaIterator(task);
+
+  // 9. Collect and print results.
+  while (itr.hasNext()) {
+    final RowVector rowVector = itr.next(); // 9.1. Get next RowVector returned by Velox.
+    final VectorSchemaRoot vsr = Arrow.toArrowVectorSchemaRoot(new RootAllocator(), rowVector); // 9.2. Convert the RowVector into Arrow format (an Arrow VectorSchemaRoot in this case).
+    System.out.println(vsr.contentToTSVString()); // 9.3. Print the arrow table to stdout.
+    vsr.close(); // 9.4. Release the Arrow VectorSchemaRoot.
+  }
+
+  // 10. Close the Velox4J session.
+  session.close();
+  memoryManager.close();
 }
-
-// 9. Close the Velox4J session.
-session.close();
-memoryManager.close();
 ```
 
 Code of the `toAssignment` utility method used above:
@@ -225,6 +228,25 @@ private static List<Assignment> toAssignments(RowType rowType) {
   }
   return list;
 }
+```
+
+## Coding Style
+
+Velox4J's code conforms to Java coding style from Google Java format and C++ coding style from Velox.
+
+You can run the following command to fix all the code style issues during development, including both
+the C++ code and Java code:
+
+```shell
+bash .github/workflows/scripts/format/format.sh -fix
+```
+
+Note, Docker environment is required to run the script.
+
+If you only need to check the code format without fixing them, use the subcommand`-check` instead:
+
+```shell
+bash .github/workflows/scripts/format/format.sh -check
 ```
 
 ## License

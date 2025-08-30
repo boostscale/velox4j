@@ -23,6 +23,8 @@
 
 namespace velox4j {
 
+/// A listener that provides a user listening hook (i.e.,`allocationChanged`) to
+/// MemoryManager.
 class AllocationListener {
  public:
   static std::unique_ptr<AllocationListener> noop();

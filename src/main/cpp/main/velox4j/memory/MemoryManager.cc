@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include "MemoryManager.h"
-#include "ArrowMemoryPool.h"
+#include "velox4j/memory/MemoryManager.h"
+#include "velox4j/memory/ArrowMemoryPool.h"
 
 namespace velox4j {
 using namespace facebook;
@@ -133,7 +133,9 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
       pool = candidates_.begin()->first;
     }
     pool->reclaim(
-        targetBytes, memoryReclaimMaxWaitMs_, status); // ignore the output
+        targetBytes,
+        memoryReclaimMaxWaitMs_,
+        status); // ignore the output
     return shrinkCapacityInternal(pool, 0);
   }
 
@@ -169,7 +171,13 @@ class ListenableArbitrator : public velox::memory::MemoryArbitrator {
     auto reclaimedFreeBytes = shrinkPool(pool, 0);
     auto neededBytes = velox::bits::roundUp(
         bytes - reclaimedFreeBytes, memoryPoolTransferCapacity_);
-    listener_->allocationChanged(neededBytes);
+    try {
+      listener_->allocationChanged(neededBytes);
+    } catch (const std::exception& e) {
+      // if allocationChanged failed, we need to free the reclaimed bytes
+      listener_->allocationChanged(-reclaimedFreeBytes);
+      throw;
+    }
     auto ret = growPool(pool, reclaimedFreeBytes + neededBytes, bytes);
     VELOX_CHECK(
         ret,
@@ -288,8 +296,8 @@ bool MemoryManager::tryDestruct() {
   // Velox memory manager considered safe to destruct when no alive pools.
   if (veloxMemoryManager_) {
     if (veloxMemoryManager_->numPools() > 3) {
-      LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
-                 << "There are " << veloxMemoryManager_->numPools()
+      LOG(ERROR) << "[Velox4J MemoryManager DTOR] " << "There are "
+                 << veloxMemoryManager_->numPools()
                  << " outstanding Velox memory pools.";
       leakFound = true;
     }
@@ -300,7 +308,7 @@ bool MemoryManager::tryDestruct() {
     int32_t spillPoolCount = 0;
     int32_t cachePoolCount = 0;
     int32_t tracePoolCount = 0;
-    veloxMemoryManager_->testingDefaultRoot().visitChildren(
+    veloxMemoryManager_->deprecatedSysRootPool().visitChildren(
         [&](velox::memory::MemoryPool* child) -> bool {
           if (child == veloxMemoryManager_->spillPool()) {
             spillPoolCount++;
@@ -347,9 +355,9 @@ MemoryManager::~MemoryManager() {
                << " Error occurred: " << ex.what();
   }
   if (!succeeded) {
-    LOG(ERROR)
-        << "[Velox4J MemoryManager DTOR] "
-        << "Fatal: Memory leak found, aborting the destruction of MemoryManager. This could cause the process to crash.";
+    LOG(ERROR) << "[Velox4J MemoryManager DTOR] "
+               << "Fatal: Memory leak found, aborting the destruction of "
+                  "MemoryManager. This could cause the process to crash.";
     VELOX_FAIL("Memory leak found during destruction of MemoryManager");
   }
 }

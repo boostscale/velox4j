@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include <velox/common/base/Exceptions.h>
 #include <atomic>
 #include <limits>
 #include <mutex>
 #include <unordered_map>
-#include <velox/common/base/Exceptions.h>
 
 namespace velox4j {
 using ResourceHandle = uint32_t;
@@ -38,7 +38,7 @@ T safeCast(F f) {
 }
 
 /**
- * An utility class that map resource handle to its shared pointers.
+ * A utility class that map resource handle to its shared pointers.
  * Not thread-safe.
  * @tparam TResource class of the object to hold.
  */
@@ -58,14 +58,17 @@ class ResourceMap {
     const std::lock_guard<std::mutex> lock(mtx_);
     VELOX_CHECK(
         map_.erase(moduleId) == 1,
-        "ResourceHandle not found in resource map when trying to erase: " + std::to_string(moduleId));
+        "ResourceHandle not found in resource map when trying to erase: " +
+            std::to_string(moduleId));
   }
 
   TResource lookup(ResourceHandle moduleId) {
     const std::lock_guard<std::mutex> lock(mtx_);
     auto it = map_.find(moduleId);
     VELOX_CHECK(
-        it != map_.end(), "ResourceHandle not found in resource map when trying to lookup: " + std::to_string(moduleId));
+        it != map_.end(),
+        "ResourceHandle not found in resource map when trying to lookup: " +
+            std::to_string(moduleId));
     return it->second;
   }
 
@@ -95,4 +98,4 @@ class ResourceMap {
   std::mutex mtx_;
 };
 
-} // namespace gluten
+} // namespace velox4j

@@ -1,4 +1,29 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import org.apache.arrow.memory.RootAllocator;
+import org.junit.Assert;
 
 import io.github.zhztheplayer.velox4j.collection.Streams;
 import io.github.zhztheplayer.velox4j.data.RowVector;
@@ -6,14 +31,6 @@ import io.github.zhztheplayer.velox4j.iterator.CloseableIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.iterator.UpIterators;
 import io.github.zhztheplayer.velox4j.serde.Serde;
-import org.apache.arrow.memory.RootAllocator;
-import org.junit.Assert;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class UpIteratorTests {
   public static RowVector collectSingleVector(UpIterator itr) {
@@ -22,9 +39,9 @@ public final class UpIteratorTests {
     return vectors.get(0);
   }
 
-  private static List<RowVector> collect(UpIterator itr) {
-    final List<RowVector> vectors = Streams.fromIterator(UpIterators.asJavaIterator(itr))
-        .collect(Collectors.toList());
+  public static List<RowVector> collect(UpIterator itr) {
+    final List<RowVector> vectors =
+        Streams.fromIterator(UpIterators.asJavaIterator(itr)).collect(Collectors.toList());
     return vectors;
   }
 
@@ -44,48 +61,55 @@ public final class UpIteratorTests {
 
     public IteratorAssertionBuilder assertNumRowVectors(int expected) {
       final AtomicInteger count = new AtomicInteger();
-      assertForEach(new Consumer<Argument>() {
-        @Override
-        public void accept(Argument argument) {
-          count.getAndIncrement();
-        }
-      });
-      assertFinal(new Runnable() {
-        @Override
-        public void run() {
-          Assert.assertEquals(expected, count.get());
-        }
-      });
+      assertForEach(
+          new Consumer<Argument>() {
+            @Override
+            public void accept(Argument argument) {
+              count.getAndIncrement();
+            }
+          });
+      assertFinal(
+          new Runnable() {
+            @Override
+            public void run() {
+              Assert.assertEquals(expected, count.get());
+            }
+          });
       return this;
     }
 
     public IteratorAssertionBuilder assertRowVectorToString(int i, String expected) {
-      return assertRowVector(i, new Consumer<RowVector>() {
-        @Override
-        public void accept(RowVector vector) {
-          Assert.assertEquals(expected, vector.toString(alloc));
-        }
-      });
+      return assertRowVector(
+          i,
+          new Consumer<RowVector>() {
+            @Override
+            public void accept(RowVector vector) {
+              Assert.assertEquals(expected, vector.toString(alloc));
+            }
+          });
     }
 
     public IteratorAssertionBuilder assertRowVectorTypeJson(int i, String typeJsonExpected) {
-      return assertRowVector(i, new Consumer<RowVector>() {
-        @Override
-        public void accept(RowVector vector) {
-          Assert.assertEquals(typeJsonExpected, Serde.toPrettyJson(vector.getType()));
-        }
-      });
+      return assertRowVector(
+          i,
+          new Consumer<RowVector>() {
+            @Override
+            public void accept(RowVector vector) {
+              Assert.assertEquals(typeJsonExpected, Serde.toPrettyJson(vector.getType()));
+            }
+          });
     }
 
     public IteratorAssertionBuilder assertRowVector(int i, Consumer<RowVector> body) {
-      assertForEach(new Consumer<Argument>() {
-        @Override
-        public void accept(Argument argument) {
-          if (argument.i == i) {
-            body.accept(argument.rv);
-          }
-        }
-      });
+      assertForEach(
+          new Consumer<Argument>() {
+            @Override
+            public void accept(Argument argument) {
+              if (argument.i == i) {
+                body.accept(argument.rv);
+              }
+            }
+          });
       return this;
     }
 

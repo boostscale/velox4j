@@ -1,11 +1,25 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.connector;
+
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.common.base.Preconditions;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
 
 // TODO: Add a builder for this class.
 public class HiveConnectorSplit extends ConnectorSplit {
@@ -13,16 +27,15 @@ public class HiveConnectorSplit extends ConnectorSplit {
   private final FileFormat fileFormat;
   private final long start;
   private final long length;
-  private final Map<String, Optional<String>> partitionKeys;
-  private final OptionalInt tableBucketNumber;
-  private final Optional<HiveBucketConversion> bucketConversion;
+  private final Map<String, String> partitionKeys;
+  private final Integer tableBucketNumber;
+  private final HiveBucketConversion bucketConversion;
   private final Map<String, String> customSplitInfo;
-  private final Optional<String> extraFileInfo;
+  private final String extraFileInfo;
   private final Map<String, String> serdeParameters;
-  private final Map<String, String> storageParameters;
   private final Map<String, String> infoColumns;
-  private final Optional<FileProperties> properties;
-  private final Optional<RowIdProperties> rowIdProperties;
+  private final FileProperties properties;
+  private final RowIdProperties rowIdProperties;
 
   @JsonCreator
   public HiveConnectorSplit(
@@ -33,16 +46,15 @@ public class HiveConnectorSplit extends ConnectorSplit {
       @JsonProperty("fileFormat") FileFormat fileFormat,
       @JsonProperty("start") long start,
       @JsonProperty("length") long length,
-      @JsonProperty("partitionKeys") Map<String, Optional<String>> partitionKeys,
-      @JsonProperty("tableBucketNumber") OptionalInt tableBucketNumber,
-      @JsonProperty("bucketConversion") Optional<HiveBucketConversion> bucketConversion,
+      @JsonProperty("partitionKeys") Map<String, String> partitionKeys,
+      @JsonProperty("tableBucketNumber") Integer tableBucketNumber,
+      @JsonProperty("bucketConversion") HiveBucketConversion bucketConversion,
       @JsonProperty("customSplitInfo") Map<String, String> customSplitInfo,
-      @JsonProperty("extraFileInfo") Optional<String> extraFileInfo,
+      @JsonProperty("extraFileInfo") String extraFileInfo,
       @JsonProperty("serdeParameters") Map<String, String> serdeParameters,
-      @JsonProperty("storageParameters") Map<String, String> storageParameters,
       @JsonProperty("infoColumns") Map<String, String> infoColumns,
-      @JsonProperty("properties") Optional<FileProperties> properties,
-      @JsonProperty("rowIdProperties") Optional<RowIdProperties> rowIdProperties) {
+      @JsonProperty("properties") FileProperties properties,
+      @JsonProperty("rowIdProperties") RowIdProperties rowIdProperties) {
     super(connectorId, splitWeight, cacheable);
     this.filePath = Preconditions.checkNotNull(filePath);
     this.fileFormat = Preconditions.checkNotNull(fileFormat);
@@ -54,7 +66,6 @@ public class HiveConnectorSplit extends ConnectorSplit {
     this.customSplitInfo = Preconditions.checkNotNull(customSplitInfo);
     this.extraFileInfo = extraFileInfo;
     this.serdeParameters = Preconditions.checkNotNull(serdeParameters);
-    this.storageParameters = Preconditions.checkNotNull(storageParameters);
     this.infoColumns = Preconditions.checkNotNull(infoColumns);
     this.properties = properties;
     this.rowIdProperties = rowIdProperties;
@@ -91,17 +102,19 @@ public class HiveConnectorSplit extends ConnectorSplit {
   }
 
   @JsonGetter("partitionKeys")
-  public Map<String, Optional<String>> getPartitionKeys() {
+  public Map<String, String> getPartitionKeys() {
     return partitionKeys;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("tableBucketNumber")
-  public OptionalInt getTableBucketNumber() {
+  public Integer getTableBucketNumber() {
     return tableBucketNumber;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("bucketConversion")
-  public Optional<HiveBucketConversion> getBucketConversion() {
+  public HiveBucketConversion getBucketConversion() {
     return bucketConversion;
   }
 
@@ -110,8 +123,9 @@ public class HiveConnectorSplit extends ConnectorSplit {
     return customSplitInfo;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("extraFileInfo")
-  public Optional<String> getExtraFileInfo() {
+  public String getExtraFileInfo() {
     return extraFileInfo;
   }
 
@@ -120,23 +134,20 @@ public class HiveConnectorSplit extends ConnectorSplit {
     return serdeParameters;
   }
 
-  @JsonGetter("storageParameters")
-  public Map<String, String> storageParameters() {
-    return storageParameters;
-  }
-
   @JsonGetter("infoColumns")
   public Map<String, String> getInfoColumns() {
     return infoColumns;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("properties")
-  public Optional<FileProperties> getProperties() {
+  public FileProperties getProperties() {
     return properties;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("rowIdProperties")
-  public Optional<RowIdProperties> getRowIdProperties() {
+  public RowIdProperties getRowIdProperties() {
     return rowIdProperties;
   }
 }

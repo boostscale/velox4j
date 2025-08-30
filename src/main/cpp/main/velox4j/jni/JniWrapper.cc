@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-#include "JniWrapper.h"
+#include "velox4j/jni/JniWrapper.h"
 #include <velox/common/encode/Base64.h>
 #include <velox/common/memory/Memory.h>
+#include <velox/connectors/hive/PartitionIdGenerator.h>
 #include <velox/core/PlanNode.h>
+#include <velox/exec/OperatorUtils.h>
 #include <velox/exec/TableWriter.h>
+#include <velox/vector/VariantToVector.h>
 #include <velox/vector/VectorSaver.h>
-#include "JniCommon.h"
-#include "JniError.h"
+
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/eval/Evaluator.h"
+#include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/DownIterator.h"
+#include "velox4j/jni/JniCommon.h"
+#include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
+#include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -36,6 +42,8 @@ using namespace facebook::velox;
 namespace {
 const char* kClassName = "io/github/zhztheplayer/velox4j/jni/JniWrapper";
 
+/// Get the Velox4J session object that is associated with the current
+/// JniWrapper.
 Session* sessionOf(JNIEnv* env, jobject javaThis) {
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("sessionId");
@@ -48,8 +56,13 @@ jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jExprJson{env, evalJson};
+  auto evaluationSerdePool = session->memoryManager()->getVeloxPool(
+      "Evaluation Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  auto exprDynamic = folly::parseJson(jExprJson.get());
+  auto evaluation =
+      ISerializable::deserialize<Evaluation>(exprDynamic, evaluationSerdePool);
   auto evaluator =
-      std::make_shared<Evaluator>(session->memoryManager(), jExprJson.get());
+      std::make_shared<Evaluator>(session->memoryManager(), evaluation);
   return sessionOf(env, javaThis)->objectStore()->save(evaluator);
   JNI_METHOD_END(-1L)
 }
@@ -91,7 +104,9 @@ jlong queryExecutorExecute(
     jlong queryExecutorId) {
   JNI_METHOD_START
   auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
-  return sessionOf(env, javaThis)->objectStore()->save(exec->execute());
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save<SerialTask>(exec->execute());
   JNI_METHOD_END(-1L)
 }
 
@@ -102,22 +117,46 @@ jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(-1L)
 }
 
-jlong newExternalStream(JNIEnv* env, jobject javaThis, jobject itrRef) {
+jlong createExternalStreamFromDownIterator(
+    JNIEnv* env,
+    jobject javaThis,
+    jobject itrRef) {
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
   JNI_METHOD_END(-1L)
 }
 
-jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
+jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
-  // TODO Session memory pool.
+  auto queue = std::make_shared<BlockingQueue>();
+  return sessionOf(env, javaThis)->objectStore()->save(queue);
+  JNI_METHOD_END(-1L)
+}
+
+void typeToArrow(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jlong cSchema) {
+  JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  auto serdePool = session->memoryManager()->getVeloxPool(
-      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jTypeJson{env, typeJson};
   auto dynamic = folly::parseJson(jTypeJson.get());
-  auto type = ISerializable::deserialize<Type>(dynamic, serdePool);
+  auto type = Type::create(dynamic);
+  auto typePool = session->memoryManager()->getVeloxPool(
+      "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  fromTypeToArrow(
+      typePool, type, reinterpret_cast<struct ArrowSchema*>(cSchema));
+  JNI_METHOD_END()
+}
+
+jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  auto dynamic = folly::parseJson(jTypeJson.get());
+  auto type = Type::create(dynamic);
   auto vectorPool = session->memoryManager()->getVeloxPool(
       "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
   auto vector = BaseVector::create(type, 0, vectorPool);
@@ -191,12 +230,87 @@ jlong baseVectorSlice(
   JNI_METHOD_END(-1)
 }
 
-jlong baseVectorLoadedVector(JNIEnv* env, jobject javaThis, jlong vid) {
+jlong baseVectorFlatten(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  auto loadedVector = BaseVector::loadedVectorShared(vector);
-  return sessionOf(env, javaThis)->objectStore()->save(loadedVector);
+  flattenVector(vector, vector->size());
+  return sessionOf(env, javaThis)->objectStore()->save(vector);
   JNI_METHOD_END(-1)
+}
+
+jlongArray rowVectorPartitionByKeys(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jintArray jKeyChannels) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Partition By Keys Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  const auto inputNumRows = inputRowVector->size();
+
+  auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
+  std::vector<column_index_t> keyChannels(safeArray.length());
+  for (jsize i = 0; i < safeArray.length(); ++i) {
+    keyChannels[i] = safeArray.elems()[i];
+  }
+
+  connector::hive::PartitionIdGenerator idGen{
+      asRowType(inputRowVector->type()), keyChannels, 128, pool, false};
+
+  raw_vector<uint64_t> partitionIds{};
+  idGen.run(inputRowVector, partitionIds);
+  const auto numPartitions = idGen.numPartitions();
+  VELOX_CHECK_EQ(
+      partitionIds.size(),
+      inputRowVector->size(),
+      "Mismatched number of partition ids");
+
+  std::vector<vector_size_t> partitionSizes(numPartitions);
+  std::vector<BufferPtr> partitionRows(numPartitions);
+  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
+  std::fill(partitionSizes.begin(), partitionSizes.end(), 0);
+
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto partitionId = partitionIds[row];
+    ++partitionSizes[partitionId];
+  }
+
+  for (int partitionId = 0; partitionId < numPartitions; ++partitionId) {
+    partitionRows[partitionId] =
+        allocateIndices(partitionSizes[partitionId], pool);
+    rawPartitionRows[partitionId] =
+        partitionRows[partitionId]->asMutable<vector_size_t>();
+  }
+
+  std::vector<vector_size_t> partitionNextRowOffset(numPartitions);
+  std::fill(partitionNextRowOffset.begin(), partitionNextRowOffset.end(), 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto partitionId = partitionIds[row];
+    rawPartitionRows[partitionId][partitionNextRowOffset[partitionId]] = row;
+    ++partitionNextRowOffset[partitionId];
+  }
+
+  std::vector<jlong> outVector(numPartitions);
+
+  for (int partitionId = 0; partitionId < numPartitions; ++partitionId) {
+    const vector_size_t partitionSize = partitionSizes[partitionId];
+    if (partitionSize == 0) {
+      continue;
+    }
+
+    const RowVectorPtr rowVector = partitionSize == inputNumRows
+        ? inputRowVector
+        : exec::wrap(partitionSize, partitionRows[partitionId], inputRowVector);
+    outVector[partitionId] = session->objectStore()->save(rowVector);
+  }
+
+  const jlongArray out = env->NewLongArray(outVector.size());
+  env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
+  return out;
+
+  JNI_METHOD_END(nullptr)
 }
 
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
@@ -207,19 +321,18 @@ jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_END(-1)
 }
 
-jstring tableWriteTraitsOutputTypeWithAggregationNode(
+jstring tableWriteTraitsOutputTypeFromColumnStatsSpec(
     JNIEnv* env,
     jobject javaThis,
-    jstring aggregationNodeJson) {
+    jstring columnStatsSpecJson) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jJson{env, aggregationNodeJson};
+  spotify::jni::JavaString jJson{env, columnStatsSpecJson};
   auto dynamic = folly::parseJson(jJson.get());
   auto serdePool = session->memoryManager()->getVeloxPool(
       "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  auto aggregationNode = std::const_pointer_cast<core::AggregationNode>(
-      ISerializable::deserialize<core::AggregationNode>(dynamic, serdePool));
-  auto type = exec::TableWriteTraits::outputType(aggregationNode);
+  auto columnStatSpec = core::ColumnStatsSpec::create(dynamic, serdePool);
+  auto type = exec::TableWriteTraits::outputType(columnStatSpec);
   auto serializedDynamic = type->serialize();
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());
@@ -246,6 +359,25 @@ jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   auto dynamic = folly::parseJson(jJson.get());
   auto deserialized = variant::create(dynamic);
   return session->objectStore()->save(std::make_shared<variant>(deserialized));
+  JNI_METHOD_END(-1)
+}
+
+jlong variantToVector(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jstring variantJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto vectorPool = session->memoryManager()->getVeloxPool(
+      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  spotify::jni::JavaString jVariantJson{env, variantJson};
+  auto type = Type::create(folly::parseJson(jTypeJson.get()));
+  auto variant = variant::create(folly::parseJson(jVariantJson.get()));
+  auto variantVector =
+      facebook::velox::variantToVector(type, variant, vectorPool);
+  return session->objectStore()->save(variantVector);
   JNI_METHOD_END(-1)
 }
 
@@ -279,11 +411,12 @@ class ExternalStreamAsUpIterator : public UpIterator {
   RowVectorPtr get() override {
     VELOX_CHECK_NOT_NULL(
         pending_,
-        "ExternalStreamAsUpIterator: No pending row vector to return. Make sure the iterator is available via member function advance() first");
+        "ExternalStreamAsUpIterator: No pending row vector to return. Make "
+        "sure the iterator is available via member function advance() first");
     auto out = pending_;
     pending_ = nullptr;
     return out;
-  };
+  }
 
  private:
   const std::shared_ptr<ExternalStream> es_;
@@ -342,16 +475,25 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
-      "newExternalStream",
-      (void*)newExternalStream,
+      "createExternalStreamFromDownIterator",
+      (void*)createExternalStreamFromDownIterator,
       kTypeLong,
       "io/github/zhztheplayer/velox4j/iterator/DownIterator",
       nullptr);
+  addNativeMethod(
+      "createBlockingQueue", (void*)createBlockingQueue, kTypeLong, nullptr);
   addNativeMethod(
       "createEmptyBaseVector",
       (void*)createEmptyBaseVector,
       kTypeLong,
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "typeToArrow",
+      (void*)typeToArrow,
+      kTypeVoid,
+      kTypeString,
+      kTypeLong,
       nullptr);
   addNativeMethod(
       "arrowToBaseVector",
@@ -383,10 +525,17 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "baseVectorLoadedVector",
-      (void*)baseVectorLoadedVector,
+      "baseVectorFlatten",
+      (void*)baseVectorFlatten,
       kTypeLong,
       kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "rowVectorPartitionByKeys",
+      (void*)rowVectorPartitionByKeys,
+      kTypeArray(kTypeLong),
+      kTypeLong,
+      kTypeArray(kTypeInt),
       nullptr);
   addNativeMethod(
       "createSelectivityVector",
@@ -395,8 +544,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "tableWriteTraitsOutputTypeWithAggregationNode",
-      (void*)tableWriteTraitsOutputTypeWithAggregationNode,
+      "tableWriteTraitsOutputTypeFromColumnStatsSpec",
+      (void*)tableWriteTraitsOutputTypeFromColumnStatsSpec,
       kTypeString,
       kTypeString,
       nullptr);
@@ -408,6 +557,13 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
   addNativeMethod(
       "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
+  addNativeMethod(
+      "variantToVector",
+      (void*)variantToVector,
+      kTypeLong,
+      kTypeString,
+      kTypeString,
+      nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",
       (void*)createUpIteratorWithExternalStream,

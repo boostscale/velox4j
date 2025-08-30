@@ -21,13 +21,13 @@
 #include <velox/common/config/Config.h>
 #include <velox/common/memory/Memory.h>
 #include <memory>
-#include "AllocationListener.h"
-#include "ArrowMemoryPool.h"
+#include "velox4j/memory/AllocationListener.h"
+#include "velox4j/memory/ArrowMemoryPool.h"
 
 namespace velox4j {
 
-namespace {}
-
+/// A memory manager is supposed to manage all the memory allocations under one
+/// or multiple certain JNI sessions in Velox4J.
 class MemoryManager {
  public:
   explicit MemoryManager(std::unique_ptr<AllocationListener> listener);

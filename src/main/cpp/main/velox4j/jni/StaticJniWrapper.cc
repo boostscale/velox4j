@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-#include "StaticJniWrapper.h"
+#include "velox4j/jni/StaticJniWrapper.h"
 #include <folly/json/json.h>
 #include <velox/common/encode/Base64.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
-#include "JniCommon.h"
-#include "JniError.h"
+
 #include "velox4j/arrow/Arrow.h"
 #include "velox4j/config/Config.h"
 #include "velox4j/init/Init.h"
+#include "velox4j/iterator/BlockingQueue.h"
 #include "velox4j/iterator/UpIterator.h"
+#include "velox4j/jni/JniCommon.h"
+#include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/memory/JavaAllocationListener.h"
+#include "velox4j/query/QueryExecutor.h"
 
 namespace velox4j {
 using namespace facebook::velox;
@@ -56,7 +59,7 @@ jlong createMemoryManager(JNIEnv* env, jobject javaThis, jobject jListener) {
 jlong createSession(JNIEnv* env, jobject javaThis, long memoryManagerId) {
   JNI_METHOD_START
   auto mm = ObjectStore::retrieve<MemoryManager>(memoryManagerId);
-  return ObjectStore::global()->save(std::make_unique<Session>(mm.get()));
+  return ObjectStore::global()->save(std::make_shared<Session>(mm.get()));
   JNI_METHOD_END(-1L)
 }
 
@@ -80,6 +83,66 @@ void upIteratorWait(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END()
 }
 
+void blockingQueuePut(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong queueId,
+    jlong rvId) {
+  JNI_METHOD_START
+  auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
+  auto rv = ObjectStore::retrieve<RowVector>(rvId);
+  queue->put(rv);
+  JNI_METHOD_END()
+}
+
+void blockingQueueNoMoreInput(JNIEnv* env, jobject javaThis, jlong queueId) {
+  JNI_METHOD_START
+  auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
+  queue->noMoreInput();
+  JNI_METHOD_END()
+}
+
+void serialTaskAddSplit(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong stId,
+    jstring planNodeId,
+    jint groupId,
+    jstring connectorSplitJson) {
+  JNI_METHOD_START
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  spotify::jni::JavaString jPlanNodeId{env, planNodeId};
+  spotify::jni::JavaString jConnectorSplitJson{env, connectorSplitJson};
+  auto jConnectorSplitDynamic = folly::parseJson(jConnectorSplitJson.get());
+  auto connectorSplit = std::const_pointer_cast<connector::ConnectorSplit>(
+      ISerializable::deserialize<connector::ConnectorSplit>(
+          jConnectorSplitDynamic));
+  serialTask->addSplit(jPlanNodeId.get(), groupId, connectorSplit);
+  JNI_METHOD_END()
+}
+
+void serialTaskNoMoreSplits(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong stId,
+    jstring planNodeId) {
+  JNI_METHOD_START
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  spotify::jni::JavaString jPlanNodeId{env, planNodeId};
+  serialTask->noMoreSplits(jPlanNodeId.get());
+  JNI_METHOD_END()
+}
+
+jstring serialTaskCollectStats(JNIEnv* env, jobject javaThis, jlong stId) {
+  JNI_METHOD_START
+  auto serialTask = ObjectStore::retrieve<SerialTask>(stId);
+  const auto stats = serialTask->collectStats();
+  const auto statsDynamic = stats->toJson();
+  const auto statsJson = folly::toPrettyJson(statsDynamic);
+  return env->NewStringUTF(statsJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   spotify::jni::JavaString jJson{env, json};
@@ -90,6 +153,15 @@ jstring variantInferType(JNIEnv* env, jobject javaThis, jstring json) {
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());
   JNI_METHOD_END(nullptr);
+}
+
+jstring arrowToType(JNIEnv* env, jobject javaThis, jlong cSchema) {
+  JNI_METHOD_START
+  auto type = fromArrowToType(reinterpret_cast<struct ArrowSchema*>(cSchema));
+  auto serializedDynamic = type->serialize();
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
+  JNI_METHOD_END(nullptr)
 }
 
 void baseVectorToArrow(
@@ -200,7 +272,7 @@ deserializeAndSerializeVariant(JNIEnv* env, jobject javaThis, jstring json) {
 
 jstring tableWriteTraitsOutputType(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
-  auto type = exec::TableWriteTraits::outputType(nullptr);
+  auto type = exec::TableWriteTraits::outputType(std::nullopt);
   auto serializedDynamic = type->serialize();
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());
@@ -239,13 +311,50 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-    "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+      "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+  addNativeMethod(
+      "blockingQueuePut",
+      (void*)blockingQueuePut,
+      kTypeVoid,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "blockingQueueNoMoreInput",
+      (void*)blockingQueueNoMoreInput,
+      kTypeVoid,
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "serialTaskAddSplit",
+      (void*)serialTaskAddSplit,
+      kTypeVoid,
+      kTypeLong,
+      kTypeString,
+      kTypeInt,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "serialTaskNoMoreSplits",
+      (void*)serialTaskNoMoreSplits,
+      kTypeVoid,
+      kTypeLong,
+      kTypeString,
+      nullptr);
+  addNativeMethod(
+      "serialTaskCollectStats",
+      (void*)serialTaskCollectStats,
+      kTypeString,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "variantInferType",
       (void*)variantInferType,
       kTypeString,
       kTypeString,
       nullptr);
+  addNativeMethod(
+      "arrowToType", (void*)arrowToType, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
       "baseVectorToArrow",
       (void*)baseVectorToArrow,

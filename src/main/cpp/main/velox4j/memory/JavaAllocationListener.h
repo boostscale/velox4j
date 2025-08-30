@@ -22,13 +22,14 @@
 #include "velox4j/memory/AllocationListener.h"
 
 namespace velox4j {
+// The JNI wrapper used by JavaAllocationListener.
 class JavaAllocationListenerJniWrapper final : public spotify::jni::JavaClass {
  public:
   explicit JavaAllocationListenerJniWrapper(JNIEnv* env) : JavaClass(env) {
     JavaAllocationListenerJniWrapper::initialize(env);
   }
 
-  JavaAllocationListenerJniWrapper() : JavaClass() {};
+  JavaAllocationListenerJniWrapper() : JavaClass(){};
 
   const char* getCanonicalName() const override;
 
@@ -37,6 +38,9 @@ class JavaAllocationListenerJniWrapper final : public spotify::jni::JavaClass {
   void mapFields() override;
 };
 
+/// A AllocationListener implementation that is backed by a Java-side
+/// allocation listener. The calls to this listener will be redirected to
+/// the methods with the same name in Java-side through JNI.
 class JavaAllocationListener : public AllocationListener {
  public:
   // CTOR.

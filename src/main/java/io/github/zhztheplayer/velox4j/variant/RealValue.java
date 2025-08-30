@@ -1,21 +1,39 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package io.github.zhztheplayer.velox4j.variant;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class RealValue extends Variant {
-  private final float value;
+  private final Float value;
 
   @JsonCreator
-  public RealValue(@JsonProperty("value") float value) {
+  public RealValue(@JsonProperty("value") Float value) {
     this.value = value;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   @JsonGetter("value")
-  public float getValue() {
+  public Float getValue() {
     return value;
   }
 
@@ -24,7 +42,7 @@ public class RealValue extends Variant {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     RealValue realValue = (RealValue) o;
-    return Float.compare(value, realValue.value) == 0;
+    return Objects.equals(value, realValue.value);
   }
 
   @Override
@@ -34,8 +52,6 @@ public class RealValue extends Variant {
 
   @Override
   public String toString() {
-    return "RealValue{" +
-        "value=" + value +
-        '}';
+    return "RealValue{" + "value=" + value + '}';
   }
 }
