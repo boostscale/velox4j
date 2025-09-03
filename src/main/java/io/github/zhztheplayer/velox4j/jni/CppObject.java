@@ -32,5 +32,4 @@ public interface CppObject extends AutoCloseable {
   default void close() {
     StaticJniApi.get().releaseCppObject(this);
   }
-  ;
 }
