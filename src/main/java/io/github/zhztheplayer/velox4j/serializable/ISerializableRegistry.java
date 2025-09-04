@@ -47,20 +47,26 @@ import io.github.zhztheplayer.velox4j.plan.RowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.StreamPartitionNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
+import io.github.zhztheplayer.velox4j.plan.HashPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.plan.LimitNode;
+import io.github.zhztheplayer.velox4j.plan.LocalPartitionNode;
+import io.github.zhztheplayer.velox4j.plan.NestedLoopJoinNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
+import io.github.zhztheplayer.velox4j.plan.RowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.StatefulPlanNode;
 import io.github.zhztheplayer.velox4j.plan.StreamJoinNode;
+import io.github.zhztheplayer.velox4j.plan.StreamPartitionNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowJoinNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
 import io.github.zhztheplayer.velox4j.plan.TopNNode;
 import io.github.zhztheplayer.velox4j.plan.TopNRowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.plan.WatermarkAssignerNode;
-import io.github.zhztheplayer.velox4j.plan.StreamWindowJoinNode;
 import io.github.zhztheplayer.velox4j.plan.WindowNode;
-import io.github.zhztheplayer.velox4j.plan.StreamWindowPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
@@ -166,6 +172,9 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("HiveInsertFileNameGenerator", HiveInsertFileNameGenerator.class);
     NAME_REGISTRY.registerClass("NexmarkTableHandle", NexmarkTableHandle.class);
     NAME_REGISTRY.registerClass("NexmarkConnectorSplit", NexmarkConnectorSplit.class);
+    NAME_REGISTRY.registerClass("PrintTableHandle", PrintTableHandle.class);
+    NAME_REGISTRY.registerClass("FromElementsTableHandle", FromElementsTableHandle.class);
+    NAME_REGISTRY.registerClass("FromElementsConnectorSplit", FromElementsConnectorSplit.class);
   }
 
   private static void registerFilters() {

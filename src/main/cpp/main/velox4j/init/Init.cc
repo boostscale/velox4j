@@ -25,8 +25,14 @@
 #include <velox/connectors/hive/HiveDataSink.h>
 #include <velox/connectors/nexmark/NexmarkConnector.h>
 #include <velox/connectors/nexmark/NexmarkConnectorSplit.h>
+#include <velox/connectors/print/PrintConnector.h>
+#include <velox/connectors/print/PrintTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnector.h>
+#include <velox/connectors/from_elements/FromElementsTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnectorSplit.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
+#include <velox/dwio/text/RegisterTextWriter.h>
 #include <velox/exec/PartitionFunction.h>
 #include <velox/experimental/stateful/StatefulPlanNode.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
@@ -67,6 +73,7 @@ void initForSpark() {
   dwio::common::registerFileSinks();
   parquet::registerParquetReaderFactory();
   parquet::registerParquetWriterFactory();
+  text::registerTextWriterFactory();
   functions::sparksql::registerFunctions();
   aggregate::prestosql::registerAllAggregateFunctions(
       "",
@@ -120,6 +127,21 @@ void initForSpark() {
       std::make_shared<facebook::velox::config::ConfigBase>(
           std::unordered_map<std::string, std::string>()),
       nullptr));
+  connector::print::PrintTableHandle::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::print::PrintConnector>(
+      "connector-print",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>()),
+        nullptr
+      ));
+  connector::from_elements::FromElementsTableHandle::registerSerDe();
+  connector::from_elements::FromElementsConnectorSplit::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::from_elements::FromElementsConnector>(
+      "connector-from-elements",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>()),
+        nullptr
+      ));
   core::PlanNode::registerSerDe();
   stateful::StatefulPlanNode::registerSerDe();
   core::ITypedExpr::registerSerDe();
