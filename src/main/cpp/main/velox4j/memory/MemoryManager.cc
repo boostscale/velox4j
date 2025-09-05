@@ -242,14 +242,14 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       defaultMemoryAllocator().get(), listener_.get());
   std::unordered_map<std::string, std::string> extraArbitratorConfigs;
   ArbitratorFactoryRegister afr(listener_.get());
-  velox::memory::MemoryManager::Options mmOptions{
-      .alignment = velox::memory::MemoryAllocator::kMaxAlignment,
-      .trackDefaultUsage = true, // memory usage tracking
-      .checkUsageLeak = true, // leak check
-      .coreOnAllocationFailureEnabled = false,
-      .allocatorCapacity = velox::memory::kMaxMemory,
-      .arbitratorKind = afr.getKind(),
-      .extraArbitratorConfigs = extraArbitratorConfigs};
+  velox::memory::MemoryManager::Options mmOptions;
+  mmOptions.alignment = velox::memory::MemoryAllocator::kMaxAlignment;
+  mmOptions.trackDefaultUsage = true; // memory usage tracking
+  mmOptions.checkUsageLeak = true; // leak check
+  mmOptions.coreOnAllocationFailureEnabled = false;
+  mmOptions.allocatorCapacity = velox::memory::kMaxMemory;
+  mmOptions.arbitratorKind = afr.getKind();
+  mmOptions.extraArbitratorConfigs = extraArbitratorConfigs;
   veloxMemoryManager_ =
       std::make_unique<velox::memory::MemoryManager>(mmOptions);
   veloxRootPool_ = veloxMemoryManager_->addRootPool(
