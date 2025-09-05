@@ -242,7 +242,7 @@ MemoryManager::MemoryManager(std::unique_ptr<AllocationListener> listener)
       defaultMemoryAllocator().get(), listener_.get());
   std::unordered_map<std::string, std::string> extraArbitratorConfigs;
   ArbitratorFactoryRegister afr(listener_.get());
-  velox::memory::MemoryManagerOptions mmOptions{
+  velox::memory::MemoryManager::Options mmOptions{
       .alignment = velox::memory::MemoryAllocator::kMaxAlignment,
       .trackDefaultUsage = true, // memory usage tracking
       .checkUsageLeak = true, // leak check
