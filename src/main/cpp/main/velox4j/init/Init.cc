@@ -81,7 +81,7 @@ void initForSpark() {
   connector::hive::LocationHandle::registerSerDe();
   connector::hive::HiveColumnHandle::registerSerDe();
   connector::hive::HiveConnectorSplit::registerSerDe();
-  connector::hive::registerHivePartitionFunctionSerDe();
+  connector::hive::HiveConnector::registerSerDe();
   connector::hive::HiveInsertTableHandle::registerSerDe();
   connector::hive::LocationHandle::registerSerDe();
   connector::hive::HiveSortingColumn::registerSerDe();
@@ -155,7 +155,7 @@ void initForFlink() {
   connector::hive::LocationHandle::registerSerDe();
   connector::hive::HiveColumnHandle::registerSerDe();
   connector::hive::HiveConnectorSplit::registerSerDe();
-  connector::hive::registerHivePartitionFunctionSerDe();
+  connector::hive::HiveConnector::registerSerDe();
   connector::hive::HiveInsertTableHandle::registerSerDe();
   connector::hive::LocationHandle::registerSerDe();
   connector::hive::HiveSortingColumn::registerSerDe();
