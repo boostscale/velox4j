@@ -43,6 +43,7 @@
 #include <velox/vector/fuzzer/ConstrainedVectorGenerator.cpp>
 #include <velox/vector/fuzzer/Utils.cpp>
 #include <velox/vector/fuzzer/VectorFuzzer.cpp>
+#include <velox/experimental/stateful/udf/Register.h>
 #include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/eval/Evaluation.h"
@@ -84,6 +85,7 @@ void initForSpark() {
       "", true /*registerCompanionFunctions*/, true /*overwrite*/);
   window::prestosql::registerAllWindowFunctions();
   functions::window::sparksql::registerWindowFunctions("");
+  stateful::udf::registerFunctions();
 
   ConfigArray::registerSerDe();
   ConnectorConfigArray::registerSerDe();
