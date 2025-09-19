@@ -41,8 +41,8 @@ pip3 install --upgrade pip
 pip3 install cmake==3.28.3
 
 # Add FindSnappy.cmake to system CMake modules as it's removed by Velox in https://github.com/facebookincubator/velox/pull/14564.
-find / -name Find*.cmake
-# TODO
+curl -fsSL https://raw.githubusercontent.com/facebookincubator/velox/c43eab52c9f4cd7d24a729025266d77dc2e52ca0/CMake/FindSnappy.cmake \
+  -o /usr/local/lib64/python3.6/site-packages/cmake/data/share/cmake-3.28/Modules/FindSnappy.cmake
 
 # Install Git >= 2.7.4
 case "$(git --version)" in "git version 2."*)
