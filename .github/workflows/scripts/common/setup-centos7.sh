@@ -125,7 +125,6 @@ cd snappy-1.1.8
 mkdir build && cd build
 cmake3 .. \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/opt/snappy-1.1.8 \
   -DBUILD_SHARED_LIBS=ON \
   -DSNAPPY_BUILD_TESTS=OFF \
   -DSNAPPY_BUILD_BENCHMARKS=OFF
