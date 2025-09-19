@@ -116,3 +116,18 @@ wget https://github.com/NixOS/patchelf/releases/download/0.17.2/patchelf-0.17.2-
 tar -xvf patchelf-0.17.2-x86_64.tar.gz
 ln -s /tmp/patchelf/bin/patchelf /usr/local/bin/patchelf
 patchelf --version
+
+# Snappy 1.1.8.
+cd /tmp
+curl -LO https://github.com/google/snappy/archive/refs/tags/1.1.8.tar.gz
+tar xf 1.1.8.tar.gz
+cd snappy-1.1.8
+mkdir build && cd build
+cmake3 .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/opt/snappy-1.1.8 \
+  -DBUILD_SHARED_LIBS=ON \
+  -DSNAPPY_BUILD_TESTS=OFF \
+  -DSNAPPY_BUILD_BENCHMARKS=OFF
+make -j"$(nproc)"
+sudo make install
