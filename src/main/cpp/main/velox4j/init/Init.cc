@@ -28,8 +28,14 @@
 #include <velox/connectors/kafka/KafkaConnector.h>
 #include <velox/connectors/kafka/KafkaConnectorSplit.h>
 #include <velox/connectors/kafka/KafkaTableHandle.h>
+#include <velox/connectors/print/PrintConnector.h>
+#include <velox/connectors/print/PrintTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnector.h>
+#include <velox/connectors/from_elements/FromElementsTableHandle.h>
+#include <velox/connectors/from_elements/FromElementsConnectorSplit.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
+#include <velox/dwio/text/RegisterTextWriter.h>
 #include <velox/exec/PartitionFunction.h>
 #include <velox/experimental/stateful/StatefulPlanNode.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
@@ -40,6 +46,7 @@
 #include <velox/vector/fuzzer/ConstrainedVectorGenerator.cpp>
 #include <velox/vector/fuzzer/Utils.cpp>
 #include <velox/vector/fuzzer/VectorFuzzer.cpp>
+#include <velox/experimental/stateful/udf/Register.h>
 #include "velox4j/config/Config.h"
 #include "velox4j/connector/ExternalStream.h"
 #include "velox4j/eval/Evaluation.h"
@@ -70,6 +77,7 @@ void initForSpark() {
   dwio::common::registerFileSinks();
   parquet::registerParquetReaderFactory();
   parquet::registerParquetWriterFactory();
+  text::registerTextWriterFactory();
   functions::sparksql::registerFunctions();
   aggregate::prestosql::registerAllAggregateFunctions(
       "",
@@ -80,6 +88,7 @@ void initForSpark() {
       "", true /*registerCompanionFunctions*/, true /*overwrite*/);
   window::prestosql::registerAllWindowFunctions();
   functions::window::sparksql::registerWindowFunctions("");
+  stateful::udf::registerFunctions();
 
   ConfigArray::registerSerDe();
   ConnectorConfigArray::registerSerDe();
@@ -130,6 +139,21 @@ void initForSpark() {
       std::make_shared<facebook::velox::config::ConfigBase>(
           std::unordered_map<std::string, std::string>()),
       nullptr));
+  connector::print::PrintTableHandle::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::print::PrintConnector>(
+      "connector-print",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>()),
+        nullptr
+      ));
+  connector::from_elements::FromElementsTableHandle::registerSerDe();
+  connector::from_elements::FromElementsConnectorSplit::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::from_elements::FromElementsConnector>(
+      "connector-from-elements",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+          std::unordered_map<std::string, std::string>()),
+        nullptr
+      ));
   core::PlanNode::registerSerDe();
   stateful::StatefulPlanNode::registerSerDe();
   core::ITypedExpr::registerSerDe();

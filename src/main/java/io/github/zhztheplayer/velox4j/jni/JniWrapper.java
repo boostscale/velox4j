@@ -55,6 +55,14 @@ final class JniWrapper {
   // For Flink.
   native void notifyWatermark(long id, long watermark, int index);
 
+  native void initializeState(long id, long context);
+
+  native void snapshotState(long id, long context);
+
+  native void notifyCheckpointComplete(long id, long checkpointId);
+
+  native void notifyCheckpointAborted(long id, long checkpointId);
+
   native long createBlockingQueue();
 
   // For BaseVector / RowVector / SelectivityVector.

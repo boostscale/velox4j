@@ -24,7 +24,7 @@ import io.github.zhztheplayer.velox4j.type.RowType;
 
 import java.util.List;
 
-public class WindowJoinNode extends PlanNode{
+public class StreamWindowJoinNode extends PlanNode{
   private final List<PlanNode> sources;
   private final PartitionFunctionSpec leftPartFuncSpec;
   private final PartitionFunctionSpec rightPartFuncSpec;
@@ -34,7 +34,7 @@ public class WindowJoinNode extends PlanNode{
   private final int leftWindowEndIndex;
   private final int rightWindowEndIndex;
 
-  public WindowJoinNode(
+  public StreamWindowJoinNode(
       String id,
       PlanNode leftInput,
       PlanNode rightInput,
@@ -57,7 +57,7 @@ public class WindowJoinNode extends PlanNode{
   }
 
   @JsonCreator
-  private static WindowJoinNode create(
+  private static StreamWindowJoinNode create(
       @JsonProperty("id") String id,
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("leftPartFuncSpec") PartitionFunctionSpec leftPartFuncSpec,
@@ -69,7 +69,7 @@ public class WindowJoinNode extends PlanNode{
       @JsonProperty("rightWindowEndIndex") int rightWindowEndIndex) {
     Preconditions.checkArgument(
         sources.size() == 2, "NestedLoopJoinNode should have 2 sources, but has %s", sources.size());
-    return new WindowJoinNode(
+    return new StreamWindowJoinNode(
         id,
         sources.get(0),
         sources.get(1),

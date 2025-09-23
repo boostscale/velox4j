@@ -171,6 +171,34 @@ void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark
   JNI_METHOD_END()
 }
 
+void initializeState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->initializeState(context);
+  JNI_METHOD_END()
+}
+
+void snapshotState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->snapshotState(context);
+  JNI_METHOD_END()
+}
+
+void notifyCheckpointComplete(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyCheckpointComplete(checkpointId);
+  JNI_METHOD_END()
+}
+
+void notifyCheckpointAborted(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyCheckpointAborted(checkpointId);
+  JNI_METHOD_END()
+}
+
 jlong createExternalStreamFromDownIterator(
     JNIEnv* env,
     jobject javaThis,
@@ -434,6 +462,34 @@ void JniWrapper::initialize(JNIEnv* env) {
        kTypeLong,
        kTypeLong,
        kTypeInt,
+       nullptr);
+  addNativeMethod(
+      "initializeState",
+       (void*)initializeState,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "snapshotState",
+       (void*)snapshotState,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "notifyCheckpointComplete",
+       (void*)notifyCheckpointComplete,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "notifyCheckpointAborted",
+       (void*)notifyCheckpointAborted,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
        nullptr);
   addNativeMethod(
       "createExternalStreamFromDownIterator",

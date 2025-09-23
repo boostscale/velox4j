@@ -43,6 +43,14 @@ class StatefulSerialTask : public UpIterator {
 
   void notifyWatermark(long watermark, int index);
 
+  void initializeState(long checkpointId);
+
+  void snapshotState(long checkpointId);
+
+  void notifyCheckpointComplete(long checkpointId);
+
+  void notifyCheckpointAborted(long checkpointId);
+
   void addSplit(
       const facebook::velox::core::PlanNodeId& planNodeId,
       int32_t groupId,

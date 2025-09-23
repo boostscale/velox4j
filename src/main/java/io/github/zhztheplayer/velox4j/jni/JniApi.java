@@ -101,6 +101,22 @@ public final class JniApi {
     jni.notifyWatermark(itr.id(), watermark, index);
   }
 
+  public void initializeState(UpIterator itr, long context) {
+    jni.initializeState(itr.id(), context);
+  }
+
+  public void snapshotState(UpIterator itr, long context) {
+    jni.snapshotState(itr.id(), context);
+  }
+
+  public void notifyCheckpointComplete(UpIterator itr, long checkpointId) {
+    jni.notifyCheckpointComplete(itr.id(), checkpointId);
+  }
+
+  public void notifyCheckpointAborted(UpIterator itr, long checkpointId) {
+    jni.notifyCheckpointAborted(itr.id(), checkpointId);
+  }
+
   public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
     return new ExternalStreams.GenericExternalStream(jni.createExternalStreamFromDownIterator(itr));
   }
