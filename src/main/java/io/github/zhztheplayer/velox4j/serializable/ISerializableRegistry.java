@@ -16,6 +16,7 @@
 */
 package io.github.zhztheplayer.velox4j.serializable;
 
+import io.github.zhztheplayer.velox4j.aggregate.Aggregate;
 import io.github.zhztheplayer.velox4j.config.Config;
 import io.github.zhztheplayer.velox4j.config.ConnectorConfig;
 import io.github.zhztheplayer.velox4j.connector.*;
@@ -30,15 +31,42 @@ import io.github.zhztheplayer.velox4j.expression.InputTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.LambdaTypedExpr;
 import io.github.zhztheplayer.velox4j.filter.AlwaysTrue;
 import io.github.zhztheplayer.velox4j.plan.AggregationNode;
+import io.github.zhztheplayer.velox4j.plan.DeduplicateNode;
+import io.github.zhztheplayer.velox4j.plan.EmptyNode;
+import io.github.zhztheplayer.velox4j.plan.GroupAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.GroupAggsHandlerNode;
+import io.github.zhztheplayer.velox4j.plan.GroupWindowAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.GroupWindowAggsHandlerNode;
+import io.github.zhztheplayer.velox4j.plan.HashPartitionFunctionSpec;
+import io.github.zhztheplayer.velox4j.plan.LocalPartitionNode;
+import io.github.zhztheplayer.velox4j.plan.StreamRankNode;
+import io.github.zhztheplayer.velox4j.plan.StreamTopNNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.NestedLoopJoinNode;
+import io.github.zhztheplayer.velox4j.plan.RowNumberNode;
+import io.github.zhztheplayer.velox4j.plan.StreamPartitionNode;
 import io.github.zhztheplayer.velox4j.plan.FilterNode;
 import io.github.zhztheplayer.velox4j.plan.HashJoinNode;
+import io.github.zhztheplayer.velox4j.plan.HashPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.plan.LimitNode;
+import io.github.zhztheplayer.velox4j.plan.LocalPartitionNode;
+import io.github.zhztheplayer.velox4j.plan.NestedLoopJoinNode;
 import io.github.zhztheplayer.velox4j.plan.OrderByNode;
 import io.github.zhztheplayer.velox4j.plan.ProjectNode;
+import io.github.zhztheplayer.velox4j.plan.RowNumberNode;
+import io.github.zhztheplayer.velox4j.plan.StatefulPlanNode;
+import io.github.zhztheplayer.velox4j.plan.StreamJoinNode;
+import io.github.zhztheplayer.velox4j.plan.StreamPartitionNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowAggregationNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowJoinNode;
+import io.github.zhztheplayer.velox4j.plan.StreamWindowPartitionFunctionSpec;
 import io.github.zhztheplayer.velox4j.plan.TableScanNode;
 import io.github.zhztheplayer.velox4j.plan.TableWriteNode;
+import io.github.zhztheplayer.velox4j.plan.TopNNode;
+import io.github.zhztheplayer.velox4j.plan.TopNRowNumberNode;
 import io.github.zhztheplayer.velox4j.plan.ValuesNode;
 import io.github.zhztheplayer.velox4j.plan.WatermarkAssignerNode;
+import io.github.zhztheplayer.velox4j.plan.WindowNode;
 import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
@@ -64,6 +92,8 @@ import io.github.zhztheplayer.velox4j.type.TinyIntType;
 import io.github.zhztheplayer.velox4j.type.UnknownType;
 import io.github.zhztheplayer.velox4j.type.VarCharType;
 import io.github.zhztheplayer.velox4j.type.VarbinaryType;
+import io.github.zhztheplayer.velox4j.window.Frame;
+import io.github.zhztheplayer.velox4j.window.WindowFunction;
 
 public final class ISerializableRegistry {
   private static final SerdeRegistry NAME_REGISTRY =
@@ -78,7 +108,8 @@ public final class ISerializableRegistry {
     registerConnectors();
     registerFilters();
     registerPlanNodes();
-    retisterConfig();
+    registerWindow();
+    registerConfig();
     registerEvaluation();
     registerQuery();
   }
@@ -141,6 +172,9 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("HiveInsertFileNameGenerator", HiveInsertFileNameGenerator.class);
     NAME_REGISTRY.registerClass("NexmarkTableHandle", NexmarkTableHandle.class);
     NAME_REGISTRY.registerClass("NexmarkConnectorSplit", NexmarkConnectorSplit.class);
+    NAME_REGISTRY.registerClass("PrintTableHandle", PrintTableHandle.class);
+    NAME_REGISTRY.registerClass("FromElementsTableHandle", FromElementsTableHandle.class);
+    NAME_REGISTRY.registerClass("FromElementsConnectorSplit", FromElementsConnectorSplit.class);
   }
 
   private static void registerFilters() {
@@ -150,6 +184,7 @@ public final class ISerializableRegistry {
   private static void registerPlanNodes() {
     NAME_REGISTRY.registerClass("ValuesNode", ValuesNode.class);
     NAME_REGISTRY.registerClass("TableScanNode", TableScanNode.class);
+    NAME_REGISTRY.registerClass("Aggregate", Aggregate.class);
     NAME_REGISTRY.registerClass("AggregationNode", AggregationNode.class);
     NAME_REGISTRY.registerClass("ProjectNode", ProjectNode.class);
     NAME_REGISTRY.registerClass("FilterNode", FilterNode.class);
@@ -158,9 +193,35 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("LimitNode", LimitNode.class);
     NAME_REGISTRY.registerClass("TableWriteNode", TableWriteNode.class);
     NAME_REGISTRY.registerClass("WatermarkAssignerNode", WatermarkAssignerNode.class);
+    NAME_REGISTRY.registerClass("StatefulPlanNode", StatefulPlanNode.class);
+    NAME_REGISTRY.registerClass("EmptyNode", EmptyNode.class);
+    NAME_REGISTRY.registerClass("StreamJoinNode", StreamJoinNode.class);
+    NAME_REGISTRY.registerClass("StreamPartitionNode", StreamPartitionNode.class);
+    NAME_REGISTRY.registerClass("LocalPartitionNode", LocalPartitionNode.class);
+    NAME_REGISTRY.registerClass("HashPartitionFunctionSpec", HashPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass("NestedLoopJoinNode", NestedLoopJoinNode.class);
+    NAME_REGISTRY.registerClass("WindowNode", WindowNode.class);
+    NAME_REGISTRY.registerClass("RowNumberNode", RowNumberNode.class);
+    NAME_REGISTRY.registerClass("TopNRowNumberNode", TopNRowNumberNode.class);
+    NAME_REGISTRY.registerClass("StreamWindowJoinNode", StreamWindowJoinNode.class);
+    NAME_REGISTRY.registerClass("StreamWindowAggregationNode", StreamWindowAggregationNode.class);
+    NAME_REGISTRY.registerClass("StreamWindowPartitionFunctionSpec", StreamWindowPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass("GroupWindowAggregationNode", GroupWindowAggregationNode.class);
+    NAME_REGISTRY.registerClass("GroupWindowAggsHandlerNode", GroupWindowAggsHandlerNode.class);
+    NAME_REGISTRY.registerClass("DeduplicateNode", DeduplicateNode.class);
+    NAME_REGISTRY.registerClass("StreamTopNNode", StreamTopNNode.class);
+    NAME_REGISTRY.registerClass("StreamRankNode", StreamRankNode.class);
+    NAME_REGISTRY.registerClass("TopNNode", TopNNode.class);
+    NAME_REGISTRY.registerClass("GroupAggregationNode", GroupAggregationNode.class);
+    NAME_REGISTRY.registerClass("GroupAggsHandlerNode", GroupAggsHandlerNode.class);
   }
 
-  private static void retisterConfig() {
+  private static void registerWindow() {
+    NAME_REGISTRY.registerClass("Frame", Frame.class);
+    NAME_REGISTRY.registerClass("Function", WindowFunction.class);
+  }
+
+  private static void registerConfig() {
     NAME_REGISTRY.registerClass("velox4j.Config", Config.class);
     NAME_REGISTRY.registerClass("velox4j.ConnectorConfig", ConnectorConfig.class);
   }

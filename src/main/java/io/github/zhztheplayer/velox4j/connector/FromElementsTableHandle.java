@@ -14,32 +14,45 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.connector;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
+import io.github.zhztheplayer.velox4j.type.RowType;
 
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
+public class FromElementsTableHandle extends ConnectorTableHandle {
+
+  private String tableName;
+  private RowType dataColumns;
+  private List<String> data;
 
   @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  public FromElementsTableHandle(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("tableName") String tableName,
+      @JsonProperty("dataColumns") RowType dataColumns,
+      @JsonProperty("data") List<String> data) {
+    super(connectorId);
+    this.tableName = tableName;
+    this.dataColumns = dataColumns;
+    this.data = data;
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
+  @JsonProperty("tableName")
+  public String getTableName() {
+    return tableName;
   }
 
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  @JsonProperty("dataColumns")
+  public RowType getDataColumns() {
+    return dataColumns;
+  }
+
+  @JsonProperty("data")
+  public List<String> getData() {
+    return data;
   }
 }

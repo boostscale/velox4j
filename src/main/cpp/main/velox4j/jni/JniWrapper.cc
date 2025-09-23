@@ -21,6 +21,7 @@
 #include <velox/core/PlanNode.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
+#include <velox/experimental/stateful/StreamElement.h>
 
 #include "JniCommon.h"
 #include "JniError.h"
@@ -119,6 +120,83 @@ jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->get());
   JNI_METHOD_END(-1L)
+}
+
+jobject statefulTaskGet(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  std::string outNodeId;
+  stateful::StreamElementPtr element = itr->statefulGet();
+  if (element->isWatermark()) {
+    auto watermark = std::static_pointer_cast<stateful::Watermark>(element);
+
+    jclass resultClass = env->FindClass("io/github/zhztheplayer/velox4j/stateful/StatefulWatermark");
+    jmethodID constructor = env->GetMethodID(resultClass, "<init>", "(Ljava/lang/String;J)V");
+
+    jstring id = env->NewStringUTF(watermark->nodeId().c_str());
+    jobject result = env->NewObject(resultClass, constructor, id, watermark->timestamp());
+
+    env->DeleteLocalRef(id);
+    env->DeleteLocalRef(resultClass);
+    return result;
+  } else {
+    VELOX_CHECK(element->isRecord());
+    auto record = std::static_pointer_cast<stateful::StreamRecord>(element);
+    jlong rvId = sessionOf(env, javaThis)->objectStore()->save(record->record());
+
+    jclass resultClass = env->FindClass("io/github/zhztheplayer/velox4j/stateful/StatefulRecord");
+    jmethodID constructor = env->GetMethodID(resultClass, "<init>", "(Ljava/lang/String;JJZI)V");
+
+    jstring id = env->NewStringUTF(record->nodeId().c_str());
+    jobject result = env->NewObject(
+        resultClass,
+        constructor,
+        id,
+        rvId,
+        record->timestamp(),
+        record->hasTimestamp(),
+        record->key());
+
+    env->DeleteLocalRef(id);
+    env->DeleteLocalRef(resultClass);
+    return result;
+  }
+  JNI_METHOD_END(nullptr)
+}
+
+void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark, jint index) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyWatermark(watermark, index);
+  JNI_METHOD_END()
+}
+
+void initializeState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->initializeState(context);
+  JNI_METHOD_END()
+}
+
+void snapshotState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->snapshotState(context);
+  JNI_METHOD_END()
+}
+
+void notifyCheckpointComplete(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyCheckpointComplete(checkpointId);
+  JNI_METHOD_END()
+}
+
+void notifyCheckpointAborted(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyCheckpointAborted(checkpointId);
+  JNI_METHOD_END()
 }
 
 jlong createExternalStreamFromDownIterator(
@@ -371,6 +449,48 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
   addNativeMethod(
       "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
+  addNativeMethod(
+      "statefulTaskGet",
+       (void*)statefulTaskGet,
+       "io/github/zhztheplayer/velox4j/stateful/StatefulElement",
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "notifyWatermark",
+       (void*)notifyWatermark,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       kTypeInt,
+       nullptr);
+  addNativeMethod(
+      "initializeState",
+       (void*)initializeState,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "snapshotState",
+       (void*)snapshotState,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "notifyCheckpointComplete",
+       (void*)notifyCheckpointComplete,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
+  addNativeMethod(
+      "notifyCheckpointAborted",
+       (void*)notifyCheckpointAborted,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       nullptr);
   addNativeMethod(
       "createExternalStreamFromDownIterator",
       (void*)createExternalStreamFromDownIterator,

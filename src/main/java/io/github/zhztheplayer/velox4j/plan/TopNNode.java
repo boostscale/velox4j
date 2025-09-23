@@ -12,59 +12,45 @@
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
-* limitations under the License.
+* countations under the License.
 */
-package io.github.zhztheplayer.velox4j.aggregate;
-
-import java.util.List;
+package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.github.zhztheplayer.velox4j.expression.CallTypedExpr;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
-import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
-import io.github.zhztheplayer.velox4j.type.Type;
 
-public class Aggregate extends ISerializable {
-  public final CallTypedExpr call;
-  public final List<Type> rawInputTypes;
-  public final FieldAccessTypedExpr mask;
-  public final List<FieldAccessTypedExpr> sortingKeys;
-  public final List<SortOrder> sortingOrders;
-  public final boolean distinct;
+import java.util.List;
+
+public class TopNNode extends PlanNode {
+  private final List<FieldAccessTypedExpr> sortingKeys;
+  private final List<SortOrder> sortingOrders;
+  private final int count;
+  private final boolean partial;
+
+  private final List<PlanNode> sources;
 
   @JsonCreator
-  public Aggregate(
-      @JsonProperty("call") CallTypedExpr call,
-      @JsonProperty("rawInputTypes") List<Type> rawInputTypes,
-      @JsonProperty("mask") FieldAccessTypedExpr mask,
+  public TopNNode(
+      @JsonProperty("id") String id,
       @JsonProperty("sortingKeys") List<FieldAccessTypedExpr> sortingKeys,
       @JsonProperty("sortingOrders") List<SortOrder> sortingOrders,
-      @JsonProperty("distinct") boolean distinct) {
-    this.call = call;
-    this.rawInputTypes = rawInputTypes;
-    this.mask = mask;
+      @JsonProperty("count") int count,
+      @JsonProperty("partial") boolean partial,
+      @JsonProperty("sources") List<PlanNode> sources) {
+    super(id);
     this.sortingKeys = sortingKeys;
     this.sortingOrders = sortingOrders;
-    this.distinct = distinct;
+    this.count = count;
+    this.partial = partial;
+    this.sources = sources;
   }
 
-  @JsonGetter("call")
-  public CallTypedExpr getCall() {
-    return call;
-  }
-
-  @JsonGetter("rawInputTypes")
-  public List<Type> getRawInputTypes() {
-    return rawInputTypes;
-  }
-
-  @JsonGetter("mask")
-  public FieldAccessTypedExpr getMask() {
-    return mask;
+  @Override
+  public List<PlanNode> getSources() {
+    return sources;
   }
 
   @JsonGetter("sortingKeys")
@@ -77,8 +63,13 @@ public class Aggregate extends ISerializable {
     return sortingOrders;
   }
 
-  @JsonGetter("distinct")
-  public boolean isDistinct() {
-    return distinct;
+  @JsonGetter("count")
+  public int getCount() {
+    return count;
+  }
+
+  @JsonGetter("partial")
+  public boolean isPartial() {
+    return partial;
   }
 }

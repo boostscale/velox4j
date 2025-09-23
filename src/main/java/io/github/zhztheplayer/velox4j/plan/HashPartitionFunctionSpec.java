@@ -14,32 +14,41 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.zhztheplayer.velox4j.expression.TypedExpr;
+import io.github.zhztheplayer.velox4j.type.RowType;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
+import java.util.List;
 
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
+public class HashPartitionFunctionSpec extends PartitionFunctionSpec {
+  private final RowType inputType;
+  private final List<Integer> keyChannels;
 
   @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  public HashPartitionFunctionSpec(
+      @JsonProperty("inputType") RowType inputType,
+      @JsonProperty("keyChannels") List<Integer> keyChannels) {
+    super();
+    this.inputType = inputType;
+    this.keyChannels = keyChannels;
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
+  @JsonGetter("inputType")
+  public RowType getInputType() {
+    return inputType;
   }
 
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  @JsonGetter("keyChannels")
+  public List<Integer> getKeyChannels() {
+    return keyChannels;
+  }
+
+  @JsonGetter("constants")
+  public List<TypedExpr> getConstants() {
+    return List.of();
   }
 }

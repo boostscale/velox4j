@@ -16,7 +16,6 @@
  */
 
 #include "StatefulQueryExecutor.h"
-#include <velox/experimental/stateful/StatefulTask.h>
 #include "velox4j/query/Query.h"
 
 #include <iostream>
@@ -35,7 +34,6 @@ StatefulSerialTask::StatefulSerialTask(
   const uint32_t eid = executionId++;
   core::PlanFragment planFragment{
       query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
-  std::cout << "Stateful velox plan is " << query_->plan()->toString(true, true) << std::endl;
   std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
       nullptr,
       core::QueryConfig{query_->queryConfig()->toMap()},
@@ -55,11 +53,7 @@ StatefulSerialTask::StatefulSerialTask(
       std::move(queryCtx));
 
   task_ = task;
-
-  if (!task_->supportSerialExecutionMode()) {
-    VELOX_FAIL(
-        "Task doesn't support single threaded execution: " + task->toString());
-  }
+  task_->init();
 }
 
 StatefulSerialTask::~StatefulSerialTask() {
@@ -82,13 +76,38 @@ void StatefulSerialTask::wait() {
 }
 
 RowVectorPtr StatefulSerialTask::get() {
+  VELOX_CHECK(false, "Should not call get for stateful task.");
+  return nullptr;
+}
+
+stateful::StreamElementPtr StatefulSerialTask::statefulGet() {
   VELOX_CHECK_NOT_NULL(
       pending_,
       "SerialTask: No pending row vector to return. Make sure the "
       "iterator is available via member function advance() first");
-  const auto out = pending_;
+  const auto out = std::move(pending_);
   pending_ = nullptr;
   return out;
+}
+
+void StatefulSerialTask::notifyWatermark(long watermark, int index) {
+  task_->notifyWatermark(watermark, index);
+}
+
+void StatefulSerialTask::initializeState(long checkpointId) {
+  task_->initializeState();
+}
+
+void StatefulSerialTask::snapshotState(long checkpointId) {
+  task_->snapshotState();
+}
+
+void StatefulSerialTask::notifyCheckpointComplete(long checkpointId) {
+  task_->notifyCheckpointComplete(checkpointId);
+}
+
+void StatefulSerialTask::notifyCheckpointAborted(long checkpointId) {
+  task_->notifyCheckpointAborted(checkpointId);
 }
 
 void StatefulSerialTask::addSplit(

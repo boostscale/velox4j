@@ -12,6 +12,7 @@ public class WatermarkAssignerNode extends PlanNode {
   private final ProjectNode project;
   private final long idleTimeout;
   private final int rowtimeFieldIndex;
+  private final long watermarkInterval;
 
   @JsonCreator
   public WatermarkAssignerNode(
@@ -19,12 +20,14 @@ public class WatermarkAssignerNode extends PlanNode {
           @JsonProperty("sources") List<PlanNode> sources,
           @JsonProperty("project") ProjectNode project,
           @JsonProperty("idleTimeout") long idleTimeout,
-          @JsonProperty("rowtimeFieldIndex") int rowtimeFieldIndex) {
+          @JsonProperty("rowtimeFieldIndex") int rowtimeFieldIndex,
+          @JsonProperty("watermarkInterval") long watermarkInterval) {
     super(id);
     this.sources = sources;
     this.project = project;
     this.idleTimeout = idleTimeout;
     this.rowtimeFieldIndex = rowtimeFieldIndex;
+    this.watermarkInterval = watermarkInterval;
   }
 
   @Override
@@ -45,6 +48,11 @@ public class WatermarkAssignerNode extends PlanNode {
   @JsonGetter("rowtimeFieldIndex")
   public int getRowtimeFieldIndex() {
     return rowtimeFieldIndex;
+  }
+
+  @JsonGetter("watermarkInterval")
+  public long getWatermarkInterval() {
+    return watermarkInterval;
   }
 
   @Override

@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.jni;
 import com.google.common.annotations.VisibleForTesting;
 
 import io.github.zhztheplayer.velox4j.iterator.DownIterator;
+import io.github.zhztheplayer.velox4j.stateful.StatefulElement;
 
 final class JniWrapper {
   private final long sessionId;
@@ -47,6 +48,20 @@ final class JniWrapper {
 
   // For DownIterator.
   native long createExternalStreamFromDownIterator(DownIterator itr);
+
+  // For Flink.
+  native StatefulElement statefulTaskGet(long id);
+
+  // For Flink.
+  native void notifyWatermark(long id, long watermark, int index);
+
+  native void initializeState(long id, long context);
+
+  native void snapshotState(long id, long context);
+
+  native void notifyCheckpointComplete(long id, long checkpointId);
+
+  native void notifyCheckpointAborted(long id, long checkpointId);
 
   native long createBlockingQueue();
 

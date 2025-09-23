@@ -14,32 +14,27 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.stateful;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class StatefulWatermark extends StatefulElement {
+  private final long timestamp;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
-
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
-
-  @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  public StatefulWatermark(String nodeId, long timestamp) {
+    super(nodeId);
+    this.timestamp = timestamp;
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
+  public long getTimestamp() {
+    return timestamp;
   }
 
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  @Override
+  public boolean isWatermark() {
+    return true;
+  }
+
+  @Override
+  public boolean isRecord() {
+    return false;
   }
 }

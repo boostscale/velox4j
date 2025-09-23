@@ -14,32 +14,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
-
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
+public class FromElementsConnectorSplit extends ConnectorSplit {
 
   @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
-  }
-
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
-  }
-
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  public FromElementsConnectorSplit(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("splitWeight") long splitWeight,
+      @JsonProperty("cacheable") boolean cacheable) {
+    super(connectorId, splitWeight, cacheable);
   }
 }

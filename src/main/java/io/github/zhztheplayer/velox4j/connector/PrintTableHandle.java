@@ -14,32 +14,46 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.sort;
+package io.github.zhztheplayer.velox4j.connector;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.github.zhztheplayer.velox4j.serde.NativeBean;
+import io.github.zhztheplayer.velox4j.type.RowType;
 
-public class SortOrder implements NativeBean {
-  private final boolean ascending;
-  private final boolean nullsFirst;
+public class PrintTableHandle extends ConnectorInsertTableHandle {
+
+  private String tableName;
+  private RowType dataColumns;
+  private String path;
 
   @JsonCreator
-  public SortOrder(
-      @JsonProperty("ascending") boolean ascending,
-      @JsonProperty("nullsFirst") boolean nullsFirst) {
-    this.ascending = ascending;
-    this.nullsFirst = nullsFirst;
+  public PrintTableHandle(
+      @JsonProperty("tableName") String tableName,
+      @JsonProperty("dataColumns") RowType dataColumns,
+      @JsonProperty("path") String path) {
+    this.tableName = tableName;
+    this.dataColumns = dataColumns;
+    this.path = path;
   }
 
-  @JsonProperty("ascending")
-  public boolean isAscending() {
-    return ascending;
+  @Override
+  public boolean supportsMultiThreading() {
+    return false;
   }
 
-  @JsonProperty("nullsFirst")
-  public boolean isNullsFirst() {
-    return nullsFirst;
+  @JsonProperty("tableName")
+  public String getTableName() {
+    return tableName;
+  }
+
+  @JsonProperty("dataColumns")
+  public RowType geDataColumns() {
+    return dataColumns;
+  }
+
+  @JsonProperty("path")
+  public String getPath() {
+    return path;
   }
 }

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.github.zhztheplayer.velox4j.stateful.StatefulElement;
+import io.github.zhztheplayer.velox4j.stateful.StatefulRecord;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -84,6 +86,35 @@ public final class JniApi {
 
   public RowVector upIteratorGet(UpIterator itr) {
     return baseVectorWrap(jni.upIteratorGet(itr.id())).asRowVector();
+  }
+
+  public StatefulElement statefulTaskGet(UpIterator itr) {
+    StatefulElement result = jni.statefulTaskGet(itr.id());
+    if (result.isRecord()) {
+      StatefulRecord record = (StatefulRecord) result;
+      record.setRowVector(baseVectorWrap(record.getRowVectorId()).asRowVector());
+    }
+    return result;
+  }
+
+  public void notifyWatermark(UpIterator itr, long watermark, int index) {
+    jni.notifyWatermark(itr.id(), watermark, index);
+  }
+
+  public void initializeState(UpIterator itr, long context) {
+    jni.initializeState(itr.id(), context);
+  }
+
+  public void snapshotState(UpIterator itr, long context) {
+    jni.snapshotState(itr.id(), context);
+  }
+
+  public void notifyCheckpointComplete(UpIterator itr, long checkpointId) {
+    jni.notifyCheckpointComplete(itr.id(), checkpointId);
+  }
+
+  public void notifyCheckpointAborted(UpIterator itr, long checkpointId) {
+    jni.notifyCheckpointAborted(itr.id(), checkpointId);
   }
 
   public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
