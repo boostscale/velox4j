@@ -288,6 +288,7 @@
             <configuration>
               <artifactSet>
                 <excludes>
+                  <!-- keep Arrow NOT relocated to preserve the API surface -->
                   <exclude>org.apache.arrow:*</exclude>
                 </excludes>
               </artifactSet>
@@ -314,9 +315,8 @@
                 </transformer>
               </transformers>
 
-              <!-- Relocate libs that are NOT part of your public API -->
+              <!-- Relocate libs that are NOT part of the public API -->
               <relocations>
-                <!-- keep Arrow NOT relocated to preserve your API surface -->
                 <relocation>
                   <pattern>com.google</pattern>
                   <shadedPattern>io.github.zhztheplayer.velox4j.shaded.com.google</shadedPattern>
@@ -331,10 +331,9 @@
                 </relocation>
               </relocations>
 
-              <!-- be conservative; you can turn this on if you want smaller jars -->
+              <!-- be conservative; we can turn this on if you want smaller jars -->
               <minimizeJar>false</minimizeJar>
 
-              <!-- include everything from this module -->
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
