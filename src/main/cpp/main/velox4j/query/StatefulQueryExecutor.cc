@@ -123,7 +123,7 @@ void StatefulSerialTask::noMoreSplits(const core::PlanNodeId& planNodeId) {
 }
 
 std::unique_ptr<SerialTaskStats> StatefulSerialTask::collectStats() {
-  const auto stats = task_->taskStats();
+  const auto stats = task_->statefulTaskStats();
   return std::make_unique<SerialTaskStats>(stats);
 }
 
