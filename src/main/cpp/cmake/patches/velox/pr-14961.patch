@@ -1,0 +1,25 @@
+From d37dc587260731ede1ae2cdde8f838dcf162d106 Mon Sep 17 00:00:00 2001
+From: Hongze Zhang <hongze.zzz123@gmail.com>
+Date: Thu, 25 Sep 2025 19:36:22 +0200
+Subject: [PATCH] build: Fix unsupported bison syntax on bison 3.0.4
+
+---
+ velox/expression/signature_parser/SignatureParser.yy | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/velox/expression/signature_parser/SignatureParser.yy b/velox/expression/signature_parser/SignatureParser.yy
+index 179762c42..c79067e96 100644
+--- a/velox/expression/signature_parser/SignatureParser.yy
++++ b/velox/expression/signature_parser/SignatureParser.yy
+@@ -7,7 +7,7 @@
+ %require "3.0.4"
+ %language "C++"
+ 
+-%define api.parser.class {Parser}
++%define parser_class_name {Parser}
+ %define api.namespace {facebook::velox::exec}
+ %define api.value.type variant
+ %parse-param {Scanner* scanner}
+-- 
+2.43.0
+
