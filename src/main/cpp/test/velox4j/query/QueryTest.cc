@@ -37,20 +37,16 @@ class QueryTest : public testing::Test, public test::VectorTestBase {
 
   void SetUp() override {
     Test::SetUp();
-    connector::registerConnectorFactory(
-        std::make_shared<connector::fuzzer::FuzzerConnectorFactory>());
+    auto fuzzerConnectorFactory =
+        std::make_shared<connector::fuzzer::FuzzerConnectorFactory>();
     std::shared_ptr<const config::ConfigBase> config;
     auto fuzzerConnector =
-        connector::getConnectorFactory(
-            connector::fuzzer::FuzzerConnectorFactory::kFuzzerConnectorName)
-            ->newConnector(kFuzzerConnectorId, config);
+        fuzzerConnectorFactory->newConnector(kFuzzerConnectorId, config);
     registerConnector(fuzzerConnector);
   }
 
   void TearDown() override {
     connector::unregisterConnector(kFuzzerConnectorId);
-    connector::unregisterConnectorFactory(
-        connector::fuzzer::FuzzerConnectorFactory::kFuzzerConnectorName);
     Test::TearDown();
   }
 
