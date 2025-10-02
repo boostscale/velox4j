@@ -125,8 +125,8 @@ class ExternalStreamDataSource : public facebook::velox::connector::DataSource {
     return 0;
   }
 
-  std::unordered_map<std::string, facebook::velox::RuntimeCounter>
-  runtimeStats() override {
+  std::unordered_map<std::string, facebook::velox::RuntimeMetric>
+  getRuntimeStats() override {
     // TODO.
     return {};
   }
