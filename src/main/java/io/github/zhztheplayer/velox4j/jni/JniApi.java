@@ -101,8 +101,8 @@ public final class JniApi {
     jni.notifyWatermark(itr.id(), watermark, index);
   }
 
-  public void initializeState(UpIterator itr, long context) {
-    jni.initializeState(itr.id(), context);
+  public void initializeState(UpIterator itr, long context, String keyedStateBackendConfigString) {
+    jni.initializeState(itr.id(), context, keyedStateBackendConfigString);
   }
 
   public void snapshotState(UpIterator itr, long context) {

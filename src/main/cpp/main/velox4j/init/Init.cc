@@ -40,6 +40,8 @@
 #include <velox/dwio/text/RegisterTextWriter.h>
 #include <velox/exec/PartitionFunction.h>
 #include <velox/experimental/stateful/StatefulPlanNode.h>
+#include <velox/experimental/stateful/state/StateBackend.h>
+#include <velox/experimental/stateful/state/RocksDBStateBackend.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
 #include <velox/functions/sparksql/aggregates/Register.h>
@@ -164,6 +166,8 @@ void initForSpark() {
       ));
   core::PlanNode::registerSerDe();
   stateful::StatefulPlanNode::registerSerDe();
+  stateful::KeyedStateBackendParameters::registerSerDe();
+  stateful::RocksDBKeyedStateBackendParameters::registerSerDe();
   core::ITypedExpr::registerSerDe();
   exec::registerPartitionFunctionSerDe();
 }

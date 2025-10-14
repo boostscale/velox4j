@@ -21,6 +21,8 @@ import io.github.zhztheplayer.velox4j.data.RowVector;
 import io.github.zhztheplayer.velox4j.iterator.UpIterator;
 import io.github.zhztheplayer.velox4j.jni.JniApi;
 import io.github.zhztheplayer.velox4j.jni.StaticJniApi;
+import io.github.zhztheplayer.velox4j.serde.Serde;
+import io.github.zhztheplayer.velox4j.stateful.KeyedStateBackendParameters;
 import io.github.zhztheplayer.velox4j.stateful.StatefulElement;
 
 public class SerialTask implements UpIterator {
@@ -74,8 +76,11 @@ public class SerialTask implements UpIterator {
     return StaticJniApi.get().serialTaskCollectStats(this);
   }
 
-  public void initializeState(long context) {
-    jniApi.initializeState(this, context);
+  public void initializeState(
+      long context, KeyedStateBackendParameters keyedStateBackendParameters) {
+    String keyedStateBackendJsonParameters =
+        keyedStateBackendParameters != null ? Serde.toJson(keyedStateBackendParameters) : "{}";
+    jniApi.initializeState(this, context, keyedStateBackendJsonParameters);
   }
 
   public void snapshotState(long context) {
