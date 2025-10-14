@@ -40,6 +40,9 @@
 #include <velox/functions/sparksql/aggregates/Register.h>
 #include <velox/functions/sparksql/registration/Register.h>
 #include <velox/functions/sparksql/window/WindowFunctionsRegistration.h>
+#include <velox/connectors/kafka/KafkaConnector.h>
+#include <velox/connectors/kafka/KafkaConnectorSplit.h>
+#include <velox/connectors/kafka/KafkaTableHandle.h>
 #include <velox/vector/fuzzer/ConstrainedVectorGenerator.cpp>
 #include <velox/vector/fuzzer/Utils.cpp>
 #include <velox/vector/fuzzer/VectorFuzzer.cpp>
@@ -144,6 +147,13 @@ void initForSpark() {
           std::unordered_map<std::string, std::string>()),
         nullptr
       ));
+  connector::kafka::KafkaTableHandle::registerSerDe();
+  connector::kafka::KafkaConnectorSplit::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::kafka::KafkaConnector>(
+      "connector-kafka",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+        std::unordered_map<std::string, std::string>()),
+      nullptr));
   core::PlanNode::registerSerDe();
   stateful::StatefulPlanNode::registerSerDe();
   core::ITypedExpr::registerSerDe();
