@@ -175,10 +175,6 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("PrintTableHandle", PrintTableHandle.class);
     NAME_REGISTRY.registerClass("FromElementsTableHandle", FromElementsTableHandle.class);
     NAME_REGISTRY.registerClass("FromElementsConnectorSplit", FromElementsConnectorSplit.class);
-    NAME_REGISTRY.registerClass("KafkaTableHandle", KafkaTableHandle.class);
-    NAME_REGISTRY.registerClass("KafkaConnectorSplit", KafkaConnectorSplit.class);
-    NAME_REGISTRY.registerClass(
-        "TopicPartitionOffset", KafkaConnectorSplit.TopicPartitionOffset.class);
   }
 
   private static void registerFilters() {
