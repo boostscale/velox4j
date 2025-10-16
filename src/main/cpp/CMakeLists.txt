@@ -70,7 +70,7 @@ file(STRINGS ${VELOX_REF_HASH_FILE} VELOX_SOURCE_URL_MD5)
 #  ${VELOX_SOURCE_URL}
 #  URL_HASH
 #  MD5=${VELOX_SOURCE_URL_MD5})
-# set(VELOX_SOURCE_URL "https://github.com/bigo-sg/velox.git")
+set(VELOX_SOURCE_URL "https://github.com/bigo-sg/velox.git")
 CPMAddPackage(
         NAME velox
         GIT_REPOSITORY ${VELOX_SOURCE_URL}
