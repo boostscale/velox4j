@@ -33,7 +33,7 @@ import io.github.zhztheplayer.velox4j.test.dataset.TestDataFile;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
 /**
- * A TPC-H Parquet SF0.1 dataset downloaded from GitHub repo velox4j/tpc-data. Note, this is a
+ * A TPC-H Parquet SF0.1 dataset downloaded from GitHub repo optscale/tpc-data. Note, this is a
  * temporary solution for generating TPC-H data for testing.
  *
  * <p>TODO: We should implement a local TPC-H data generator in Java instead. Velox4J itself could
@@ -50,14 +50,14 @@ import io.github.zhztheplayer.velox4j.type.RowType;
  *
  * <pre>
  * 1. cd /tmp
- * 2. wget https://github.com/velox4j/tpc-data/releases/download/v0.1.0/tpch-parquet-sf0.1.tar.gz
+ * 2. wget https://github.com/optscale/tpc-data/releases/download/v0.1.0/tpch-parquet-sf0.1.tar.gz
  * 3. tar -xvf tpch-parquet-sf0.1.tar.gz
  * 4. ls -l tpch-parquet-sf0.1 # Check the extracted data.
  * </pre>
  */
 class DownloadedTpchDataset implements TpchDataset {
   private static final String DOWNLOAD_LINK =
-      "https://github.com/velox4j/tpc-data/releases/download/v0.1.0/tpch-parquet-sf0.1.tar.gz";
+      "https://github.com/optscale/tpc-data/releases/download/v0.1.0/tpch-parquet-sf0.1.tar.gz";
   private static final String SHA256 =
       "705f97c32ff4f6e15b8ca84cad58c3900e2047ebb74e103c5b984cee2417aabb";
   private static final String DIRECTORY = "tpch-parquet-sf0.1";

@@ -1,8 +1,8 @@
-# Velox4J: Java Bindings for Velox
+# Velox4J: Community Java Bindings for Velox
 
-![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-java.yml/badge.svg?branch=main)
-![badge](https://github.com/velox4j/velox4j/actions/workflows/ut-cpp.yml/badge.svg?branch=main)
-![badge](https://github.com/velox4j/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg?branch=main)
+![badge](https://github.com/optscale/velox4j/actions/workflows/ut-java.yml/badge.svg?branch=main)
+![badge](https://github.com/optscale/velox4j/actions/workflows/ut-cpp.yml/badge.svg?branch=main)
+![badge](https://github.com/optscale/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg?branch=main)
 
 ## Project Status
 
@@ -12,7 +12,7 @@ Velox4J is currently a **concept project**.
 
 ### What is Velox?
 
-Velox is an "open source unified execution engine" as it states. The project was originally
+Velox is an open source unified execution engine. The project was originally
 funded by Meta in 2020. Projects often use Velox as a C++ library to accelerate SQL query
 executions.
 
@@ -28,8 +28,10 @@ Critical open source projects depending on Velox:
 
 ### What is Velox4J?
 
-Velox4J is the Java bindings for Velox. It enables JVM applications to directly invoke Velox's
+Velox4J is a set of Java bindings for Velox. It enables JVM applications to directly invoke Velox's
 functionalities without writing and maintaining any C++ / JNI code.
+
+*Velox4J is an independent community project and is not affiliated with or endorsed by Meta Platforms, Inc.*
 
 ## Design
 
@@ -117,7 +119,7 @@ to be added:
 
 NOTE:
 1. The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
-2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/velox4j/velox4j-integration-test).
+2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/optscale/velox4j-integration-test).
 
 ## Build From Source
 
