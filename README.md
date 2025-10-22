@@ -1,8 +1,8 @@
 # Velox4J: Community Java Bindings for Velox
 
-![badge](https://github.com/optscale/velox4j/actions/workflows/ut-java.yml/badge.svg?branch=main)
-![badge](https://github.com/optscale/velox4j/actions/workflows/ut-cpp.yml/badge.svg?branch=main)
-![badge](https://github.com/optscale/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg?branch=main)
+![badge](https://github.com/optpulse/velox4j/actions/workflows/ut-java.yml/badge.svg?branch=main)
+![badge](https://github.com/optpulse/velox4j/actions/workflows/ut-cpp.yml/badge.svg?branch=main)
+![badge](https://github.com/optpulse/velox4j-integration-test/actions/workflows/integration-test.yml/badge.svg?branch=main)
 
 ## Project Status
 
@@ -119,7 +119,7 @@ to be added:
 
 NOTE:
 1. The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
-2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/optscale/velox4j-integration-test).
+2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/optpulse/velox4j-integration-test).
 
 ## Build From Source
 
