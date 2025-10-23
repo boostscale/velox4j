@@ -92,7 +92,7 @@ Velox4J currently only provides SNAPSHOT jar releases.
 
 ```xml
 <dependency>
-  <groupId>io.github.zhztheplayer</groupId>
+  <groupId>org.boostscale</groupId>
   <artifactId>velox4j</artifactId>
   <version>0.1.0-SNAPSHOT</version>
 </dependency>
