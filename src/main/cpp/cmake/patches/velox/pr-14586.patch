@@ -1,14 +1,14 @@
-Index: velox/vector/VariantToVector.cpp
+Index: velox/vector/BaseVector.cpp
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/velox/vector/VariantToVector.cpp b/velox/vector/VariantToVector.cpp
---- a/velox/vector/VariantToVector.cpp	(revision 1d12342246b75ccdfd2ac050a0adf27164a8f893)
-+++ b/velox/vector/VariantToVector.cpp	(revision 9a23bdbc582e65651009bcd6c093c81ea7191ddb)
-@@ -62,7 +62,14 @@
- 
-     // Allocate nulls and data buffers and set all values to null by default.
+diff --git a/velox/vector/BaseVector.cpp b/velox/vector/BaseVector.cpp
+--- a/velox/vector/BaseVector.cpp	(revision 9f7f64abdfc6f078adfbc0d1b07de0399f38d482)
++++ b/velox/vector/BaseVector.cpp	(revision 91c39aac46f040b574986a8240c21d277f12b72c)
+@@ -832,7 +832,14 @@
+     using T = typename TypeTraits<KIND>::NativeType;
+
      const vector_size_t dataSize = data.size();
 -    BufferPtr valuesBuffer = AlignedBuffer::allocate<T>(dataSize, pool);
 +    BufferPtr valuesBuffer;
@@ -20,5 +20,5 @@ diff --git a/velox/vector/VariantToVector.cpp b/velox/vector/VariantToVector.cpp
 +      valuesBuffer = AlignedBuffer::allocate<T>(dataSize, pool);
 +    }
      BufferPtr nulls = allocateNulls(dataSize, pool, bits::kNull);
- 
-     // Create flat vector to store all the values.
+
+     auto values = std::make_shared<FlatVector<T>>(
