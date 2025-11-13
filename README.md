@@ -6,7 +6,7 @@
 
 ## Project Status
 
-Velox4J is currently a **concept project**.
+Velox4J is currently an **experimental project**.
 
 ## Introduction
 
@@ -32,6 +32,12 @@ Velox4J is a set of Java bindings for Velox. It enables JVM applications to dire
 functionalities without writing and maintaining any C++ / JNI code.
 
 *Velox4J is an independent community project and is not affiliated with or endorsed by Meta Platforms, Inc.*
+
+### Powered by Velox4J
+
+The Gluten-Flink subproject is backed by Velox via Velox4J:
+
+- [The Flink accelerator of Apache Gluten (incubating)](https://github.com/apache/incubator-gluten/tree/main/gluten-flink)
 
 ## Design
 
