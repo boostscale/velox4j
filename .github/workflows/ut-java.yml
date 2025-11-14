@@ -55,15 +55,30 @@ jobs:
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
-      - name: Run setup script / Build and run UTs
+      - name: Start Docker container
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w / ubuntu:24.04 bash -c "
+          docker run --init -d --name test-container -v ${{ github.workspace }}:/velox4j -w /velox4j ubuntu:24.04 sleep infinity
+      - name: Run setup script / Build C++ libraries
+        run: |
+          docker exec test-container bash -c "
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
-            cd /velox4j
             bash .github/workflows/scripts/ut-java/setup-ubuntu24.sh
-            mvn clean test
+            mvn clean generate-resources
           "
+      - name: Run UTs
+        run: |
+          docker exec test-container bash -c "
+            mvn clean test -Dskip.cpp.build
+          "
+      - name: Run UTs with Arrow 7.0.0
+        run: |
+          docker exec test-container bash -c "
+            mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
+          "
+      - name: Stop Docker container
+        run: |
+          docker stop test-container
       - name: Save Ccache
         uses: actions/cache/save@v4
         with:
@@ -85,10 +100,9 @@ jobs:
             ut-java-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
+          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
-            cd /velox4j
             bash .github/workflows/scripts/ut-java/setup-centos7.sh
             mvn clean test
           "
