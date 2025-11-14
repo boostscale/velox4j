@@ -55,14 +55,26 @@ jobs:
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
-      - name: Run setup script / Build and run UTs
+      - name: Run setup script / Build
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w / ubuntu:24.04 bash -c "
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
             bash .github/workflows/scripts/ut-java/setup-ubuntu24.sh
-            mvn clean test
+            mvn clean generate-resources
+          "
+      - name: Run UTs
+        run: |
+          docker run -v ${{ github.workspace }}:/velox4j -w / ubuntu:24.04 bash -c "
+            cd /velox4j
+            mvn clean test -Dskip.cpp.build
+          "
+      - name: Run UTs with Arrow 7.0.0
+        run: |
+          docker run -v ${{ github.workspace }}:/velox4j -w / ubuntu:24.04 bash -c "
+            cd /velox4j
+            mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
           "
       - name: Save Ccache
         uses: actions/cache/save@v4
