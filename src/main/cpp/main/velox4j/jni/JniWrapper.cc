@@ -254,7 +254,7 @@ jlongArray rowVectorPartitionByKeys(
   }
 
   connector::hive::PartitionIdGenerator idGen{
-      asRowType(inputRowVector->type()), keyChannels, 128, pool, false};
+      asRowType(inputRowVector->type()), keyChannels, 128, pool};
 
   raw_vector<uint64_t> partitionIds{};
   idGen.run(inputRowVector, partitionIds);
