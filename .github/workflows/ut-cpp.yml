@@ -41,8 +41,8 @@ jobs:
             ut-cpp-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/work -w /work centos:7 bash -c "
-            export CCACHE_DIR=/work/.ccache
+          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
+            export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/ut-cpp/setup-centos7.sh
             bash src/main/cpp/test.sh
