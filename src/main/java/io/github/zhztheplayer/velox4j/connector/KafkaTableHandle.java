@@ -16,23 +16,42 @@
 */
 package io.github.zhztheplayer.velox4j.connector;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class FuzzerTableHandle extends ConnectorTableHandle {
-  private final int fuzzerSeed;
+import io.github.zhztheplayer.velox4j.type.RowType;
+
+public class KafkaTableHandle extends ConnectorTableHandle {
+  private String tableName;
+  private final RowType dataColumns;
+  private final Map<String, String> tableParameters;
 
   @JsonCreator
-  public FuzzerTableHandle(
-      @JsonProperty("connectorId") String connectorId, @JsonProperty("fuzzerSeed") int fuzzerSeed) {
+  public KafkaTableHandle(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("tableName") String tableName,
+      @JsonProperty("dataColumns") RowType dataColumns,
+      @JsonProperty("tableParameters") Map<String, String> tableParameters) {
     super(connectorId);
-    this.fuzzerSeed = fuzzerSeed;
+    this.tableName = tableName;
+    this.dataColumns = dataColumns;
+    this.tableParameters = tableParameters;
   }
 
-  @JsonGetter("fuzzerSeed")
-  public int getSeed() {
-    return fuzzerSeed;
+  @JsonProperty("tableName")
+  public String getTableName() {
+    return this.tableName;
   }
 
+  @JsonProperty("dataColumns")
+  public RowType getDataColumns() {
+    return this.dataColumns;
+  }
+
+  @JsonProperty("tableParameters")
+  public Map<String, String> getTableParameters() {
+    return this.tableParameters;
+  }
 }
