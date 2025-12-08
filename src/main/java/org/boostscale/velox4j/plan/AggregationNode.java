@@ -30,6 +30,7 @@ public class AggregationNode extends PlanNode {
   private final List<String> aggregateNames;
   private final List<Aggregate> aggregates;
   private final boolean ignoreNullKeys;
+  private final boolean noGroupsSpanBatches;
 
   private final List<PlanNode> sources;
 
@@ -45,6 +46,7 @@ public class AggregationNode extends PlanNode {
       @JsonProperty("aggregateNames") List<String> aggregateNames,
       @JsonProperty("aggregates") List<Aggregate> aggregates,
       @JsonProperty("ignoreNullKeys") boolean ignoreNullKeys,
+      @JsonProperty("noGroupsSpanBatches") boolean noGroupsSpanBatches,
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("groupId") FieldAccessTypedExpr groupId,
       @JsonProperty("globalGroupingSets") List<Integer> globalGroupingSets) {
@@ -58,6 +60,7 @@ public class AggregationNode extends PlanNode {
     this.sources = sources;
     this.groupId = groupId;
     this.globalGroupingSets = globalGroupingSets;
+    this.noGroupsSpanBatches = noGroupsSpanBatches;
   }
 
   @Override
@@ -93,6 +96,11 @@ public class AggregationNode extends PlanNode {
   @JsonGetter("ignoreNullKeys")
   public boolean isIgnoreNullKeys() {
     return ignoreNullKeys;
+  }
+
+  @JsonGetter("noGroupsSpanBatches")
+  public boolean isNoGroupsSpanBatches() {
+    return noGroupsSpanBatches;
   }
 
   @JsonGetter("groupId")

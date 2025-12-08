@@ -303,6 +303,7 @@ public final class SerdeTests {
             ImmutableList.of("sum"),
             ImmutableList.of(aggregate),
             true,
+            true,
             ImmutableList.of(scan),
             FieldAccessTypedExpr.create(new IntegerType(), "foo"),
             ImmutableList.of(0));
