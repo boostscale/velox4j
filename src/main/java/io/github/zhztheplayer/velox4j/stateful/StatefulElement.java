@@ -39,6 +39,5 @@ public abstract class StatefulElement {
     return (StatefulRecord) this;
   }
 
-  public void close() {
-  }
+  public void close() {}
 }

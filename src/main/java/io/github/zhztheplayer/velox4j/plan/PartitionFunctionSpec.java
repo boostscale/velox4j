@@ -17,16 +17,10 @@
 package io.github.zhztheplayer.velox4j.plan;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
-import java.util.List;
+import io.github.zhztheplayer.velox4j.serializable.ISerializable;
 
 public class PartitionFunctionSpec extends ISerializable {
   @JsonCreator
-  public PartitionFunctionSpec() {
-  }
-
+  public PartitionFunctionSpec() {}
 }

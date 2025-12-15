@@ -45,5 +45,4 @@ public class FuzzerConnectorSplit extends ConnectorSplit {
   public int getNumRows() {
     return numRows;
   }
-
 }

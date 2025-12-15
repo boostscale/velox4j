@@ -34,5 +34,4 @@ public class FuzzerTableHandle extends ConnectorTableHandle {
   public int getSeed() {
     return fuzzerSeed;
   }
-
 }

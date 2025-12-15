@@ -16,6 +16,8 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,8 +26,6 @@ import com.google.common.base.Preconditions;
 import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.join.JoinType;
 import io.github.zhztheplayer.velox4j.type.RowType;
-
-import java.util.List;
 
 public class NestedLoopJoinNode extends PlanNode {
   private final List<PlanNode> sources;
@@ -55,14 +55,11 @@ public class NestedLoopJoinNode extends PlanNode {
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("outputType") RowType outputType) {
     Preconditions.checkArgument(
-        sources.size() == 2, "NestedLoopJoinNode should have 2 sources, but has %s", sources.size());
+        sources.size() == 2,
+        "NestedLoopJoinNode should have 2 sources, but has %s",
+        sources.size());
     return new NestedLoopJoinNode(
-        id,
-        joinType,
-        joinCondition,
-        sources.get(0),
-        sources.get(1),
-        outputType);
+        id, joinType, joinCondition, sources.get(0), sources.get(1), outputType);
   }
 
   @Override

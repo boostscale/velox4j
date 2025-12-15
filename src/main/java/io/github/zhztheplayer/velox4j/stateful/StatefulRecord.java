@@ -26,11 +26,7 @@ public class StatefulRecord extends StatefulElement {
   private final int key;
 
   public StatefulRecord(
-      String nodeId,
-      long rowVectorId,
-      long timestamp,
-      boolean hasTimestamp,
-      int key) {
+      String nodeId, long rowVectorId, long timestamp, boolean hasTimestamp, int key) {
     super(nodeId);
     this.rowVectorId = rowVectorId;
     this.timestamp = timestamp;
