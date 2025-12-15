@@ -16,6 +16,8 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,8 +25,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.zhztheplayer.velox4j.expression.FieldAccessTypedExpr;
 import io.github.zhztheplayer.velox4j.sort.SortOrder;
 import io.github.zhztheplayer.velox4j.window.WindowFunction;
-
-import java.util.List;
 
 public class WindowNode extends PlanNode {
   private final List<FieldAccessTypedExpr> partitionKeys;

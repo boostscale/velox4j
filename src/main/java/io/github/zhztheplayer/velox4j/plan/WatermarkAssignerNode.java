@@ -16,12 +16,12 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
+import com.google.common.base.Preconditions;
 
 public class WatermarkAssignerNode extends PlanNode {
   private List<PlanNode> sources;
@@ -32,12 +32,12 @@ public class WatermarkAssignerNode extends PlanNode {
 
   @JsonCreator
   public WatermarkAssignerNode(
-          @JsonProperty("id") String id,
-          @JsonProperty("sources") List<PlanNode> sources,
-          @JsonProperty("project") ProjectNode project,
-          @JsonProperty("idleTimeout") long idleTimeout,
-          @JsonProperty("rowtimeFieldIndex") int rowtimeFieldIndex,
-          @JsonProperty("watermarkInterval") long watermarkInterval) {
+      @JsonProperty("id") String id,
+      @JsonProperty("sources") List<PlanNode> sources,
+      @JsonProperty("project") ProjectNode project,
+      @JsonProperty("idleTimeout") long idleTimeout,
+      @JsonProperty("rowtimeFieldIndex") int rowtimeFieldIndex,
+      @JsonProperty("watermarkInterval") long watermarkInterval) {
     super(id);
     this.sources = sources;
     this.project = project;

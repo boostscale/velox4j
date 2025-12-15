@@ -17,7 +17,6 @@
 package io.github.zhztheplayer.velox4j.jni;
 
 import io.github.zhztheplayer.velox4j.memory.AllocationListener;
-import io.github.zhztheplayer.velox4j.query.SerialTask;
 
 public class StaticJniWrapper {
   private static final StaticJniWrapper INSTANCE = new StaticJniWrapper();

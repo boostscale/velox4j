@@ -16,23 +16,19 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
-import io.github.zhztheplayer.velox4j.expression.TypedExpr;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class StatefulPlanNode extends PlanNode {
   private final PlanNode node;
   private List<StatefulPlanNode> targets;
 
   @JsonCreator
-  public StatefulPlanNode(
-      @JsonProperty("id") String id,
-      @JsonProperty("node") PlanNode node) {
+  public StatefulPlanNode(@JsonProperty("id") String id, @JsonProperty("node") PlanNode node) {
     super(id);
     this.node = node;
   }
@@ -48,7 +44,7 @@ public class StatefulPlanNode extends PlanNode {
   }
 
   @JsonGetter("targets")
-  //@JsonInclude(JsonInclude.Include.NON_EMPTY)
+  // @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public List<StatefulPlanNode> getTargets() {
     return targets;
   }
