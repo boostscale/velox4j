@@ -16,14 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-import java.util.List;
-
-public class StreamTopNNode extends PlanNode{
+public class StreamTopNNode extends PlanNode {
   private final List<PlanNode> sources;
   private final RowType outputType;
   private PlanNode topN;

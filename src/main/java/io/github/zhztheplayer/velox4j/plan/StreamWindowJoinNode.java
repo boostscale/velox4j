@@ -16,15 +16,16 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-import java.util.List;
-
-public class StreamWindowJoinNode extends PlanNode{
+public class StreamWindowJoinNode extends PlanNode {
   private final List<PlanNode> sources;
   private final PartitionFunctionSpec leftPartFuncSpec;
   private final PartitionFunctionSpec rightPartFuncSpec;
@@ -68,7 +69,9 @@ public class StreamWindowJoinNode extends PlanNode{
       @JsonProperty("leftWindowEndIndex") int leftWindowEndIndex,
       @JsonProperty("rightWindowEndIndex") int rightWindowEndIndex) {
     Preconditions.checkArgument(
-        sources.size() == 2, "NestedLoopJoinNode should have 2 sources, but has %s", sources.size());
+        sources.size() == 2,
+        "NestedLoopJoinNode should have 2 sources, but has %s",
+        sources.size());
     return new StreamWindowJoinNode(
         id,
         sources.get(0),

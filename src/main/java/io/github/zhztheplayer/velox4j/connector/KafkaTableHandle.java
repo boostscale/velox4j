@@ -14,42 +14,44 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package io.github.zhztheplayer.velox4j.plan;
+package io.github.zhztheplayer.velox4j.connector;
 
-import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.github.zhztheplayer.velox4j.expression.TypedExpr;
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-public class HashPartitionFunctionSpec extends PartitionFunctionSpec {
-  private final RowType inputType;
-  private final List<Integer> keyChannels;
+public class KafkaTableHandle extends ConnectorTableHandle {
+  private String tableName;
+  private final RowType dataColumns;
+  private final Map<String, String> tableParameters;
 
   @JsonCreator
-  public HashPartitionFunctionSpec(
-      @JsonProperty("inputType") RowType inputType,
-      @JsonProperty("keyChannels") List<Integer> keyChannels) {
-    super();
-    this.inputType = inputType;
-    this.keyChannels = keyChannels;
+  public KafkaTableHandle(
+      @JsonProperty("connectorId") String connectorId,
+      @JsonProperty("tableName") String tableName,
+      @JsonProperty("dataColumns") RowType dataColumns,
+      @JsonProperty("tableParameters") Map<String, String> tableParameters) {
+    super(connectorId);
+    this.tableName = tableName;
+    this.dataColumns = dataColumns;
+    this.tableParameters = tableParameters;
   }
 
-  @JsonGetter("inputType")
-  public RowType getInputType() {
-    return inputType;
+  @JsonProperty("tableName")
+  public String getTableName() {
+    return this.tableName;
   }
 
-  @JsonGetter("keyChannels")
-  public List<Integer> getKeyChannels() {
-    return keyChannels;
+  @JsonProperty("dataColumns")
+  public RowType getDataColumns() {
+    return this.dataColumns;
   }
 
-  @JsonGetter("constants")
-  public List<TypedExpr> getConstants() {
-    return List.of();
+  @JsonProperty("tableParameters")
+  public Map<String, String> getTableParameters() {
+    return this.tableParameters;
   }
 }

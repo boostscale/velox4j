@@ -19,6 +19,7 @@ package io.github.zhztheplayer.velox4j.plan;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.type.RowType;
 
 public class StreamWindowPartitionFunctionSpec extends PartitionFunctionSpec {
@@ -75,5 +76,4 @@ public class StreamWindowPartitionFunctionSpec extends PartitionFunctionSpec {
   public Integer getWindowType() {
     return windowType;
   }
-
 }

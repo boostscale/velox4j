@@ -16,14 +16,15 @@
 */
 package io.github.zhztheplayer.velox4j.plan;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.github.zhztheplayer.velox4j.type.RowType;
 
-import java.util.List;
-
-public class StreamRankNode extends PlanNode{
+public class StreamRankNode extends PlanNode {
   private final List<PlanNode> sources;
   private final PartitionFunctionSpec keySelectorSpec;
   private final PlanNode ranker;
