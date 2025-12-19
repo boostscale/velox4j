@@ -44,23 +44,23 @@ public class StreamWindowAggregationNode extends PlanNode {
 
   @JsonCreator
   public StreamWindowAggregationNode(
-          @JsonProperty("id") String id,
-          @JsonProperty("aggregation") PlanNode aggregation,
-          @JsonProperty("localAgg") PlanNode localAgg,
-          @JsonProperty("keySelectorSpec") PartitionFunctionSpec keySelectorSpec,
-          @JsonProperty("sliceAssignerSpec") PartitionFunctionSpec sliceAssignerSpec,
-          @JsonProperty("windowInterval") Long windowInterval,
-          @JsonProperty("useDayLightSaving") boolean useDayLightSaving,
-          @JsonProperty("isLocalAgg") boolean isLocalAgg,
-          @JsonProperty("size") Long size,
-          @JsonProperty("step") Long step,
-          @JsonProperty("offset") Long offset,
-          @JsonProperty("windowType") Integer windowType,
-          @JsonProperty("outputType") RowType outputType,
-          @JsonProperty("isRowTime") boolean isEventTime,
-          @JsonProperty("rowtimeIndex") Integer rowtimeIndex,
-          @JsonProperty("windowStartIndex") Integer windowStart,
-          @JsonProperty("windowEndIndex") Integer windowEnd) {
+      @JsonProperty("id") String id,
+      @JsonProperty("aggregation") PlanNode aggregation,
+      @JsonProperty("localAgg") PlanNode localAgg,
+      @JsonProperty("keySelectorSpec") PartitionFunctionSpec keySelectorSpec,
+      @JsonProperty("sliceAssignerSpec") PartitionFunctionSpec sliceAssignerSpec,
+      @JsonProperty("windowInterval") Long windowInterval,
+      @JsonProperty("useDayLightSaving") boolean useDayLightSaving,
+      @JsonProperty("isLocalAgg") boolean isLocalAgg,
+      @JsonProperty("size") Long size,
+      @JsonProperty("step") Long step,
+      @JsonProperty("offset") Long offset,
+      @JsonProperty("windowType") Integer windowType,
+      @JsonProperty("outputType") RowType outputType,
+      @JsonProperty("isRowTime") boolean isEventTime,
+      @JsonProperty("rowtimeIndex") Integer rowtimeIndex,
+      @JsonProperty("windowStartIndex") Integer windowStart,
+      @JsonProperty("windowEndIndex") Integer windowEnd) {
     super(id);
     this.aggregation = aggregation;
     this.localAgg = localAgg;
