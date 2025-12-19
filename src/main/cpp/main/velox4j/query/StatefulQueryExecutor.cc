@@ -19,6 +19,7 @@
 #include "velox4j/query/Query.h"
 
 #include <iostream>
+#include <string>
 #include <utility>
 
 namespace velox4j {
@@ -29,9 +30,14 @@ StatefulSerialTask::StatefulSerialTask(
     MemoryManager* memoryManager,
     std::shared_ptr<const Query> query)
     : memoryManager_(memoryManager), query_(std::move(query)) {
-  static std::atomic<uint32_t> executionId{
-      0}; // Velox query ID, same with taskId.
+  static std::atomic<uint32_t> executionId{0};
   const uint32_t eid = executionId++;
+  auto connectorConfigs = query_->connectorConfig()->toMap();
+  std::string taskIndex = std::to_string(eid);
+  for (const auto &[key, config] : connectorConfigs) {
+    taskIndex = config->get<std::string>("task_index", taskIndex);
+    break;
+  }
   core::PlanFragment planFragment{
       query_->plan(), core::ExecutionStrategy::kUngrouped, 1, {}};
   std::shared_ptr<core::QueryCtx> queryCtx = core::QueryCtx::create(
@@ -41,14 +47,14 @@ StatefulSerialTask::StatefulSerialTask(
       cache::AsyncDataCache::getInstance(),
       memoryManager_
           ->getVeloxPool(
-              fmt::format("Query Memory Pool - EID {}", std::to_string(eid)),
+              fmt::format("Query Memory Pool - EID {}", taskIndex),
               memory::MemoryPool::Kind::kAggregate)
           ->shared_from_this(),
       nullptr,
-      fmt::format("Query Context - EID {}", std::to_string(eid)));
+      fmt::format("Query Context - EID {}", taskIndex));
 
   auto task = stateful::StatefulTask::create(
-      fmt::format("Task - EID {}", std::to_string(eid)),
+      fmt::format("Task - EID {}", taskIndex),
       std::move(planFragment),
       std::move(queryCtx));
 
@@ -102,8 +108,8 @@ void StatefulSerialTask::snapshotState(long checkpointId) {
   task_->snapshotState();
 }
 
-void StatefulSerialTask::notifyCheckpointComplete(long checkpointId) {
-  task_->notifyCheckpointComplete(checkpointId);
+std::vector<std::string> StatefulSerialTask::notifyCheckpointComplete(long checkpointId) {
+  return task_->notifyCheckpointComplete(checkpointId);
 }
 
 void StatefulSerialTask::notifyCheckpointAborted(long checkpointId) {

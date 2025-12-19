@@ -33,6 +33,8 @@
 #include <velox/connectors/from_elements/FromElementsConnector.h>
 #include <velox/connectors/from_elements/FromElementsTableHandle.h>
 #include <velox/connectors/from_elements/FromElementsConnectorSplit.h>
+#include <velox/connectors/filesystem/FileSystemInsertTableHandle.h>
+#include <velox/connectors/filesystem/FileSystemConnector.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
 #include <velox/dwio/text/RegisterTextWriter.h>
@@ -118,6 +120,12 @@ void initForSpark() {
   connector::kafka::KafkaConnectorSplit::registerSerDe();
   connector::registerConnector(std::make_shared<connector::kafka::KafkaConnector>(
       "connector-kafka",
+      std::make_shared<facebook::velox::config::ConfigBase>(
+        std::unordered_map<std::string, std::string>()),
+      nullptr));
+  connector::filesystem::FileSystemInsertTableHandle::registerSerDe();
+  connector::registerConnector(std::make_shared<connector::filesystem::FileSystemConnector>(
+      "connector-filesystem",
       std::make_shared<facebook::velox::config::ConfigBase>(
         std::unordered_map<std::string, std::string>()),
       nullptr));

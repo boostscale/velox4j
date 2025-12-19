@@ -185,11 +185,20 @@ void snapshotState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
   JNI_METHOD_END()
 }
 
-void notifyCheckpointComplete(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
+jobject notifyCheckpointComplete(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
-  itr->notifyCheckpointComplete(checkpointId);
-  JNI_METHOD_END()
+  std::vector<std::string> committed = itr->notifyCheckpointComplete(checkpointId);
+  jclass stringClass = env->FindClass("java/lang/String");
+  jobjectArray result = env->NewObjectArray(committed.size(), stringClass, nullptr);
+  for (size_t i = 0; i < committed.size(); ++i) {
+    jstring str = env->NewStringUTF(committed[i].c_str());
+    env->SetObjectArrayElement(result, i, str);
+    env->DeleteLocalRef(str);
+  }
+  env->DeleteLocalRef(stringClass);
+  return result;
+  JNI_METHOD_END(nullptr)
 }
 
 void notifyCheckpointAborted(JNIEnv* env, jobject javaThis, jlong itrId, jlong checkpointId) {
@@ -480,7 +489,7 @@ void JniWrapper::initialize(JNIEnv* env) {
   addNativeMethod(
       "notifyCheckpointComplete",
        (void*)notifyCheckpointComplete,
-       kTypeVoid,
+       "[Ljava/lang/String;",
        kTypeLong,
        kTypeLong,
        nullptr);
