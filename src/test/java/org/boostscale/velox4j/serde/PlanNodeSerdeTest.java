@@ -174,6 +174,7 @@ public class PlanNodeSerdeTest {
                 ImmutableList.of("foo1", "bar1", "foo2", "bar2"),
                 ImmutableList.of(
                     new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
+            false,
             false);
     SerdeTests.testISerializableRoundTrip(joinNode);
   }
