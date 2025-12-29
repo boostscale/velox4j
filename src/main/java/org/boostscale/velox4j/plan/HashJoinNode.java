@@ -27,6 +27,7 @@ import org.boostscale.velox4j.type.RowType;
 
 public class HashJoinNode extends AbstractJoinNode {
   private final boolean nullAware;
+  private final boolean useHashTableCache;
 
   public HashJoinNode(
       String id,
@@ -37,9 +38,11 @@ public class HashJoinNode extends AbstractJoinNode {
       PlanNode left,
       PlanNode right,
       RowType outputType,
-      boolean nullAware) {
+      boolean nullAware,
+      boolean useHashTableCache) {
     super(id, joinType, leftKeys, rightKeys, filter, left, right, outputType);
     this.nullAware = nullAware;
+    this.useHashTableCache = useHashTableCache;
   }
 
   @JsonCreator
@@ -51,7 +54,8 @@ public class HashJoinNode extends AbstractJoinNode {
       @JsonProperty("filter") TypedExpr filter,
       @JsonProperty("sources") List<PlanNode> sources,
       @JsonProperty("outputType") RowType outputType,
-      @JsonProperty("nullAware") boolean nullAware) {
+      @JsonProperty("nullAware") boolean nullAware,
+      @JsonProperty("useHashTableCache") boolean useHashTableCache) {
     Preconditions.checkArgument(
         sources.size() == 2,
         String.format("HashJoinNode should have 2 sources, but has %s", sources.size()));
@@ -64,7 +68,8 @@ public class HashJoinNode extends AbstractJoinNode {
         sources.get(0),
         sources.get(1),
         outputType,
-        nullAware);
+        nullAware,
+        useHashTableCache);
   }
 
   @JsonGetter("nullAware")

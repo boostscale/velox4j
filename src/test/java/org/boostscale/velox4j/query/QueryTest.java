@@ -735,6 +735,7 @@ public class QueryTest {
                 ImmutableList.of("n_nationkey", "n_name", "r_regionkey", "r_name"),
                 ImmutableList.of(
                     new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
+            false,
             false);
     final Query query = new Query(hashJoinNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);
