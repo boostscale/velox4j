@@ -164,10 +164,17 @@ jobject statefulTaskGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_END(nullptr)
 }
 
-void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark, jint index) {
+void notifyIndexedWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark, jint index) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
   itr->notifyWatermark(watermark, index);
+  JNI_METHOD_END()
+}
+
+void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyWatermark(watermark);
   JNI_METHOD_END()
 }
 
@@ -465,12 +472,19 @@ void JniWrapper::initialize(JNIEnv* env) {
        kTypeLong,
        nullptr);
   addNativeMethod(
+      "notifyIndexedWatermark",
+       (void*)notifyIndexedWatermark,
+       kTypeVoid,
+       kTypeLong,
+       kTypeLong,
+       kTypeInt,
+       nullptr);
+  addNativeMethod(
       "notifyWatermark",
        (void*)notifyWatermark,
        kTypeVoid,
        kTypeLong,
        kTypeLong,
-       kTypeInt,
        nullptr);
   addNativeMethod(
       "initializeState",
