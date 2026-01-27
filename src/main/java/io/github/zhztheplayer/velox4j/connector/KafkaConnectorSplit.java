@@ -120,4 +120,3 @@ public class KafkaConnectorSplit extends ConnectorSplit {
     }
   }
 }
-
