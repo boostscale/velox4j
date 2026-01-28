@@ -59,6 +59,11 @@ public class SerialTask implements UpIterator {
     jniApi.notifyWatermark(this, watermark, index);
   }
 
+  // This method is for Flink
+  public void notifyWatermark(long watermark) {
+    jniApi.notifyWatermark(this, watermark);
+  }
+
   @Override
   public long id() {
     return id;
