@@ -171,6 +171,13 @@ void notifyIndexedWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong wa
   JNI_METHOD_END()
 }
 
+void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+  itr->notifyWatermark(watermark);
+  JNI_METHOD_END()
+}
+
 void initializeState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context, jstring keyedStateBackendConfigString) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);

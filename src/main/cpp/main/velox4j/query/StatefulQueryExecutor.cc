@@ -103,6 +103,10 @@ void StatefulSerialTask::notifyWatermark(long watermark, int index) {
   task_->notifyWatermark(watermark, index);
 }
 
+void StatefulSerialTask::notifyWatermark(long watermark) {
+  task_->notifyWatermark(watermark);
+}
+
 void StatefulSerialTask::initializeState(long checkpointId, std::string keyedStateBackendConfigString) {
   folly::dynamic obj = folly::parseJson(keyedStateBackendConfigString);
   std::shared_ptr<const stateful::KeyedStateBackendParameters> params = stateful::KeyedStateBackendParameters::create(obj, nullptr);
