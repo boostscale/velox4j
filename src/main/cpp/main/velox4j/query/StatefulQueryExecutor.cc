@@ -100,6 +100,10 @@ void StatefulSerialTask::notifyWatermark(long watermark, int index) {
   task_->notifyWatermark(watermark, index);
 }
 
+void StatefulSerialTask::notifyWatermark(long watermark) {
+  task_->notifyWatermark(watermark);
+}
+
 void StatefulSerialTask::initializeState(long checkpointId) {
   task_->initializeState();
 }
