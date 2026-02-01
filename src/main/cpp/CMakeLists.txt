@@ -65,7 +65,8 @@ set(VELOX_SOURCE_URL
 FetchContent_Declare(
   velox
   URL ${VELOX_SOURCE_URL}
-  URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
+  URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
+  PATCH_COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/patch-folly.sh)
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
