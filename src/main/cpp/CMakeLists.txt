@@ -37,12 +37,16 @@ if(JNI_FOUND)
 endif()
 include(UseJava)
 
-# Check for SO_INCOMING_NAPI_ID availability and define it if missing.
-# This is needed for CentOS 7 and other systems with older kernel headers.
+# Check for SO_INCOMING_NAPI_ID availability and define it if missing. This is
+# needed for CentOS 7 and other systems with older kernel headers.
 include(CheckSymbolExists)
-check_symbol_exists(SO_INCOMING_NAPI_ID "sys/socket.h;linux/socket.h" HAVE_SO_INCOMING_NAPI_ID)
+check_symbol_exists(SO_INCOMING_NAPI_ID "sys/socket.h;linux/socket.h"
+                    HAVE_SO_INCOMING_NAPI_ID)
 if(NOT HAVE_SO_INCOMING_NAPI_ID)
-  message(STATUS "SO_INCOMING_NAPI_ID not found, defining it for compatibility with older kernels")
+  message(
+    STATUS
+      "SO_INCOMING_NAPI_ID not found, defining it for compatibility with older kernels"
+  )
   add_compile_definitions(SO_INCOMING_NAPI_ID=56)
 endif()
 
