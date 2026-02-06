@@ -178,10 +178,11 @@ void notifyWatermark(JNIEnv* env, jobject javaThis, jlong itrId, jlong watermark
   JNI_METHOD_END()
 }
 
-void initializeState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context) {
+void initializeState(JNIEnv* env, jobject javaThis, jlong itrId, jlong context, jstring keyedStateBackendConfigString) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
-  itr->initializeState(context);
+  spotify::jni::JavaString jTypeJson{env, keyedStateBackendConfigString};
+  itr->initializeState(context, jTypeJson.get());
   JNI_METHOD_END()
 }
 
@@ -492,6 +493,7 @@ void JniWrapper::initialize(JNIEnv* env) {
        kTypeVoid,
        kTypeLong,
        kTypeLong,
+       kTypeString,
        nullptr);
   addNativeMethod(
       "snapshotState",
