@@ -10,7 +10,7 @@ target_link_libraries(
     velox_vector_test_lib
     velox_dwio_common_test_utils
     velox_file_test_utils
-    velox_temp_path
+    velox_test_util
     velox_exec_test_lib)
 set(TEST_OBJECT_FILES $<TARGET_OBJECTS:velox_fuzzer_connector>)
 
