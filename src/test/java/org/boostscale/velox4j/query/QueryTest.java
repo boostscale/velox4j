@@ -973,13 +973,7 @@ public class QueryTest {
             planNodeId,
             outputType,
             new HiveTableHandle(
-                "connector-hive",
-                "tab-1",
-                false,
-                ImmutableList.of(),
-                null,
-                outputType,
-                ImmutableMap.of()),
+                "connector-hive", "tab-1", ImmutableList.of(), null, outputType, ImmutableMap.of()),
             toAssignments(outputType));
     return scanNode;
   }
