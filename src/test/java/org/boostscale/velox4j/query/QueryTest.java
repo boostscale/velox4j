@@ -975,7 +975,6 @@ public class QueryTest {
             new HiveTableHandle(
                 "connector-hive",
                 "tab-1",
-                false,
                 ImmutableList.of(),
                 null,
                 outputType,

@@ -224,7 +224,6 @@ public final class SerdeTests {
         new HiveTableHandle(
             "connector-1",
             "tab-1",
-            true,
             ImmutableList.of(new SubfieldFilter("complex_type[1].id", new AlwaysTrue())),
             new CallTypedExpr(new BooleanType(), Collections.emptyList(), "always_true"),
             outputType,

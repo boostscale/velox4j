@@ -26,7 +26,6 @@ import org.boostscale.velox4j.type.RowType;
 
 public class HiveTableHandle extends ConnectorTableHandle {
   private final String tableName;
-  private final boolean filterPushdownEnabled;
   private final List<SubfieldFilter> subfieldFilters;
   private final TypedExpr remainingFilter;
   private final RowType dataColumns;
@@ -36,14 +35,12 @@ public class HiveTableHandle extends ConnectorTableHandle {
   public HiveTableHandle(
       @JsonProperty("connectorId") String connectorId,
       @JsonProperty("tableName") String tableName,
-      @JsonProperty("filterPushdownEnabled") boolean filterPushdownEnabled,
       @JsonProperty("subfieldFilters") List<SubfieldFilter> subfieldFilters,
       @JsonProperty("remainingFilter") TypedExpr remainingFilter,
       @JsonProperty("dataColumns") RowType dataColumns,
       @JsonProperty("tableParameters") Map<String, String> tableParameters) {
     super(connectorId);
     this.tableName = tableName;
-    this.filterPushdownEnabled = filterPushdownEnabled;
     this.subfieldFilters = subfieldFilters;
     this.remainingFilter = remainingFilter;
     this.dataColumns = dataColumns;
@@ -57,11 +54,6 @@ public class HiveTableHandle extends ConnectorTableHandle {
   @JsonGetter("tableName")
   public String getTableName() {
     return tableName;
-  }
-
-  @JsonGetter("filterPushdownEnabled")
-  public boolean isFilterPushdownEnabled() {
-    return filterPushdownEnabled;
   }
 
   @JsonGetter("subfieldFilters")
