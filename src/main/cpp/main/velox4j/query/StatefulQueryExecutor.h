@@ -43,7 +43,9 @@ class StatefulSerialTask : public UpIterator {
 
   void notifyWatermark(long watermark, int index);
 
-  void initializeState(long checkpointId);
+  void notifyWatermark(long watermark);
+
+  void initializeState(long checkpointId, std::string keyedStateBackendConfigString);
 
   void snapshotState(long checkpointId);
 

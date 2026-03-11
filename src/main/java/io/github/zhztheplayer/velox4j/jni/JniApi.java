@@ -98,11 +98,15 @@ public final class JniApi {
   }
 
   public void notifyWatermark(UpIterator itr, long watermark, int index) {
-    jni.notifyWatermark(itr.id(), watermark, index);
+    jni.notifyIndexedWatermark(itr.id(), watermark, index);
   }
 
-  public void initializeState(UpIterator itr, long context) {
-    jni.initializeState(itr.id(), context);
+  public void notifyWatermark(UpIterator itr, long watermark) {
+    jni.notifyWatermark(itr.id(), watermark);
+  }
+
+  public void initializeState(UpIterator itr, long context, String keyedStateBackendConfigString) {
+    jni.initializeState(itr.id(), context, keyedStateBackendConfigString);
   }
 
   public void snapshotState(UpIterator itr, long context) {

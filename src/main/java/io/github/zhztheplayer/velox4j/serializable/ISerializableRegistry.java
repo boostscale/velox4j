@@ -65,6 +65,8 @@ import io.github.zhztheplayer.velox4j.query.Query;
 import io.github.zhztheplayer.velox4j.serde.Serde;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistry;
 import io.github.zhztheplayer.velox4j.serde.SerdeRegistryFactory;
+import io.github.zhztheplayer.velox4j.stateful.KeyedStateBackendParameters;
+import io.github.zhztheplayer.velox4j.stateful.RocksDBKeyedStateBackendParameters;
 import io.github.zhztheplayer.velox4j.type.ArrayType;
 import io.github.zhztheplayer.velox4j.type.BigIntType;
 import io.github.zhztheplayer.velox4j.type.BooleanType;
@@ -214,6 +216,9 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("TopNNode", TopNNode.class);
     NAME_REGISTRY.registerClass("GroupAggregationNode", GroupAggregationNode.class);
     NAME_REGISTRY.registerClass("GroupAggsHandlerNode", GroupAggsHandlerNode.class);
+    NAME_REGISTRY.registerClass("KeyedStateBackendParameters", KeyedStateBackendParameters.class);
+    NAME_REGISTRY.registerClass(
+        "RocksDBKeyedStateBackendParameters", RocksDBKeyedStateBackendParameters.class);
   }
 
   private static void registerWindow() {

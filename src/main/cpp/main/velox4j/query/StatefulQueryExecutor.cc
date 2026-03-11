@@ -16,11 +16,14 @@
  */
 
 #include "StatefulQueryExecutor.h"
+#include <velox/experimental/stateful/state/StateBackend.h>
+#include <velox/experimental/stateful/state/RocksDBStateBackend.h>
 #include "velox4j/query/Query.h"
-
-#include <iostream>
 #include <string>
 #include <utility>
+#include <folly/json.h>
+#include <folly/json/dynamic.h>
+#include <folly/json/json.h>
 
 namespace velox4j {
 
@@ -100,8 +103,20 @@ void StatefulSerialTask::notifyWatermark(long watermark, int index) {
   task_->notifyWatermark(watermark, index);
 }
 
-void StatefulSerialTask::initializeState(long checkpointId) {
-  task_->initializeState();
+void StatefulSerialTask::notifyWatermark(long watermark) {
+  task_->notifyWatermark(watermark);
+}
+
+void StatefulSerialTask::initializeState(long checkpointId, std::string keyedStateBackendConfigString) {
+  folly::dynamic obj = folly::parseJson(keyedStateBackendConfigString);
+  std::shared_ptr<const stateful::KeyedStateBackendParameters> params = stateful::KeyedStateBackendParameters::create(obj, nullptr);
+  if (params && params->getBackendType() == stateful::StateBackendType::ROCKSDB) {
+    auto rocksdbParams = stateful::RocksDBKeyedStateBackendParameters::create(obj, nullptr);
+    task_->initializeState(rocksdbParams);
+  } else {
+    // params maybe null, then initialize by using default heap state backend.
+    task_->initializeState(params);
+  }
 }
 
 void StatefulSerialTask::snapshotState(long checkpointId) {
