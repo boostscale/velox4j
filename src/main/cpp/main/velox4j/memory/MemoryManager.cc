@@ -320,16 +320,16 @@ bool MemoryManager::tryDestruct() {
         });
     VELOX_CHECK(
         spillPoolCount == 1,
-        "Illegal pool count state: spillPoolCount: " +
-            std::to_string(spillPoolCount));
+        "Illegal pool count state: spillPoolCount: {}",
+        spillPoolCount);
     VELOX_CHECK(
         cachePoolCount == 1,
-        "Illegal pool count state: cachePoolCount: " +
-            std::to_string(cachePoolCount));
+        "Illegal pool count state: cachePoolCount: {}",
+        cachePoolCount);
     VELOX_CHECK(
         tracePoolCount == 1,
-        "Illegal pool count state: tracePoolCount: " +
-            std::to_string(tracePoolCount));
+        "Illegal pool count state: tracePoolCount: {}",
+        tracePoolCount);
   }
   veloxMemoryManager_.reset();
 
@@ -367,7 +367,8 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
     VELOX_CHECK_EQ(
         pool->kind(),
         kind,
-        "Pool [" + name + "] was already created but with different kind");
+        "Pool [{}] was already created but with different kind",
+        name);
     return pool.get();
   }
   switch (kind) {
