@@ -39,9 +39,11 @@ import org.boostscale.velox4j.plan.WindowNode;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.sort.SortOrder;
 import org.boostscale.velox4j.test.Velox4jTests;
+import org.boostscale.velox4j.type.BigIntType;
 import org.boostscale.velox4j.type.BooleanType;
 import org.boostscale.velox4j.type.IntegerType;
 import org.boostscale.velox4j.type.RowType;
+import org.boostscale.velox4j.type.VarbinaryType;
 import org.boostscale.velox4j.variant.BooleanValue;
 import org.boostscale.velox4j.variant.IntegerValue;
 import org.boostscale.velox4j.window.BoundType;
@@ -205,6 +207,17 @@ public class PlanNodeSerdeTest {
   public void testTableWriteNode() {
     final RowType rowType = SerdeTests.newSampleOutputType();
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1", rowType);
+    // The outputType for TableWriteNode must match Velox's computed type, which includes:
+    // metadata columns (rows, fragments, commitcontext) followed by column stats columns.
+    final RowType tableWriteOutputType =
+        new RowType(
+            ImmutableList.of("rows", "fragments", "commitcontext", "foo", "sum"),
+            ImmutableList.of(
+                new BigIntType(),
+                new VarbinaryType(),
+                new VarbinaryType(),
+                new IntegerType(),
+                new IntegerType()));
     final TableWriteNode tableWriteNode =
         new TableWriteNode(
             "id-2",
@@ -214,7 +227,7 @@ public class PlanNodeSerdeTest {
             "connector-1",
             SerdeTests.newSampleHiveInsertTableHandle(),
             true,
-            rowType,
+            tableWriteOutputType,
             CommitStrategy.TASK_COMMIT,
             ImmutableList.of(scan));
     SerdeTests.testISerializableRoundTrip(tableWriteNode);
