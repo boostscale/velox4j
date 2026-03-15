@@ -48,6 +48,7 @@ import org.boostscale.velox4j.window.BoundType;
 import org.boostscale.velox4j.window.WindowFrame;
 import org.boostscale.velox4j.window.WindowFunction;
 import org.boostscale.velox4j.window.WindowType;
+import org.boostscale.velox4j.write.ColumnStatsSpec;
 
 public class PlanNodeSerdeTest {
   private static BytesAllocationListener allocationListener;
@@ -205,16 +206,20 @@ public class PlanNodeSerdeTest {
   public void testTableWriteNode() {
     final RowType rowType = SerdeTests.newSampleOutputType();
     final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1", rowType);
+    final ColumnStatsSpec columnStatsSpec = SerdeTests.newSampleColumnStatsSpec();
+    // The outputType for TableWriteNode must match Velox's computed type, which includes:
+    // metadata columns (rows, fragments, commitcontext) followed by column stats columns.
+    final RowType tableWriteOutputType = session.tableWriteTraitsOps().outputType(columnStatsSpec);
     final TableWriteNode tableWriteNode =
         new TableWriteNode(
             "id-2",
             rowType,
             rowType.getNames(),
-            SerdeTests.newSampleColumnStatsSpec(),
+            columnStatsSpec,
             "connector-1",
             SerdeTests.newSampleHiveInsertTableHandle(),
             true,
-            rowType,
+            tableWriteOutputType,
             CommitStrategy.TASK_COMMIT,
             ImmutableList.of(scan));
     SerdeTests.testISerializableRoundTrip(tableWriteNode);
