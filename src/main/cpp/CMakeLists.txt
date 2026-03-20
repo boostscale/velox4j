@@ -81,6 +81,12 @@ FetchContent_Declare(
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
 FetchContent_MakeAvailable(velox)
 
+# velox_rpc_node_test uses gmock but its CMakeLists.txt does not link GTest::gmock,
+# which means gmock headers are not on the include path. Fix it here.
+if(TARGET velox_rpc_node_test)
+  target_link_libraries(velox_rpc_node_test PRIVATE GTest::gmock)
+endif()
+
 # Import JniHelpers.
 set(JNI_HELPERS_REPO spotify/JniHelpers)
 set(JNI_HELPERS_REF 956649eb352252ff6c43362d9b9c526f9241e480)
