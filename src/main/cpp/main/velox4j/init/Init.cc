@@ -42,6 +42,7 @@
 #include <velox/experimental/stateful/StatefulPlanNode.h>
 #include <velox/experimental/stateful/state/StateBackend.h>
 #include <velox/experimental/stateful/state/RocksDBStateBackend.h>
+#include <velox/experimental/stateful/InternalTimerService.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
 #include <velox/functions/sparksql/aggregates/Register.h>
@@ -56,6 +57,7 @@
 #include "velox4j/eval/Evaluation.h"
 #include "velox4j/init/Config.h"
 #include "velox4j/query/Query.h"
+#include "velox4j/jni/StatefulTimerService.h"
 
 namespace velox4j {
 
@@ -168,6 +170,8 @@ void initForSpark() {
   stateful::StatefulPlanNode::registerSerDe();
   stateful::KeyedStateBackendParameters::registerSerDe();
   stateful::RocksDBKeyedStateBackendParameters::registerSerDe();
+  stateful::registerTimerService<int64_t, int64_t>("stateful-timer-service",
+    std::make_shared<velox4j::StatefulTimerService<int64_t, int64_t>>("stateful-timer-service"));
   core::ITypedExpr::registerSerDe();
   exec::registerPartitionFunctionSerDe();
 }
