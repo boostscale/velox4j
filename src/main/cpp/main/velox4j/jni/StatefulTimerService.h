@@ -52,6 +52,9 @@ class StatefulTimerService : public facebook::velox::stateful::InternalTimerServ
   
   void registerProcessingTimeTimers(const std::unordered_map<K, std::map<N, int64_t>>& timers) override {
     // 必须用 GlobalRef 保存 operator_：local ref 不能跨线程；首次可能在 A 线程 init，后续在 timer 线程调用
+    if (operator_ == nullptr) {
+      init();
+    }
     JNIEnv* env = getLocalJNIEnv();
     if (env == nullptr || operator_ == nullptr || registerTimerMethodId_ == nullptr) {
       return;
