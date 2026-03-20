@@ -17,8 +17,15 @@ name: C++ UT
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 4 * * *"
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    paths:
+      - '**/*'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**/*'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
