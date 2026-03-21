@@ -12,6 +12,13 @@ target_link_libraries(
     velox_file_test_utils
     velox_test_util
     velox_exec_test_lib)
+
+# velox_rpc_node_test (from Velox) includes <gmock/gmock.h> but its upstream
+# CMakeLists.txt omits GTest::gmock from its link libraries, so the gmock
+# headers are never added to the include path. Add the missing dependency here.
+if(TARGET velox_rpc_node_test)
+  target_link_libraries(velox_rpc_node_test GTest::gmock)
+endif()
 set(TEST_OBJECT_FILES $<TARGET_OBJECTS:velox_fuzzer_connector>)
 
 add_executable(velox4j_query_serde_test ${TEST_OBJECT_FILES}
