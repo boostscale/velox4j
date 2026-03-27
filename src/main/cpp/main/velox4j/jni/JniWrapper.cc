@@ -206,10 +206,9 @@ jlongArray
 baseVectorDeserializeFromBuf(JNIEnv* env, jobject javaThis, jbyteArray buf) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
-  jsize len = env->GetArrayLength(buf);
-  jbyte* bytes = env->GetByteArrayElements(buf, nullptr);
-  std::string data(reinterpret_cast<char*>(bytes), len);
-  env->ReleaseByteArrayElements(buf, bytes, JNI_ABORT);
+  auto safeArray = getByteArrayElementsSafe(env, buf);
+  std::string data(
+      reinterpret_cast<const char*>(safeArray.elems()), safeArray.length());
   std::istringstream dataStream(data);
   auto pool = session->memoryManager()->getVeloxPool(
       "Decoding Memory Pool", memory::MemoryPool::Kind::kLeaf);
