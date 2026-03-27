@@ -64,6 +64,9 @@ final class JniWrapper {
 
   native long[] baseVectorDeserialize(String serialized);
 
+  // Deserialize vectors from raw binary (no Base64 decoding). More efficient for network transport.
+  native long[] baseVectorDeserializeFromBuf(byte[] buf);
+
   native long baseVectorWrapInConstant(long id, int length, int index);
 
   native long baseVectorSlice(long id, int offset, int length);

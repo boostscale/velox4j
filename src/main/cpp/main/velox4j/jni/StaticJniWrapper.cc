@@ -192,6 +192,29 @@ jstring baseVectorSerialize(JNIEnv* env, jobject javaThis, jlongArray vids) {
   JNI_METHOD_END(nullptr)
 }
 
+// Serialize vectors to a raw byte array (no Base64 encoding).
+// More efficient than baseVectorSerialize() for binary transport protocols.
+jbyteArray
+baseVectorSerializeToBuf(JNIEnv* env, jobject javaThis, jlongArray vids) {
+  JNI_METHOD_START
+  std::ostringstream out;
+  auto safeArray = getLongArrayElementsSafe(env, vids);
+  for (int i = 0; i < safeArray.length(); ++i) {
+    const jlong& vid = safeArray.elems()[i];
+    auto vector = ObjectStore::retrieve<BaseVector>(vid);
+    saveVector(*vector, out);
+  }
+  auto serializedData = out.str();
+  jbyteArray byteArray = env->NewByteArray(serializedData.size());
+  env->SetByteArrayRegion(
+      byteArray,
+      0,
+      serializedData.size(),
+      reinterpret_cast<const jbyte*>(serializedData.data()));
+  return byteArray;
+  JNI_METHOD_END(nullptr)
+}
+
 jstring baseVectorGetType(JNIEnv* env, jobject javaThis, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
@@ -364,6 +387,12 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "baseVectorSerialize",
       (void*)baseVectorSerialize,
       kTypeString,
+      kTypeArray(kTypeLong),
+      nullptr);
+  addNativeMethod(
+      "baseVectorSerializeToBuf",
+      (void*)baseVectorSerializeToBuf,
+      kTypeArray(kTypeByte),
       kTypeArray(kTypeLong),
       nullptr);
   addNativeMethod(

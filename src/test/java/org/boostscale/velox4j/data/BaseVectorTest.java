@@ -95,6 +95,47 @@ public class BaseVectorTest {
   }
 
   @Test
+  public void testSerializeDeserializeRoundTrip() {
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    // Serialize using Base64 (existing API)
+    final String serialized = BaseVectors.serializeOne(input);
+    final BaseVector deserialized = session.baseVectorOps().deserializeOne(serialized);
+    BaseVectorTests.assertEquals(input, deserialized);
+  }
+
+  @Test
+  public void testSerializeDeserializeBufRoundTrip() {
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    // Serialize using raw binary (new API)
+    final byte[] buf = BaseVectors.serializeOneToBuf(input);
+    final BaseVector deserialized = session.baseVectorOps().deserializeOneFromBuf(buf);
+    BaseVectorTests.assertEquals(input, deserialized);
+  }
+
+  @Test
+  public void testSerializeBufMultipleVectors() {
+    final RowVector input1 = BaseVectorTests.newSampleRowVector(session);
+    final RowVector input2 = BaseVectorTests.newSampleRowVector(session);
+    final byte[] buf = BaseVectors.serializeAllToBuf(ImmutableList.of(input1, input2));
+    final java.util.List<BaseVector> deserialized =
+        session.baseVectorOps().deserializeAllFromBuf(buf);
+    Assert.assertEquals(2, deserialized.size());
+    BaseVectorTests.assertEquals(input1, deserialized.get(0));
+    BaseVectorTests.assertEquals(input2, deserialized.get(1));
+  }
+
+  @Test
+  public void testSerializeBufConsistentWithBase64() {
+    // Verify that the binary and Base64 serialization produce equivalent results
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    final BaseVector fromBase64 =
+        session.baseVectorOps().deserializeOne(BaseVectors.serializeOne(input));
+    final BaseVector fromBuf =
+        session.baseVectorOps().deserializeOneFromBuf(BaseVectors.serializeOneToBuf(input));
+    BaseVectorTests.assertEquals(fromBase64, fromBuf);
+  }
+
+  @Test
   public void testAppend() {
     final RowVector input1 = BaseVectorTests.newSampleRowVector(session);
     final RowVector input2 = BaseVectorTests.newSampleRowVector(session);

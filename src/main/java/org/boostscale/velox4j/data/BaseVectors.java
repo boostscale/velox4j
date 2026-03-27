@@ -48,8 +48,33 @@ public class BaseVectors {
     return StaticJniApi.get().baseVectorSerialize(vectors);
   }
 
+  /** Serialize a single vector to raw binary bytes (no Base64). Efficient for network transport. */
+  public static byte[] serializeOneToBuf(BaseVector vector) {
+    return StaticJniApi.get().baseVectorSerializeToBuf(ImmutableList.of(vector));
+  }
+
+  /**
+   * Serialize multiple vectors to raw binary bytes (no Base64). Efficient for network transport.
+   */
+  public static byte[] serializeAllToBuf(List<? extends BaseVector> vectors) {
+    return StaticJniApi.get().baseVectorSerializeToBuf(vectors);
+  }
+
   public List<BaseVector> deserializeAll(String serialized) {
     return jniApi.baseVectorDeserialize(serialized);
+  }
+
+  /** Deserialize a single vector from raw binary bytes (no Base64). */
+  public BaseVector deserializeOneFromBuf(byte[] buf) {
+    final List<BaseVector> vectors = jniApi.baseVectorDeserializeFromBuf(buf);
+    Preconditions.checkState(
+        vectors.size() == 1, String.format("Expected one vector, but got %s", vectors.size()));
+    return vectors.get(0);
+  }
+
+  /** Deserialize multiple vectors from raw binary bytes (no Base64). */
+  public List<BaseVector> deserializeAllFromBuf(byte[] buf) {
+    return jniApi.baseVectorDeserializeFromBuf(buf);
   }
 
   public static String toString(List<? extends BaseVector> vectors) {

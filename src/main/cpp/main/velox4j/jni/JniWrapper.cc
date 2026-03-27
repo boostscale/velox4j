@@ -201,6 +201,31 @@ baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   JNI_METHOD_END(nullptr)
 }
 
+// Deserialize vectors from a raw byte array (no Base64 decoding).
+jlongArray
+baseVectorDeserializeFromBuf(JNIEnv* env, jobject javaThis, jbyteArray buf) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  jsize len = env->GetArrayLength(buf);
+  jbyte* bytes = env->GetByteArrayElements(buf, nullptr);
+  std::string data(reinterpret_cast<char*>(bytes), len);
+  env->ReleaseByteArrayElements(buf, bytes, JNI_ABORT);
+  std::istringstream dataStream(data);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Decoding Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  std::vector<ObjectHandle> vids{};
+  while (dataStream.tellg() < data.size()) {
+    const VectorPtr& vector = restoreVector(dataStream, pool);
+    const ObjectHandle vid = session->objectStore()->save(vector);
+    vids.push_back(vid);
+  }
+  const jsize& outLen = static_cast<jsize>(vids.size());
+  const jlongArray& out = env->NewLongArray(outLen);
+  env->SetLongArrayRegion(out, 0, outLen, vids.data());
+  return out;
+  JNI_METHOD_END(nullptr)
+}
+
 jlong baseVectorWrapInConstant(
     JNIEnv* env,
     jobject javaThis,
@@ -504,6 +529,12 @@ void JniWrapper::initialize(JNIEnv* env) {
       (void*)baseVectorDeserialize,
       kTypeArray(kTypeLong),
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "baseVectorDeserializeFromBuf",
+      (void*)baseVectorDeserializeFromBuf,
+      kTypeArray(kTypeLong),
+      kTypeArray(kTypeByte),
       nullptr);
   addNativeMethod(
       "baseVectorWrapInConstant",
