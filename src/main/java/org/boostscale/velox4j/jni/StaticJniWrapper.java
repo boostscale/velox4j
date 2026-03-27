@@ -68,6 +68,9 @@ public class StaticJniWrapper {
 
   native String baseVectorSerialize(long[] id);
 
+  // Serialize vectors to raw binary (no Base64 encoding). More efficient for network transport.
+  native byte[] baseVectorSerializeToBuf(long[] id);
+
   native String baseVectorGetType(long id);
 
   native int baseVectorGetSize(long id);

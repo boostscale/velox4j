@@ -113,6 +113,12 @@ public final class JniApi {
         .collect(Collectors.toList());
   }
 
+  public List<BaseVector> baseVectorDeserializeFromBuf(byte[] buf) {
+    return Arrays.stream(jni.baseVectorDeserializeFromBuf(buf))
+        .mapToObj(this::baseVectorWrap)
+        .collect(Collectors.toList());
+  }
+
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
     return baseVectorWrap(jni.baseVectorWrapInConstant(vector.id(), length, index));
   }

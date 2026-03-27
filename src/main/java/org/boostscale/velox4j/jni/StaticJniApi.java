@@ -120,6 +120,11 @@ public class StaticJniApi {
     return jni.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
   }
 
+  /** Serialize vectors to raw binary bytes (no Base64 encoding). */
+  public byte[] baseVectorSerializeToBuf(List<? extends BaseVector> vector) {
+    return jni.baseVectorSerializeToBuf(vector.stream().mapToLong(BaseVector::id).toArray());
+  }
+
   public Type baseVectorGetType(BaseVector vector) {
     final String typeJson = jni.baseVectorGetType(vector.id());
     return Serde.fromJson(typeJson, Type.class);
