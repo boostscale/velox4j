@@ -31,6 +31,7 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
   private final Map<String, String> serdeParameters;
   private final boolean ensureFiles;
   private final FileNameGenerator fileNameGenerator;
+  private final Map<String, String> storageParameters;
 
   @JsonCreator
   public HiveInsertTableHandle(
@@ -41,7 +42,8 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
       @JsonProperty("compressionKind") CompressionKind compressionKind,
       @JsonProperty("serdeParameters") Map<String, String> serdeParameters,
       @JsonProperty("ensureFiles") boolean ensureFiles,
-      @JsonProperty("fileNameGenerator") FileNameGenerator fileNameGenerator) {
+      @JsonProperty("fileNameGenerator") FileNameGenerator fileNameGenerator,
+      @JsonProperty("storageParameters") Map<String, String> storageParameters) {
     this.inputColumns = inputColumns;
     this.locationHandle = locationHandle;
     this.storageFormat = storageFormat;
@@ -50,6 +52,7 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
     this.serdeParameters = serdeParameters;
     this.ensureFiles = ensureFiles;
     this.fileNameGenerator = fileNameGenerator;
+    this.storageParameters = storageParameters;
   }
 
   @JsonGetter("inputColumns")
@@ -90,6 +93,11 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
   @JsonGetter("fileNameGenerator")
   public FileNameGenerator getFileNameGenerator() {
     return fileNameGenerator;
+  }
+
+  @JsonGetter("storageParameters")
+  public Map<String, String> getStorageParameters() {
+    return storageParameters;
   }
 
   @Override
