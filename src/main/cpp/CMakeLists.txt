@@ -81,12 +81,6 @@ FetchContent_Declare(
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5})
 FetchContent_MakeAvailable(velox)
 
-# Fix: velox_hive_connector_test uses gmock but does not link against it.
-# Add GTest::gmock to its link libraries so that gmock headers are found.
-if(VELOX4J_BUILD_TESTING AND TARGET velox_hive_connector_test)
-  target_link_libraries(velox_hive_connector_test PRIVATE GTest::gmock)
-endif()
-
 # Import JniHelpers.
 set(JNI_HELPERS_REPO spotify/JniHelpers)
 set(JNI_HELPERS_REF 956649eb352252ff6c43362d9b9c526f9241e480)
