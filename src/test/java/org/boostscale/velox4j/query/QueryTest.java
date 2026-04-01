@@ -907,7 +907,8 @@ public class QueryTest {
             CompressionKind.GZIP,
             ImmutableMap.of(),
             true,
-            new HiveInsertFileNameGenerator());
+            new HiveInsertFileNameGenerator(),
+            ImmutableMap.of());
     final RowType outputType = TableWriteTraits.outputType();
     final TableWriteNode tableWriteNode =
         new TableWriteNode(

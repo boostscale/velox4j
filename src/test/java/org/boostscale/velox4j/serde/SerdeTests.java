@@ -259,7 +259,8 @@ public final class SerdeTests {
         CompressionKind.ZLIB,
         ImmutableMap.of("serde_key", "serde_value"),
         false,
-        new HiveInsertFileNameGenerator());
+        new HiveInsertFileNameGenerator(),
+        ImmutableMap.of("storage_key", "storage_value"));
   }
 
   public static RowType newSampleOutputType() {
