@@ -133,6 +133,36 @@ NOTE:
 mvn clean install
 ```
 
+### Build on Amazon Linux 2023
+
+A setup script is provided to install all required dependencies on AL2023:
+
+```shell
+# 1. Run the setup script (as root or with sudo).
+sudo bash .github/workflows/scripts/common/setup-al2023.sh
+
+# 2. Set JAVA_HOME and build.
+export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+mvn clean install -DskipTests -Dspotless.check.skip=true
+```
+
+Alternatively, use Docker from any Linux machine:
+
+```shell
+docker run --init -it -v $(pwd):/velox4j -w /velox4j amazonlinux:2023 bash
+
+# Inside the container:
+export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+bash .github/workflows/scripts/common/setup-al2023.sh
+mvn clean install -DskipTests -Dspotless.check.skip=true
+```
+
+NOTE: The `-Dspotless.check.skip=true` flag is required when building with JDK 21
+because the Spotless code formatter plugin is not yet compatible with JDK 21.
+
+The AL2023 CI workflow is manual-only. To trigger it on GitHub, go to
+Actions → "Java UT (Amazon Linux 2023)" → "Run workflow".
+
 ## Get Started
 
 The following is a brief example of using Velox4J to execute a query:

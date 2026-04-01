@@ -1,0 +1,74 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Java UT (Amazon Linux 2023)
+
+on:
+  workflow_dispatch:
+  # Uncomment the following to enable auto triggers on PRs and pushes to main.
+  # pull_request:
+  #   types: [ opened, reopened, synchronize ]
+  #   paths:
+  #     - '**/*'
+  # push:
+  #   branches:
+  #     - 'main'
+  #   paths:
+  #     - '**/*'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  ut-al2023:
+    runs-on: ubuntu-latest
+    env:
+      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CCACHE_MAXSIZE: 3000M
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore Ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: '${{ env.HOST_CCACHE_DIR }}'
+          key: ut-java-ut-al2023-ccache-${{github.sha}}
+          restore-keys: |
+            ut-java-ut-al2023-ccache-
+      - name: Run setup script / Build C++ libraries
+        run: |
+          docker run --init -d --name test-container -v ${{ github.workspace }}:/velox4j -w /velox4j amazonlinux:2023 sleep infinity
+          docker exec test-container bash -c "
+            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_MAXSIZE=3000M
+            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+            bash .github/workflows/scripts/common/setup-al2023.sh
+            mvn clean generate-resources
+          "
+      - name: Run UTs
+        run: |
+          docker exec test-container bash -c "
+            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+            mvn clean test -Dskip.cpp.build -Dspotless.check.skip=true
+          "
+      - name: Stop Docker container
+        run: |
+          docker stop test-container
+      - name: Save Ccache
+        uses: actions/cache/save@v4
+        with:
+          path: '${{ env.HOST_CCACHE_DIR }}'
+          key: ut-java-ut-al2023-ccache-${{github.sha}}
