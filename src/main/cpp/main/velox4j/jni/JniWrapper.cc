@@ -17,6 +17,7 @@
 #include <velox/common/memory/Memory.h>
 #include <velox/connectors/hive/PartitionIdGenerator.h>
 #include <velox/core/PlanNode.h>
+#include <velox/exec/HashPartitionFunction.h>
 #include <velox/exec/OperatorUtils.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VariantToVector.h>
@@ -263,7 +264,8 @@ jlongArray rowVectorPartitionByKeys(
     JNIEnv* env,
     jobject javaThis,
     jlong vid,
-    jintArray jKeyChannels) {
+    jintArray jKeyChannels,
+    jint maxPartitions) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
@@ -277,8 +279,12 @@ jlongArray rowVectorPartitionByKeys(
     keyChannels[i] = safeArray.elems()[i];
   }
 
+  VELOX_USER_CHECK_GT(maxPartitions, 0, "maxPartitions must be positive");
   connector::hive::PartitionIdGenerator idGen{
-      asRowType(inputRowVector->type()), keyChannels, 128, pool};
+      asRowType(inputRowVector->type()),
+      keyChannels,
+      static_cast<uint32_t>(maxPartitions),
+      pool};
 
   raw_vector<uint64_t> partitionIds{};
   idGen.run(inputRowVector, partitionIds);
@@ -330,6 +336,189 @@ jlongArray rowVectorPartitionByKeys(
   const jlongArray out = env->NewLongArray(outVector.size());
   env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
   return out;
+
+  JNI_METHOD_END(nullptr)
+}
+
+jlongArray rowVectorHashPartition(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jintArray jKeyChannels,
+    jint numPartitions) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Hash Partition Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  const auto inputNumRows = inputRowVector->size();
+
+  auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
+  std::vector<column_index_t> keyChannels(safeArray.length());
+  for (jsize i = 0; i < safeArray.length(); ++i) {
+    keyChannels[i] = safeArray.elems()[i];
+  }
+
+  VELOX_USER_CHECK_GT(numPartitions, 0, "numPartitions must be positive");
+
+  exec::HashPartitionFunction hashFunc(
+      false, numPartitions, asRowType(inputRowVector->type()), keyChannels);
+
+  std::vector<uint32_t> partitions(inputNumRows);
+  hashFunc.partition(*inputRowVector, partitions);
+
+  std::vector<vector_size_t> partitionSizes(numPartitions, 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    ++partitionSizes[partitions[row]];
+  }
+
+  std::vector<BufferPtr> partitionRows(numPartitions);
+  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
+  for (int pid = 0; pid < numPartitions; ++pid) {
+    partitionRows[pid] = allocateIndices(partitionSizes[pid], pool);
+    rawPartitionRows[pid] = partitionRows[pid]->asMutable<vector_size_t>();
+  }
+
+  std::vector<vector_size_t> partitionNextRowOffset(numPartitions, 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto pid = partitions[row];
+    rawPartitionRows[pid][partitionNextRowOffset[pid]] = row;
+    ++partitionNextRowOffset[pid];
+  }
+
+  std::vector<jlong> outVector(numPartitions, 0);
+  for (int pid = 0; pid < numPartitions; ++pid) {
+    const vector_size_t partitionSize = partitionSizes[pid];
+    if (partitionSize == 0) {
+      continue;
+    }
+    const RowVectorPtr rowVector = partitionSize == inputNumRows
+        ? inputRowVector
+        : exec::wrap(partitionSize, partitionRows[pid], inputRowVector);
+    outVector[pid] = session->objectStore()->save(rowVector);
+  }
+
+  const jlongArray out = env->NewLongArray(outVector.size());
+  env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
+  return out;
+
+  JNI_METHOD_END(nullptr)
+}
+
+jobjectArray rowVectorHashPartitionAndSerialize(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong vid,
+    jintArray jKeyChannels,
+    jint numPartitions) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Hash Partition And Serialize Memory Pool",
+      memory::MemoryPool::Kind::kLeaf);
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  const auto inputNumRows = inputRowVector->size();
+
+  auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
+  std::vector<column_index_t> keyChannels(safeArray.length());
+  for (jsize i = 0; i < safeArray.length(); ++i) {
+    keyChannels[i] = safeArray.elems()[i];
+  }
+
+  VELOX_USER_CHECK_GT(numPartitions, 0, "numPartitions must be positive");
+
+  exec::HashPartitionFunction hashFunc(
+      false, numPartitions, asRowType(inputRowVector->type()), keyChannels);
+
+  std::vector<uint32_t> partitions(inputNumRows);
+  hashFunc.partition(*inputRowVector, partitions);
+
+  std::vector<vector_size_t> partitionSizes(numPartitions, 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    ++partitionSizes[partitions[row]];
+  }
+
+  std::vector<BufferPtr> partitionRows(numPartitions);
+  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
+  for (int pid = 0; pid < numPartitions; ++pid) {
+    partitionRows[pid] = allocateIndices(partitionSizes[pid], pool);
+    rawPartitionRows[pid] = partitionRows[pid]->asMutable<vector_size_t>();
+  }
+
+  std::vector<vector_size_t> partitionNextRowOffset(numPartitions, 0);
+  for (auto row = 0; row < inputNumRows; ++row) {
+    const auto pid = partitions[row];
+    rawPartitionRows[pid][partitionNextRowOffset[pid]] = row;
+    ++partitionNextRowOffset[pid];
+  }
+
+  jclass byteArrayClass = env->FindClass("[B");
+  jobjectArray result =
+      env->NewObjectArray(numPartitions, byteArrayClass, nullptr);
+
+  for (int pid = 0; pid < numPartitions; ++pid) {
+    const vector_size_t partitionSize = partitionSizes[pid];
+    if (partitionSize == 0) {
+      continue;
+    }
+    const RowVectorPtr rowVector = partitionSize == inputNumRows
+        ? inputRowVector
+        : exec::wrap(partitionSize, partitionRows[pid], inputRowVector);
+
+    std::ostringstream out;
+    saveVector(*rowVector, out);
+    const std::string& serialized = out.str();
+
+    jbyteArray bytes = env->NewByteArray(serialized.size());
+    env->SetByteArrayRegion(
+        bytes,
+        0,
+        serialized.size(),
+        reinterpret_cast<const jbyte*>(serialized.data()));
+    env->SetObjectArrayElement(result, pid, bytes);
+    env->DeleteLocalRef(bytes);
+  }
+
+  return result;
+
+  JNI_METHOD_END(nullptr)
+}
+
+jlong baseVectorDeserializeOneFromBuf(
+    JNIEnv* env,
+    jobject javaThis,
+    jbyteArray buf) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto pool = session->memoryManager()->getVeloxPool(
+      "Deserialize From Buf Memory Pool", memory::MemoryPool::Kind::kLeaf);
+
+  jsize len = env->GetArrayLength(buf);
+  std::string data(len, '\0');
+  env->GetByteArrayRegion(buf, 0, len, reinterpret_cast<jbyte*>(data.data()));
+
+  std::istringstream dataStream(data);
+  const VectorPtr& vector = restoreVector(dataStream, pool);
+  return session->objectStore()->save(vector);
+
+  JNI_METHOD_END(-1L)
+}
+
+jbyteArray
+baseVectorSerializeOneToBuf(JNIEnv* env, jobject javaThis, jlong vid) {
+  JNI_METHOD_START
+  auto vector = ObjectStore::retrieve<BaseVector>(vid);
+  std::ostringstream out;
+  saveVector(*vector, out);
+  const std::string& serialized = out.str();
+
+  jbyteArray bytes = env->NewByteArray(serialized.size());
+  env->SetByteArrayRegion(
+      bytes,
+      0,
+      serialized.size(),
+      reinterpret_cast<const jbyte*>(serialized.data()));
+  return bytes;
 
   JNI_METHOD_END(nullptr)
 }
@@ -563,6 +752,7 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeArray(kTypeLong),
       kTypeLong,
       kTypeArray(kTypeInt),
+      kTypeInt,
       nullptr);
   addNativeMethod(
       "createSelectivityVector",
@@ -590,6 +780,34 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeString,
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "rowVectorHashPartition",
+      (void*)rowVectorHashPartition,
+      kTypeArray(kTypeLong),
+      kTypeLong,
+      kTypeArray(kTypeInt),
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "rowVectorHashPartitionAndSerialize",
+      (void*)rowVectorHashPartitionAndSerialize,
+      "[[B",
+      kTypeLong,
+      kTypeArray(kTypeInt),
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
+      "baseVectorSerializeOneToBuf",
+      (void*)baseVectorSerializeOneToBuf,
+      "[B",
+      kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "baseVectorDeserializeOneFromBuf",
+      (void*)baseVectorDeserializeOneFromBuf,
+      kTypeLong,
+      "[B",
       nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",

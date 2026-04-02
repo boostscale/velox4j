@@ -73,7 +73,15 @@ final class JniWrapper {
 
   native long baseVectorFlatten(long id);
 
-  native long[] rowVectorPartitionByKeys(long id, int[] keyChannels);
+  native long[] rowVectorPartitionByKeys(long id, int[] keyChannels, int maxPartitions);
+
+  native long[] rowVectorHashPartition(long id, int[] keyChannels, int numPartitions);
+
+  native byte[][] rowVectorHashPartitionAndSerialize(long id, int[] keyChannels, int numPartitions);
+
+  native byte[] baseVectorSerializeOneToBuf(long id);
+
+  native long baseVectorDeserializeOneFromBuf(byte[] buf);
 
   native long createSelectivityVector(int length);
 

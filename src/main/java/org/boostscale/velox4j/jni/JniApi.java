@@ -128,12 +128,46 @@ public final class JniApi {
   }
 
   public List<RowVector> rowVectorPartitionByKeys(RowVector vector, List<Integer> keyChannels) {
+    return rowVectorPartitionByKeys(vector, keyChannels, 128);
+  }
+
+  public List<RowVector> rowVectorPartitionByKeys(
+      RowVector vector, List<Integer> keyChannels, int maxPartitions) {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
-    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray);
+    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray, maxPartitions);
     return Arrays.stream(vids)
         .mapToObj(this::baseVectorWrap)
         .map(BaseVector::asRowVector)
         .collect(Collectors.toList());
+  }
+
+  public List<RowVector> rowVectorHashPartition(
+      RowVector vector, List<Integer> keyChannels, int numPartitions) {
+    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
+    final long[] vids = jni.rowVectorHashPartition(vector.id(), keyChannelArray, numPartitions);
+    return Arrays.stream(vids)
+        .mapToObj(
+            vid -> {
+              if (vid == 0) {
+                return null;
+              }
+              return baseVectorWrap(vid).asRowVector();
+            })
+        .collect(Collectors.toList());
+  }
+
+  public byte[][] rowVectorHashPartitionAndSerialize(
+      RowVector vector, List<Integer> keyChannels, int numPartitions) {
+    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
+    return jni.rowVectorHashPartitionAndSerialize(vector.id(), keyChannelArray, numPartitions);
+  }
+
+  public byte[] baseVectorSerializeOneToBuf(BaseVector vector) {
+    return jni.baseVectorSerializeOneToBuf(vector.id());
+  }
+
+  public BaseVector baseVectorDeserializeOneFromBuf(byte[] buf) {
+    return baseVectorWrap(jni.baseVectorDeserializeOneFromBuf(buf));
   }
 
   public BaseVector flattenVector(BaseVector vector) {
