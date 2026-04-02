@@ -350,7 +350,14 @@ jlongArray rowVectorHashPartition(
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
       "Hash Partition Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  // Materialize lazy columns before partitioning. exec::wrap() creates
+  // dictionary views over the original vector — if it has lazy columns
+  // (e.g. from a Parquet scan), the wraps inherit them and will fail
+  // when accessed outside the scan's lifecycle.
+  VectorPtr inputVec = std::dynamic_pointer_cast<BaseVector>(inputRowVector);
+  flattenVector(inputVec, inputRowVector->size());
+  inputRowVector = std::dynamic_pointer_cast<RowVector>(inputVec);
   const auto inputNumRows = inputRowVector->size();
 
   auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
@@ -416,7 +423,11 @@ jobjectArray rowVectorHashPartitionAndSerialize(
   auto pool = session->memoryManager()->getVeloxPool(
       "Hash Partition And Serialize Memory Pool",
       memory::MemoryPool::Kind::kLeaf);
-  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
+  // Materialize lazy columns before partitioning and serializing.
+  VectorPtr inputVec = std::dynamic_pointer_cast<BaseVector>(inputRowVector);
+  flattenVector(inputVec, inputRowVector->size());
+  inputRowVector = std::dynamic_pointer_cast<RowVector>(inputVec);
   const auto inputNumRows = inputRowVector->size();
 
   auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
