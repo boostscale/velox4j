@@ -174,7 +174,7 @@ public class HashPartitionTest {
   @Test
   public void testSerializeOneToBufRoundTrip() {
     RowVector vector = createTestVector();
-    byte[] serialized = session.baseVectorOps().serializeOneToBuf(vector);
+    byte[] serialized = BaseVectors.serializeOneToBuf(vector);
     Assert.assertNotNull(serialized);
     Assert.assertTrue(serialized.length > 0);
 

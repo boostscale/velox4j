@@ -162,14 +162,6 @@ public final class JniApi {
     return jni.rowVectorHashPartitionAndSerialize(vector.id(), keyChannelArray, numPartitions);
   }
 
-  public byte[] baseVectorSerializeOneToBuf(BaseVector vector) {
-    return jni.baseVectorSerializeOneToBuf(vector.id());
-  }
-
-  public BaseVector baseVectorDeserializeOneFromBuf(byte[] buf) {
-    return baseVectorWrap(jni.baseVectorDeserializeOneFromBuf(buf));
-  }
-
   public BaseVector flattenVector(BaseVector vector) {
     return baseVectorWrap(jni.baseVectorFlatten(vector.id()));
   }

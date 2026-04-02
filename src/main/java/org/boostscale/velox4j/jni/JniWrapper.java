@@ -79,10 +79,6 @@ final class JniWrapper {
 
   native byte[][] rowVectorHashPartitionAndSerialize(long id, int[] keyChannels, int numPartitions);
 
-  native byte[] baseVectorSerializeOneToBuf(long id);
-
-  native long baseVectorDeserializeOneFromBuf(byte[] buf);
-
   native long createSelectivityVector(int length);
 
   // For TableWrite.

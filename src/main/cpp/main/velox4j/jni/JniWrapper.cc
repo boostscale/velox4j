@@ -484,45 +484,6 @@ jobjectArray rowVectorHashPartitionAndSerialize(
   JNI_METHOD_END(nullptr)
 }
 
-jlong baseVectorDeserializeOneFromBuf(
-    JNIEnv* env,
-    jobject javaThis,
-    jbyteArray buf) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  auto pool = session->memoryManager()->getVeloxPool(
-      "Deserialize From Buf Memory Pool", memory::MemoryPool::Kind::kLeaf);
-
-  jsize len = env->GetArrayLength(buf);
-  std::string data(len, '\0');
-  env->GetByteArrayRegion(buf, 0, len, reinterpret_cast<jbyte*>(data.data()));
-
-  std::istringstream dataStream(data);
-  const VectorPtr& vector = restoreVector(dataStream, pool);
-  return session->objectStore()->save(vector);
-
-  JNI_METHOD_END(-1L)
-}
-
-jbyteArray
-baseVectorSerializeOneToBuf(JNIEnv* env, jobject javaThis, jlong vid) {
-  JNI_METHOD_START
-  auto vector = ObjectStore::retrieve<BaseVector>(vid);
-  std::ostringstream out;
-  saveVector(*vector, out);
-  const std::string& serialized = out.str();
-
-  jbyteArray bytes = env->NewByteArray(serialized.size());
-  env->SetByteArrayRegion(
-      bytes,
-      0,
-      serialized.size(),
-      reinterpret_cast<const jbyte*>(serialized.data()));
-  return bytes;
-
-  JNI_METHOD_END(nullptr)
-}
-
 jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_START
   auto vector =
@@ -796,18 +757,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeArray(kTypeInt),
       kTypeInt,
-      nullptr);
-  addNativeMethod(
-      "baseVectorSerializeOneToBuf",
-      (void*)baseVectorSerializeOneToBuf,
-      "[B",
-      kTypeLong,
-      nullptr);
-  addNativeMethod(
-      "baseVectorDeserializeOneFromBuf",
-      (void*)baseVectorDeserializeOneFromBuf,
-      kTypeLong,
-      "[B",
       nullptr);
   addNativeMethod(
       "createUpIteratorWithExternalStream",

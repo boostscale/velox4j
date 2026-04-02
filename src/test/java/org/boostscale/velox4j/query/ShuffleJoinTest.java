@@ -27,6 +27,7 @@ import org.boostscale.velox4j.config.Config;
 import org.boostscale.velox4j.config.ConnectorConfig;
 import org.boostscale.velox4j.connector.*;
 import org.boostscale.velox4j.data.BaseVector;
+import org.boostscale.velox4j.data.BaseVectors;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.expression.FieldAccessTypedExpr;
 import org.boostscale.velox4j.iterator.UpIterators;
@@ -201,7 +202,7 @@ public class ShuffleJoinTest {
     List<RowVector> regionBatches = scanTable(REGION_FILE);
     List<byte[]> broadcastBuffers = new ArrayList<>();
     for (RowVector batch : regionBatches) {
-      broadcastBuffers.add(session.baseVectorOps().serializeOneToBuf(batch));
+      broadcastBuffers.add(BaseVectors.serializeOneToBuf(batch));
     }
 
     // Step 2: Scan the large table (would be local shards on each data node)
