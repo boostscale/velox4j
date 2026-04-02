@@ -5,7 +5,9 @@ set -o pipefail
 set -u
 
 # Install essentials.
-dnf -y install wget curl tar zip unzip which patch sudo git
+# Use --allowerasing to replace curl-minimal (shipped in the base Docker image)
+# with the full curl package required by other dependencies.
+dnf -y install --allowerasing wget curl tar zip unzip which patch sudo git xz
 dnf -y install ninja-build perl-IPC-Cmd autoconf autoconf-archive automake libtool
 dnf -y install gcc-c++ python3 python3-pip
 dnf -y install bison flex
