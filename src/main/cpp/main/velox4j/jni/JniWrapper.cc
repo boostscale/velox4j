@@ -751,14 +751,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
-      "rowVectorHashPartitionAndSerialize",
-      (void*)rowVectorHashPartitionAndSerialize,
-      "[[B",
-      kTypeLong,
-      kTypeArray(kTypeInt),
-      kTypeInt,
-      nullptr);
-  addNativeMethod(
       "createUpIteratorWithExternalStream",
       (void*)createUpIteratorWithExternalStream,
       kTypeLong,
@@ -766,6 +758,16 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
 
   registerNativeMethods(env);
+
+  // Use raw JNI registration for methods with nested array types (e.g.
+  // byte[][]) that JniHelpers' addNativeMethod cannot handle.
+  // See registerNativeMethodRaw() in JniCommon.h for details.
+  registerNativeMethodRaw(
+      env,
+      _clazz,
+      "rowVectorHashPartitionAndSerialize",
+      "(J[II)[[B",
+      reinterpret_cast<void*>(rowVectorHashPartitionAndSerialize));
 }
 
 } // namespace velox4j

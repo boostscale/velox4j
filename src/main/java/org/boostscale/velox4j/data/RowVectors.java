@@ -58,9 +58,9 @@ public class RowVectors {
   }
 
   /**
-   * Hash-partitions and serializes a RowVector in a single JNI call. Returns byte[][] indexed by
-   * partition number. Null entries for empty partitions. Uses Velox native binary format
-   * (compatible with {@link BaseVectors#deserializeOneFromBuf}).
+   * Hash-partitions and serializes a RowVector. Returns byte[][] indexed by partition number. Null
+   * entries for empty partitions. Uses Velox native binary format (compatible with {@link
+   * BaseVectors#deserializeOneFromBuf}).
    */
   public byte[][] hashPartitionAndSerialize(
       RowVector rowVector, List<Integer> keyChannels, int numPartitions) {
