@@ -85,6 +85,45 @@ jobs:
           path: '${{ env.HOST_CCACHE_DIR }}'
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
 
+  ut-al2023:
+    runs-on: ubuntu-latest
+    env:
+      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CCACHE_MAXSIZE: 3000M
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore Ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: '${{ env.HOST_CCACHE_DIR }}'
+          key: ut-java-ut-al2023-ccache-${{github.sha}}
+          restore-keys: |
+            ut-java-ut-al2023-ccache-
+      - name: Run setup script / Build C++ libraries
+        run: |
+          docker run --init -d --name al2023-container -v ${{ github.workspace }}:/velox4j -w /velox4j amazonlinux:latest sleep infinity
+          docker exec al2023-container bash -c "
+            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_MAXSIZE=3000M
+            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+            bash .github/workflows/scripts/common/setup-al2023.sh
+            mvn clean generate-resources
+          "
+      - name: Run UTs
+        run: |
+          docker exec al2023-container bash -c "
+            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+            mvn clean test -Dskip.cpp.build -Dspotless.check.skip=true
+          "
+      - name: Stop Docker container
+        run: |
+          docker stop al2023-container
+      - name: Save Ccache
+        uses: actions/cache/save@v4
+        with:
+          path: '${{ env.HOST_CCACHE_DIR }}'
+          key: ut-java-ut-al2023-ccache-${{github.sha}}
+
   ut-centos7:
     runs-on: ubuntu-latest
     env:

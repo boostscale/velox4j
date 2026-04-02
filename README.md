@@ -160,9 +160,6 @@ mvn clean install -DskipTests -Dspotless.check.skip=true
 NOTE: The `-Dspotless.check.skip=true` flag is required when building with JDK 21
 because the Spotless code formatter plugin is not yet compatible with JDK 21.
 
-The AL2023 CI workflow is manual-only. To trigger it on GitHub, go to
-Actions → "Java UT (Amazon Linux 2023)" → "Run workflow".
-
 ## Get Started
 
 The following is a brief example of using Velox4J to execute a query:
