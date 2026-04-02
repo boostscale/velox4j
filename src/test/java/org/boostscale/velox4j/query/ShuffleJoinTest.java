@@ -198,14 +198,16 @@ public class ShuffleJoinTest {
    */
   @Test
   public void testBroadcastJoin() {
-    // Step 1: Scan the small table and serialize it (this would be broadcast to all nodes)
+    // Step 1: Scan the small table and serialize it (this would be broadcast to all nodes).
+    // Flatten to materialize lazy columns from Parquet scan before serializing.
     List<RowVector> regionBatches = scanTable(REGION_FILE);
     List<byte[]> broadcastBuffers = new ArrayList<>();
     for (RowVector batch : regionBatches) {
-      broadcastBuffers.add(BaseVectors.serializeOneToBuf(batch));
+      broadcastBuffers.add(BaseVectors.serializeOneToBuf(batch.flattenedVector()));
     }
 
-    // Step 2: Scan the large table (would be local shards on each data node)
+    // Step 2: Scan the large table (would be local shards on each data node).
+    // Flatten to materialize lazy columns before feeding into the join.
     List<RowVector> nationBatches = scanTable(NATION_FILE);
 
     // Step 3: On each "data node", join local nation data with broadcast region data
@@ -214,7 +216,7 @@ public class ShuffleJoinTest {
 
     // Feed nation data (probe side)
     for (RowVector batch : nationBatches) {
-      leftQueue.put(batch);
+      leftQueue.put(batch.flattenedVector().asRowVector());
     }
     leftQueue.noMoreInput();
 
