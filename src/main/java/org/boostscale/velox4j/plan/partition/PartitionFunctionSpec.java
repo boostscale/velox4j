@@ -13,6 +13,7 @@
  */
 package org.boostscale.velox4j.plan.partition;
 
+import org.boostscale.velox4j.plan.LocalPartitionNode;
 import org.boostscale.velox4j.serializable.ISerializable;
 
 /** Base class for partition function specifications used by {@link LocalPartitionNode}. */
