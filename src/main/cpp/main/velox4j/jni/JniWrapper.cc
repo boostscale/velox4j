@@ -17,7 +17,6 @@
 #include <velox/common/memory/Memory.h>
 #include <velox/connectors/hive/PartitionIdGenerator.h>
 #include <velox/core/PlanNode.h>
-#include <velox/exec/HashPartitionFunction.h>
 #include <velox/exec/OperatorUtils.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VariantToVector.h>
@@ -32,6 +31,7 @@
 #include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
+#include "velox4j/shuffle/ShuffleWriter.h"
 #include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
@@ -350,15 +350,7 @@ jlongArray rowVectorHashPartition(
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
       "Hash Partition Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
-  // Materialize lazy columns before partitioning. exec::wrap() creates
-  // dictionary views over the original vector — if it has lazy columns
-  // (e.g. from a Parquet scan), the wraps inherit them and will fail
-  // when accessed outside the scan's lifecycle.
-  VectorPtr inputVec = std::dynamic_pointer_cast<BaseVector>(inputRowVector);
-  flattenVector(inputVec, inputRowVector->size());
-  inputRowVector = std::dynamic_pointer_cast<RowVector>(inputVec);
-  const auto inputNumRows = inputRowVector->size();
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
 
   auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
   std::vector<column_index_t> keyChannels(safeArray.length());
@@ -366,43 +358,14 @@ jlongArray rowVectorHashPartition(
     keyChannels[i] = safeArray.elems()[i];
   }
 
-  VELOX_USER_CHECK_GT(numPartitions, 0, "numPartitions must be positive");
-
-  exec::HashPartitionFunction hashFunc(
-      false, numPartitions, asRowType(inputRowVector->type()), keyChannels);
-
-  std::vector<uint32_t> partitions(inputNumRows);
-  hashFunc.partition(*inputRowVector, partitions);
-
-  std::vector<vector_size_t> partitionSizes(numPartitions, 0);
-  for (auto row = 0; row < inputNumRows; ++row) {
-    ++partitionSizes[partitions[row]];
-  }
-
-  std::vector<BufferPtr> partitionRows(numPartitions);
-  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
-  for (int pid = 0; pid < numPartitions; ++pid) {
-    partitionRows[pid] = allocateIndices(partitionSizes[pid], pool);
-    rawPartitionRows[pid] = partitionRows[pid]->asMutable<vector_size_t>();
-  }
-
-  std::vector<vector_size_t> partitionNextRowOffset(numPartitions, 0);
-  for (auto row = 0; row < inputNumRows; ++row) {
-    const auto pid = partitions[row];
-    rawPartitionRows[pid][partitionNextRowOffset[pid]] = row;
-    ++partitionNextRowOffset[pid];
-  }
+  ShuffleWriter writer(std::move(keyChannels), numPartitions, pool);
+  auto partitions = writer.partition(inputRowVector);
 
   std::vector<jlong> outVector(numPartitions, 0);
   for (int pid = 0; pid < numPartitions; ++pid) {
-    const vector_size_t partitionSize = partitionSizes[pid];
-    if (partitionSize == 0) {
-      continue;
+    if (partitions[pid] != nullptr) {
+      outVector[pid] = session->objectStore()->save(partitions[pid]);
     }
-    const RowVectorPtr rowVector = partitionSize == inputNumRows
-        ? inputRowVector
-        : exec::wrap(partitionSize, partitionRows[pid], inputRowVector);
-    outVector[pid] = session->objectStore()->save(rowVector);
   }
 
   const jlongArray out = env->NewLongArray(outVector.size());
@@ -423,12 +386,7 @@ jobjectArray rowVectorHashPartitionAndSerialize(
   auto pool = session->memoryManager()->getVeloxPool(
       "Hash Partition And Serialize Memory Pool",
       memory::MemoryPool::Kind::kLeaf);
-  auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
-  // Materialize lazy columns before partitioning and serializing.
-  VectorPtr inputVec = std::dynamic_pointer_cast<BaseVector>(inputRowVector);
-  flattenVector(inputVec, inputRowVector->size());
-  inputRowVector = std::dynamic_pointer_cast<RowVector>(inputVec);
-  const auto inputNumRows = inputRowVector->size();
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
 
   auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
   std::vector<column_index_t> keyChannels(safeArray.length());
@@ -436,56 +394,23 @@ jobjectArray rowVectorHashPartitionAndSerialize(
     keyChannels[i] = safeArray.elems()[i];
   }
 
-  VELOX_USER_CHECK_GT(numPartitions, 0, "numPartitions must be positive");
-
-  exec::HashPartitionFunction hashFunc(
-      false, numPartitions, asRowType(inputRowVector->type()), keyChannels);
-
-  std::vector<uint32_t> partitions(inputNumRows);
-  hashFunc.partition(*inputRowVector, partitions);
-
-  std::vector<vector_size_t> partitionSizes(numPartitions, 0);
-  for (auto row = 0; row < inputNumRows; ++row) {
-    ++partitionSizes[partitions[row]];
-  }
-
-  std::vector<BufferPtr> partitionRows(numPartitions);
-  std::vector<vector_size_t*> rawPartitionRows(numPartitions);
-  for (int pid = 0; pid < numPartitions; ++pid) {
-    partitionRows[pid] = allocateIndices(partitionSizes[pid], pool);
-    rawPartitionRows[pid] = partitionRows[pid]->asMutable<vector_size_t>();
-  }
-
-  std::vector<vector_size_t> partitionNextRowOffset(numPartitions, 0);
-  for (auto row = 0; row < inputNumRows; ++row) {
-    const auto pid = partitions[row];
-    rawPartitionRows[pid][partitionNextRowOffset[pid]] = row;
-    ++partitionNextRowOffset[pid];
-  }
+  ShuffleWriter writer(std::move(keyChannels), numPartitions, pool);
+  auto buffers = writer.partitionAndSerialize(inputRowVector);
 
   jclass byteArrayClass = env->FindClass("[B");
   jobjectArray result =
       env->NewObjectArray(numPartitions, byteArrayClass, nullptr);
 
   for (int pid = 0; pid < numPartitions; ++pid) {
-    const vector_size_t partitionSize = partitionSizes[pid];
-    if (partitionSize == 0) {
+    if (buffers[pid].empty()) {
       continue;
     }
-    const RowVectorPtr rowVector = partitionSize == inputNumRows
-        ? inputRowVector
-        : exec::wrap(partitionSize, partitionRows[pid], inputRowVector);
-
-    std::ostringstream out;
-    saveVector(*rowVector, out);
-    const std::string& serialized = out.str();
-
-    jbyteArray bytes = env->NewByteArray(serialized.size());
+    jbyteArray bytes = env->NewByteArray(buffers[pid].size());
     env->SetByteArrayRegion(
         bytes,
         0,
-        serialized.size(),
-        reinterpret_cast<const jbyte*>(serialized.data()));
+        buffers[pid].size(),
+        reinterpret_cast<const jbyte*>(buffers[pid].data()));
     env->SetObjectArrayElement(result, pid, bytes);
     env->DeleteLocalRef(bytes);
   }
