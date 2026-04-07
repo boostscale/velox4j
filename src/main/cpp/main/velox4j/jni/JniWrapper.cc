@@ -54,7 +54,8 @@ jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jExprJson{env, evalJson};
   auto evaluationSerdePool = session->memoryManager()->getVeloxPool(
-      "Evaluation Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Evaluation Serde Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   auto exprDynamic = folly::parseJson(jExprJson.get());
   auto evaluation =
       ISerializable::deserialize<Evaluation>(exprDynamic, evaluationSerdePool);
@@ -86,7 +87,8 @@ jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
   auto querySerdePool = session->memoryManager()->getVeloxPool(
-      fmt::format("Query Serde Memory Pool"), memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Query Serde Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   // Keep the pool alive until the task is finished.
   auto queryDynamic = folly::parseJson(jQueryJson.get());
   auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
@@ -142,7 +144,8 @@ void typeToArrow(
   auto dynamic = folly::parseJson(jTypeJson.get());
   auto type = Type::create(dynamic);
   auto typePool = session->memoryManager()->getVeloxPool(
-      "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Type Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   fromTypeToArrow(
       typePool, type, reinterpret_cast<struct ArrowSchema*>(cSchema));
   JNI_METHOD_END()
@@ -155,7 +158,8 @@ jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
   auto dynamic = folly::parseJson(jTypeJson.get());
   auto type = Type::create(dynamic);
   auto vectorPool = session->memoryManager()->getVeloxPool(
-      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("BaseVector Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   auto vector = BaseVector::create(type, 0, vectorPool);
   return session->objectStore()->save(vector);
   JNI_METHOD_END(-1L)
@@ -170,7 +174,8 @@ jlong arrowToBaseVector(
   // TODO Session memory pool.
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
-      "Arrow Import Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Arrow Import Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   auto vector = fromArrowToBaseVector(
       pool,
       reinterpret_cast<struct ArrowSchema*>(cSchema),
@@ -187,7 +192,8 @@ baseVectorDeserialize(JNIEnv* env, jobject javaThis, jstring serialized) {
   auto decoded = encoding::Base64::decode(jSerialized.get());
   std::istringstream dataStream(decoded);
   auto pool = session->memoryManager()->getVeloxPool(
-      "Decoding Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Decoding Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   std::vector<ObjectHandle> vids{};
   while (dataStream.tellg() < decoded.size()) {
     const VectorPtr& vector = restoreVector(dataStream, pool);
@@ -267,7 +273,8 @@ jlongArray rowVectorPartitionByKeys(
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
-      "Partition By Keys Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Partition By Keys Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
   const auto inputNumRows = inputRowVector->size();
 
@@ -351,7 +358,8 @@ jstring tableWriteTraitsOutputTypeFromColumnStatsSpec(
   spotify::jni::JavaString jJson{env, columnStatsSpecJson};
   auto dynamic = folly::parseJson(jJson.get());
   auto serdePool = session->memoryManager()->getVeloxPool(
-      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Serde Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   auto columnStatSpec = core::ColumnStatsSpec::create(dynamic, serdePool);
   auto type = exec::TableWriteTraits::outputType(columnStatSpec);
   auto serializedDynamic = type->serialize();
@@ -364,7 +372,8 @@ jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto serdePool = session->memoryManager()->getVeloxPool(
-      "Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("Serde Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jJson{env, json};
   auto dynamic = folly::parseJson(jJson.get());
   auto deserialized = std::const_pointer_cast<ISerializable>(
@@ -391,7 +400,8 @@ jlong variantToVector(
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto vectorPool = session->memoryManager()->getVeloxPool(
-      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      session->memoryManager()->uniquePoolName("BaseVector Memory Pool"),
+      memory::MemoryPool::Kind::kLeaf);
   spotify::jni::JavaString jTypeJson{env, typeJson};
   spotify::jni::JavaString jVariantJson{env, variantJson};
   auto type = Type::create(folly::parseJson(jTypeJson.get()));

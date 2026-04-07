@@ -362,6 +362,7 @@ MemoryManager::~MemoryManager() {
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
     const std::string& name,
     const velox::memory::MemoryPool::Kind& kind) {
+  std::lock_guard<std::mutex> guard(poolMutex_);
   if (veloxPoolRefs_.count(name) > 0) {
     const auto& pool = veloxPoolRefs_[name];
     VELOX_CHECK_EQ(
@@ -389,6 +390,10 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
     }
   }
   VELOX_FAIL("Unreachable code");
+}
+
+std::string MemoryManager::uniquePoolName(const std::string& baseName) {
+  return fmt::format("{} #{}", baseName, poolIdCounter_++);
 }
 
 arrow::MemoryPool* MemoryManager::getArrowPool(const std::string& name) {
