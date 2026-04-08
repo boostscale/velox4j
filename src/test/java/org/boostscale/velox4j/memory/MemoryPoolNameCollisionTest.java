@@ -76,7 +76,7 @@ public class MemoryPoolNameCollisionTest {
    * Memory Pool already exists in root"
    */
   @Test
-  public void testMultipleQueriesOnSameMemoryManager() {
+  public void testMultipleQueriesOnSameMemoryManager() throws Exception {
     for (int i = 0; i < 5; i++) {
       Session session = Velox4j.newSession(memoryManager);
       try {
@@ -92,7 +92,7 @@ public class MemoryPoolNameCollisionTest {
    * within a single session too.
    */
   @Test
-  public void testMultipleQueriesOnSameSession() {
+  public void testMultipleQueriesOnSameSession() throws Exception {
     Session session = Velox4j.newSession(memoryManager);
     try {
       for (int i = 0; i < 5; i++) {
@@ -160,7 +160,7 @@ public class MemoryPoolNameCollisionTest {
     }
   }
 
-  private void runSimpleQuery(Session session) {
+  private void runSimpleQuery(Session session) throws Exception {
     RowType schema = SampleQueryTests.getSchema();
     ExternalStreams.BlockingQueue queue = session.externalStreamOps().newBlockingQueue();
     TableScanNode scanNode =
