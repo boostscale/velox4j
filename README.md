@@ -143,7 +143,7 @@ sudo bash .github/workflows/scripts/common/setup-al2023.sh
 
 # 2. Set JAVA_HOME and build.
 export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
-mvn clean install -DskipTests -Dspotless.check.skip=true
+mvn clean install -DskipTests
 ```
 
 Alternatively, use Docker from any Linux machine:
@@ -154,11 +154,8 @@ docker run --init -it -v $(pwd):/velox4j -w /velox4j amazonlinux:2023 bash
 # Inside the container:
 export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
 bash .github/workflows/scripts/common/setup-al2023.sh
-mvn clean install -DskipTests -Dspotless.check.skip=true
+mvn clean install -DskipTests
 ```
-
-NOTE: The `-Dspotless.check.skip=true` flag is required when building with JDK 21
-because the Spotless code formatter plugin is not yet compatible with JDK 21.
 
 ## Get Started
 

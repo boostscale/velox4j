@@ -113,7 +113,7 @@ jobs:
         run: |
           docker exec al2023-container bash -c "
             export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
-            mvn clean test -Dskip.cpp.build -Dspotless.check.skip=true
+            mvn clean test -Dskip.cpp.build
           "
       - name: Stop Docker container
         run: |
