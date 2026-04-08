@@ -216,6 +216,20 @@ void notifyCheckpointAborted(JNIEnv* env, jobject javaThis, jlong itrId, jlong c
   JNI_METHOD_END()
 }
 
+// void onProcessingTime(JNIEnv* env, jobject javaThis, jlong itrId, jlong key, jlong ns, jlong timestamp) {
+//   JNI_METHOD_START
+//   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+//   itr->onProcessingTime(key, ns, timestamp);
+//   JNI_METHOD_END()
+// }
+
+// void onEventTime(JNIEnv* env, jobject javaThis, jlong itrId, jlong key, jlong ns, jlong timestamp) {
+//   JNI_METHOD_START
+//   auto itr = ObjectStore::retrieve<StatefulSerialTask>(itrId);
+//   itr->onEventTime(key, ns, timestamp);
+//   JNI_METHOD_END()
+// }
+
 jlong createExternalStreamFromDownIterator(
     JNIEnv* env,
     jobject javaThis,
@@ -452,6 +466,24 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       kTypeLong,
       nullptr);
+  // addNativeMethod(
+  //     "onProcessingTime",
+  //     (void*)onProcessingTime,
+  //     kTypeVoid,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     nullptr);
+  // addNativeMethod(
+  //     "onEventTime",
+  //     (void*)onEventTime,
+  //     kTypeVoid,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     kTypeLong,
+  //     nullptr);
   addNativeMethod(
       "createQueryExecutor",
       (void*)createQueryExecutor,
