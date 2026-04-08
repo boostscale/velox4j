@@ -14,12 +14,16 @@
 package org.boostscale.velox4j.memory;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.VectorSchemaRoot;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.boostscale.velox4j.Velox4j;
+import org.boostscale.velox4j.arrow.Arrow;
 import org.boostscale.velox4j.config.Config;
 import org.boostscale.velox4j.config.ConnectorConfig;
 import org.boostscale.velox4j.connector.ExternalStreamConnectorSplit;
@@ -150,13 +154,18 @@ public class MemoryPoolNameCollisionTest {
    */
   @Test
   public void testMultipleArrowImportsOnSameMemoryManager() {
-    for (int i = 0; i < 5; i++) {
-      Session session = Velox4j.newSession(memoryManager);
-      try {
-        runArrowRoundTrip(session);
-      } finally {
-        session.close();
+    BufferAllocator allocator = new RootAllocator(Long.MAX_VALUE);
+    try {
+      for (int i = 0; i < 5; i++) {
+        Session session = Velox4j.newSession(memoryManager);
+        try {
+          runArrowRoundTrip(session, allocator);
+        } finally {
+          session.close();
+        }
       }
+    } finally {
+      allocator.close();
     }
   }
 
@@ -191,25 +200,19 @@ public class MemoryPoolNameCollisionTest {
     Assert.assertTrue("Expected at least 1 result batch", count > 0);
   }
 
-  private void runArrowRoundTrip(Session session) {
+  private void runArrowRoundTrip(Session session, BufferAllocator allocator) {
     RowVector rv = BaseVectorTests.newSampleRowVector(session);
-    org.apache.arrow.memory.BufferAllocator allocator =
-        new org.apache.arrow.memory.RootAllocator(Long.MAX_VALUE);
-    try {
-      // Velox → Arrow (uses toArrowVectorSchemaRoot internally)
-      org.apache.arrow.vector.VectorSchemaRoot arrowRoot =
-          org.boostscale.velox4j.arrow.Arrow.toArrowVectorSchemaRoot(allocator, rv);
-      Assert.assertNotNull(arrowRoot);
-      Assert.assertTrue(arrowRoot.getRowCount() > 0);
 
-      // Arrow → Velox (uses "Arrow Import Memory Pool" path)
-      RowVector roundTripped = session.arrowOps().fromArrowVectorSchemaRoot(allocator, arrowRoot);
-      Assert.assertNotNull(roundTripped);
-      Assert.assertEquals(rv.getSize(), roundTripped.getSize());
+    // Velox → Arrow (uses toArrowVectorSchemaRoot internally)
+    VectorSchemaRoot arrowRoot = Arrow.toArrowVectorSchemaRoot(allocator, rv);
+    Assert.assertNotNull(arrowRoot);
+    Assert.assertTrue(arrowRoot.getRowCount() > 0);
 
-      arrowRoot.close();
-    } finally {
-      allocator.close();
-    }
+    // Arrow → Velox (uses "Arrow Import Memory Pool" path)
+    RowVector roundTripped = session.arrowOps().fromArrowVectorSchemaRoot(allocator, arrowRoot);
+    Assert.assertNotNull(roundTripped);
+    Assert.assertEquals(rv.getSize(), roundTripped.getSize());
+
+    arrowRoot.close();
   }
 }
