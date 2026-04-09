@@ -17,7 +17,6 @@
 #include <arrow/memory_pool.h>
 #include <velox/common/config/Config.h>
 #include <velox/common/memory/Memory.h>
-#include <atomic>
 #include <memory>
 #include <mutex>
 #include "velox4j/memory/AllocationListener.h"
@@ -44,11 +43,6 @@ class MemoryManager {
 
   arrow::MemoryPool* getArrowPool(const std::string& name);
 
-  /// Generate a unique pool name by appending an atomic counter suffix.
-  /// This avoids "Leaf child memory pool already exists" collisions when
-  /// multiple sessions or concurrent JNI calls use the same MemoryManager.
-  std::string uniquePoolName(const std::string& baseName);
-
  private:
   bool tryDestruct();
 
@@ -63,6 +57,5 @@ class MemoryManager {
       std::shared_ptr<facebook::velox::memory::MemoryPool>>
       veloxPoolRefs_;
   mutable std::mutex poolMutex_;
-  std::atomic<uint64_t> poolIdCounter_{0};
 };
 } // namespace velox4j

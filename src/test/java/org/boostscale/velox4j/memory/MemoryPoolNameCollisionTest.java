@@ -42,16 +42,12 @@ import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.RowType;
 
 /**
- * Tests that multiple sequential query executions on the same MemoryManager do not crash with "Leaf
- * child memory pool X already exists in root".
+ * Tests that shared memory pools in MemoryManager work correctly across multiple sequential and
+ * concurrent sessions.
  *
- * <p>Before the fix, JNI functions used hardcoded pool names (e.g. "Arrow Import Memory Pool",
- * "Query Serde Memory Pool"). When a second query (or a second Session sharing the same
- * MemoryManager) called the same JNI function, Velox's addLeafChild() threw because the name was
- * already registered.
- *
- * <p>The fix uses MemoryManager::uniquePoolName() to append an atomic counter suffix, ensuring each
- * pool gets a unique name like "Arrow Import Memory Pool #0", "#1", etc.
+ * <p>Memory pools are intentionally shared by name (e.g. "Query Serde Memory Pool") across calls to
+ * avoid creation overhead. Thread safety is ensured by {@code std::lock_guard} in {@code
+ * getVeloxPool()} and {@code getArrowPool()}.
  */
 public class MemoryPoolNameCollisionTest {
 
@@ -72,12 +68,8 @@ public class MemoryPoolNameCollisionTest {
   }
 
   /**
-   * Run multiple queries sequentially on the same MemoryManager using different Sessions. This
-   * simulates the OpenSearch OLAP plugin pattern where each query gets a new Session but shares the
-   * MemoryManager.
-   *
-   * <p>Before the fix, the second query would crash with: "Leaf child memory pool Query Serde
-   * Memory Pool already exists in root"
+   * Run multiple queries sequentially on the same MemoryManager using different Sessions. Verifies
+   * that shared memory pools are correctly reused across sessions.
    */
   @Test
   public void testMultipleQueriesOnSameMemoryManager() throws Exception {
@@ -91,10 +83,7 @@ public class MemoryPoolNameCollisionTest {
     }
   }
 
-  /**
-   * Run multiple queries sequentially on the same Session. Tests that pool name uniqueness works
-   * within a single session too.
-   */
+  /** Run multiple queries sequentially on the same Session. Tests pool reuse within a session. */
   @Test
   public void testMultipleQueriesOnSameSession() throws Exception {
     Session session = Velox4j.newSession(memoryManager);
@@ -148,10 +137,7 @@ public class MemoryPoolNameCollisionTest {
     }
   }
 
-  /**
-   * Run multiple Arrow import operations (arrowToBaseVector path) on the same MemoryManager. The
-   * "Arrow Import Memory Pool" was one of the most common collision points.
-   */
+  /** Run multiple Arrow import operations on the same MemoryManager across different sessions. */
   @Test
   public void testMultipleArrowImportsOnSameMemoryManager() {
     BufferAllocator allocator = new RootAllocator(Long.MAX_VALUE);

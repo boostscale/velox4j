@@ -392,11 +392,8 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
   VELOX_FAIL("Unreachable code");
 }
 
-std::string MemoryManager::uniquePoolName(const std::string& baseName) {
-  return fmt::format("{} #{}", baseName, poolIdCounter_++);
-}
-
 arrow::MemoryPool* MemoryManager::getArrowPool(const std::string& name) {
+  std::lock_guard<std::mutex> guard(poolMutex_);
   if (arrowPoolRefs_.count(name) > 0) {
     return arrowPoolRefs_[name].get();
   }
