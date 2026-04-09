@@ -60,7 +60,7 @@ public class HashPartitionTest {
 
     final int numPartitions = 4;
     final List<RowVector> partitions =
-        session.rowVectorOps().hashPartition(input, ImmutableList.of(0), numPartitions);
+        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
     Assert.assertEquals(numPartitions, partitions.size());
 
     int totalRows = 0;
@@ -78,9 +78,9 @@ public class HashPartitionTest {
     final int numPartitions = 4;
 
     final List<RowVector> run1 =
-        session.rowVectorOps().hashPartition(input, ImmutableList.of(0), numPartitions);
+        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
     final List<RowVector> run2 =
-        session.rowVectorOps().hashPartition(input, ImmutableList.of(0), numPartitions);
+        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
 
     for (int i = 0; i < numPartitions; i++) {
       if (run1.get(i) == null) {
@@ -94,19 +94,19 @@ public class HashPartitionTest {
   }
 
   @Test
-  public void testHashPartitionAndSerializeRoundTrip() {
+  public void testPartitionThenSerializeRoundTrip() {
     final RowVector input = BaseVectorTests.newSampleRowVector(session);
     final int numPartitions = 4;
 
-    final byte[][] serialized =
-        session.rowVectorOps().hashPartitionAndSerialize(input, ImmutableList.of(0), numPartitions);
-    Assert.assertEquals(numPartitions, serialized.length);
+    final List<RowVector> partitions =
+        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
 
     int totalRows = 0;
-    for (byte[] buf : serialized) {
-      if (buf != null) {
+    for (RowVector partition : partitions) {
+      if (partition != null) {
+        final byte[] buf = BaseVectors.serializeOneToBuf(partition);
         final BaseVector deserialized = session.baseVectorOps().deserializeOneFromBuf(buf);
-        Assert.assertNotNull(deserialized);
+        Assert.assertEquals(partition.getSize(), deserialized.getSize());
         totalRows += deserialized.getSize();
       }
     }
@@ -132,7 +132,7 @@ public class HashPartitionTest {
     final int numPartitions = 64;
 
     final List<RowVector> partitions =
-        session.rowVectorOps().hashPartition(input, ImmutableList.of(0), numPartitions);
+        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
     Assert.assertEquals(numPartitions, partitions.size());
 
     int nonNull = 0;

@@ -52,7 +52,7 @@ import org.boostscale.velox4j.type.VarCharType;
  *
  * <ol>
  *   <li>Scan left and right tables (TPCH nation and region)
- *   <li>Hash-partition both sides by join key using hashPartitionAndSerialize
+ *   <li>Hash-partition both sides by join key, then serialize each partition
  *   <li>Simulate network transfer (in-process: byte[] round-trip)
  *   <li>Deserialize and feed each partition into BlockingQueues
  *   <li>Execute HashJoinNode with ExternalStream sources
@@ -306,13 +306,13 @@ public class ShuffleJoinTest {
       result.add(new ArrayList<>());
     }
     for (RowVector batch : batches) {
-      byte[][] serialized =
+      List<RowVector> partitions =
           session
               .rowVectorOps()
-              .hashPartitionAndSerialize(batch, ImmutableList.of(keyChannel), numPartitions);
-      for (int pid = 0; pid < serialized.length; pid++) {
-        if (serialized[pid] != null) {
-          result.get(pid).add(serialized[pid]);
+              .partitionByKeyHashes(batch, ImmutableList.of(keyChannel), numPartitions);
+      for (int pid = 0; pid < partitions.size(); pid++) {
+        if (partitions.get(pid) != null) {
+          result.get(pid).add(BaseVectors.serializeOneToBuf(partitions.get(pid)));
         }
       }
     }

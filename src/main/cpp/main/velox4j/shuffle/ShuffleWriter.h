@@ -46,13 +46,6 @@ class ShuffleWriter {
   std::vector<facebook::velox::RowVectorPtr> partition(
       const facebook::velox::RowVectorPtr& input);
 
-  /// Hash-partitions and serializes the input RowVector. Returns a vector
-  /// of size numPartitions where each element is a serialized byte string
-  /// for that partition, or an empty string if the partition is empty.
-  /// Uses Velox's VectorSaver binary format.
-  std::vector<std::string> partitionAndSerialize(
-      const facebook::velox::RowVectorPtr& input);
-
  private:
   /// Materializes lazy columns and computes partition assignments.
   /// Returns the flattened input and fills partitionedRows_ with

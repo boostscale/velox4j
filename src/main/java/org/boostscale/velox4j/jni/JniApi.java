@@ -141,10 +141,11 @@ public final class JniApi {
         .collect(Collectors.toList());
   }
 
-  public List<RowVector> rowVectorHashPartition(
+  public List<RowVector> rowVectorPartitionByKeyHashes(
       RowVector vector, List<Integer> keyChannels, int numPartitions) {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
-    final long[] vids = jni.rowVectorHashPartition(vector.id(), keyChannelArray, numPartitions);
+    final long[] vids =
+        jni.rowVectorPartitionByKeyHashes(vector.id(), keyChannelArray, numPartitions);
     return Arrays.stream(vids)
         .mapToObj(
             vid -> {
@@ -154,12 +155,6 @@ public final class JniApi {
               return baseVectorWrap(vid).asRowVector();
             })
         .collect(Collectors.toList());
-  }
-
-  public byte[][] rowVectorHashPartitionAndSerialize(
-      RowVector vector, List<Integer> keyChannels, int numPartitions) {
-    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
-    return jni.rowVectorHashPartitionAndSerialize(vector.id(), keyChannelArray, numPartitions);
   }
 
   public BaseVector flattenVector(BaseVector vector) {

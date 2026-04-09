@@ -50,22 +50,10 @@ public class RowVectors {
    * always maps to the same partition regardless of which node computes it. Returns a list of size
    * numPartitions where index i contains rows for partition i (null if empty).
    */
-  public List<RowVector> hashPartition(
+  public List<RowVector> partitionByKeyHashes(
       RowVector rowVector, List<Integer> keyChannels, int numPartitions) {
     Preconditions.checkArgument(
         numPartitions > 0, "numPartitions must be positive, got %s", numPartitions);
-    return jniApi.rowVectorHashPartition(rowVector, keyChannels, numPartitions);
-  }
-
-  /**
-   * Hash-partitions and serializes a RowVector. Returns byte[][] indexed by partition number. Null
-   * entries for empty partitions. Uses Velox native binary format (compatible with {@link
-   * BaseVectors#deserializeOneFromBuf}).
-   */
-  public byte[][] hashPartitionAndSerialize(
-      RowVector rowVector, List<Integer> keyChannels, int numPartitions) {
-    Preconditions.checkArgument(
-        numPartitions > 0, "numPartitions must be positive, got %s", numPartitions);
-    return jniApi.rowVectorHashPartitionAndSerialize(rowVector, keyChannels, numPartitions);
+    return jniApi.rowVectorPartitionByKeyHashes(rowVector, keyChannels, numPartitions);
   }
 }

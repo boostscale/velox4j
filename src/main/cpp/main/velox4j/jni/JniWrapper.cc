@@ -340,7 +340,7 @@ jlongArray rowVectorPartitionByKeys(
   JNI_METHOD_END(nullptr)
 }
 
-jlongArray rowVectorHashPartition(
+jlongArray rowVectorPartitionByKeyHashes(
     JNIEnv* env,
     jobject javaThis,
     jlong vid,
@@ -371,51 +371,6 @@ jlongArray rowVectorHashPartition(
   const jlongArray out = env->NewLongArray(outVector.size());
   env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
   return out;
-
-  JNI_METHOD_END(nullptr)
-}
-
-jobjectArray rowVectorHashPartitionAndSerialize(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong vid,
-    jintArray jKeyChannels,
-    jint numPartitions) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  auto pool = session->memoryManager()->getVeloxPool(
-      "Hash Partition And Serialize Memory Pool",
-      memory::MemoryPool::Kind::kLeaf);
-  const auto inputRowVector = ObjectStore::retrieve<RowVector>(vid);
-
-  auto safeArray = getIntArrayElementsSafe(env, jKeyChannels);
-  std::vector<column_index_t> keyChannels(safeArray.length());
-  for (jsize i = 0; i < safeArray.length(); ++i) {
-    keyChannels[i] = safeArray.elems()[i];
-  }
-
-  ShuffleWriter writer(std::move(keyChannels), numPartitions, pool);
-  auto buffers = writer.partitionAndSerialize(inputRowVector);
-
-  jclass byteArrayClass = env->FindClass("[B");
-  jobjectArray result =
-      env->NewObjectArray(numPartitions, byteArrayClass, nullptr);
-
-  for (int pid = 0; pid < numPartitions; ++pid) {
-    if (buffers[pid].empty()) {
-      continue;
-    }
-    jbyteArray bytes = env->NewByteArray(buffers[pid].size());
-    env->SetByteArrayRegion(
-        bytes,
-        0,
-        buffers[pid].size(),
-        reinterpret_cast<const jbyte*>(buffers[pid].data()));
-    env->SetObjectArrayElement(result, pid, bytes);
-    env->DeleteLocalRef(bytes);
-  }
-
-  return result;
 
   JNI_METHOD_END(nullptr)
 }
@@ -679,8 +634,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "rowVectorHashPartition",
-      (void*)rowVectorHashPartition,
+      "rowVectorPartitionByKeyHashes",
+      (void*)rowVectorPartitionByKeyHashes,
       kTypeArray(kTypeLong),
       kTypeLong,
       kTypeArray(kTypeInt),
@@ -694,16 +649,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       nullptr);
 
   registerNativeMethods(env);
-
-  // Use raw JNI registration for methods with nested array types (e.g.
-  // byte[][]) that JniHelpers' addNativeMethod cannot handle.
-  // See registerNativeMethodRaw() in JniCommon.h for details.
-  registerNativeMethodRaw(
-      env,
-      _clazz,
-      "rowVectorHashPartitionAndSerialize",
-      "(J[II)[[B",
-      reinterpret_cast<void*>(rowVectorHashPartitionAndSerialize));
 }
 
 } // namespace velox4j

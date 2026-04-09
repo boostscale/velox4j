@@ -16,8 +16,6 @@
 
 #include <velox/exec/HashPartitionFunction.h>
 #include <velox/exec/OperatorUtils.h>
-#include <velox/vector/VectorSaver.h>
-
 #include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
@@ -87,27 +85,6 @@ std::vector<RowVectorPtr> ShuffleWriter::partition(const RowVectorPtr& input) {
     result[pid] = partitionSizes_[pid] == numRows
         ? flattened
         : exec::wrap(partitionSizes_[pid], partitionRows_[pid], flattened);
-  }
-  return result;
-}
-
-std::vector<std::string> ShuffleWriter::partitionAndSerialize(
-    const RowVectorPtr& input) {
-  auto flattened = preparePartitions(input);
-  const auto numRows = flattened->size();
-
-  std::vector<std::string> result(numPartitions_);
-  for (int pid = 0; pid < numPartitions_; ++pid) {
-    if (partitionSizes_[pid] == 0) {
-      continue;
-    }
-    const RowVectorPtr rowVector = partitionSizes_[pid] == numRows
-        ? flattened
-        : exec::wrap(partitionSizes_[pid], partitionRows_[pid], flattened);
-
-    std::ostringstream out;
-    saveVector(*rowVector, out);
-    result[pid] = out.str();
   }
   return result;
 }

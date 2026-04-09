@@ -178,24 +178,4 @@ DEFINE_SAFE_GET_PRIMITIVE_ARRAY_FUNCTIONS(kLong, jlongArray, Long)
 DEFINE_SAFE_GET_PRIMITIVE_ARRAY_FUNCTIONS(kFloat, jfloatArray, Float)
 DEFINE_SAFE_GET_PRIMITIVE_ARRAY_FUNCTIONS(kDouble, jdoubleArray, Double)
 
-/// Register a native method using raw JNI, bypassing JniHelpers'
-/// addNativeMethod. This is necessary for methods whose JNI type signatures
-/// contain nested arrays (e.g. "[[B" for byte[][]), because JniHelpers'
-/// makeNameForSignature misinterprets nested array types — it treats "[[B" as
-/// an object array of class "[B" and produces the invalid signature "[L[[B;"
-/// instead of "[[B".
-///
-/// Usage:
-///   registerNativeMethodRaw(env, clazz, "methodName", "(J[II)[[B", fn);
-inline void registerNativeMethodRaw(
-    JNIEnv* env,
-    jclass clazz,
-    const char* name,
-    const char* signature,
-    void* fnPtr) {
-  JNINativeMethod method = {
-      const_cast<char*>(name), const_cast<char*>(signature), fnPtr};
-  env->RegisterNatives(clazz, &method, 1);
-}
-
 } // namespace velox4j
