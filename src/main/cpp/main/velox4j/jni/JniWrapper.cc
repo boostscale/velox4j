@@ -86,7 +86,7 @@ jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
   auto session = sessionOf(env, javaThis);
   spotify::jni::JavaString jQueryJson{env, queryJson};
   auto querySerdePool = session->memoryManager()->getVeloxPool(
-      "Query Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+      fmt::format("Query Serde Memory Pool"), memory::MemoryPool::Kind::kLeaf);
   // Keep the pool alive until the task is finished.
   auto queryDynamic = folly::parseJson(jQueryJson.get());
   auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
