@@ -362,6 +362,7 @@ MemoryManager::~MemoryManager() {
 velox::memory::MemoryPool* MemoryManager::getVeloxPool(
     const std::string& name,
     const velox::memory::MemoryPool::Kind& kind) {
+  std::lock_guard<std::mutex> guard(poolMutex_);
   if (veloxPoolRefs_.count(name) > 0) {
     const auto& pool = veloxPoolRefs_[name];
     VELOX_CHECK_EQ(
@@ -392,6 +393,7 @@ velox::memory::MemoryPool* MemoryManager::getVeloxPool(
 }
 
 arrow::MemoryPool* MemoryManager::getArrowPool(const std::string& name) {
+  std::lock_guard<std::mutex> guard(poolMutex_);
   if (arrowPoolRefs_.count(name) > 0) {
     return arrowPoolRefs_[name].get();
   }

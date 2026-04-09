@@ -18,6 +18,7 @@
 #include <velox/common/config/Config.h>
 #include <velox/common/memory/Memory.h>
 #include <memory>
+#include <mutex>
 #include "velox4j/memory/AllocationListener.h"
 #include "velox4j/memory/ArrowMemoryPool.h"
 
@@ -55,5 +56,6 @@ class MemoryManager {
       std::string,
       std::shared_ptr<facebook::velox::memory::MemoryPool>>
       veloxPoolRefs_;
+  mutable std::mutex poolMutex_;
 };
 } // namespace velox4j
