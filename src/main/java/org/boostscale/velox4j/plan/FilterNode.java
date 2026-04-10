@@ -13,6 +13,7 @@
  */
 package org.boostscale.velox4j.plan;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -36,8 +37,8 @@ public class FilterNode extends PlanNode {
   }
 
   @Override
-  protected List<PlanNode> getSources() {
-    return sources;
+  public List<PlanNode> getSources() {
+    return Collections.unmodifiableList(sources);
   }
 
   @JsonGetter("filter")
