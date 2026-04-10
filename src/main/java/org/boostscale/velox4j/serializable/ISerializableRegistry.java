@@ -30,12 +30,16 @@ import org.boostscale.velox4j.plan.AggregationNode;
 import org.boostscale.velox4j.plan.FilterNode;
 import org.boostscale.velox4j.plan.HashJoinNode;
 import org.boostscale.velox4j.plan.LimitNode;
+import org.boostscale.velox4j.plan.LocalPartitionNode;
 import org.boostscale.velox4j.plan.OrderByNode;
 import org.boostscale.velox4j.plan.ProjectNode;
 import org.boostscale.velox4j.plan.TableScanNode;
 import org.boostscale.velox4j.plan.TableWriteNode;
 import org.boostscale.velox4j.plan.ValuesNode;
 import org.boostscale.velox4j.plan.WindowNode;
+import org.boostscale.velox4j.plan.partition.GatherPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.RoundRobinPartitionFunctionSpec;
 import org.boostscale.velox4j.query.Query;
 import org.boostscale.velox4j.serde.Serde;
 import org.boostscale.velox4j.serde.SerdeRegistry;
@@ -75,6 +79,7 @@ public final class ISerializableRegistry {
     registerConnectors();
     registerFilters();
     registerPlanNodes();
+    registerPartitionFunctionSpecs();
     registerConfig();
     registerEvaluation();
     registerQuery();
@@ -150,6 +155,14 @@ public final class ISerializableRegistry {
     NAME_REGISTRY.registerClass("LimitNode", LimitNode.class);
     NAME_REGISTRY.registerClass("TableWriteNode", TableWriteNode.class);
     NAME_REGISTRY.registerClass("WindowNode", WindowNode.class);
+    NAME_REGISTRY.registerClass("LocalPartitionNode", LocalPartitionNode.class);
+  }
+
+  private static void registerPartitionFunctionSpecs() {
+    NAME_REGISTRY.registerClass("GatherPartitionFunctionSpec", GatherPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass("HashPartitionFunctionSpec", HashPartitionFunctionSpec.class);
+    NAME_REGISTRY.registerClass(
+        "RoundRobinPartitionFunctionSpec", RoundRobinPartitionFunctionSpec.class);
   }
 
   private static void registerConfig() {

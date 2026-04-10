@@ -30,12 +30,16 @@ import org.boostscale.velox4j.plan.AggregationNode;
 import org.boostscale.velox4j.plan.FilterNode;
 import org.boostscale.velox4j.plan.HashJoinNode;
 import org.boostscale.velox4j.plan.LimitNode;
+import org.boostscale.velox4j.plan.LocalPartitionNode;
 import org.boostscale.velox4j.plan.OrderByNode;
 import org.boostscale.velox4j.plan.PlanNode;
 import org.boostscale.velox4j.plan.ProjectNode;
 import org.boostscale.velox4j.plan.TableWriteNode;
 import org.boostscale.velox4j.plan.ValuesNode;
 import org.boostscale.velox4j.plan.WindowNode;
+import org.boostscale.velox4j.plan.partition.GatherPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.RoundRobinPartitionFunctionSpec;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.sort.SortOrder;
 import org.boostscale.velox4j.test.Velox4jTests;
@@ -257,5 +261,50 @@ public class PlanNodeSerdeTest {
   public void testWindowNode() {
     final WindowNode windowNode = SerdeTests.newSampleWindowNode("id-1", "id-2");
     SerdeTests.testISerializableRoundTrip(windowNode);
+  }
+
+  @Test
+  public void testLocalPartitionNodeGather() {
+    final PlanNode scan =
+        SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
+    final LocalPartitionNode node =
+        new LocalPartitionNode(
+            "id-2",
+            LocalPartitionNode.Type.GATHER,
+            false,
+            new GatherPartitionFunctionSpec(),
+            ImmutableList.of(scan));
+    SerdeTests.testISerializableRoundTrip(node);
+  }
+
+  @Test
+  public void testLocalPartitionNodeRepartitionWithHash() {
+    final RowType inputType =
+        new RowType(
+            ImmutableList.of("foo1", "bar1"),
+            ImmutableList.of(new IntegerType(), new IntegerType()));
+    final PlanNode scan = SerdeTests.newSampleTableScanNode("id-1", inputType);
+    final LocalPartitionNode node =
+        new LocalPartitionNode(
+            "id-2",
+            LocalPartitionNode.Type.REPARTITION,
+            false,
+            new HashPartitionFunctionSpec(inputType, ImmutableList.of(0)),
+            ImmutableList.of(scan));
+    SerdeTests.testISerializableRoundTrip(node);
+  }
+
+  @Test
+  public void testLocalPartitionNodeRepartitionWithRoundRobin() {
+    final PlanNode scan =
+        SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
+    final LocalPartitionNode node =
+        new LocalPartitionNode(
+            "id-2",
+            LocalPartitionNode.Type.REPARTITION,
+            false,
+            new RoundRobinPartitionFunctionSpec(),
+            ImmutableList.of(scan));
+    SerdeTests.testISerializableRoundTrip(node);
   }
 }
