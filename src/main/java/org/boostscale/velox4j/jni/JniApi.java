@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -29,6 +30,8 @@ import org.boostscale.velox4j.eval.Evaluator;
 import org.boostscale.velox4j.iterator.DownIterator;
 import org.boostscale.velox4j.iterator.GenericUpIterator;
 import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.PartitionFunctionSpec;
 import org.boostscale.velox4j.query.Query;
 import org.boostscale.velox4j.query.QueryExecutor;
 import org.boostscale.velox4j.query.SerialTask;
@@ -141,9 +144,14 @@ public final class JniApi {
         .collect(Collectors.toList());
   }
 
-  public List<RowVector> rowVectorPartitionByKeyHashes(
-      RowVector vector, List<Integer> keyChannels, int numPartitions) {
-    final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
+  public List<RowVector> rowVectorPartitionBySpec(
+      RowVector vector, PartitionFunctionSpec spec, int numPartitions) {
+    Preconditions.checkArgument(
+        spec instanceof HashPartitionFunctionSpec,
+        "Only HashPartitionFunctionSpec is supported, got %s",
+        spec.getClass().getSimpleName());
+    HashPartitionFunctionSpec hashSpec = (HashPartitionFunctionSpec) spec;
+    final int[] keyChannelArray = hashSpec.getKeyChannels().stream().mapToInt(i -> i).toArray();
     final long[] vids =
         jni.rowVectorPartitionByKeyHashes(vector.id(), keyChannelArray, numPartitions);
     return Arrays.stream(vids)

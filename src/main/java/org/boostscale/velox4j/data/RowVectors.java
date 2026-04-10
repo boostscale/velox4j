@@ -18,6 +18,8 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 
 import org.boostscale.velox4j.jni.JniApi;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.PartitionFunctionSpec;
 
 public class RowVectors {
   private final JniApi jniApi;
@@ -46,14 +48,16 @@ public class RowVectors {
   }
 
   /**
-   * Hash-partitions a RowVector into numPartitions groups using consistent hashing. The same key
-   * always maps to the same partition regardless of which node computes it. Returns a list of size
-   * numPartitions where index i contains rows for partition i (null if empty).
+   * Partitions a RowVector into numPartitions groups using the given partition function spec.
+   * Returns a list of size numPartitions where index i contains rows for partition i (null if
+   * empty).
+   *
+   * <p>Currently only {@link HashPartitionFunctionSpec} is supported.
    */
-  public List<RowVector> partitionByKeyHashes(
-      RowVector rowVector, List<Integer> keyChannels, int numPartitions) {
+  public List<RowVector> partitionBySpec(
+      RowVector rowVector, PartitionFunctionSpec spec, int numPartitions) {
     Preconditions.checkArgument(
         numPartitions > 0, "numPartitions must be positive, got %s", numPartitions);
-    return jniApi.rowVectorPartitionByKeyHashes(rowVector, keyChannels, numPartitions);
+    return jniApi.rowVectorPartitionBySpec(rowVector, spec, numPartitions);
   }
 }

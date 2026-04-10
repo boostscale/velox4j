@@ -36,6 +36,7 @@ import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.plan.HashJoinNode;
 import org.boostscale.velox4j.plan.TableScanNode;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.test.dataset.TestDataFile;
@@ -309,7 +310,11 @@ public class ShuffleJoinTest {
       List<RowVector> partitions =
           session
               .rowVectorOps()
-              .partitionByKeyHashes(batch, ImmutableList.of(keyChannel), numPartitions);
+              .partitionBySpec(
+                  batch,
+                  new HashPartitionFunctionSpec(
+                      (RowType) batch.getType(), ImmutableList.of(keyChannel)),
+                  numPartitions);
       for (int pid = 0; pid < partitions.size(); pid++) {
         if (partitions.get(pid) != null) {
           result.get(pid).add(BaseVectors.serializeOneToBuf(partitions.get(pid)));

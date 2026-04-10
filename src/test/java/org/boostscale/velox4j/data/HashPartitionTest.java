@@ -21,8 +21,10 @@ import org.junit.*;
 import org.boostscale.velox4j.Velox4j;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.test.Velox4jTests;
+import org.boostscale.velox4j.type.RowType;
 
 public class HashPartitionTest {
   private static BytesAllocationListener allocationListener;
@@ -60,7 +62,12 @@ public class HashPartitionTest {
 
     final int numPartitions = 4;
     final List<RowVector> partitions =
-        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
+        session
+            .rowVectorOps()
+            .partitionBySpec(
+                input,
+                new HashPartitionFunctionSpec((RowType) input.getType(), ImmutableList.of(0)),
+                numPartitions);
     Assert.assertEquals(numPartitions, partitions.size());
 
     int totalRows = 0;
@@ -78,9 +85,19 @@ public class HashPartitionTest {
     final int numPartitions = 4;
 
     final List<RowVector> run1 =
-        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
+        session
+            .rowVectorOps()
+            .partitionBySpec(
+                input,
+                new HashPartitionFunctionSpec((RowType) input.getType(), ImmutableList.of(0)),
+                numPartitions);
     final List<RowVector> run2 =
-        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
+        session
+            .rowVectorOps()
+            .partitionBySpec(
+                input,
+                new HashPartitionFunctionSpec((RowType) input.getType(), ImmutableList.of(0)),
+                numPartitions);
 
     for (int i = 0; i < numPartitions; i++) {
       if (run1.get(i) == null) {
@@ -99,7 +116,12 @@ public class HashPartitionTest {
     final int numPartitions = 4;
 
     final List<RowVector> partitions =
-        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
+        session
+            .rowVectorOps()
+            .partitionBySpec(
+                input,
+                new HashPartitionFunctionSpec((RowType) input.getType(), ImmutableList.of(0)),
+                numPartitions);
 
     int totalRows = 0;
     for (RowVector partition : partitions) {
@@ -132,7 +154,12 @@ public class HashPartitionTest {
     final int numPartitions = 64;
 
     final List<RowVector> partitions =
-        session.rowVectorOps().partitionByKeyHashes(input, ImmutableList.of(0), numPartitions);
+        session
+            .rowVectorOps()
+            .partitionBySpec(
+                input,
+                new HashPartitionFunctionSpec((RowType) input.getType(), ImmutableList.of(0)),
+                numPartitions);
     Assert.assertEquals(numPartitions, partitions.size());
 
     int nonNull = 0;
