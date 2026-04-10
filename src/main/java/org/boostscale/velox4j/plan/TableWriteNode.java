@@ -102,7 +102,7 @@ public class TableWriteNode extends PlanNode {
   }
 
   @Override
-  protected List<PlanNode> getSources() {
+  public List<PlanNode> getSources() {
     return sources;
   }
 }

@@ -62,7 +62,7 @@ public class ValuesNode extends PlanNode {
   }
 
   @Override
-  protected List<PlanNode> getSources() {
+  public List<PlanNode> getSources() {
     return ImmutableList.of();
   }
 }

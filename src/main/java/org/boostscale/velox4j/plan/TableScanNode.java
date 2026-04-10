@@ -57,7 +57,7 @@ public class TableScanNode extends PlanNode {
   }
 
   @Override
-  protected List<PlanNode> getSources() {
+  public List<PlanNode> getSources() {
     return Collections.emptyList();
   }
 }
