@@ -13,6 +13,7 @@
  */
 package org.boostscale.velox4j.plan;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -44,7 +45,7 @@ public class OrderByNode extends PlanNode {
 
   @Override
   public List<PlanNode> getSources() {
-    return sources;
+    return Collections.unmodifiableList(sources);
   }
 
   @JsonGetter("sortingKeys")
