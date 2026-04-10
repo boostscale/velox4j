@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-#include "velox4j/shuffle/ShuffleWriter.h"
+#include "velox4j/shuffle/HashPartitioner.h"
 
 #include <velox/exec/HashPartitionFunction.h>
 #include <velox/exec/OperatorUtils.h>
@@ -22,7 +22,7 @@ namespace velox4j {
 
 using namespace facebook::velox;
 
-ShuffleWriter::ShuffleWriter(
+HashPartitioner::HashPartitioner(
     std::vector<column_index_t> keyChannels,
     int numPartitions,
     memory::MemoryPool* pool)
@@ -32,7 +32,7 @@ ShuffleWriter::ShuffleWriter(
   VELOX_USER_CHECK_GT(numPartitions_, 0, "numPartitions must be positive");
 }
 
-RowVectorPtr ShuffleWriter::preparePartitions(const RowVectorPtr& input) {
+RowVectorPtr HashPartitioner::preparePartitions(const RowVectorPtr& input) {
   // Materialize lazy columns before partitioning. exec::wrap() creates
   // dictionary views over the original vector — if it has lazy columns
   // (e.g. from a Parquet scan), the wraps inherit them and will fail
@@ -73,7 +73,7 @@ RowVectorPtr ShuffleWriter::preparePartitions(const RowVectorPtr& input) {
   return flattened;
 }
 
-std::vector<RowVectorPtr> ShuffleWriter::partition(const RowVectorPtr& input) {
+std::vector<RowVectorPtr> HashPartitioner::partition(const RowVectorPtr& input) {
   auto flattened = preparePartitions(input);
   const auto numRows = flattened->size();
 

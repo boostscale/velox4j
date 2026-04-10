@@ -19,23 +19,22 @@
 
 namespace velox4j {
 
-/// ShuffleWriter partitions a RowVector by hash of key columns and optionally
-/// serializes each partition for network transfer. This is the serial-mode
-/// equivalent of Velox's PartitionedOutput operator (which requires parallel
-/// mode).
+/// HashPartitioner partitions a RowVector by hash of key columns. This is
+/// the serial-mode equivalent of Velox's PartitionedOutput operator (which
+/// requires parallel mode).
 ///
 /// - For in-process repartitioning, use Velox's built-in LocalPartitionNode.
-/// - For cross-node shuffle where data must be serialized to bytes, use
-///   ShuffleWriter.
+/// - For cross-node shuffle, use HashPartitioner to partition, then serialize
+///   each partition separately via VectorSaver.
 ///
-/// The writer automatically materializes lazy-loaded columns (e.g., from
-/// Parquet scans) before partitioning.
-class ShuffleWriter {
+/// Automatically materializes lazy-loaded columns (e.g., from Parquet scans)
+/// before partitioning.
+class HashPartitioner {
  public:
   /// @param keyChannels Column indices to hash on for partitioning.
   /// @param numPartitions Number of output partitions.
   /// @param pool Memory pool for temporary allocations.
-  ShuffleWriter(
+  HashPartitioner(
       std::vector<facebook::velox::column_index_t> keyChannels,
       int numPartitions,
       facebook::velox::memory::MemoryPool* pool);

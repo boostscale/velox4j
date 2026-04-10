@@ -31,7 +31,7 @@
 #include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
 #include "velox4j/query/QueryExecutor.h"
-#include "velox4j/shuffle/ShuffleWriter.h"
+#include "velox4j/shuffle/HashPartitioner.h"
 #include "velox4j/vector/Vectors.h"
 
 namespace velox4j {
@@ -358,8 +358,8 @@ jlongArray rowVectorPartitionByKeyHashes(
     keyChannels[i] = safeArray.elems()[i];
   }
 
-  ShuffleWriter writer(std::move(keyChannels), numPartitions, pool);
-  auto partitions = writer.partition(inputRowVector);
+  HashPartitioner partitioner(std::move(keyChannels), numPartitions, pool);
+  auto partitions = partitioner.partition(inputRowVector);
 
   std::vector<jlong> outVector(numPartitions, 0);
   for (int pid = 0; pid < numPartitions; ++pid) {
