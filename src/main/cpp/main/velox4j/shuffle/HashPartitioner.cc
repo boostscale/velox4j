@@ -73,7 +73,8 @@ RowVectorPtr HashPartitioner::preparePartitions(const RowVectorPtr& input) {
   return flattened;
 }
 
-std::vector<RowVectorPtr> HashPartitioner::partition(const RowVectorPtr& input) {
+std::vector<RowVectorPtr> HashPartitioner::partition(
+    const RowVectorPtr& input) {
   auto flattened = preparePartitions(input);
   const auto numRows = flattened->size();
 
