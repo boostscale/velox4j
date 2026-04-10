@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
@@ -29,6 +30,8 @@ import org.boostscale.velox4j.eval.Evaluator;
 import org.boostscale.velox4j.iterator.DownIterator;
 import org.boostscale.velox4j.iterator.GenericUpIterator;
 import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.plan.partition.PartitionFunctionSpec;
 import org.boostscale.velox4j.query.Query;
 import org.boostscale.velox4j.query.QueryExecutor;
 import org.boostscale.velox4j.query.SerialTask;
@@ -128,11 +131,37 @@ public final class JniApi {
   }
 
   public List<RowVector> rowVectorPartitionByKeys(RowVector vector, List<Integer> keyChannels) {
+    return rowVectorPartitionByKeys(vector, keyChannels, 128);
+  }
+
+  public List<RowVector> rowVectorPartitionByKeys(
+      RowVector vector, List<Integer> keyChannels, int maxPartitions) {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
-    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray);
+    final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray, maxPartitions);
     return Arrays.stream(vids)
         .mapToObj(this::baseVectorWrap)
         .map(BaseVector::asRowVector)
+        .collect(Collectors.toList());
+  }
+
+  public List<RowVector> rowVectorPartitionBySpec(
+      RowVector vector, PartitionFunctionSpec spec, int numPartitions) {
+    Preconditions.checkArgument(
+        spec instanceof HashPartitionFunctionSpec,
+        "Only HashPartitionFunctionSpec is supported, got %s",
+        spec.getClass().getSimpleName());
+    HashPartitionFunctionSpec hashSpec = (HashPartitionFunctionSpec) spec;
+    final int[] keyChannelArray = hashSpec.getKeyChannels().stream().mapToInt(i -> i).toArray();
+    final long[] vids =
+        jni.rowVectorPartitionByKeyHashes(vector.id(), keyChannelArray, numPartitions);
+    return Arrays.stream(vids)
+        .mapToObj(
+            vid -> {
+              if (vid == 0) {
+                return null;
+              }
+              return baseVectorWrap(vid).asRowVector();
+            })
         .collect(Collectors.toList());
   }
 
