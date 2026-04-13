@@ -185,6 +185,37 @@ public class PlanNodeSerdeTest {
   }
 
   @Test
+  public void testSemiProjectHashJoinNode() {
+    final PlanNode scan1 =
+            SerdeTests.newSampleTableScanNode(
+                    "id-1",
+                    new RowType(
+                            ImmutableList.of("foo1", "bar1"),
+                            ImmutableList.of(new IntegerType(), new IntegerType())));
+    final PlanNode scan2 =
+            SerdeTests.newSampleTableScanNode(
+                    "id-2",
+                    new RowType(
+                            ImmutableList.of("foo2", "bar2"),
+                            ImmutableList.of(new IntegerType(), new IntegerType())));
+    final PlanNode joinNode =
+            new HashJoinNode(
+                    "id-3",
+                    JoinType.LEFT_SEMI_PROJECT,
+                    ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo1")),
+                    ImmutableList.of(FieldAccessTypedExpr.create(new IntegerType(), "foo2")),
+                    ConstantTypedExpr.create(new BooleanType(), new BooleanValue(true)),
+                    scan1,
+                    scan2,
+                    new RowType(
+                            ImmutableList.of("foo1", "bar1", "matched"),
+                            ImmutableList.of(new IntegerType(), new IntegerType(), new BooleanType())),
+                    true,
+                    true);
+    SerdeTests.testISerializableRoundTrip(joinNode);
+  }
+
+  @Test
   public void testOrderByNode() {
     final PlanNode scan =
         SerdeTests.newSampleTableScanNode("id-1", SerdeTests.newSampleOutputType());
