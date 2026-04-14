@@ -23,6 +23,7 @@ import org.apache.arrow.memory.RootAllocator;
 import org.junit.Assert;
 
 import org.boostscale.velox4j.collection.Streams;
+import org.boostscale.velox4j.data.BaseVectors;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.iterator.CloseableIterator;
 import org.boostscale.velox4j.iterator.UpIterator;
@@ -81,7 +82,7 @@ public final class UpIteratorTests {
           new Consumer<RowVector>() {
             @Override
             public void accept(RowVector vector) {
-              Assert.assertEquals(expected, vector.toString(alloc));
+              Assert.assertEquals(expected, vector.toString());
             }
           });
     }
@@ -105,6 +106,35 @@ public final class UpIteratorTests {
               if (argument.i == i) {
                 body.accept(argument.rv);
               }
+            }
+          });
+      return this;
+    }
+
+    public IteratorAssertionBuilder assertRowVectorsToString(String expected) {
+      return assertRowVectors(
+          new Consumer<List<RowVector>>() {
+            @Override
+            public void accept(List<RowVector> rowVectors) {
+              Assert.assertEquals(expected, BaseVectors.toString(rowVectors));
+            }
+          });
+    }
+
+    public IteratorAssertionBuilder assertRowVectors(Consumer<List<RowVector>> body) {
+      final List<RowVector> rowVectors = new ArrayList<>();
+      assertForEach(
+          new Consumer<Argument>() {
+            @Override
+            public void accept(Argument argument) {
+              rowVectors.add(argument.rv);
+            }
+          });
+      assertFinal(
+          new Runnable() {
+            @Override
+            public void run() {
+              body.accept(rowVectors);
             }
           });
       return this;

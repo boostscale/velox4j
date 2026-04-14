@@ -40,8 +40,7 @@ public class PartitionFunctionSpecTest {
   public void testHashPartitionFunctionSpec() {
     final RowType inputType =
         new RowType(
-            ImmutableList.of("foo", "bar"),
-            ImmutableList.of(new IntegerType(), new IntegerType()));
+            ImmutableList.of("foo", "bar"), ImmutableList.of(new IntegerType(), new IntegerType()));
     SerdeTests.testISerializableRoundTrip(
         new HashPartitionFunctionSpec(inputType, ImmutableList.of(0)));
   }

@@ -16,6 +16,7 @@ package org.boostscale.velox4j.query;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -818,12 +819,10 @@ public class QueryTest {
     task.noMoreSplits(scanNode2.getId());
 
     UpIteratorTests.assertIterator(task)
-            .assertNumRowVectors(2)
-            .assertRowVectorToString(
-                    0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
-            .assertRowVectorToString(
-                    1, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
-            .run();
+        .assertNumRowVectors(2)
+        .assertRowVectorsToString(
+            ResourceTests.readResourceAsString("query-output/tpch-local-partition-gather-1.tsv"))
+        .run();
   }
 
   @Test
@@ -1038,5 +1037,24 @@ public class QueryTest {
             null,
             ImmutableList.of());
     return aggregationNode;
+  }
+
+  private static String tsvHeader(String tsv) {
+    final String[] lines = tsvLines(tsv);
+    Assert.assertTrue(lines.length > 0);
+    return lines[0];
+  }
+
+  private static List<String> sortedTsvRows(String tsv) {
+    final String[] lines = tsvLines(tsv);
+    return Arrays.stream(lines).skip(1).sorted().collect(Collectors.toList());
+  }
+
+  private static String[] tsvLines(String tsv) {
+    String normalized = tsv;
+    while (normalized.endsWith("\n")) {
+      normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    return normalized.split("\n");
   }
 }
