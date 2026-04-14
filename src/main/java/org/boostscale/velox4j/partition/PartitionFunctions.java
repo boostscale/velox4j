@@ -11,10 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.boostscale.velox4j.plan.partition;
+package org.boostscale.velox4j.partition;
 
-import org.boostscale.velox4j.plan.LocalPartitionNode;
-import org.boostscale.velox4j.serializable.ISerializable;
+import org.boostscale.velox4j.jni.JniApi;
 
-/** Base class for partition function specifications used by {@link LocalPartitionNode}. */
-public abstract class PartitionFunctionSpec extends ISerializable {}
+public class PartitionFunctions {
+  private final JniApi jniApi;
+
+  public PartitionFunctions(JniApi jniApi) {
+    this.jniApi = jniApi;
+  }
+
+  public PartitionFunction create(
+      PartitionFunctionSpec spec, int numPartitions, boolean localExchange) {
+    return jniApi.createPartitionFunction(spec, numPartitions, localExchange);
+  }
+}

@@ -20,6 +20,7 @@ import org.boostscale.velox4j.data.RowVectors;
 import org.boostscale.velox4j.data.SelectivityVectors;
 import org.boostscale.velox4j.eval.Evaluations;
 import org.boostscale.velox4j.jni.CppObject;
+import org.boostscale.velox4j.partition.PartitionFunctions;
 import org.boostscale.velox4j.query.Queries;
 import org.boostscale.velox4j.serializable.ISerializables;
 import org.boostscale.velox4j.variant.Variants;
@@ -68,4 +69,7 @@ public interface Session extends CppObject {
 
   /** APIs in relation to {@link org.boostscale.velox4j.variant.Variant}. */
   Variants variantOps();
+
+  /** APIs in relation to {@link org.boostscale.velox4j.partition.PartitionFunction}. */
+  PartitionFunctions partitionFunctionOps();
 }
