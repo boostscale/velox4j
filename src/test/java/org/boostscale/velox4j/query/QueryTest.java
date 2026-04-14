@@ -45,6 +45,7 @@ import org.boostscale.velox4j.join.JoinType;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.plan.*;
+import org.boostscale.velox4j.plan.partition.GatherPartitionFunctionSpec;
 import org.boostscale.velox4j.serde.Serde;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.sort.SortOrder;
@@ -792,6 +793,37 @@ public class QueryTest {
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
         .run();
+  }
+
+  @Test
+  public void testLocalPartitionGather() {
+    final File file = NATION_FILE.file();
+    final RowType outputType = NATION_FILE.schema();
+    final TableScanNode scanNode1 = newSampleTableScanNode("id-1", outputType);
+    final TableScanNode scanNode2 = newSampleTableScanNode("id-2", outputType);
+    final ConnectorSplit split1 = newSampleSplit(file);
+    final ConnectorSplit split2 = newSampleSplit(file);
+    final LocalPartitionNode localPartitionNode =
+        new LocalPartitionNode(
+            "id-3",
+            LocalPartitionNode.Type.GATHER,
+            false,
+            new GatherPartitionFunctionSpec(),
+            ImmutableList.of(scanNode1, scanNode2));
+    final Query query = new Query(localPartitionNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode1.getId(), split1);
+    task.noMoreSplits(scanNode1.getId());
+    task.addSplit(scanNode2.getId(), split2);
+    task.noMoreSplits(scanNode2.getId());
+
+    UpIteratorTests.assertIterator(task)
+            .assertNumRowVectors(2)
+            .assertRowVectorToString(
+                    0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
+            .assertRowVectorToString(
+                    1, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
+            .run();
   }
 
   @Test
