@@ -81,7 +81,7 @@ public class BaseVector implements CppObject {
     return BaseVectors.serializeOne(this);
   }
 
-  public String toString(BufferAllocator alloc) {
+  protected String toString(BufferAllocator alloc) {
     try (final FieldVector fv = Arrow.toArrowVector(alloc, this)) {
       return fv.toString();
     }

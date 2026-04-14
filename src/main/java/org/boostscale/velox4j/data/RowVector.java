@@ -25,7 +25,7 @@ public class RowVector extends BaseVector {
   }
 
   @Override
-  public String toString(BufferAllocator alloc) {
+  protected String toString(BufferAllocator alloc) {
     try (final VectorSchemaRoot vsr = Arrow.toArrowVectorSchemaRoot(alloc, this)) {
       return vsr.contentToTSVString();
     }

@@ -39,7 +39,7 @@ public class HashPartitionFunctionSpec extends PartitionFunctionSpec {
       @JsonProperty("constants") List<ConstantTypedExpr> constants) {
     this.inputType = inputType;
     this.keyChannels = keyChannels;
-    this.constants = constants != null ? constants : Collections.emptyList();
+    this.constants = constants;
   }
 
   public HashPartitionFunctionSpec(RowType inputType, List<Integer> keyChannels) {

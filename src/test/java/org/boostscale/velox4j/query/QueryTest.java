@@ -16,6 +16,7 @@ package org.boostscale.velox4j.query;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +46,7 @@ import org.boostscale.velox4j.join.JoinType;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.plan.*;
+import org.boostscale.velox4j.plan.partition.GatherPartitionFunctionSpec;
 import org.boostscale.velox4j.serde.Serde;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.sort.SortOrder;
@@ -796,6 +798,35 @@ public class QueryTest {
   }
 
   @Test
+  public void testLocalPartitionGather() {
+    final File file = NATION_FILE.file();
+    final RowType outputType = NATION_FILE.schema();
+    final TableScanNode scanNode1 = newSampleTableScanNode("id-1", outputType);
+    final TableScanNode scanNode2 = newSampleTableScanNode("id-2", outputType);
+    final ConnectorSplit split1 = newSampleSplit(file);
+    final ConnectorSplit split2 = newSampleSplit(file);
+    final LocalPartitionNode localPartitionNode =
+        new LocalPartitionNode(
+            "id-3",
+            LocalPartitionNode.Type.GATHER,
+            false,
+            new GatherPartitionFunctionSpec(),
+            ImmutableList.of(scanNode1, scanNode2));
+    final Query query = new Query(localPartitionNode, Config.empty(), ConnectorConfig.empty());
+    final SerialTask task = session.queryOps().execute(query);
+    task.addSplit(scanNode1.getId(), split1);
+    task.noMoreSplits(scanNode1.getId());
+    task.addSplit(scanNode2.getId(), split2);
+    task.noMoreSplits(scanNode2.getId());
+
+    UpIteratorTests.assertIterator(task)
+        .assertNumRowVectors(2)
+        .assertRowVectorsToString(
+            ResourceTests.readResourceAsString("query-output/tpch-local-partition-gather-1.tsv"))
+        .run();
+  }
+
+  @Test
   public void testTableWrite() throws IOException {
     final File folder = JniWorkspace.getDefault().getSubDir("test");
     final String fileName = String.format("test-write-%s.tmp", UUID.randomUUID());
@@ -1007,5 +1038,24 @@ public class QueryTest {
             null,
             ImmutableList.of());
     return aggregationNode;
+  }
+
+  private static String tsvHeader(String tsv) {
+    final String[] lines = tsvLines(tsv);
+    Assert.assertTrue(lines.length > 0);
+    return lines[0];
+  }
+
+  private static List<String> sortedTsvRows(String tsv) {
+    final String[] lines = tsvLines(tsv);
+    return Arrays.stream(lines).skip(1).sorted().collect(Collectors.toList());
+  }
+
+  private static String[] tsvLines(String tsv) {
+    String normalized = tsv;
+    while (normalized.endsWith("\n")) {
+      normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    return normalized.split("\n");
   }
 }
