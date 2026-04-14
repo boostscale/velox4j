@@ -76,4 +76,9 @@ public class HashJoinNode extends AbstractJoinNode {
   public boolean isNullAware() {
     return nullAware;
   }
+
+  @JsonGetter("useHashTableCache")
+  public boolean getUseHashTableCache() {
+    return useHashTableCache;
+  }
 }
