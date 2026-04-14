@@ -171,6 +171,7 @@ public class ShuffleJoinTest {
               rightScan,
               joinOutputType,
               false,
+              false,
               false);
 
       Query query = new Query(join, Config.empty(), ConnectorConfig.empty());
@@ -260,6 +261,7 @@ public class ShuffleJoinTest {
             leftScan,
             rightScan,
             joinOutputType,
+            false,
             false,
             false);
 

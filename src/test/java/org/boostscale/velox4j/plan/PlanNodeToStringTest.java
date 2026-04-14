@@ -144,6 +144,7 @@ public class PlanNodeToStringTest {
             rightScan,
             outputType,
             false,
+            false,
             false);
 
     Assert.assertEquals(
@@ -258,6 +259,7 @@ public class PlanNodeToStringTest {
             leftScan,
             rightScan,
             outputType,
+            false,
             false,
             false);
 
