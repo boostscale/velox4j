@@ -85,7 +85,7 @@ public class StaticJniWrapper {
   native String tableWriteTraitsOutputType();
 
   // For PlanNode.
-  native String planNodeToString(long id, boolean detailed, boolean recursive);
+  native String planNodeToString(String planNodeJson, boolean detailed, boolean recursive);
 
   // For serde.
   native String iSerializableAsJava(long id);

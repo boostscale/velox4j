@@ -264,15 +264,13 @@ selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
 jstring planNodeToString(
     JNIEnv* env,
     jobject javaThis,
-    jlong id,
+    jstring planNodeJson,
     jboolean detailed,
     jboolean recursive) {
   JNI_METHOD_START
-  auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
-  auto planNode =
-      std::dynamic_pointer_cast<const core::PlanNode>(iSerializable);
-  VELOX_CHECK_NOT_NULL(
-      planNode, "Object is not a PlanNode: {}", typeid(*iSerializable).name());
+  spotify::jni::JavaString jJson{env, planNodeJson};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto planNode = ISerializable::deserialize<core::PlanNode>(dynamic);
   auto str = planNode->toString(detailed, recursive);
   return env->NewStringUTF(str.data());
   JNI_METHOD_END(nullptr)
@@ -454,7 +452,7 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "planNodeToString",
       (void*)planNodeToString,
       kTypeString,
-      kTypeLong,
+      kTypeString,
       kTypeBool,
       kTypeBool,
       nullptr);

@@ -28,6 +28,7 @@ import org.boostscale.velox4j.data.VectorEncoding;
 import org.boostscale.velox4j.iterator.UpIterator;
 import org.boostscale.velox4j.memory.AllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
+import org.boostscale.velox4j.plan.PlanNode;
 import org.boostscale.velox4j.query.SerialTask;
 import org.boostscale.velox4j.query.SerialTaskStats;
 import org.boostscale.velox4j.serde.Serde;
@@ -152,8 +153,8 @@ public class StaticJniApi {
     return type;
   }
 
-  public String planNodeToString(CppObject planNodeCo, boolean detailed, boolean recursive) {
-    return jni.planNodeToString(planNodeCo.id(), detailed, recursive);
+  public String planNodeToString(PlanNode planNode, boolean detailed, boolean recursive) {
+    return jni.planNodeToString(Serde.toPrettyJson(planNode), detailed, recursive);
   }
 
   public ISerializable iSerializableAsJava(ISerializableCo co) {
