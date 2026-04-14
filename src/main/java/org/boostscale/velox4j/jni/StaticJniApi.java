@@ -152,6 +152,10 @@ public class StaticJniApi {
     return type;
   }
 
+  public String planNodeToString(CppObject planNodeCo, boolean detailed, boolean recursive) {
+    return jni.planNodeToString(planNodeCo.id(), detailed, recursive);
+  }
+
   public ISerializable iSerializableAsJava(ISerializableCo co) {
     final String json = jni.iSerializableAsJava(co.id());
     return Serde.fromJson(json, ISerializable.class);

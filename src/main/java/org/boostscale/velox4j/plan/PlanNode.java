@@ -18,7 +18,10 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.serializable.ISerializable;
+import org.boostscale.velox4j.serializable.ISerializableCo;
+import org.boostscale.velox4j.session.Session;
 
 public abstract class PlanNode extends ISerializable {
   private final String id;
@@ -35,4 +38,17 @@ public abstract class PlanNode extends ISerializable {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   @JsonGetter("sources")
   public abstract List<PlanNode> getSources();
+
+  /**
+   * Returns a human-readable string representation of this plan tree using Velox's C++ formatting.
+   *
+   * @param session the session used to send the plan to C++ for formatting
+   * @param detailed if true, includes node-specific details (expressions, join keys, etc.)
+   * @param recursive if true, includes the entire subtree; otherwise just this node
+   */
+  public String toFormatString(Session session, boolean detailed, boolean recursive) {
+    try (ISerializableCo co = session.iSerializableOps().asCpp(this)) {
+      return StaticJniApi.get().planNodeToString(co, detailed, recursive);
+    }
+  }
 }

@@ -15,6 +15,7 @@
 #include "velox4j/jni/StaticJniWrapper.h"
 #include <folly/json/json.h>
 #include <velox/common/encode/Base64.h>
+#include <velox/core/PlanNode.h>
 #include <velox/exec/TableWriter.h>
 #include <velox/vector/VectorSaver.h>
 
@@ -260,6 +261,23 @@ selectivityVectorIsValid(JNIEnv* env, jobject javaThis, jlong svId, jint idx) {
   JNI_METHOD_END(false)
 }
 
+jstring planNodeToString(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong id,
+    jboolean detailed,
+    jboolean recursive) {
+  JNI_METHOD_START
+  auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
+  auto planNode =
+      std::dynamic_pointer_cast<const core::PlanNode>(iSerializable);
+  VELOX_CHECK_NOT_NULL(
+      planNode, "Object is not a PlanNode: {}", typeid(*iSerializable).name());
+  auto str = planNode->toString(detailed, recursive);
+  return env->NewStringUTF(str.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jstring iSerializableAsJava(JNIEnv* env, jobject javaThis, jlong id) {
   JNI_METHOD_START
   auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
@@ -431,6 +449,14 @@ void StaticJniWrapper::initialize(JNIEnv* env) {
       "tableWriteTraitsOutputType",
       (void*)tableWriteTraitsOutputType,
       kTypeString,
+      nullptr);
+  addNativeMethod(
+      "planNodeToString",
+      (void*)planNodeToString,
+      kTypeString,
+      kTypeLong,
+      kTypeBool,
+      kTypeBool,
       nullptr);
   addNativeMethod(
       "iSerializableAsJava",
