@@ -33,7 +33,7 @@ public class LocalSession implements Session {
     this.id = id;
   }
 
-  public JniApi jniApi() {
+  private JniApi jniApi() {
     final JniWrapper jniWrapper = new JniWrapper(this.id);
     return new JniApi(jniWrapper);
   }
