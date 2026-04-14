@@ -736,6 +736,7 @@ public class QueryTest {
                 ImmutableList.of(
                     new BigIntType(), new VarCharType(), new BigIntType(), new VarCharType())),
             false,
+            false,
             false);
     final Query query = new Query(hashJoinNode, Config.empty(), ConnectorConfig.empty());
     final SerialTask task = session.queryOps().execute(query);

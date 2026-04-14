@@ -146,6 +146,7 @@ public class PlanNodeToStringTest {
             rightScan,
             outputType,
             false,
+            false,
             false);
 
     String result = join.toFormatString(session, true, true);

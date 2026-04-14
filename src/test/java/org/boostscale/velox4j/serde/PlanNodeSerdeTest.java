@@ -180,6 +180,7 @@ public class PlanNodeSerdeTest {
                 ImmutableList.of(
                     new IntegerType(), new IntegerType(), new IntegerType(), new IntegerType())),
             false,
+            false,
             false);
     SerdeTests.testISerializableRoundTrip(joinNode);
   }
@@ -211,6 +212,7 @@ public class PlanNodeSerdeTest {
                 ImmutableList.of("foo1", "bar1", "matched"),
                 ImmutableList.of(new IntegerType(), new IntegerType(), new BooleanType())),
             true,
+            false,
             true);
     SerdeTests.testISerializableRoundTrip(joinNode);
   }
