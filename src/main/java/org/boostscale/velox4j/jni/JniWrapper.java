@@ -79,7 +79,7 @@ final class JniWrapper {
 
   native int[] partitionFunctionPartition(long partitionFunctionId, long rowVectorId);
 
-  native long[] rowVectorWrapPartitions(long rowVectorId, int[] partitions, int numPartitions);
+  native long[] baseVectorWrapPartitions(long vectorId, int[] partitions, int numPartitions);
 
   native long createSelectivityVector(int length);
 

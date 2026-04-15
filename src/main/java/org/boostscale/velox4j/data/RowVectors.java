@@ -14,6 +14,7 @@
 package org.boostscale.velox4j.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 
@@ -48,7 +49,15 @@ public class RowVectors {
     try (PartitionFunction partitionFunction =
         jniApi.createPartitionFunction(spec, numPartitions, false)) {
       final int[] partitions = jniApi.partitionFunctionPartition(partitionFunction, rowVector);
-      return jniApi.rowVectorWrapPartitions(rowVector, partitions, numPartitions);
+      return jniApi.baseVectorWrapPartitions(rowVector, partitions, numPartitions).stream()
+          .map(
+              vector -> {
+                if (vector == null) {
+                  return null;
+                }
+                return vector.asRowVector();
+              })
+          .collect(Collectors.toList());
     }
   }
 }

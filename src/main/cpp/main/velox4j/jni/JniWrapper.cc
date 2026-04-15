@@ -339,69 +339,19 @@ jlongArray rowVectorPartitionByKeys(
   JNI_METHOD_END(nullptr)
 }
 
-jlong createPartitionFunction(
+jlongArray baseVectorWrapPartitions(
     JNIEnv* env,
     jobject javaThis,
-    jstring specJson,
-    jint numPartitions,
-    jboolean localExchange) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  auto serdePool = session->memoryManager()->getVeloxPool(
-      "Partition Function Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  spotify::jni::JavaString jSpecJson{env, specJson};
-  auto dynamic = folly::parseJson(jSpecJson.get());
-  auto spec = ISerializable::deserialize<core::PartitionFunctionSpec>(
-      dynamic, serdePool);
-  auto function = std::shared_ptr<core::PartitionFunction>(
-      spec->create(numPartitions, static_cast<bool>(localExchange)).release());
-  return session->objectStore()->save(function);
-  JNI_METHOD_END(-1)
-}
-
-jintArray partitionFunctionPartition(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong partitionFunctionId,
-    jlong rowVectorId) {
-  JNI_METHOD_START
-  auto function =
-      ObjectStore::retrieve<core::PartitionFunction>(partitionFunctionId);
-  const auto inputRowVector = ObjectStore::retrieve<RowVector>(rowVectorId);
-
-  std::vector<uint32_t> partitions;
-  auto singlePartition = function->partition(*inputRowVector, partitions);
-  std::vector<jint> outVector;
-  if (singlePartition.has_value()) {
-    outVector.assign(
-        inputRowVector->size(), static_cast<jint>(singlePartition.value()));
-  } else {
-    outVector.reserve(partitions.size());
-    for (const auto partition : partitions) {
-      outVector.push_back(static_cast<jint>(partition));
-    }
-  }
-  const jintArray out = env->NewIntArray(outVector.size());
-  env->SetIntArrayRegion(out, 0, outVector.size(), outVector.data());
-  return out;
-  JNI_METHOD_END(nullptr)
-}
-
-jlongArray rowVectorWrapPartitions(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong rowVectorId,
+    jlong vectorId,
     jintArray jPartitions,
     jint numPartitions) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
   auto pool = session->memoryManager()->getVeloxPool(
       "Wrap Partitions Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  auto inputRowVector = ObjectStore::retrieve<RowVector>(rowVectorId);
-  VectorPtr vector = std::dynamic_pointer_cast<BaseVector>(inputRowVector);
-  flattenVector(vector, inputRowVector->size());
-  auto flattened = std::dynamic_pointer_cast<RowVector>(vector);
-  const auto inputNumRows = flattened->size();
+  VectorPtr vector = ObjectStore::retrieve<BaseVector>(vectorId);
+  flattenVector(vector, vector->size());
+  const auto inputNumRows = vector->size();
   auto safeArray = getIntArrayElementsSafe(env, jPartitions);
 
   std::vector<jlong> outVector(numPartitions, 0);
@@ -447,16 +397,64 @@ jlongArray rowVectorWrapPartitions(
     if (partitionSize == 0) {
       continue;
     }
-    const RowVectorPtr rowVector = partitionSize == inputNumRows
-        ? flattened
-        : exec::wrap(partitionSize, partitionRows[partitionId], flattened);
-    outVector[partitionId] = session->objectStore()->save(rowVector);
+    VectorPtr partitionVector = partitionSize == inputNumRows
+        ? vector
+        : wrapInDictionary(partitionSize, partitionRows[partitionId], vector);
+    outVector[partitionId] = session->objectStore()->save(partitionVector);
   }
 
   const jlongArray out = env->NewLongArray(outVector.size());
   env->SetLongArrayRegion(out, 0, outVector.size(), outVector.data());
   return out;
 
+  JNI_METHOD_END(nullptr)
+}
+
+jlong createPartitionFunction(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring specJson,
+    jint numPartitions,
+    jboolean localExchange) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto serdePool = session->memoryManager()->getVeloxPool(
+      "Partition Function Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jSpecJson{env, specJson};
+  auto dynamic = folly::parseJson(jSpecJson.get());
+  auto spec = ISerializable::deserialize<core::PartitionFunctionSpec>(
+      dynamic, serdePool);
+  auto function = std::shared_ptr<core::PartitionFunction>(
+      spec->create(numPartitions, static_cast<bool>(localExchange)).release());
+  return session->objectStore()->save(function);
+  JNI_METHOD_END(-1)
+}
+
+jintArray partitionFunctionPartition(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong partitionFunctionId,
+    jlong rowVectorId) {
+  JNI_METHOD_START
+  auto function =
+      ObjectStore::retrieve<core::PartitionFunction>(partitionFunctionId);
+  const auto inputRowVector = ObjectStore::retrieve<RowVector>(rowVectorId);
+
+  std::vector<uint32_t> partitions;
+  auto singlePartition = function->partition(*inputRowVector, partitions);
+  std::vector<jint> outVector;
+  if (singlePartition.has_value()) {
+    outVector.assign(
+        inputRowVector->size(), static_cast<jint>(singlePartition.value()));
+  } else {
+    outVector.reserve(partitions.size());
+    for (const auto partition : partitions) {
+      outVector.push_back(static_cast<jint>(partition));
+    }
+  }
+  const jintArray out = env->NewIntArray(outVector.size());
+  env->SetIntArrayRegion(out, 0, outVector.size(), outVector.data());
+  return out;
   JNI_METHOD_END(nullptr)
 }
 
@@ -692,6 +690,14 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeInt,
       nullptr);
   addNativeMethod(
+      "baseVectorWrapPartitions",
+      (void*)baseVectorWrapPartitions,
+      kTypeArray(kTypeLong),
+      kTypeLong,
+      kTypeArray(kTypeInt),
+      kTypeInt,
+      nullptr);
+  addNativeMethod(
       "createPartitionFunction",
       (void*)createPartitionFunction,
       kTypeLong,
@@ -705,14 +711,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeArray(kTypeInt),
       kTypeLong,
       kTypeLong,
-      nullptr);
-  addNativeMethod(
-      "rowVectorWrapPartitions",
-      (void*)rowVectorWrapPartitions,
-      kTypeArray(kTypeLong),
-      kTypeLong,
-      kTypeArray(kTypeInt),
-      kTypeInt,
       nullptr);
   addNativeMethod(
       "createSelectivityVector",

@@ -27,4 +27,9 @@ namespace velox4j {
 void flattenVector(
     facebook::velox::VectorPtr& vector,
     facebook::velox::vector_size_t targetSize);
+
+facebook::velox::VectorPtr wrapInDictionary(
+    facebook::velox::vector_size_t size,
+    const facebook::velox::BufferPtr& indices,
+    const facebook::velox::VectorPtr& vector);
 } // namespace velox4j

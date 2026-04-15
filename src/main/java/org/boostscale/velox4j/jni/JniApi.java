@@ -151,16 +151,16 @@ public final class JniApi {
     return jni.partitionFunctionPartition(partitionFunction.id(), rowVector.id());
   }
 
-  public List<RowVector> rowVectorWrapPartitions(
-      RowVector rowVector, int[] partitions, int numPartitions) {
-    final long[] vids = jni.rowVectorWrapPartitions(rowVector.id(), partitions, numPartitions);
+  public List<BaseVector> baseVectorWrapPartitions(
+      BaseVector vector, int[] partitions, int numPartitions) {
+    final long[] vids = jni.baseVectorWrapPartitions(vector.id(), partitions, numPartitions);
     return Arrays.stream(vids)
         .mapToObj(
             vid -> {
               if (vid == 0) {
                 return null;
               }
-              return baseVectorWrap(vid).asRowVector();
+              return baseVectorWrap(vid);
             })
         .collect(Collectors.toList());
   }
