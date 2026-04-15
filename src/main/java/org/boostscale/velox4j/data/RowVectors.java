@@ -48,8 +48,8 @@ public class RowVectors {
         numPartitions > 0, "numPartitions must be positive, got %s", numPartitions);
     try (PartitionFunction partitionFunction =
         jniApi.createPartitionFunction(spec, numPartitions, false)) {
-      final int[] partitions = jniApi.partitionFunctionPartition(partitionFunction, rowVector);
-      return jniApi.baseVectorWrapPartitions(rowVector, partitions, numPartitions).stream()
+      final int[] partitions = partitionFunction.partition(rowVector);
+      return rowVector.wrapPartitions(partitions, numPartitions).stream()
           .map(
               vector -> {
                 if (vector == null) {

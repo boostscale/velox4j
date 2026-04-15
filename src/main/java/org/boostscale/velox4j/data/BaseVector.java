@@ -13,6 +13,8 @@
  */
 package org.boostscale.velox4j.data;
 
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
@@ -74,6 +76,10 @@ public class BaseVector implements CppObject {
 
   public BaseVector flattenedVector() {
     return jniApi.flattenVector(this);
+  }
+
+  public List<BaseVector> wrapPartitions(int[] partitions, int numPartitions) {
+    return jniApi.baseVectorWrapPartitions(this, partitions, numPartitions);
   }
 
   public String serialize() {
