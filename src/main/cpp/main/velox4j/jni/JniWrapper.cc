@@ -58,14 +58,14 @@ jlong createMemoryManager(JNIEnv* env, jclass clazz, jobject jListener) {
       std::make_unique<JavaAllocationListener>(env, jListener), 8 << 10 << 10);
   auto mm = std::make_shared<MemoryManager>(std::move(listener));
   return ObjectStore::global()->save(mm);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong createSession(JNIEnv* env, jclass clazz, long memoryManagerId) {
   JNI_METHOD_START
   auto mm = ObjectStore::retrieve<MemoryManager>(memoryManagerId);
   return ObjectStore::global()->save(std::make_shared<Session>(mm.get()));
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 void releaseCppObject(JNIEnv* env, jclass clazz, jlong objId) {
@@ -96,7 +96,7 @@ jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
   auto evaluator =
       std::make_shared<Evaluator>(session->memoryManager(), evaluation);
   return sessionOf(env, javaThis)->objectStore()->save(evaluator);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong evaluatorEval(
@@ -113,7 +113,7 @@ jlong evaluatorEval(
   return sessionOf(env, javaThis)
       ->objectStore()
       ->save(evaluator->eval(*selectivityVector, *input));
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
@@ -127,7 +127,7 @@ jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
   auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
   auto exec = std::make_shared<QueryExecutor>(session->memoryManager(), query);
   return sessionOf(env, javaThis)->objectStore()->save(exec);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong queryExecutorExecute(
@@ -139,14 +139,14 @@ jlong queryExecutorExecute(
   return sessionOf(env, javaThis)
       ->objectStore()
       ->save<SerialTask>(exec->execute());
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jint upIteratorAdvance(JNIEnv* env, jclass clazz, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return static_cast<jint>(itr->advance());
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 void upIteratorWait(JNIEnv* env, jclass clazz, jlong itrId) {
@@ -160,7 +160,7 @@ jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->get());
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 void blockingQueuePut(JNIEnv* env, jclass clazz, jlong queueId, jlong rvId) {
@@ -185,14 +185,14 @@ jlong createExternalStreamFromDownIterator(
   JNI_METHOD_START
   auto es = std::make_shared<DownIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
   JNI_METHOD_START
   auto queue = std::make_shared<BlockingQueue>();
   return sessionOf(env, javaThis)->objectStore()->save(queue);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 void serialTaskAddSplit(
@@ -264,7 +264,7 @@ jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   auto dynamic = folly::parseJson(jJson.get());
   auto deserialized = variant::create(dynamic);
   return session->objectStore()->save(std::make_shared<variant>(deserialized));
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong variantToVector(
@@ -283,7 +283,7 @@ jlong variantToVector(
   auto variantVector =
       facebook::velox::variantToVector(type, variant, vectorPool);
   return session->objectStore()->save(variantVector);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jstring arrowToType(JNIEnv* env, jclass clazz, jlong cSchema) {
@@ -377,7 +377,7 @@ jint baseVectorGetSize(JNIEnv* env, jclass clazz, jlong vid) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   return static_cast<jint>(vector->size());
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jstring baseVectorGetEncoding(JNIEnv* env, jclass clazz, jlong vid) {
@@ -415,7 +415,7 @@ jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
       "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
   auto vector = BaseVector::create(type, 0, vectorPool);
   return session->objectStore()->save(vector);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong arrowToBaseVector(
@@ -433,7 +433,7 @@ jlong arrowToBaseVector(
       reinterpret_cast<struct ArrowSchema*>(cSchema),
       reinterpret_cast<struct ArrowArray*>(cArray));
   return session->objectStore()->save(vector);
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlongArray
@@ -492,7 +492,7 @@ jlong baseVectorWrapInConstant(
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto constVector = BaseVector::wrapInConstant(length, index, vector);
   return sessionOf(env, javaThis)->objectStore()->save(constVector);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong baseVectorSlice(
@@ -505,7 +505,7 @@ jlong baseVectorSlice(
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   auto slicedVector = vector->slice(offset, length);
   return sessionOf(env, javaThis)->objectStore()->save(slicedVector);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlong baseVectorFlatten(JNIEnv* env, jobject javaThis, jlong vid) {
@@ -513,7 +513,7 @@ jlong baseVectorFlatten(JNIEnv* env, jobject javaThis, jlong vid) {
   auto vector = ObjectStore::retrieve<BaseVector>(vid);
   flattenVector(vector, vector->size());
   return sessionOf(env, javaThis)->objectStore()->save(vector);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jlongArray rowVectorPartitionByKeys(
@@ -611,7 +611,7 @@ jlongArray baseVectorWrapPartitions(
   const auto inputNumRows = vector->size();
   auto safeArray = getIntArrayElementsSafe(env, jPartitions);
 
-  std::vector<jlong> outVector(numPartitions, 0);
+  std::vector<jlong> outVector(numPartitions, kInvalidObjectHandle);
   VELOX_USER_CHECK_EQ(
       safeArray.length(),
       inputNumRows,
@@ -684,7 +684,7 @@ jlong createPartitionFunction(
   auto function = std::shared_ptr<core::PartitionFunction>(
       spec->create(numPartitions, static_cast<bool>(localExchange)).release());
   return session->objectStore()->save(function);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jintArray partitionFunctionPartition(
@@ -720,7 +720,7 @@ jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   auto vector =
       std::make_shared<SelectivityVector>(static_cast<vector_size_t>(length));
   return sessionOf(env, javaThis)->objectStore()->save(vector);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 jstring tableWriteTraitsOutputType(JNIEnv* env, jclass clazz) {
@@ -784,7 +784,7 @@ jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   auto deserialized = std::const_pointer_cast<ISerializable>(
       ISerializable::deserialize<ISerializable>(dynamic, serdePool));
   return session->objectStore()->save(deserialized);
-  JNI_METHOD_END(-1)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 
 class ExternalStreamAsUpIterator : public UpIterator {
@@ -838,7 +838,7 @@ jlong createUpIteratorWithExternalStream(
   return sessionOf(env, javaThis)
       ->objectStore()
       ->save(std::make_shared<ExternalStreamAsUpIterator>(es));
-  JNI_METHOD_END(-1L)
+  JNI_METHOD_END(kInvalidObjectHandle)
 }
 } // namespace
 

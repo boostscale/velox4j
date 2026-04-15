@@ -27,7 +27,7 @@ import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.type.Type;
 
 public class BaseVector implements CppObject {
-  public static BaseVector wrap(JniApi jniApi, long id, VectorEncoding encoding) {
+  public static BaseVector createById(JniApi jniApi, long id, VectorEncoding encoding) {
     // TODO Add JNI API `isRowVector` for performance.
     if (encoding == VectorEncoding.ROW) {
       return new RowVector(jniApi, id);
