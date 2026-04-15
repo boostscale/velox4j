@@ -14,7 +14,7 @@
 package org.boostscale.velox4j.serializable;
 
 import org.boostscale.velox4j.jni.CppObject;
-import org.boostscale.velox4j.jni.StaticJniApi;
+import org.boostscale.velox4j.jni.JniApi;
 
 /** Binds a CPP ISerializable object. */
 public class ISerializableCo implements CppObject {
@@ -30,6 +30,6 @@ public class ISerializableCo implements CppObject {
   }
 
   public ISerializable asJava() {
-    return StaticJniApi.get().iSerializableAsJava(this);
+    return JniApi.iSerializableAsJava(this);
   }
 }

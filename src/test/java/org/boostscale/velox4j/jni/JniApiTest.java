@@ -61,7 +61,7 @@ public class JniApiTest {
     Velox4jTests.ensureInitialized();
     arrowAlloc = new RootAllocator(Long.MAX_VALUE);
     allocationListener = new BytesAllocationListener();
-    memoryManager = StaticJniApi.get().createMemoryManager(allocationListener);
+    memoryManager = JniApi.createMemoryManager(allocationListener);
   }
 
   @AfterClass
@@ -140,10 +140,10 @@ public class JniApiTest {
   public void testVectorSerdeEmpty() {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
-    final String serialized = StaticJniApi.get().baseVectorSerialize(Collections.emptyList());
+    final String serialized = JniApi.baseVectorSerialize(Collections.emptyList());
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     Assert.assertTrue(deserialized.isEmpty());
-    final String serializedSecond = StaticJniApi.get().baseVectorSerialize(deserialized);
+    final String serializedSecond = JniApi.baseVectorSerialize(deserialized);
     Assert.assertEquals(serialized, serializedSecond);
     session.close();
     ;
@@ -158,7 +158,7 @@ public class JniApiTest {
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = ImmutableList.of(vector);
-    final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
+    final String serialized = JniApi.baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);
     session.close();
@@ -174,7 +174,7 @@ public class JniApiTest {
     final UpIterator itr = queryExecutor.execute();
     final RowVector vector = UpIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = ImmutableList.of(vector, vector);
-    final String serialized = StaticJniApi.get().baseVectorSerialize(vectors);
+    final String serialized = JniApi.baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
     BaseVectorTests.assertEquals(vectors, deserialized);
     session.close();
@@ -197,11 +197,9 @@ public class JniApiTest {
 
   @Test
   public void testVariantInferType() {
-    Assert.assertTrue(
-        StaticJniApi.get().variantInferType(new IntegerValue(5)) instanceof IntegerType);
-    Assert.assertTrue(StaticJniApi.get().variantInferType(new RealValue(4.6f)) instanceof RealType);
-    Assert.assertTrue(
-        StaticJniApi.get().variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
+    Assert.assertTrue(JniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(JniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
+    Assert.assertTrue(JniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
   }
 
   @Test

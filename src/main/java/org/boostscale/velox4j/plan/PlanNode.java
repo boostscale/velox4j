@@ -18,7 +18,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.boostscale.velox4j.jni.StaticJniApi;
+import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.serializable.ISerializable;
 
 public abstract class PlanNode extends ISerializable {
@@ -45,6 +45,6 @@ public abstract class PlanNode extends ISerializable {
    * @param recursive if true, includes the entire subtree; otherwise just this node
    */
   public String toFormatString(boolean detailed, boolean recursive) {
-    return StaticJniApi.get().planNodeToString(this, detailed, recursive);
+    return JniApi.planNodeToString(this, detailed, recursive);
   }
 }

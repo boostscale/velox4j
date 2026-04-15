@@ -19,7 +19,6 @@
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/jni/JniError.h"
 #include "velox4j/jni/JniWrapper.h"
-#include "velox4j/jni/StaticJniWrapper.h"
 #include "velox4j/memory/JavaAllocationListener.h"
 
 // The JNI entrypoint.
@@ -31,7 +30,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void*) {
   }
 
   velox4j::getJniErrorState()->ensureInitialized(env);
-  velox4j::jniClassRegistry()->add(env, new velox4j::StaticJniWrapper(env));
   velox4j::jniClassRegistry()->add(env, new velox4j::JniWrapper(env));
   velox4j::jniClassRegistry()->add(
       env, new velox4j::DownIteratorJniWrapper(env));
