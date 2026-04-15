@@ -146,11 +146,13 @@ public final class JniApi {
         this, jni.createPartitionFunction(specJson, numPartitions, localExchange));
   }
 
-  public int[] partitionFunctionPartition(PartitionFunction partitionFunction, RowVector rowVector) {
+  public int[] partitionFunctionPartition(
+      PartitionFunction partitionFunction, RowVector rowVector) {
     return jni.partitionFunctionPartition(partitionFunction.id(), rowVector.id());
   }
 
-  public List<RowVector> rowVectorWrapPartitions(RowVector rowVector, int[] partitions, int numPartitions) {
+  public List<RowVector> rowVectorWrapPartitions(
+      RowVector rowVector, int[] partitions, int numPartitions) {
     final long[] vids = jni.rowVectorWrapPartitions(rowVector.id(), partitions, numPartitions);
     return Arrays.stream(vids)
         .mapToObj(

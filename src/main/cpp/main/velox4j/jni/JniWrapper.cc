@@ -365,7 +365,8 @@ jintArray partitionFunctionPartition(
     jlong partitionFunctionId,
     jlong rowVectorId) {
   JNI_METHOD_START
-  auto function = ObjectStore::retrieve<core::PartitionFunction>(partitionFunctionId);
+  auto function =
+      ObjectStore::retrieve<core::PartitionFunction>(partitionFunctionId);
   const auto inputRowVector = ObjectStore::retrieve<RowVector>(rowVectorId);
 
   std::vector<uint32_t> partitions;
