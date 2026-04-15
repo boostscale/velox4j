@@ -232,7 +232,8 @@ public final class JniApi {
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
     try {
-      return baseVectorCreateById(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+      return baseVectorCreateById(
+          jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
     } finally {
       schema.close();
       array.close();
