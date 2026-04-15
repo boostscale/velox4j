@@ -1,0 +1,25 @@
+repos:
+  - repo: local
+    hooks:
+      - id: clang-format-fix
+        name: clang-format (fix)
+        language: python
+        additional_dependencies:
+          - clang-format==18.1.8
+        entry: clang-format -i
+        files: ^src/main/cpp/(main|test)/.*\.(h|cc|cpp)$
+
+      - id: cmake-format-fix
+        name: cmake-format (fix)
+        language: python
+        additional_dependencies:
+          - cmakelang==0.6.13
+          - pyyaml==6.0.3
+        entry: cmake-format --first-comment-is-literal True -i
+        files: ^src/main/cpp/(CMakeLists\.txt|(main|test)/.*(CMakeLists\.txt|\.cmake))$
+
+      - id: spotless-apply
+        name: spotless (apply)
+        language: system
+        entry: mvn --batch-mode spotless:apply
+        pass_filenames: false
