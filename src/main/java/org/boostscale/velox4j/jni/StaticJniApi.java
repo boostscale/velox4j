@@ -39,7 +39,7 @@ import org.boostscale.velox4j.type.Type;
 import org.boostscale.velox4j.variant.Variant;
 import org.boostscale.velox4j.variant.VariantCo;
 
-/** The higher-level JNI-based API over {@link StaticJniWrapper}. */
+/** The higher-level API over static native methods on {@link JniWrapper}. */
 public class StaticJniApi {
   private static final StaticJniApi INSTANCE = new StaticJniApi();
 
@@ -47,66 +47,64 @@ public class StaticJniApi {
     return INSTANCE;
   }
 
-  private final StaticJniWrapper jni = StaticJniWrapper.get();
-
   private StaticJniApi() {}
 
   public void initialize(Config globalConf) {
-    jni.initialize(Serde.toPrettyJson(globalConf));
+    JniWrapper.initialize(Serde.toPrettyJson(globalConf));
   }
 
   public MemoryManager createMemoryManager(AllocationListener listener) {
-    return new MemoryManager(jni.createMemoryManager(listener));
+    return new MemoryManager(JniWrapper.createMemoryManager(listener));
   }
 
   public LocalSession createSession(MemoryManager memoryManager) {
-    return new LocalSession(jni.createSession(memoryManager.id()));
+    return new LocalSession(JniWrapper.createSession(memoryManager.id()));
   }
 
   public void releaseCppObject(CppObject obj) {
-    jni.releaseCppObject(obj.id());
+    JniWrapper.releaseCppObject(obj.id());
   }
 
   public UpIterator.State upIteratorAdvance(UpIterator itr) {
-    return UpIterator.State.get(jni.upIteratorAdvance(itr.id()));
+    return UpIterator.State.get(JniWrapper.upIteratorAdvance(itr.id()));
   }
 
   public void upIteratorWait(UpIterator itr) {
-    jni.upIteratorWait(itr.id());
+    JniWrapper.upIteratorWait(itr.id());
   }
 
   public void blockingQueuePut(ExternalStreams.BlockingQueue queue, RowVector rowVector) {
-    jni.blockingQueuePut(queue.id(), rowVector.id());
+    JniWrapper.blockingQueuePut(queue.id(), rowVector.id());
   }
 
   public void blockingQueueNoMoreInput(ExternalStreams.BlockingQueue queue) {
-    jni.blockingQueueNoMoreInput(queue.id());
+    JniWrapper.blockingQueueNoMoreInput(queue.id());
   }
 
   public void serialTaskAddSplit(
       SerialTask serialTask, String planNodeId, int groupId, ConnectorSplit split) {
     final String splitJson = Serde.toJson(split);
-    jni.serialTaskAddSplit(serialTask.id(), planNodeId, groupId, splitJson);
+    JniWrapper.serialTaskAddSplit(serialTask.id(), planNodeId, groupId, splitJson);
   }
 
   public void serialTaskNoMoreSplits(SerialTask serialTask, String planNodeId) {
-    jni.serialTaskNoMoreSplits(serialTask.id(), planNodeId);
+    JniWrapper.serialTaskNoMoreSplits(serialTask.id(), planNodeId);
   }
 
   public SerialTaskStats serialTaskCollectStats(SerialTask serialTask) {
-    final String statsJson = jni.serialTaskCollectStats(serialTask.id());
+    final String statsJson = JniWrapper.serialTaskCollectStats(serialTask.id());
     return SerialTaskStats.fromJson(statsJson);
   }
 
   public Type variantInferType(Variant variant) {
     final String variantJson = Serde.toJson(variant);
-    final String typeJson = jni.variantInferType(variantJson);
+    final String typeJson = JniWrapper.variantInferType(variantJson);
     return Serde.fromJson(typeJson, Type.class);
   }
 
   public Type arrowToRowType(ArrowSchema schema) {
     try {
-      final String typeJson = jni.arrowToType(schema.memoryAddress());
+      final String typeJson = JniWrapper.arrowToType(schema.memoryAddress());
       return Serde.fromJson(typeJson, Type.class);
     } finally {
       schema.close();
@@ -114,56 +112,56 @@ public class StaticJniApi {
   }
 
   public void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
-    jni.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
+    JniWrapper.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
   }
 
   public String baseVectorSerialize(List<? extends BaseVector> vector) {
-    return jni.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
+    return JniWrapper.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
   }
 
   /** Serialize vectors to raw binary bytes (no Base64 encoding). */
   public byte[] baseVectorSerializeToBuf(List<? extends BaseVector> vector) {
-    return jni.baseVectorSerializeToBuf(vector.stream().mapToLong(BaseVector::id).toArray());
+    return JniWrapper.baseVectorSerializeToBuf(vector.stream().mapToLong(BaseVector::id).toArray());
   }
 
   public Type baseVectorGetType(BaseVector vector) {
-    final String typeJson = jni.baseVectorGetType(vector.id());
+    final String typeJson = JniWrapper.baseVectorGetType(vector.id());
     return Serde.fromJson(typeJson, Type.class);
   }
 
   public int baseVectorGetSize(BaseVector vector) {
-    return jni.baseVectorGetSize(vector.id());
+    return JniWrapper.baseVectorGetSize(vector.id());
   }
 
   public VectorEncoding baseVectorGetEncoding(BaseVector vector) {
-    return VectorEncoding.valueOf(jni.baseVectorGetEncoding(vector.id()));
+    return VectorEncoding.valueOf(JniWrapper.baseVectorGetEncoding(vector.id()));
   }
 
   public void baseVectorAppend(BaseVector vector, BaseVector toAppend) {
-    jni.baseVectorAppend(vector.id(), toAppend.id());
+    JniWrapper.baseVectorAppend(vector.id(), toAppend.id());
   }
 
   public boolean selectivityVectorIsValid(SelectivityVector vector, int idx) {
-    return jni.selectivityVectorIsValid(vector.id(), idx);
+    return JniWrapper.selectivityVectorIsValid(vector.id(), idx);
   }
 
   public RowType tableWriteTraitsOutputType() {
-    final String typeJson = jni.tableWriteTraitsOutputType();
+    final String typeJson = JniWrapper.tableWriteTraitsOutputType();
     final RowType type = Serde.fromJson(typeJson, RowType.class);
     return type;
   }
 
   public String planNodeToString(PlanNode planNode, boolean detailed, boolean recursive) {
-    return jni.planNodeToString(Serde.toPrettyJson(planNode), detailed, recursive);
+    return JniWrapper.planNodeToString(Serde.toPrettyJson(planNode), detailed, recursive);
   }
 
   public ISerializable iSerializableAsJava(ISerializableCo co) {
-    final String json = jni.iSerializableAsJava(co.id());
+    final String json = JniWrapper.iSerializableAsJava(co.id());
     return Serde.fromJson(json, ISerializable.class);
   }
 
   public Variant variantAsJava(VariantCo co) {
-    final String json = jni.variantAsJava(co.id());
+    final String json = JniWrapper.variantAsJava(co.id());
     return Serde.fromJson(json, Variant.class);
   }
 }
