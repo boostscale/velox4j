@@ -55,6 +55,7 @@ import org.boostscale.velox4j.write.ColumnStatsSpec;
  * functionalities.
  */
 public final class JniApi {
+  private static final Long INVALID_OBJECT_HANDLE = -1L;
   private final JniWrapper jni;
 
   JniApi(JniWrapper jni) {
@@ -87,7 +88,7 @@ public final class JniApi {
   }
 
   public BaseVector evaluatorEval(Evaluator evaluator, SelectivityVector sv, RowVector input) {
-    return baseVectorWrap(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
+    return baseVectorCreateById(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
   }
 
   // Plan execution.
@@ -115,7 +116,7 @@ public final class JniApi {
   }
 
   public RowVector upIteratorGet(UpIterator itr) {
-    return baseVectorWrap(jni.upIteratorGet(itr.id())).asRowVector();
+    return baseVectorCreateById(jni.upIteratorGet(itr.id())).asRowVector();
   }
 
   // DownIterator.
@@ -171,7 +172,7 @@ public final class JniApi {
   public BaseVector variantToVector(Type type, Variant variant) {
     final String typeJson = Serde.toJson(type);
     final String variantJson = Serde.toPrettyJson(variant);
-    return baseVectorWrap(jni.variantToVector(typeJson, variantJson));
+    return baseVectorCreateById(jni.variantToVector(typeJson, variantJson));
   }
 
   // Type.
@@ -226,12 +227,13 @@ public final class JniApi {
 
   public BaseVector createEmptyBaseVector(Type type) {
     final String typeJson = Serde.toJson(type);
-    return baseVectorWrap(jni.createEmptyBaseVector(typeJson));
+    return baseVectorCreateById(jni.createEmptyBaseVector(typeJson));
   }
 
   public BaseVector arrowToBaseVector(ArrowSchema schema, ArrowArray array) {
     try {
-      return baseVectorWrap(jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
+      return baseVectorCreateById(
+          jni.arrowToBaseVector(schema.memoryAddress(), array.memoryAddress()));
     } finally {
       schema.close();
       array.close();
@@ -240,22 +242,22 @@ public final class JniApi {
 
   public List<BaseVector> baseVectorDeserialize(String serialized) {
     return Arrays.stream(jni.baseVectorDeserialize(serialized))
-        .mapToObj(this::baseVectorWrap)
+        .mapToObj(this::baseVectorCreateById)
         .collect(Collectors.toList());
   }
 
   public List<BaseVector> baseVectorDeserializeFromBuf(byte[] buf) {
     return Arrays.stream(jni.baseVectorDeserializeFromBuf(buf))
-        .mapToObj(this::baseVectorWrap)
+        .mapToObj(this::baseVectorCreateById)
         .collect(Collectors.toList());
   }
 
   public BaseVector baseVectorWrapInConstant(BaseVector vector, int length, int index) {
-    return baseVectorWrap(jni.baseVectorWrapInConstant(vector.id(), length, index));
+    return baseVectorCreateById(jni.baseVectorWrapInConstant(vector.id(), length, index));
   }
 
   public BaseVector baseVectorSlice(BaseVector vector, int offset, int length) {
-    return baseVectorWrap(jni.baseVectorSlice(vector.id(), offset, length));
+    return baseVectorCreateById(jni.baseVectorSlice(vector.id(), offset, length));
   }
 
   public List<RowVector> rowVectorPartitionByKeys(
@@ -263,7 +265,7 @@ public final class JniApi {
     final int[] keyChannelArray = keyChannels.stream().mapToInt(i -> i).toArray();
     final long[] vids = jni.rowVectorPartitionByKeys(vector.id(), keyChannelArray, maxPartitions);
     return Arrays.stream(vids)
-        .mapToObj(this::baseVectorWrap)
+        .mapToObj(this::baseVectorCreateById)
         .map(BaseVector::asRowVector)
         .collect(Collectors.toList());
   }
@@ -286,16 +288,16 @@ public final class JniApi {
     return Arrays.stream(vids)
         .mapToObj(
             vid -> {
-              if (vid == 0) {
+              if (vid == INVALID_OBJECT_HANDLE) {
                 return null;
               }
-              return baseVectorWrap(vid);
+              return baseVectorCreateById(vid);
             })
         .collect(Collectors.toList());
   }
 
   public BaseVector flattenVector(BaseVector vector) {
-    return baseVectorWrap(jni.baseVectorFlatten(vector.id()));
+    return baseVectorCreateById(jni.baseVectorFlatten(vector.id()));
   }
 
   public SelectivityVector createSelectivityVector(int length) {
@@ -337,8 +339,8 @@ public final class JniApi {
     return new GenericUpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
   }
 
-  private BaseVector baseVectorWrap(long id) {
+  private BaseVector baseVectorCreateById(long id) {
     final VectorEncoding encoding = VectorEncoding.valueOf(JniWrapper.baseVectorGetEncoding(id));
-    return BaseVector.wrap(this, id, encoding);
+    return BaseVector.createById(this, id, encoding);
   }
 }

@@ -13,6 +13,8 @@
  */
 package org.boostscale.velox4j.data;
 
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
@@ -25,7 +27,7 @@ import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.type.Type;
 
 public class BaseVector implements CppObject {
-  public static BaseVector wrap(JniApi jniApi, long id, VectorEncoding encoding) {
+  public static BaseVector createById(JniApi jniApi, long id, VectorEncoding encoding) {
     // TODO Add JNI API `isRowVector` for performance.
     if (encoding == VectorEncoding.ROW) {
       return new RowVector(jniApi, id);
@@ -74,6 +76,10 @@ public class BaseVector implements CppObject {
 
   public BaseVector flattenedVector() {
     return jniApi.flattenVector(this);
+  }
+
+  public List<BaseVector> wrapPartitions(int[] partitions, int numPartitions) {
+    return jniApi.baseVectorWrapPartitions(this, partitions, numPartitions);
   }
 
   public String serialize() {

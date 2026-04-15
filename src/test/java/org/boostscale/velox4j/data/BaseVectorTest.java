@@ -13,7 +13,11 @@
  */
 package org.boostscale.velox4j.data;
 
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.IntVector;
 import org.junit.*;
 
 import org.boostscale.velox4j.Velox4j;
@@ -151,5 +155,43 @@ public class BaseVectorTest {
     Assert.assertEquals(9, input2.getSize());
     Assert.assertEquals(
         ResourceTests.readResourceAsString("vector-output/append-2.txt"), input2.toString());
+  }
+
+  @Test
+  public void testWrapPartitionsRowVector() {
+    final RowVector input = BaseVectorTests.newSampleRowVector(session);
+    final List<BaseVector> partitions = input.wrapPartitions(new int[] {0, 1, 0}, 3);
+
+    Assert.assertEquals(3, partitions.size());
+    Assert.assertEquals(2, partitions.get(0).getSize());
+    Assert.assertTrue(partitions.get(0) instanceof RowVector);
+    Assert.assertEquals(
+        ResourceTests.readResourceAsString("vector-output/wrap-partitions-row-vector-1.txt"),
+        partitions.get(0).toString());
+    Assert.assertEquals(1, partitions.get(1).getSize());
+    Assert.assertTrue(partitions.get(1) instanceof RowVector);
+    Assert.assertEquals(
+        ResourceTests.readResourceAsString("vector-output/wrap-partitions-row-vector-2.txt"),
+        partitions.get(1).toString());
+    Assert.assertNull(partitions.get(2));
+  }
+
+  @Test
+  public void testWrapPartitionsBaseVector() {
+    final RootAllocator alloc = new RootAllocator();
+    final IntVector arrowVector = new IntVector("ints", alloc);
+    arrowVector.allocateNew(3);
+    arrowVector.setSafe(0, 10);
+    arrowVector.setSafe(1, 20);
+    arrowVector.setSafe(2, 30);
+    arrowVector.setValueCount(3);
+
+    final BaseVector input = session.arrowOps().fromArrowVector(alloc, arrowVector);
+    final List<BaseVector> partitions = input.wrapPartitions(new int[] {0, 1, 0}, 3);
+
+    Assert.assertEquals(3, partitions.size());
+    Assert.assertEquals("[10, 30]", partitions.get(0).toString());
+    Assert.assertEquals("[20]", partitions.get(1).toString());
+    Assert.assertNull(partitions.get(2));
   }
 }
