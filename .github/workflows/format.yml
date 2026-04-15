@@ -38,4 +38,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run format checker
         run: |
-          bash .github/workflows/scripts/format/format.sh -check
+          bash .github/workflows/scripts/format/format.sh -fix

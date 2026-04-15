@@ -98,7 +98,7 @@ class ObjectStore {
 
   void releaseInternal(ResourceHandle handle);
 
-  explicit ObjectStore(StoreHandle storeId) : storeId_(storeId){};
+  explicit ObjectStore(StoreHandle storeId) : storeId_(storeId) {};
   StoreHandle storeId_;
   ResourceMap<std::shared_ptr<void>> store_;
   // Preserves handles of objects in the store in order, with the text

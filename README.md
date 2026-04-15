@@ -273,13 +273,9 @@ the C++ code and Java code:
 bash .github/workflows/scripts/format/format.sh -fix
 ```
 
-Note, Docker environment is required to run the script.
-
-If you only need to check the code format without fixing them, use the subcommand`-check` instead:
-
-```shell
-bash .github/workflows/scripts/format/format.sh -check
-```
+The script is backed by `pre-commit` hooks for `clang-format`, `cmake-format`, and Spotless.
+Install `pre-commit` before running it by following the official instructions:
+https://pre-commit.com/#installation
 
 ## License
 
