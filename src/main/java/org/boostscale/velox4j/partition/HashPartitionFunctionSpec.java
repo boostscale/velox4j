@@ -19,8 +19,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.google.common.base.Preconditions;
+
 import org.boostscale.velox4j.expression.ConstantTypedExpr;
 import org.boostscale.velox4j.type.RowType;
 
