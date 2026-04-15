@@ -14,7 +14,6 @@
 package org.boostscale.velox4j.write;
 
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.type.RowType;
 
 public class TableWriteTraits {
@@ -25,7 +24,7 @@ public class TableWriteTraits {
   }
 
   public static RowType outputType() {
-    return StaticJniApi.get().tableWriteTraitsOutputType();
+    return JniApi.tableWriteTraitsOutputType();
   }
 
   public RowType outputType(ColumnStatsSpec columnStatsSpec) {

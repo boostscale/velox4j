@@ -21,6 +21,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 
+import org.boostscale.velox4j.config.Config;
+import org.boostscale.velox4j.connector.ConnectorSplit;
 import org.boostscale.velox4j.connector.ExternalStream;
 import org.boostscale.velox4j.connector.ExternalStreams;
 import org.boostscale.velox4j.data.*;
@@ -29,11 +31,15 @@ import org.boostscale.velox4j.eval.Evaluator;
 import org.boostscale.velox4j.iterator.DownIterator;
 import org.boostscale.velox4j.iterator.GenericUpIterator;
 import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.memory.AllocationListener;
+import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.partition.PartitionFunction;
 import org.boostscale.velox4j.partition.PartitionFunctionSpec;
+import org.boostscale.velox4j.plan.PlanNode;
 import org.boostscale.velox4j.query.Query;
 import org.boostscale.velox4j.query.QueryExecutor;
 import org.boostscale.velox4j.query.SerialTask;
+import org.boostscale.velox4j.query.SerialTaskStats;
 import org.boostscale.velox4j.serde.Serde;
 import org.boostscale.velox4j.serializable.ISerializable;
 import org.boostscale.velox4j.serializable.ISerializableCo;
@@ -55,6 +61,26 @@ public final class JniApi {
     this.jni = jni;
   }
 
+  // Global initialization.
+  public static void initialize(Config globalConf) {
+    JniWrapper.initialize(Serde.toPrettyJson(globalConf));
+  }
+
+  // Memory.
+  public static MemoryManager createMemoryManager(AllocationListener listener) {
+    return new MemoryManager(JniWrapper.createMemoryManager(listener));
+  }
+
+  // Lifecycle.
+  public static LocalSession createSession(MemoryManager memoryManager) {
+    return new LocalSession(JniWrapper.createSession(memoryManager.id()));
+  }
+
+  public static void releaseCppObject(CppObject obj) {
+    JniWrapper.releaseCppObject(obj.id());
+  }
+
+  // Expression evaluation.
   public Evaluator createEvaluator(Evaluation evaluation) {
     final String evalJson = Serde.toPrettyJson(evaluation);
     return new Evaluator(this, jni.createEvaluator(evalJson));
@@ -64,6 +90,7 @@ public final class JniApi {
     return baseVectorWrap(jni.evaluatorEval(evaluator.id(), sv.id(), input.id()));
   }
 
+  // Plan execution.
   public QueryExecutor createQueryExecutor(Query query) {
     final String queryJson = Serde.toPrettyJson(query);
     return new QueryExecutor(this, jni.createQueryExecutor(queryJson));
@@ -78,8 +105,26 @@ public final class JniApi {
     return new SerialTask(this, jni.queryExecutorExecute(executor.id()));
   }
 
+  // UpIterator.
+  public static UpIterator.State upIteratorAdvance(UpIterator itr) {
+    return UpIterator.State.get(JniWrapper.upIteratorAdvance(itr.id()));
+  }
+
+  public static void upIteratorWait(UpIterator itr) {
+    JniWrapper.upIteratorWait(itr.id());
+  }
+
   public RowVector upIteratorGet(UpIterator itr) {
     return baseVectorWrap(jni.upIteratorGet(itr.id())).asRowVector();
+  }
+
+  // DownIterator.
+  public static void blockingQueuePut(ExternalStreams.BlockingQueue queue, RowVector rowVector) {
+    JniWrapper.blockingQueuePut(queue.id(), rowVector.id());
+  }
+
+  public static void blockingQueueNoMoreInput(ExternalStreams.BlockingQueue queue) {
+    JniWrapper.blockingQueueNoMoreInput(queue.id());
   }
 
   public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
@@ -90,9 +135,93 @@ public final class JniApi {
     return new ExternalStreams.BlockingQueue(jni.createBlockingQueue());
   }
 
+  // SerialTask.
+  public static void serialTaskAddSplit(
+      SerialTask serialTask, String planNodeId, int groupId, ConnectorSplit split) {
+    final String splitJson = Serde.toJson(split);
+    JniWrapper.serialTaskAddSplit(serialTask.id(), planNodeId, groupId, splitJson);
+  }
+
+  public static void serialTaskNoMoreSplits(SerialTask serialTask, String planNodeId) {
+    JniWrapper.serialTaskNoMoreSplits(serialTask.id(), planNodeId);
+  }
+
+  public static SerialTaskStats serialTaskCollectStats(SerialTask serialTask) {
+    final String statsJson = JniWrapper.serialTaskCollectStats(serialTask.id());
+    return SerialTaskStats.fromJson(statsJson);
+  }
+
+  // Variant.
+  public static Type variantInferType(Variant variant) {
+    final String variantJson = Serde.toJson(variant);
+    final String typeJson = JniWrapper.variantInferType(variantJson);
+    return Serde.fromJson(typeJson, Type.class);
+  }
+
+  public static Variant variantAsJava(VariantCo co) {
+    final String json = JniWrapper.variantAsJava(co.id());
+    return Serde.fromJson(json, Variant.class);
+  }
+
+  public VariantCo variantAsCpp(Variant variant) {
+    final String json = Serde.toPrettyJson(variant);
+    return new VariantCo(jni.variantAsCpp(json));
+  }
+
+  public BaseVector variantToVector(Type type, Variant variant) {
+    final String typeJson = Serde.toJson(type);
+    final String variantJson = Serde.toPrettyJson(variant);
+    return baseVectorWrap(jni.variantToVector(typeJson, variantJson));
+  }
+
+  // Type.
+  public static Type arrowToRowType(ArrowSchema schema) {
+    try {
+      final String typeJson = JniWrapper.arrowToType(schema.memoryAddress());
+      return Serde.fromJson(typeJson, Type.class);
+    } finally {
+      schema.close();
+    }
+  }
+
   public void typeToArrow(Type type, ArrowSchema schema) {
     final String typeJson = Serde.toJson(type);
     jni.typeToArrow(typeJson, schema.memoryAddress());
+  }
+
+  // BaseVector / RowVector / SelectivityVector.
+  public static void baseVectorToArrow(BaseVector vector, ArrowSchema schema, ArrowArray array) {
+    JniWrapper.baseVectorToArrow(vector.id(), schema.memoryAddress(), array.memoryAddress());
+  }
+
+  public static String baseVectorSerialize(List<? extends BaseVector> vector) {
+    return JniWrapper.baseVectorSerialize(vector.stream().mapToLong(BaseVector::id).toArray());
+  }
+
+  /** Serialize vectors to raw binary bytes (no Base64 encoding). */
+  public static byte[] baseVectorSerializeToBuf(List<? extends BaseVector> vector) {
+    return JniWrapper.baseVectorSerializeToBuf(vector.stream().mapToLong(BaseVector::id).toArray());
+  }
+
+  public static Type baseVectorGetType(BaseVector vector) {
+    final String typeJson = JniWrapper.baseVectorGetType(vector.id());
+    return Serde.fromJson(typeJson, Type.class);
+  }
+
+  public static int baseVectorGetSize(BaseVector vector) {
+    return JniWrapper.baseVectorGetSize(vector.id());
+  }
+
+  public static VectorEncoding baseVectorGetEncoding(BaseVector vector) {
+    return VectorEncoding.valueOf(JniWrapper.baseVectorGetEncoding(vector.id()));
+  }
+
+  public static void baseVectorAppend(BaseVector vector, BaseVector toAppend) {
+    JniWrapper.baseVectorAppend(vector.id(), toAppend.id());
+  }
+
+  public static boolean selectivityVectorIsValid(SelectivityVector vector, int idx) {
+    return JniWrapper.selectivityVectorIsValid(vector.id(), idx);
   }
 
   public BaseVector createEmptyBaseVector(Type type) {
@@ -173,6 +302,13 @@ public final class JniApi {
     return new SelectivityVector(jni.createSelectivityVector(length));
   }
 
+  // TableWrite.
+  public static RowType tableWriteTraitsOutputType() {
+    final String typeJson = JniWrapper.tableWriteTraitsOutputType();
+    final RowType type = Serde.fromJson(typeJson, RowType.class);
+    return type;
+  }
+
   public RowType tableWriteTraitsOutputTypeFromColumnStatsSpec(ColumnStatsSpec columnStatsSpec) {
     final String columnStatsSpecJson = Serde.toJson(columnStatsSpec);
     final String typeJson = jni.tableWriteTraitsOutputTypeFromColumnStatsSpec(columnStatsSpecJson);
@@ -180,20 +316,20 @@ public final class JniApi {
     return type;
   }
 
+  // PlanNode.
+  public static String planNodeToString(PlanNode planNode, boolean detailed, boolean recursive) {
+    return JniWrapper.planNodeToString(Serde.toPrettyJson(planNode), detailed, recursive);
+  }
+
+  // Serde.
+  public static ISerializable iSerializableAsJava(ISerializableCo co) {
+    final String json = JniWrapper.iSerializableAsJava(co.id());
+    return Serde.fromJson(json, ISerializable.class);
+  }
+
   public ISerializableCo iSerializableAsCpp(ISerializable iSerializable) {
     final String json = Serde.toPrettyJson(iSerializable);
     return new ISerializableCo(jni.iSerializableAsCpp(json));
-  }
-
-  public VariantCo variantAsCpp(Variant variant) {
-    final String json = Serde.toPrettyJson(variant);
-    return new VariantCo(jni.variantAsCpp(json));
-  }
-
-  public BaseVector variantToVector(Type type, Variant variant) {
-    final String typeJson = Serde.toJson(type);
-    final String variantJson = Serde.toPrettyJson(variant);
-    return baseVectorWrap(jni.variantToVector(typeJson, variantJson));
   }
 
   @VisibleForTesting

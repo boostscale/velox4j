@@ -856,6 +856,10 @@ const char* JniWrapper::getCanonicalName() const {
 void JniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
+  // Caches the sessionId Java method.
+  cacheMethod(env, "sessionId", kTypeLong, nullptr);
+
+  // All native method definitions.
   addNativeMethod(
       "initialize", (void*)initialize0, kTypeVoid, kTypeString, nullptr);
   addNativeMethod(
@@ -872,8 +876,6 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeVoid,
       kTypeLong,
       nullptr);
-
-  cacheMethod(env, "sessionId", kTypeLong, nullptr);
   addNativeMethod(
       "createEvaluator",
       (void*)createEvaluator,
@@ -1153,6 +1155,7 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
 
+  // Registers all native methods.
   registerNativeMethods(env);
 }
 

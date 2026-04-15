@@ -27,6 +27,6 @@ public interface CppObject extends AutoCloseable {
    */
   @Override
   default void close() {
-    StaticJniApi.get().releaseCppObject(this);
+    JniApi.releaseCppObject(this);
   }
 }

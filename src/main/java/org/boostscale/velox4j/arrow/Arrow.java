@@ -25,7 +25,6 @@ import org.apache.arrow.vector.types.pojo.Schema;
 import org.boostscale.velox4j.data.BaseVector;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.type.RowType;
 import org.boostscale.velox4j.type.Type;
 
@@ -47,7 +46,7 @@ public class Arrow {
   public static RowType fromArrowSchema(BufferAllocator alloc, Schema schema) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc)) {
       Data.exportSchema(alloc, schema, null, cSchema);
-      final RowType type = (RowType) StaticJniApi.get().arrowToRowType(cSchema);
+      final RowType type = (RowType) JniApi.arrowToRowType(cSchema);
       return type;
     }
   }
@@ -63,7 +62,7 @@ public class Arrow {
   public static Type fromArrowField(BufferAllocator alloc, Field field) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc)) {
       Data.exportField(alloc, field, null, cSchema);
-      final Type type = StaticJniApi.get().arrowToRowType(cSchema);
+      final Type type = JniApi.arrowToRowType(cSchema);
       return type;
     }
   }
@@ -71,7 +70,7 @@ public class Arrow {
   public static FieldVector toArrowVector(BufferAllocator alloc, BaseVector vector) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
-      StaticJniApi.get().baseVectorToArrow(vector, cSchema, cArray);
+      JniApi.baseVectorToArrow(vector, cSchema, cArray);
       final FieldVector fv = Data.importVector(alloc, cArray, cSchema, null);
       return fv;
     }
@@ -89,7 +88,7 @@ public class Arrow {
   public static VectorSchemaRoot toArrowVectorSchemaRoot(BufferAllocator alloc, RowVector vector) {
     try (final ArrowSchema cSchema = ArrowSchema.allocateNew(alloc);
         final ArrowArray cArray = ArrowArray.allocateNew(alloc)) {
-      StaticJniApi.get().baseVectorToArrow(vector, cSchema, cArray);
+      JniApi.baseVectorToArrow(vector, cSchema, cArray);
       final VectorSchemaRoot vsr = Data.importVectorSchemaRoot(alloc, cArray, cSchema, null);
       return vsr;
     }

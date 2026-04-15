@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.boostscale.velox4j.data.BaseVector;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.type.Type;
 
 public class Variants {
@@ -36,7 +35,7 @@ public class Variants {
   }
 
   public Type inferType(Variant variant) {
-    return StaticJniApi.get().variantInferType(variant);
+    return JniApi.variantInferType(variant);
   }
 
   public static void checkSameType(List<Variant> variants) {

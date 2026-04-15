@@ -14,7 +14,7 @@
 package org.boostscale.velox4j.variant;
 
 import org.boostscale.velox4j.jni.CppObject;
-import org.boostscale.velox4j.jni.StaticJniApi;
+import org.boostscale.velox4j.jni.JniApi;
 
 /** Binds a CPP variant object. */
 public class VariantCo implements CppObject {
@@ -30,6 +30,6 @@ public class VariantCo implements CppObject {
   }
 
   public Variant asJava() {
-    return StaticJniApi.get().variantAsJava(this);
+    return JniApi.variantAsJava(this);
   }
 }

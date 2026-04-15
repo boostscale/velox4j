@@ -15,7 +15,6 @@ package org.boostscale.velox4j.iterator;
 
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 
 public class GenericUpIterator implements UpIterator {
   private final JniApi jniApi;
@@ -28,12 +27,12 @@ public class GenericUpIterator implements UpIterator {
 
   @Override
   public State advance() {
-    return StaticJniApi.get().upIteratorAdvance(this);
+    return JniApi.upIteratorAdvance(this);
   }
 
   @Override
   public void waitFor() {
-    StaticJniApi.get().upIteratorWait(this);
+    JniApi.upIteratorWait(this);
   }
 
   @Override

@@ -19,7 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.type.Type;
 
 public class BaseVectors {
@@ -34,7 +33,7 @@ public class BaseVectors {
   }
 
   public static String serializeOne(BaseVector vector) {
-    return StaticJniApi.get().baseVectorSerialize(ImmutableList.of(vector));
+    return JniApi.baseVectorSerialize(ImmutableList.of(vector));
   }
 
   public BaseVector deserializeOne(String serialized) {
@@ -45,19 +44,19 @@ public class BaseVectors {
   }
 
   public static String serializeAll(List<? extends BaseVector> vectors) {
-    return StaticJniApi.get().baseVectorSerialize(vectors);
+    return JniApi.baseVectorSerialize(vectors);
   }
 
   /** Serialize a single vector to raw binary bytes (no Base64). Efficient for network transport. */
   public static byte[] serializeOneToBuf(BaseVector vector) {
-    return StaticJniApi.get().baseVectorSerializeToBuf(ImmutableList.of(vector));
+    return JniApi.baseVectorSerializeToBuf(ImmutableList.of(vector));
   }
 
   /**
    * Serialize multiple vectors to raw binary bytes (no Base64). Efficient for network transport.
    */
   public static byte[] serializeAllToBuf(List<? extends BaseVector> vectors) {
-    return StaticJniApi.get().baseVectorSerializeToBuf(vectors);
+    return JniApi.baseVectorSerializeToBuf(vectors);
   }
 
   public List<BaseVector> deserializeAll(String serialized) {

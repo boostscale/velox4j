@@ -16,7 +16,6 @@ package org.boostscale.velox4j.connector;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.iterator.DownIterator;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 
 /** A factory for creating {@link ExternalStream} instances. */
 public class ExternalStreams {
@@ -65,11 +64,11 @@ public class ExternalStreams {
     }
 
     public void put(RowVector rowVector) {
-      StaticJniApi.get().blockingQueuePut(this, rowVector);
+      JniApi.blockingQueuePut(this, rowVector);
     }
 
     public void noMoreInput() {
-      StaticJniApi.get().blockingQueueNoMoreInput(this);
+      JniApi.blockingQueueNoMoreInput(this);
     }
   }
 }

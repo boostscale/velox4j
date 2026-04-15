@@ -22,7 +22,6 @@ import org.boostscale.velox4j.arrow.Arrow;
 import org.boostscale.velox4j.exception.VeloxException;
 import org.boostscale.velox4j.jni.CppObject;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 import org.boostscale.velox4j.type.Type;
 
 public class BaseVector implements CppObject {
@@ -50,7 +49,7 @@ public class BaseVector implements CppObject {
   }
 
   public Type getType() {
-    return StaticJniApi.get().baseVectorGetType(this);
+    return JniApi.baseVectorGetType(this);
   }
 
   public VectorEncoding getEncoding() {
@@ -58,7 +57,7 @@ public class BaseVector implements CppObject {
   }
 
   public int getSize() {
-    return StaticJniApi.get().baseVectorGetSize(this);
+    return JniApi.baseVectorGetSize(this);
   }
 
   public BaseVector wrapInConstant(int length, int index) {
@@ -70,7 +69,7 @@ public class BaseVector implements CppObject {
   }
 
   public void append(BaseVector toAppend) {
-    StaticJniApi.get().baseVectorAppend(this, toAppend);
+    JniApi.baseVectorAppend(this, toAppend);
   }
 
   public BaseVector flattenedVector() {

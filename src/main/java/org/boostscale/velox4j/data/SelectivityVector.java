@@ -14,7 +14,7 @@
 package org.boostscale.velox4j.data;
 
 import org.boostscale.velox4j.jni.CppObject;
-import org.boostscale.velox4j.jni.StaticJniApi;
+import org.boostscale.velox4j.jni.JniApi;
 
 public class SelectivityVector implements CppObject {
   private final long id;
@@ -29,6 +29,6 @@ public class SelectivityVector implements CppObject {
   }
 
   public boolean isValid(int idx) {
-    return StaticJniApi.get().selectivityVectorIsValid(this, idx);
+    return JniApi.selectivityVectorIsValid(this, idx);
   }
 }

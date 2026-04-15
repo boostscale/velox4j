@@ -17,7 +17,6 @@ import org.boostscale.velox4j.connector.ConnectorSplit;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.iterator.UpIterator;
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.jni.StaticJniApi;
 
 /**
  * An up-iterator implementation that is backed by a Velox task that runs in serial execution mode.
@@ -33,12 +32,12 @@ public class SerialTask implements UpIterator {
 
   @Override
   public State advance() {
-    return StaticJniApi.get().upIteratorAdvance(this);
+    return JniApi.upIteratorAdvance(this);
   }
 
   @Override
   public void waitFor() {
-    StaticJniApi.get().upIteratorWait(this);
+    JniApi.upIteratorWait(this);
   }
 
   @Override
@@ -52,14 +51,14 @@ public class SerialTask implements UpIterator {
   }
 
   public void addSplit(String planNodeId, ConnectorSplit split) {
-    StaticJniApi.get().serialTaskAddSplit(this, planNodeId, -1, split);
+    JniApi.serialTaskAddSplit(this, planNodeId, -1, split);
   }
 
   public void noMoreSplits(String planNodeId) {
-    StaticJniApi.get().serialTaskNoMoreSplits(this, planNodeId);
+    JniApi.serialTaskNoMoreSplits(this, planNodeId);
   }
 
   public SerialTaskStats collectStats() {
-    return StaticJniApi.get().serialTaskCollectStats(this);
+    return JniApi.serialTaskCollectStats(this);
   }
 }

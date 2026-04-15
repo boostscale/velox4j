@@ -24,7 +24,7 @@ import org.boostscale.velox4j.config.Config;
 import org.boostscale.velox4j.exception.VeloxException;
 import org.boostscale.velox4j.jni.JniLibLoader;
 import org.boostscale.velox4j.jni.JniWorkspace;
-import org.boostscale.velox4j.jni.StaticJniApi;
+import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.memory.AllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.serializable.ISerializableRegistry;
@@ -79,12 +79,12 @@ public class Velox4j {
    * listen on all the native memory allocations.
    */
   public static MemoryManager newMemoryManager(AllocationListener listener) {
-    return StaticJniApi.get().createMemoryManager(listener);
+    return JniApi.createMemoryManager(listener);
   }
 
   /** Creates a new Velox4J session. */
   public static Session newSession(MemoryManager memoryManager) {
-    return StaticJniApi.get().createSession(memoryManager);
+    return JniApi.createSession(memoryManager);
   }
 
   private static void initialize0() {
@@ -93,7 +93,7 @@ public class Velox4j {
       JniLibLoader.loadAll(JniWorkspace.getDefault().getSubDir("lib"));
       VariantRegistry.registerAll();
       ISerializableRegistry.registerAll();
-      StaticJniApi.get().initialize(globalConf);
+      JniApi.initialize(globalConf);
     }
   }
 }
