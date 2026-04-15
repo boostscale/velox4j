@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.google.common.base.Preconditions;
 import org.boostscale.velox4j.expression.ConstantTypedExpr;
 import org.boostscale.velox4j.type.RowType;
 
@@ -39,7 +40,7 @@ public class HashPartitionFunctionSpec extends PartitionFunctionSpec {
       @JsonProperty("constants") List<ConstantTypedExpr> constants) {
     this.inputType = inputType;
     this.keyChannels = keyChannels;
-    this.constants = constants != null ? constants : Collections.emptyList();
+    this.constants = Preconditions.checkNotNull(constants);
   }
 
   public HashPartitionFunctionSpec(RowType inputType, List<Integer> keyChannels) {
