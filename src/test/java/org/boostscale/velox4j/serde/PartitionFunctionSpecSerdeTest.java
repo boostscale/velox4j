@@ -24,7 +24,7 @@ import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.IntegerType;
 import org.boostscale.velox4j.type.RowType;
 
-public class PartitionFunctionSpecTest {
+public class PartitionFunctionSpecSerdeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
