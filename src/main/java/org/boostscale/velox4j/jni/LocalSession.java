@@ -19,6 +19,7 @@ import org.boostscale.velox4j.data.BaseVectors;
 import org.boostscale.velox4j.data.RowVectors;
 import org.boostscale.velox4j.data.SelectivityVectors;
 import org.boostscale.velox4j.eval.Evaluations;
+import org.boostscale.velox4j.partition.PartitionFunctions;
 import org.boostscale.velox4j.query.Queries;
 import org.boostscale.velox4j.serializable.ISerializables;
 import org.boostscale.velox4j.session.Session;
@@ -90,5 +91,10 @@ public class LocalSession implements Session {
   @Override
   public Variants variantOps() {
     return new Variants(jniApi());
+  }
+
+  @Override
+  public PartitionFunctions partitionFunctionOps() {
+    return new PartitionFunctions(jniApi());
   }
 }

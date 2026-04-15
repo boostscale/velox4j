@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.boostscale.velox4j.plan.partition;
+package org.boostscale.velox4j.partition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

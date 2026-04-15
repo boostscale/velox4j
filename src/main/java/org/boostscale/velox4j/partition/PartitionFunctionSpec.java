@@ -11,13 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.boostscale.velox4j.plan.partition;
+package org.boostscale.velox4j.partition;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import org.boostscale.velox4j.plan.LocalPartitionNode;
+import org.boostscale.velox4j.serializable.ISerializable;
 
-/** Round-robin partition function that distributes data evenly across partitions. */
-public class RoundRobinPartitionFunctionSpec extends PartitionFunctionSpec {
-
-  @JsonCreator
-  public RoundRobinPartitionFunctionSpec() {}
-}
+/** Base class for partition function specifications used by {@link LocalPartitionNode}. */
+public abstract class PartitionFunctionSpec extends ISerializable {}

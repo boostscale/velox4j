@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.boostscale.velox4j.plan.partition;
+package org.boostscale.velox4j.partition;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 
 import org.boostscale.velox4j.expression.ConstantTypedExpr;
 import org.boostscale.velox4j.type.RowType;
@@ -39,7 +40,7 @@ public class HashPartitionFunctionSpec extends PartitionFunctionSpec {
       @JsonProperty("constants") List<ConstantTypedExpr> constants) {
     this.inputType = inputType;
     this.keyChannels = keyChannels;
-    this.constants = constants;
+    this.constants = Preconditions.checkNotNull(constants);
   }
 
   public HashPartitionFunctionSpec(RowType inputType, List<Integer> keyChannels) {

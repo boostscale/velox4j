@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import org.boostscale.velox4j.plan.partition.PartitionFunctionSpec;
+import org.boostscale.velox4j.partition.PartitionFunctionSpec;
 
 /**
  * In-process repartitioning plan node. Partitions data using the specified partition function. Can

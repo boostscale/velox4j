@@ -14,6 +14,7 @@
 
 #include "velox4j/vector/Vectors.h"
 
+#include <velox/exec/OperatorUtils.h>
 #include <velox/vector/ComplexVector.h>
 #include <velox/vector/LazyVector.h>
 
@@ -74,5 +75,16 @@ void flattenVector(VectorPtr& vector, vector_size_t targetSize) {
   if (vector->size() > targetSize) {
     vector = vector->slice(0, targetSize);
   }
+}
+
+VectorPtr wrapInDictionary(
+    vector_size_t size,
+    const BufferPtr& indices,
+    const VectorPtr& vector) {
+  VELOX_CHECK_NOT_NULL(vector);
+  if (auto rowVector = std::dynamic_pointer_cast<RowVector>(vector)) {
+    return exec::wrap(size, indices, rowVector);
+  }
+  return BaseVector::wrapInDictionary(nullptr, indices, size, vector);
 }
 } // namespace velox4j

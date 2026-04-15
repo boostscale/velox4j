@@ -14,12 +14,13 @@
 package org.boostscale.velox4j.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 
 import org.boostscale.velox4j.jni.JniApi;
-import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
-import org.boostscale.velox4j.plan.partition.PartitionFunctionSpec;
+import org.boostscale.velox4j.partition.PartitionFunction;
+import org.boostscale.velox4j.partition.PartitionFunctionSpec;
 
 public class RowVectors {
   private final JniApi jniApi;
@@ -37,27 +38,26 @@ public class RowVectors {
   }
 
   /**
-   * Partitions the input RowVector into a list of RowVectors where each one has the same keys
-   * defined by the key indices of `keyChannels`, with a configurable maximum number of partitions.
-   */
-  public List<RowVector> partitionByKeys(
-      RowVector rowVector, List<Integer> keyChannels, int maxPartitions) {
-    Preconditions.checkArgument(
-        maxPartitions > 0, "maxPartitions must be positive, got %s", maxPartitions);
-    return jniApi.rowVectorPartitionByKeys(rowVector, keyChannels, maxPartitions);
-  }
-
-  /**
    * Partitions a RowVector into numPartitions groups using the given partition function spec.
    * Returns a list of size numPartitions where index i contains rows for partition i (null if
    * empty).
-   *
-   * <p>Currently only {@link HashPartitionFunctionSpec} is supported.
    */
   public List<RowVector> partitionBySpec(
       RowVector rowVector, PartitionFunctionSpec spec, int numPartitions) {
     Preconditions.checkArgument(
         numPartitions > 0, "numPartitions must be positive, got %s", numPartitions);
-    return jniApi.rowVectorPartitionBySpec(rowVector, spec, numPartitions);
+    try (PartitionFunction partitionFunction =
+        jniApi.createPartitionFunction(spec, numPartitions, false)) {
+      final int[] partitions = jniApi.partitionFunctionPartition(partitionFunction, rowVector);
+      return jniApi.baseVectorWrapPartitions(rowVector, partitions, numPartitions).stream()
+          .map(
+              vector -> {
+                if (vector == null) {
+                  return null;
+                }
+                return vector.asRowVector();
+              })
+          .collect(Collectors.toList());
+    }
   }
 }

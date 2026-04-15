@@ -17,9 +17,9 @@ import com.google.common.collect.ImmutableList;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.boostscale.velox4j.plan.partition.GatherPartitionFunctionSpec;
-import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
-import org.boostscale.velox4j.plan.partition.RoundRobinPartitionFunctionSpec;
+import org.boostscale.velox4j.partition.GatherPartitionFunctionSpec;
+import org.boostscale.velox4j.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.partition.RoundRobinPartitionFunctionSpec;
 import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.IntegerType;
 import org.boostscale.velox4j.type.RowType;

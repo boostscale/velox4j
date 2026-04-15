@@ -21,12 +21,12 @@ import org.junit.*;
 import org.boostscale.velox4j.Velox4j;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
-import org.boostscale.velox4j.plan.partition.HashPartitionFunctionSpec;
+import org.boostscale.velox4j.partition.HashPartitionFunctionSpec;
 import org.boostscale.velox4j.session.Session;
 import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.RowType;
 
-public class HashPartitionTest {
+public class RowVectorPartitionTest {
   private static BytesAllocationListener allocationListener;
   private static MemoryManager memoryManager;
   private static Session session;
