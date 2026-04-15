@@ -22,9 +22,9 @@ import com.google.common.base.Preconditions;
 
 import org.boostscale.velox4j.config.Config;
 import org.boostscale.velox4j.exception.VeloxException;
+import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.jni.JniLibLoader;
 import org.boostscale.velox4j.jni.JniWorkspace;
-import org.boostscale.velox4j.jni.JniApi;
 import org.boostscale.velox4j.memory.AllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.serializable.ISerializableRegistry;

@@ -338,8 +338,7 @@ public final class JniApi {
   }
 
   private BaseVector baseVectorWrap(long id) {
-    final VectorEncoding encoding =
-        VectorEncoding.valueOf(JniWrapper.baseVectorGetEncoding(id));
+    final VectorEncoding encoding = VectorEncoding.valueOf(JniWrapper.baseVectorGetEncoding(id));
     return BaseVector.wrap(this, id, encoding);
   }
 }

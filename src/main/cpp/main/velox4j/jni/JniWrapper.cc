@@ -196,10 +196,8 @@ jstring baseVectorSerialize(JNIEnv* env, jclass clazz, jlongArray vids) {
   JNI_METHOD_END(nullptr)
 }
 
-jbyteArray baseVectorSerializeToBuf(
-    JNIEnv* env,
-    jclass clazz,
-    jlongArray vids) {
+jbyteArray
+baseVectorSerializeToBuf(JNIEnv* env, jclass clazz, jlongArray vids) {
   JNI_METHOD_START
   std::ostringstream out;
   auto safeArray = getLongArrayElementsSafe(env, vids);
@@ -251,11 +249,8 @@ void baseVectorAppend(JNIEnv* env, jclass clazz, jlong vid, jlong toAppendVid) {
   JNI_METHOD_END()
 }
 
-jboolean selectivityVectorIsValid(
-    JNIEnv* env,
-    jclass clazz,
-    jlong svId,
-    jint idx) {
+jboolean
+selectivityVectorIsValid(JNIEnv* env, jclass clazz, jlong svId, jint idx) {
   JNI_METHOD_START
   auto vector = ObjectStore::retrieve<SelectivityVector>(svId);
   auto valid = vector->isValid(static_cast<vector_size_t>(idx));

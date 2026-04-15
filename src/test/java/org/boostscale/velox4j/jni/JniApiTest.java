@@ -197,11 +197,9 @@ public class JniApiTest {
 
   @Test
   public void testVariantInferType() {
-    Assert.assertTrue(
-        JniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
+    Assert.assertTrue(JniApi.variantInferType(new IntegerValue(5)) instanceof IntegerType);
     Assert.assertTrue(JniApi.variantInferType(new RealValue(4.6f)) instanceof RealType);
-    Assert.assertTrue(
-        JniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
+    Assert.assertTrue(JniApi.variantInferType(new DoubleValue(4.6d)) instanceof DoubleType);
   }
 
   @Test
