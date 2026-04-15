@@ -74,6 +74,74 @@ void releaseCppObject(JNIEnv* env, jclass clazz, jlong objId) {
   JNI_METHOD_END()
 }
 
+/// Get the Velox4J session object that is associated with the current
+/// JniWrapper.
+Session* sessionOf(JNIEnv* env, jobject javaThis) {
+  static const auto* clazz = jniClassRegistry()->get(kClassName);
+  static jmethodID methodId = clazz->getMethod("sessionId");
+  const jlong sessionId = env->CallLongMethod(javaThis, methodId);
+  checkException(env);
+  return ObjectStore::retrieve<Session>(sessionId).get();
+}
+
+jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jExprJson{env, evalJson};
+  auto evaluationSerdePool = session->memoryManager()->getVeloxPool(
+      "Evaluation Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  auto exprDynamic = folly::parseJson(jExprJson.get());
+  auto evaluation =
+      ISerializable::deserialize<Evaluation>(exprDynamic, evaluationSerdePool);
+  auto evaluator =
+      std::make_shared<Evaluator>(session->memoryManager(), evaluation);
+  return sessionOf(env, javaThis)->objectStore()->save(evaluator);
+  JNI_METHOD_END(-1L)
+}
+
+jlong evaluatorEval(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong evaluatorId,
+    jlong selectivityVectorId,
+    jlong rvId) {
+  JNI_METHOD_START
+  auto evaluator = ObjectStore::retrieve<Evaluator>(evaluatorId);
+  auto selectivityVector =
+      ObjectStore::retrieve<SelectivityVector>(selectivityVectorId);
+  auto input = ObjectStore::retrieve<RowVector>(rvId);
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save(evaluator->eval(*selectivityVector, *input));
+  JNI_METHOD_END(-1L)
+}
+
+jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jQueryJson{env, queryJson};
+  auto querySerdePool = session->memoryManager()->getVeloxPool(
+      fmt::format("Query Serde Memory Pool"), memory::MemoryPool::Kind::kLeaf);
+  // Keep the pool alive until the task is finished.
+  auto queryDynamic = folly::parseJson(jQueryJson.get());
+  auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
+  auto exec = std::make_shared<QueryExecutor>(session->memoryManager(), query);
+  return sessionOf(env, javaThis)->objectStore()->save(exec);
+  JNI_METHOD_END(-1L)
+}
+
+jlong queryExecutorExecute(
+    JNIEnv* env,
+    jobject javaThis,
+    jlong queryExecutorId) {
+  JNI_METHOD_START
+  auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
+  return sessionOf(env, javaThis)
+      ->objectStore()
+      ->save<SerialTask>(exec->execute());
+  JNI_METHOD_END(-1L)
+}
+
 jint upIteratorAdvance(JNIEnv* env, jclass clazz, jlong itrId) {
   JNI_METHOD_START
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
@@ -86,6 +154,13 @@ void upIteratorWait(JNIEnv* env, jclass clazz, jlong itrId) {
   auto itr = ObjectStore::retrieve<UpIterator>(itrId);
   itr->wait();
   JNI_METHOD_END()
+}
+
+jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
+  JNI_METHOD_START
+  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  return sessionOf(env, javaThis)->objectStore()->save(itr->get());
+  JNI_METHOD_END(-1L)
 }
 
 void blockingQueuePut(JNIEnv* env, jclass clazz, jlong queueId, jlong rvId) {
@@ -101,6 +176,23 @@ void blockingQueueNoMoreInput(JNIEnv* env, jclass clazz, jlong queueId) {
   auto queue = ObjectStore::retrieve<BlockingQueue>(queueId);
   queue->noMoreInput();
   JNI_METHOD_END()
+}
+
+jlong createExternalStreamFromDownIterator(
+    JNIEnv* env,
+    jobject javaThis,
+    jobject itrRef) {
+  JNI_METHOD_START
+  auto es = std::make_shared<DownIterator>(env, itrRef);
+  return sessionOf(env, javaThis)->objectStore()->save(es);
+  JNI_METHOD_END(-1L)
+}
+
+jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
+  JNI_METHOD_START
+  auto queue = std::make_shared<BlockingQueue>();
+  return sessionOf(env, javaThis)->objectStore()->save(queue);
+  JNI_METHOD_END(-1L)
 }
 
 void serialTaskAddSplit(
@@ -156,6 +248,44 @@ jstring variantInferType(JNIEnv* env, jclass clazz, jstring json) {
   JNI_METHOD_END(nullptr);
 }
 
+jstring variantAsJava(JNIEnv* env, jclass clazz, jlong id) {
+  JNI_METHOD_START
+  auto v = ObjectStore::retrieve<variant>(id);
+  auto serializedDynamic = v->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jJson{env, json};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto deserialized = variant::create(dynamic);
+  return session->objectStore()->save(std::make_shared<variant>(deserialized));
+  JNI_METHOD_END(-1)
+}
+
+jlong variantToVector(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jstring variantJson) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  auto vectorPool = session->memoryManager()->getVeloxPool(
+      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  spotify::jni::JavaString jVariantJson{env, variantJson};
+  auto type = Type::create(folly::parseJson(jTypeJson.get()));
+  auto variant = variant::create(folly::parseJson(jVariantJson.get()));
+  auto variantVector =
+      facebook::velox::variantToVector(type, variant, vectorPool);
+  return session->objectStore()->save(variantVector);
+  JNI_METHOD_END(-1)
+}
+
 jstring arrowToType(JNIEnv* env, jclass clazz, jlong cSchema) {
   JNI_METHOD_START
   auto type = fromArrowToType(reinterpret_cast<struct ArrowSchema*>(cSchema));
@@ -163,6 +293,23 @@ jstring arrowToType(JNIEnv* env, jclass clazz, jlong cSchema) {
   auto typeJson = folly::toPrettyJson(serializedDynamic);
   return env->NewStringUTF(typeJson.data());
   JNI_METHOD_END(nullptr)
+}
+
+void typeToArrow(
+    JNIEnv* env,
+    jobject javaThis,
+    jstring typeJson,
+    jlong cSchema) {
+  JNI_METHOD_START
+  auto session = sessionOf(env, javaThis);
+  spotify::jni::JavaString jTypeJson{env, typeJson};
+  auto dynamic = folly::parseJson(jTypeJson.get());
+  auto type = Type::create(dynamic);
+  auto typePool = session->memoryManager()->getVeloxPool(
+      "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
+  fromTypeToArrow(
+      typePool, type, reinterpret_cast<struct ArrowSchema*>(cSchema));
+  JNI_METHOD_END()
 }
 
 void baseVectorToArrow(
@@ -256,157 +403,6 @@ selectivityVectorIsValid(JNIEnv* env, jclass clazz, jlong svId, jint idx) {
   auto valid = vector->isValid(static_cast<vector_size_t>(idx));
   return static_cast<jboolean>(valid);
   JNI_METHOD_END(false)
-}
-
-jstring planNodeToString(
-    JNIEnv* env,
-    jclass clazz,
-    jstring planNodeJson,
-    jboolean detailed,
-    jboolean recursive) {
-  JNI_METHOD_START
-  spotify::jni::JavaString jJson{env, planNodeJson};
-  auto dynamic = folly::parseJson(jJson.get());
-  auto planNode = ISerializable::deserialize<core::PlanNode>(dynamic);
-  auto str = planNode->toString(detailed, recursive);
-  return env->NewStringUTF(str.data());
-  JNI_METHOD_END(nullptr)
-}
-
-jstring iSerializableAsJava(JNIEnv* env, jclass clazz, jlong id) {
-  JNI_METHOD_START
-  auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
-  auto serializedDynamic = iSerializable->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
-jstring variantAsJava(JNIEnv* env, jclass clazz, jlong id) {
-  JNI_METHOD_START
-  auto v = ObjectStore::retrieve<variant>(id);
-  auto serializedDynamic = v->serialize();
-  auto serializeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(serializeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
-jstring tableWriteTraitsOutputType(JNIEnv* env, jclass clazz) {
-  JNI_METHOD_START
-  auto type = exec::TableWriteTraits::outputType(std::nullopt);
-  auto serializedDynamic = type->serialize();
-  auto typeJson = folly::toPrettyJson(serializedDynamic);
-  return env->NewStringUTF(typeJson.data());
-  JNI_METHOD_END(nullptr)
-}
-
-/// Get the Velox4J session object that is associated with the current
-/// JniWrapper.
-Session* sessionOf(JNIEnv* env, jobject javaThis) {
-  static const auto* clazz = jniClassRegistry()->get(kClassName);
-  static jmethodID methodId = clazz->getMethod("sessionId");
-  const jlong sessionId = env->CallLongMethod(javaThis, methodId);
-  checkException(env);
-  return ObjectStore::retrieve<Session>(sessionId).get();
-}
-
-jlong createEvaluator(JNIEnv* env, jobject javaThis, jstring evalJson) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jExprJson{env, evalJson};
-  auto evaluationSerdePool = session->memoryManager()->getVeloxPool(
-      "Evaluation Serde Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  auto exprDynamic = folly::parseJson(jExprJson.get());
-  auto evaluation =
-      ISerializable::deserialize<Evaluation>(exprDynamic, evaluationSerdePool);
-  auto evaluator =
-      std::make_shared<Evaluator>(session->memoryManager(), evaluation);
-  return sessionOf(env, javaThis)->objectStore()->save(evaluator);
-  JNI_METHOD_END(-1L)
-}
-
-jlong evaluatorEval(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong evaluatorId,
-    jlong selectivityVectorId,
-    jlong rvId) {
-  JNI_METHOD_START
-  auto evaluator = ObjectStore::retrieve<Evaluator>(evaluatorId);
-  auto selectivityVector =
-      ObjectStore::retrieve<SelectivityVector>(selectivityVectorId);
-  auto input = ObjectStore::retrieve<RowVector>(rvId);
-  return sessionOf(env, javaThis)
-      ->objectStore()
-      ->save(evaluator->eval(*selectivityVector, *input));
-  JNI_METHOD_END(-1L)
-}
-
-jlong createQueryExecutor(JNIEnv* env, jobject javaThis, jstring queryJson) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jQueryJson{env, queryJson};
-  auto querySerdePool = session->memoryManager()->getVeloxPool(
-      fmt::format("Query Serde Memory Pool"), memory::MemoryPool::Kind::kLeaf);
-  // Keep the pool alive until the task is finished.
-  auto queryDynamic = folly::parseJson(jQueryJson.get());
-  auto query = ISerializable::deserialize<Query>(queryDynamic, querySerdePool);
-  auto exec = std::make_shared<QueryExecutor>(session->memoryManager(), query);
-  return sessionOf(env, javaThis)->objectStore()->save(exec);
-  JNI_METHOD_END(-1L)
-}
-
-jlong queryExecutorExecute(
-    JNIEnv* env,
-    jobject javaThis,
-    jlong queryExecutorId) {
-  JNI_METHOD_START
-  auto exec = ObjectStore::retrieve<QueryExecutor>(queryExecutorId);
-  return sessionOf(env, javaThis)
-      ->objectStore()
-      ->save<SerialTask>(exec->execute());
-  JNI_METHOD_END(-1L)
-}
-
-jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
-  JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
-  return sessionOf(env, javaThis)->objectStore()->save(itr->get());
-  JNI_METHOD_END(-1L)
-}
-
-jlong createExternalStreamFromDownIterator(
-    JNIEnv* env,
-    jobject javaThis,
-    jobject itrRef) {
-  JNI_METHOD_START
-  auto es = std::make_shared<DownIterator>(env, itrRef);
-  return sessionOf(env, javaThis)->objectStore()->save(es);
-  JNI_METHOD_END(-1L)
-}
-
-jlong createBlockingQueue(JNIEnv* env, jobject javaThis) {
-  JNI_METHOD_START
-  auto queue = std::make_shared<BlockingQueue>();
-  return sessionOf(env, javaThis)->objectStore()->save(queue);
-  JNI_METHOD_END(-1L)
-}
-
-void typeToArrow(
-    JNIEnv* env,
-    jobject javaThis,
-    jstring typeJson,
-    jlong cSchema) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jTypeJson{env, typeJson};
-  auto dynamic = folly::parseJson(jTypeJson.get());
-  auto type = Type::create(dynamic);
-  auto typePool = session->memoryManager()->getVeloxPool(
-      "Type Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  fromTypeToArrow(
-      typePool, type, reinterpret_cast<struct ArrowSchema*>(cSchema));
-  JNI_METHOD_END()
 }
 
 jlong createEmptyBaseVector(JNIEnv* env, jobject javaThis, jstring typeJson) {
@@ -727,6 +723,15 @@ jlong createSelectivityVector(JNIEnv* env, jobject javaThis, jint length) {
   JNI_METHOD_END(-1)
 }
 
+jstring tableWriteTraitsOutputType(JNIEnv* env, jclass clazz) {
+  JNI_METHOD_START
+  auto type = exec::TableWriteTraits::outputType(std::nullopt);
+  auto serializedDynamic = type->serialize();
+  auto typeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(typeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jstring tableWriteTraitsOutputTypeFromColumnStatsSpec(
     JNIEnv* env,
     jobject javaThis,
@@ -745,6 +750,30 @@ jstring tableWriteTraitsOutputTypeFromColumnStatsSpec(
   JNI_METHOD_END(nullptr)
 }
 
+jstring planNodeToString(
+    JNIEnv* env,
+    jclass clazz,
+    jstring planNodeJson,
+    jboolean detailed,
+    jboolean recursive) {
+  JNI_METHOD_START
+  spotify::jni::JavaString jJson{env, planNodeJson};
+  auto dynamic = folly::parseJson(jJson.get());
+  auto planNode = ISerializable::deserialize<core::PlanNode>(dynamic);
+  auto str = planNode->toString(detailed, recursive);
+  return env->NewStringUTF(str.data());
+  JNI_METHOD_END(nullptr)
+}
+
+jstring iSerializableAsJava(JNIEnv* env, jclass clazz, jlong id) {
+  JNI_METHOD_START
+  auto iSerializable = ObjectStore::retrieve<ISerializable>(id);
+  auto serializedDynamic = iSerializable->serialize();
+  auto serializeJson = folly::toPrettyJson(serializedDynamic);
+  return env->NewStringUTF(serializeJson.data());
+  JNI_METHOD_END(nullptr)
+}
+
 jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_START
   auto session = sessionOf(env, javaThis);
@@ -755,35 +784,6 @@ jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   auto deserialized = std::const_pointer_cast<ISerializable>(
       ISerializable::deserialize<ISerializable>(dynamic, serdePool));
   return session->objectStore()->save(deserialized);
-  JNI_METHOD_END(-1)
-}
-
-jlong variantAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  spotify::jni::JavaString jJson{env, json};
-  auto dynamic = folly::parseJson(jJson.get());
-  auto deserialized = variant::create(dynamic);
-  return session->objectStore()->save(std::make_shared<variant>(deserialized));
-  JNI_METHOD_END(-1)
-}
-
-jlong variantToVector(
-    JNIEnv* env,
-    jobject javaThis,
-    jstring typeJson,
-    jstring variantJson) {
-  JNI_METHOD_START
-  auto session = sessionOf(env, javaThis);
-  auto vectorPool = session->memoryManager()->getVeloxPool(
-      "BaseVector Memory Pool", memory::MemoryPool::Kind::kLeaf);
-  spotify::jni::JavaString jTypeJson{env, typeJson};
-  spotify::jni::JavaString jVariantJson{env, variantJson};
-  auto type = Type::create(folly::parseJson(jTypeJson.get()));
-  auto variant = variant::create(folly::parseJson(jVariantJson.get()));
-  auto variantVector =
-      facebook::velox::variantToVector(type, variant, vectorPool);
-  return session->objectStore()->save(variantVector);
   JNI_METHOD_END(-1)
 }
 
@@ -957,19 +957,30 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "arrowToType", (void*)arrowToType, kTypeString, kTypeLong, nullptr);
+      "variantAsJava", (void*)variantAsJava, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
-      "createEmptyBaseVector",
-      (void*)createEmptyBaseVector,
+      "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
+  addNativeMethod(
+      "variantToVector",
+      (void*)variantToVector,
       kTypeLong,
       kTypeString,
+      kTypeString,
       nullptr);
+  addNativeMethod(
+      "arrowToType", (void*)arrowToType, kTypeString, kTypeLong, nullptr);
   addNativeMethod(
       "typeToArrow",
       (void*)typeToArrow,
       kTypeVoid,
       kTypeString,
       kTypeLong,
+      nullptr);
+  addNativeMethod(
+      "createEmptyBaseVector",
+      (void*)createEmptyBaseVector,
+      kTypeLong,
+      kTypeString,
       nullptr);
   addNativeMethod(
       "arrowToBaseVector",
@@ -1127,20 +1138,9 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "variantAsJava", (void*)variantAsJava, kTypeString, kTypeLong, nullptr);
-  addNativeMethod(
       "iSerializableAsCpp",
       (void*)iSerializableAsCpp,
       kTypeLong,
-      kTypeString,
-      nullptr);
-  addNativeMethod(
-      "variantAsCpp", (void*)variantAsCpp, kTypeLong, kTypeString, nullptr);
-  addNativeMethod(
-      "variantToVector",
-      (void*)variantToVector,
-      kTypeLong,
-      kTypeString,
       kTypeString,
       nullptr);
   addNativeMethod(

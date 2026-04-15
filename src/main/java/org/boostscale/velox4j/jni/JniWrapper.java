@@ -79,6 +79,12 @@ final class JniWrapper {
   // For Variant.
   static native String variantInferType(String json);
 
+  static native String variantAsJava(long id);
+
+  native long variantAsCpp(String json);
+
+  native long variantToVector(String typeJson, String variantJson);
+
   // For Type.
   static native String arrowToType(long cSchema);
 
@@ -138,13 +144,7 @@ final class JniWrapper {
   // For serde.
   static native String iSerializableAsJava(long id);
 
-  static native String variantAsJava(long id);
-
   native long iSerializableAsCpp(String json);
-
-  native long variantAsCpp(String json);
-
-  native long variantToVector(String typeJson, String variantJson);
 
   @VisibleForTesting
   native long createUpIteratorWithExternalStream(long id);
