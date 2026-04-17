@@ -85,8 +85,9 @@ FetchContent_Declare(
   velox
   URL ${VELOX_SOURCE_URL}
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-  PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
-                "${VELOX_PATCH_DIR}/iconfig-gcc-bug-103186.patch")
+  PATCH_COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=<SOURCE_DIR>
+                -DPATCH_DIR=${VELOX_PATCH_DIR} -P
+                ${CMAKE_CURRENT_LIST_DIR}/cmake/apply_velox_patches.cmake)
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
