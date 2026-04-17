@@ -59,12 +59,6 @@ set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
 set(VELOX_BUILD_STATIC OFF)
 set(VELOX_ENABLE_ARROW ON)
-# Disable GEO support: Velox's VELOX_ENABLE_GEO pulls in s2geometry which
-# requires absl, but absl is only resolved by Velox when VELOX_BUILD_TESTING=ON
-# (for the Spark query runner). Since velox4j builds with
-# VELOX_BUILD_TESTING=OFF and does not use any geospatial functions, disable
-# this feature to avoid the unresolved absl dependency.
-set(VELOX_ENABLE_GEO OFF)
 if(NOT VELOX4J_BUILD_TESTING)
   set(VELOX_BUILD_TESTING OFF)
 endif()
