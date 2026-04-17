@@ -59,6 +59,9 @@ set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
 set(VELOX_BUILD_STATIC OFF)
 set(VELOX_ENABLE_ARROW ON)
+set(VELOX_ENABLE_GEO OFF) # s2geometry (GEO dep) requires absl which is only
+                          # fetched when VELOX_BUILD_TESTING=ON; disable GEO
+                          # since velox4j does not use geospatial functions.
 if(NOT VELOX4J_BUILD_TESTING)
   set(VELOX_BUILD_TESTING OFF)
 endif()
