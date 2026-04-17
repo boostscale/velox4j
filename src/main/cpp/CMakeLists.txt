@@ -59,9 +59,6 @@ set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
 set(VELOX_BUILD_STATIC OFF)
 set(VELOX_ENABLE_ARROW ON)
-set(VELOX_ENABLE_GEO OFF) # s2geometry (GEO dep) requires absl which is only
-                          # fetched when VELOX_BUILD_TESTING=ON; disable GEO
-                          # since velox4j does not use geospatial functions.
 if(NOT VELOX4J_BUILD_TESTING)
   set(VELOX_BUILD_TESTING OFF)
 endif()
@@ -82,8 +79,9 @@ FetchContent_Declare(
   velox
   URL ${VELOX_SOURCE_URL}
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-  PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch -p1 -i
-                "${VELOX_PATCH_DIR}/iconfig-gcc-bug-103186.patch")
+  PATCH_COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=<SOURCE_DIR>
+                -DPATCH_DIR=${VELOX_PATCH_DIR} -P
+                ${CMAKE_CURRENT_LIST_DIR}/cmake/apply_velox_patches.cmake)
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
