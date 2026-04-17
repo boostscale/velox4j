@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt	(revision 3da0390118fa4b0addbfbdeb03f438ec1b1237a6)
++++ b/CMakeLists.txt	(date 1776431293835)
+@@ -763,6 +763,10 @@
+ endif()
+
+ if(VELOX_ENABLE_GEO)
++  if(NOT TARGET absl::base)
++    velox_set_source(absl)
++    velox_resolve_dependency(absl)
++  endif()
+   list(PREPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake/resolve_dependency_modules/s2geometry)
+   velox_set_source(s2geometry)
+   velox_resolve_dependency(s2geometry)
