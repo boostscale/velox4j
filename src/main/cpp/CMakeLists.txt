@@ -85,9 +85,9 @@ FetchContent_Declare(
   velox
   URL ${VELOX_SOURCE_URL}
   URL_HASH MD5=${VELOX_SOURCE_URL_MD5}
-  PATCH_COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=<SOURCE_DIR>
-                -DPATCH_DIR=${VELOX_PATCH_DIR} -P
-                ${CMAKE_CURRENT_LIST_DIR}/cmake/apply_velox_patches.cmake)
+  PATCH_COMMAND
+    ${CMAKE_COMMAND} -DSOURCE_DIR=<SOURCE_DIR> -DPATCH_DIR=${VELOX_PATCH_DIR}
+    -P ${VELOX_PATCH_DIR}/apply.cmake)
 FetchContent_MakeAvailable(velox)
 
 # Import JniHelpers.
