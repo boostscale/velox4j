@@ -67,6 +67,9 @@ jobs:
             bash .github/workflows/scripts/common/setup-ubuntu24.sh
             mvn clean generate-resources
           "
+      - name: Show disk usage (debug)
+        run:
+          df -h
       - name: Run UTs
         run: |
           docker exec test-container bash -c "
@@ -114,6 +117,9 @@ jobs:
             bash .github/workflows/scripts/common/setup-al2023.sh
             mvn clean generate-resources
           "
+      - name: Show disk usage (debug)
+        run:
+          df -h
       - name: Run UTs
         run: |
           docker exec al2023-container bash -c "
