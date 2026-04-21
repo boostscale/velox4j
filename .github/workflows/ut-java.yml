@@ -53,6 +53,12 @@ jobs:
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
+      - name: Check system resources
+        run: |
+          echo "=== Disk space ==="
+          df -h
+          echo "=== Memory ==="
+          free -h
       - name: Start Docker container
         run: |
           docker run --init -d --name test-container -v ${{ github.workspace }}:/velox4j -w /velox4j ubuntu:24.04 sleep infinity

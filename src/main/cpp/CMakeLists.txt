@@ -127,6 +127,14 @@ endif()
 message("Setting CMAKE_CXX_FLAGS=${SCRIPT_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SCRIPT_CXX_FLAGS}")
 
+# On aarch64 with GCC, xsimd emits one psabi note per translation unit about
+# std::pair<float/double, float/double> ABI differences introduced in GCC 10.
+# These notes are harmless but flood the step log on GitHub Actions, causing
+# log truncation that hides the actual build output.  Silence them here.
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
+
 # Continue to build.
 add_subdirectory(main)
 if(VELOX4J_BUILD_TESTING)
