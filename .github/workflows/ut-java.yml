@@ -42,7 +42,7 @@ jobs:
         ]
     runs-on: ${{ matrix.runner }}
     env:
-      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
@@ -62,7 +62,7 @@ jobs:
       - name: Run setup script / Build C++ libraries
         run: |
           docker exec test-container bash -c "
-            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/common/setup-ubuntu24.sh
             mvn clean generate-resources
@@ -87,13 +87,13 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
 
   ut-al2023:
     runs-on: ubuntu-latest
     env:
-      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-al2023-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-al2023-ccache-
@@ -111,7 +111,7 @@ jobs:
         run: |
           docker run --init -d --name al2023-container -v ${{ github.workspace }}:/velox4j -w /velox4j amazonlinux:latest sleep infinity
           docker exec al2023-container bash -c "
-            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
             bash .github/workflows/scripts/common/setup-al2023.sh
@@ -133,13 +133,13 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-al2023-ccache-${{github.sha}}
 
   ut-centos7:
     runs-on: ubuntu-latest
     env:
-      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CACHE_DIR: .ccache
     steps:
       - uses: actions/checkout@v4
       - name: Reclaim runner disk space
@@ -148,14 +148,14 @@ jobs:
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
             ut-java-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
-            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/common/setup-centos7.sh
             mvn clean test
@@ -164,5 +164,5 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-java-ut-centos7-ccache-${{github.sha}}
