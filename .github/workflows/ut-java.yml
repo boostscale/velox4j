@@ -46,7 +46,7 @@ jobs:
       CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
-      - name: Free runner disk
+      - name: Reclaim runner disk space
         run:
           bash .github/workflows/scripts/common/free-runner-disk.sh
       - name: Restore Ccache
@@ -93,7 +93,7 @@ jobs:
       CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
-      - name: Free runner disk
+      - name: Reclaim runner disk space
         run:
           bash .github/workflows/scripts/common/free-runner-disk.sh
       - name: Restore Ccache
@@ -134,7 +134,7 @@ jobs:
       HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
       - uses: actions/checkout@v4
-      - name: Free runner disk
+      - name: Reclaim runner disk space
         run:
           bash .github/workflows/scripts/common/free-runner-disk.sh
       - name: Restore Ccache
