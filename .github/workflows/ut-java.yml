@@ -81,6 +81,7 @@ jobs:
         run: |
           docker stop test-container
       - name: Save Ccache
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
@@ -123,6 +124,7 @@ jobs:
         run: |
           docker stop al2023-container
       - name: Save Ccache
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
@@ -153,6 +155,7 @@ jobs:
             mvn clean test
           "
       - name: Save Ccache
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'

@@ -58,6 +58,7 @@ jobs:
             bash src/main/cpp/test.sh
           "
       - name: Save Ccache
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
