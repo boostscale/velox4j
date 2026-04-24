@@ -21,6 +21,7 @@
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
 #include <velox/dwio/parquet/writer/Writer.h>
 #include <velox/exec/PartitionFunction.h>
+#include <velox/functions/lib/window/RegistrationFunctions.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
 #include <velox/functions/prestosql/registration/RegistrationFunctions.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
@@ -139,6 +140,17 @@ void initForFlink() {
       "", true /*registerCompanionFunctions*/, true /*overwrite*/);
   window::prestosql::registerAllWindowFunctions();
   functions::window::sparksql::registerWindowFunctions("");
+  // Spark's registration above overwrites Presto's BIGINT row_number/rank/
+  // dense_rank with INTEGER variants. ANSI SQL and most non-Spark engines
+  // specify BIGINT return types for these ranking functions, and the Velox
+  // implementation uses an int64 counter internally so keeping the result as
+  // INTEGER risks silent overflow past INT32_MAX rows per partition.
+  // Re-register the BIGINT variants for just these three ranking functions
+  // while preserving Spark's INTEGER overloads for nth_value and ntile,
+  // which remain useful for plans that pass integer-typed arguments.
+  functions::window::registerRowNumberBigint("row_number");
+  functions::window::registerRankBigint("rank");
+  functions::window::registerDenseRankBigint("dense_rank");
 
   ConfigArray::registerSerDe();
   ConnectorConfigArray::registerSerDe();

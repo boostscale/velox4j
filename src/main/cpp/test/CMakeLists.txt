@@ -32,3 +32,9 @@ add_executable(velox4j_blocking_queue_test
 target_link_libraries(
   velox4j_blocking_queue_test velox4j_test)
 add_test(velox4j_blocking_queue_test velox4j_blocking_queue_test)
+
+add_executable(velox4j_init_flink_test
+               ${TEST_OBJECT_FILES} velox4j/init/InitFlinkTest.cc)
+target_link_libraries(
+  velox4j_init_flink_test velox4j_test)
+add_test(velox4j_init_flink_test velox4j_init_flink_test)
