@@ -28,8 +28,11 @@ class InitFlinkTest : public testing::Test {
 };
 
 TEST_F(InitFlinkTest, rankingFunctionsResolveToBigint) {
-  EXPECT_EQ(exec::resolveWindowResultType("row_number", {})->kind(), TypeKind::BIGINT);
-  EXPECT_EQ(exec::resolveWindowResultType("rank", {})->kind(), TypeKind::BIGINT);
+  EXPECT_EQ(
+      exec::resolveWindowResultType("row_number", {})->kind(),
+      TypeKind::BIGINT);
+  EXPECT_EQ(
+      exec::resolveWindowResultType("rank", {})->kind(), TypeKind::BIGINT);
   EXPECT_EQ(
       exec::resolveWindowResultType("dense_rank", {})->kind(),
       TypeKind::BIGINT);
