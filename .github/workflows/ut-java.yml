@@ -109,7 +109,6 @@ jobs:
           docker exec al2023-container bash -c "
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
-            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
             bash .github/workflows/scripts/common/setup-al2023.sh
             mvn clean generate-resources
           "
@@ -119,7 +118,6 @@ jobs:
       - name: Run UTs
         run: |
           docker exec al2023-container bash -c "
-            export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
             mvn clean test -Dskip.cpp.build
           "
       - name: Stop Docker container
