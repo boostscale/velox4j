@@ -59,7 +59,10 @@ ldconfig
 # Both the full (non-headless) package and the devel package are needed.
 # The full package provides libjawt.so required by CMake's FindJNI.
 dnf -y install java-21-amazon-corretto java-21-amazon-corretto-devel
-export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+alternatives --set java /usr/lib/jvm/java-21-amazon-corretto.x86_64/bin/java
+alternatives --set javac /usr/lib/jvm/java-21-amazon-corretto.x86_64/bin/javac
+java -version
+javac -version
 
 # Install Maven.
 if [ -z "$(which mvn 2>/dev/null)" ]; then
