@@ -36,26 +36,30 @@ jobs:
   ut-centos7:
     runs-on: ubuntu-latest
     env:
-      HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
+      CACHE_DIR: .ccache
     steps:
       - uses: actions/checkout@v4
+      - name: Reclaim runner disk space
+        run:
+          bash .github/workflows/scripts/common/free-runner-disk.sh
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-cpp-ut-centos7-ccache-${{github.sha}}
           restore-keys: |
             ut-cpp-ut-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
-            export CCACHE_DIR=/velox4j/.ccache
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/ut-cpp/setup-centos7.sh
+            bash .github/workflows/scripts/common/setup-centos7.sh
             bash src/main/cpp/test.sh
           "
       - name: Save Ccache
+        if: always()
         uses: actions/cache/save@v4
         with:
-          path: '${{ env.HOST_CCACHE_DIR }}'
+          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
           key: ut-cpp-ut-centos7-ccache-${{github.sha}}

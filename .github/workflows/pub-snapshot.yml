@@ -30,6 +30,9 @@ jobs:
       HOST_CCACHE_DIR: "${{ github.workspace }}/.ccache"
     steps:
       - uses: actions/checkout@v4
+      - name: Reclaim runner disk space
+        run:
+          bash .github/workflows/scripts/common/free-runner-disk.sh
       - name: Restore Ccache
         uses: actions/cache/restore@v4
         with:
@@ -43,7 +46,7 @@ jobs:
             export CCACHE_DIR=/velox4j/.ccache
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
-            bash .github/workflows/scripts/ut-java/setup-centos7.sh
+            bash .github/workflows/scripts/common/setup-centos7.sh
             mvn generate-resources
           "
       - name: Set up Java / Maven environment
