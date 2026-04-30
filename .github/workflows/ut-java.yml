@@ -41,7 +41,7 @@ jobs:
             image: ubuntu:24.04
             setup_script: setup-ubuntu24.sh
           - name: al2023
-            image: amazonlinux:latest
+            image: amazonlinux:2023
             setup_script: setup-al2023.sh
           - name: centos7
             image: centos:7
