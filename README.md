@@ -141,8 +141,7 @@ A setup script is provided to install all required dependencies on AL2023:
 # 1. Run the setup script (as root or with sudo).
 sudo bash .github/workflows/scripts/common/setup-al2023.sh
 
-# 2. Set JAVA_HOME and build.
-export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
+# 2. Build.
 mvn clean install -DskipTests
 ```
 
@@ -152,7 +151,6 @@ Alternatively, use Docker from any Linux machine:
 docker run --init -it -v $(pwd):/velox4j -w /velox4j amazonlinux:2023 bash
 
 # Inside the container:
-export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64
 bash .github/workflows/scripts/common/setup-al2023.sh
 mvn clean install -DskipTests
 ```
