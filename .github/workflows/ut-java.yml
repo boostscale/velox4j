@@ -77,9 +77,6 @@ jobs:
           docker exec test-container bash -c "
             mvn clean generate-resources
           "
-      - name: Show disk usage (debug)
-        run:
-          df -h
       - name: Run UTs
         run: |
           docker exec test-container bash -c "
