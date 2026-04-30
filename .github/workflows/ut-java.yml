@@ -39,13 +39,13 @@ jobs:
         include:
           - name: ubuntu24
             image: ubuntu:24.04
-            setup_script: .github/workflows/scripts/common/setup-ubuntu24.sh
+            setup_script: setup-ubuntu24.sh
           - name: al2023
             image: amazonlinux:latest
-            setup_script: .github/workflows/scripts/common/setup-al2023.sh
+            setup_script: setup-al2023.sh
           - name: centos7
             image: centos:7
-            setup_script: .github/workflows/scripts/common/setup-centos7.sh
+            setup_script: setup-centos7.sh
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
@@ -70,7 +70,7 @@ jobs:
       - name: Run setup script
         run: |
           docker exec test-container bash -c "
-            bash ${{ matrix.setup_script }}
+            bash .github/workflows/scripts/common/${{ matrix.setup_script }}
           "
       - name: Build C++ libraries
         run: |
