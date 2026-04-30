@@ -34,9 +34,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ env.HOST_CCACHE_DIR }}'
-          key: ut-java-ut-centos7-ccache-${{github.sha}}
+          key: ut-java-centos7-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-ut-centos7-ccache-
+            ut-java-centos7-ccache-
       - name: Run setup script / Build
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
