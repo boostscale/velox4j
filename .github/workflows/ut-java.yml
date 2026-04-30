@@ -56,9 +56,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-${{ matrix.name }}-${{ runner.arch }}-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-${{ matrix.name }}-${{ runner.arch }}-ccache-
+            ut-java-${{ matrix.name }}-ccache-
       - name: Start Docker container
         run: |
           docker run --init -d --name test-container \
@@ -99,4 +99,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-${{ matrix.name }}-${{ runner.arch }}-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
