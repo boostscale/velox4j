@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
 
-  ut-centos7:
+  ut-cpp:
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
