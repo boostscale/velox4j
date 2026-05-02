@@ -40,6 +40,7 @@ jobs:
       - name: Run setup script / Build
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c '
+            set -euo pipefail
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             cd /velox4j

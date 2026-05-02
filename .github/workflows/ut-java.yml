@@ -85,11 +85,10 @@ jobs:
       - name: Run UTs with Arrow 7.0.0 / Arrow 13.0.0
         run: |
           docker exec test-container bash -c '
+            set -euo pipefail
             JAVA_VERSION=$(mvn help:evaluate -Dexpression=java.version -q -DforceStdout)
             JAVA_MAJOR_VERSION=$(echo "$JAVA_VERSION" | grep -oE "^[0-9]+")
-            
             echo "Detected Java version: $JAVA_VERSION (major=$JAVA_MAJOR_VERSION)"
-            
             if [ "$JAVA_MAJOR_VERSION" -ge 21 ]; then
               mvn clean test -Dskip.cpp.build -Darrow.version=13.0.0
             else

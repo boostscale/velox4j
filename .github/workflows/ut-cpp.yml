@@ -49,6 +49,7 @@ jobs:
       - name: Run setup script / Build and run UTs
         run: |
           docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c '
+            set -euo pipefail
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/common/setup-centos7.sh
