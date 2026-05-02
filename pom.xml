@@ -39,10 +39,7 @@
   <properties>
     <skip.cpp.build>false</skip.cpp.build>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <surefire.add-opens.argLine>
-      -XX:+IgnoreUnrecognizedVMOptions
-      --add-opens=java.base/java.nio=ALL-UNNAMED
-    </surefire.add-opens.argLine>
+    <surefire.add-opens.argLine>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.nio=ALL-UNNAMED</surefire.add-opens.argLine>
     <java.version>8</java.version>
     <junit.version>4.13.1</junit.version>
     <arrow.version>17.0.0</arrow.version>
