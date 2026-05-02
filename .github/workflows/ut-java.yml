@@ -84,6 +84,12 @@ jobs:
           '
       - name: Run UTs with Arrow 7.0.0 / Arrow 13.0.0
         run: |
+          # This is a step testing the compatibility for Velox4J and low Arrow Java versions,
+          #   so user can safely exclude the Arrow-Java transitive dependency introduced by Velox4J
+          #   and depends on their own Arrow-Java instead.
+          # References about why we choose Arrow Java 7 / 13 for different Java versions:
+          #   1. https://github.com/openjdk/jdk/commit/a56598f5a534cc9223367e7faa8433ea38661db9
+          #   2. https://github.com/apache/arrow/pull/36370
           docker exec test-container bash -c '
             set -euo pipefail
             JAVA_VERSION=$(mvn help:evaluate -Dexpression=java.version -q -DforceStdout)
