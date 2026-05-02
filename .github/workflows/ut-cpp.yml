@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
 
-  ut-centos7:
+  ut-cpp:
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
@@ -43,20 +43,21 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-ut-centos7-ccache-${{github.sha}}
+          key: ut-cpp-centos7-ccache-${{github.sha}}
           restore-keys: |
-            ut-cpp-ut-centos7-ccache-
+            ut-cpp-centos7-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
+          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c '
+            set -euo pipefail
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/common/setup-centos7.sh
             bash src/main/cpp/test.sh
-          "
+          '
       - name: Save Ccache
         if: always()
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-ut-centos7-ccache-${{github.sha}}
+          key: ut-cpp-centos7-ccache-${{github.sha}}

@@ -33,16 +33,20 @@ concurrency:
 
 jobs:
 
-  ut-ubuntu24:
+  ut-java:
     strategy:
       matrix:
-        runner: [
-          "ubuntu-latest",
-          "ubuntu-24.04-arm"
-        ]
-        exclude:
-          - runner: "ubuntu-24.04-arm"
-    runs-on: ${{ matrix.runner }}
+        include:
+          - name: ubuntu24
+            image: ubuntu:24.04
+            setup_script: setup-ubuntu24.sh
+          - name: al2023
+            image: amazonlinux:2023
+            setup_script: setup-al2023.sh
+          - name: centos7
+            image: centos:7
+            setup_script: setup-centos7.sh
+    runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
@@ -52,34 +56,53 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-ut-ubuntu24-${{runner.arch}}-ccache-
+            ut-java-${{ matrix.name }}-ccache-
       - name: Start Docker container
         run: |
-          docker run --init -d --name test-container -v ${{ github.workspace }}:/velox4j -w /velox4j ubuntu:24.04 sleep infinity
-      - name: Run setup script / Build C++ libraries
+          docker run --init -d --name test-container \
+            -e CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }} \
+            -e CCACHE_MAXSIZE=${{ env.CCACHE_MAXSIZE }} \
+            -v ${{ github.workspace }}:/velox4j \
+            -w /velox4j \
+            ${{ matrix.image }} sleep infinity
+      - name: Run setup script
         run: |
-          docker exec test-container bash -c "
-            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
-            export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/common/setup-ubuntu24.sh
+          docker exec test-container bash -c '
+            bash .github/workflows/scripts/common/${{ matrix.setup_script }}
+          '
+      - name: Build C++ libraries
+        run: |
+          docker exec test-container bash -c '
             mvn clean generate-resources
-          "
-      - name: Show disk usage (debug)
-        run:
-          df -h
+          '
       - name: Run UTs
         run: |
-          docker exec test-container bash -c "
+          docker exec test-container bash -c '
             mvn clean test -Dskip.cpp.build
-          "
-      - name: Run UTs with Arrow 7.0.0
+          '
+      - name: Run UTs with Arrow 7.0.0 / Arrow 13.0.0
         run: |
-          docker exec test-container bash -c "
-            mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
-          "
+          # This is a step testing the compatibility for Velox4J and low Arrow Java versions,
+          #   so user can safely exclude the Arrow-Java transitive dependency introduced by Velox4J
+          #   and depends on their own Arrow-Java instead.
+          # References about why we choose Arrow Java 7 / 13 for different Java versions:
+          #   1. https://github.com/openjdk/jdk/commit/a56598f5a534cc9223367e7faa8433ea38661db9
+          #   2. https://github.com/apache/arrow/pull/36370
+          docker exec test-container bash -c '
+            set -euo pipefail
+            JAVA_VERSION=$(mvn help:evaluate -Dexpression=java.version -q -DforceStdout)
+            JAVA_MAJOR_VERSION=$(echo "$JAVA_VERSION" | grep -oE "^[0-9]+")
+            echo "Detected Java version: $JAVA_VERSION (major=$JAVA_MAJOR_VERSION)"
+            if [ "$JAVA_MAJOR_VERSION" -ge 21 ]; then
+              mvn clean test -Dskip.cpp.build -Darrow.version=13.0.0
+            else
+              mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
+            fi
+          '
       - name: Stop Docker container
+        if: always()
         run: |
           docker stop test-container
       - name: Save Ccache
@@ -87,73 +110,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-ubuntu24-${{runner.arch}}-ccache-${{github.sha}}
-
-  ut-al2023:
-    runs-on: ubuntu-latest
-    env:
-      CACHE_DIR: .ccache
-      CCACHE_MAXSIZE: 3000M
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore Ccache
-        uses: actions/cache/restore@v4
-        with:
-          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-al2023-ccache-${{github.sha}}
-          restore-keys: |
-            ut-java-ut-al2023-ccache-
-      - name: Run setup script / Build C++ libraries
-        run: |
-          docker run --init -d --name al2023-container -v ${{ github.workspace }}:/velox4j -w /velox4j amazonlinux:latest sleep infinity
-          docker exec al2023-container bash -c "
-            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
-            export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/common/setup-al2023.sh
-            mvn clean generate-resources
-          "
-      - name: Show disk usage (debug)
-        run:
-          df -h
-      - name: Run UTs
-        run: |
-          docker exec al2023-container bash -c "
-            mvn clean test -Dskip.cpp.build
-          "
-      - name: Stop Docker container
-        run: |
-          docker stop al2023-container
-      - name: Save Ccache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-al2023-ccache-${{github.sha}}
-
-  ut-centos7:
-    runs-on: ubuntu-latest
-    env:
-      CACHE_DIR: .ccache
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore Ccache
-        uses: actions/cache/restore@v4
-        with:
-          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-centos7-ccache-${{github.sha}}
-          restore-keys: |
-            ut-java-ut-centos7-ccache-
-      - name: Run setup script / Build and run UTs
-        run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c "
-            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
-            export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/common/setup-centos7.sh
-            mvn clean test
-          "
-      - name: Save Ccache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-ut-centos7-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
