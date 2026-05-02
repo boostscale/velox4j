@@ -69,24 +69,33 @@ jobs:
             ${{ matrix.image }} sleep infinity
       - name: Run setup script
         run: |
-          docker exec test-container bash -c "
+          docker exec test-container bash -c '
             bash .github/workflows/scripts/common/${{ matrix.setup_script }}
-          "
+          '
       - name: Build C++ libraries
         run: |
-          docker exec test-container bash -c "
+          docker exec test-container bash -c '
             mvn clean generate-resources
-          "
+          '
       - name: Run UTs
         run: |
-          docker exec test-container bash -c "
+          docker exec test-container bash -c '
             mvn clean test -Dskip.cpp.build
-          "
-      - name: Run UTs with Arrow 7.0.0
+          '
+      - name: Run UTs with Arrow 7.0.0 / Arrow 13.0.0
         run: |
-          docker exec test-container bash -c "
-            mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
-          "
+          docker exec test-container bash -c '
+            JAVA_VERSION=$(mvn help:evaluate -Dexpression=java.version -q -DforceStdout)
+            JAVA_MAJOR_VERSION=$(echo "$JAVA_VERSION" | grep -oE "^[0-9]+")
+            
+            echo "Detected Java version: $JAVA_VERSION (major=$JAVA_MAJOR_VERSION)"
+            
+            if [ "$JAVA_MAJOR_VERSION" -ge 21 ]; then
+              mvn clean test -Dskip.cpp.build -Darrow.version=13.0.0
+            else
+              mvn clean test -Dskip.cpp.build -Darrow.version=7.0.0
+            fi
+          '
       - name: Stop Docker container
         if: always()
         run: |

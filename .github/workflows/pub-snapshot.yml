@@ -39,13 +39,13 @@ jobs:
             ut-java-centos7-ccache-
       - name: Run setup script / Build
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c "
+          docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c '
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
             bash .github/workflows/scripts/common/setup-centos7.sh
             mvn generate-resources
-          "
+          '
       - name: Set up Java / Maven environment
         uses: actions/setup-java@v4
         with:
