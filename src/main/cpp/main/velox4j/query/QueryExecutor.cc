@@ -74,15 +74,14 @@ SerialTask::SerialTask(
 }
 
 SerialTask::~SerialTask() {
-  if (task_ != nullptr) {
-    if (task_->isRunning()) {
-      // calling .wait() may take no effect in single thread execution mode.
-      task_->requestCancel().wait();
-    }
-    auto deletionFuture = task_->taskDeletionFuture();
-    task_.reset();
-    deletionFuture.wait();
+  VELOX_CHECK_NOT_NULL(task_);
+  if (task_->isRunning()) {
+    // calling .wait() may take no effect in single thread execution mode.
+    task_->requestCancel().wait();
   }
+  auto deletionFuture = task_->taskDeletionFuture();
+  task_.reset();
+  deletionFuture.wait();
 }
 
 UpIterator::State SerialTask::advance() {
