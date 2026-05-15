@@ -19,7 +19,7 @@
 #include <velox/connectors/hive/HiveDataSink.h>
 #include <velox/dwio/parquet/RegisterParquetReader.h>
 #include <velox/dwio/parquet/RegisterParquetWriter.h>
-#include <velox/dwio/parquet/writer/Writer.h>
+#include <velox/dwio/parquet/writer/WriterConfig.h>
 #include <velox/exec/PartitionFunction.h>
 #include <velox/functions/lib/window/RegistrationFunctions.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
@@ -96,7 +96,7 @@ void initForSpark() {
            "false"},
           {connector::hive::HiveConfig::kPartitionPathAsLowerCaseSession,
            "false"},
-          {parquet::WriterOptions::kParquetWriteTimestampUnit, "6"},
+          {parquet::WriterConfig::kParquetHiveConnectorWriteTimestampUnit, "6"},
           {connector::hive::HiveConfig::kReadTimestampUnit, "6"},
           {connector::hive::HiveConfig::kMaxPartitionsPerWriters, "10000"},
           {connector::hive::HiveConfig::kIgnoreMissingFilesSession, "false"},
