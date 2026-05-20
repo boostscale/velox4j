@@ -84,6 +84,28 @@ FetchContent_Declare(
     -P ${VELOX_PATCH_DIR}/apply.cmake)
 FetchContent_MakeAvailable(velox)
 
+if(UNIX
+   AND NOT APPLE
+   AND VELOX_BUILD_SHARED)
+  # Velox's bundled shared build can embed static gflags into both libvelox.so
+  # and libglog.so.1 after
+  # https://github.com/facebookincubator/velox/pull/17531. Keep the upstream
+  # static gflags build, but hide the archive symbols so ELF interposition does
+  # not cause duplicate gflags registration when the libraries are loaded
+  # through JNI.
+  set(VELOX4J_HIDE_STATIC_GFLAGS "-Wl,--exclude-libs,libgflags.a"
+                                 "-Wl,--exclude-libs,libgflags_nothreads.a")
+  target_link_options(velox PRIVATE ${VELOX4J_HIDE_STATIC_GFLAGS})
+  if(TARGET glog::glog)
+    get_target_property(VELOX4J_GLOG_TARGET glog::glog ALIASED_TARGET)
+    if(NOT VELOX4J_GLOG_TARGET)
+      message(FATAL_ERROR "glog::glog is not an alias target")
+    endif()
+    target_link_options(${VELOX4J_GLOG_TARGET} PRIVATE
+                        ${VELOX4J_HIDE_STATIC_GFLAGS})
+  endif()
+endif()
+
 # Import JniHelpers.
 set(JNI_HELPERS_REPO spotify/JniHelpers)
 set(JNI_HELPERS_REF 956649eb352252ff6c43362d9b9c526f9241e480)
