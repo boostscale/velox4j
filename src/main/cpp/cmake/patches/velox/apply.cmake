@@ -2,7 +2,10 @@
 # Invoked by FetchContent_Declare's PATCH_COMMAND.
 # Variables: SOURCE_DIR, PATCH_DIR
 
-set(PATCHES)
+set(
+  PATCHES
+  0001-disable-shared-gflags-for-bundled-arrow.patch
+)
 
 foreach(patch IN LISTS PATCHES)
   execute_process(
