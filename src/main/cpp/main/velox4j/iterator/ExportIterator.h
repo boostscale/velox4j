@@ -19,23 +19,23 @@
 
 namespace velox4j {
 
-/// An up-iterator is the opposite of down-iterator. It transmits data
+/// An export-iterator is the opposite of import-iterator. It transmits data
 /// that is output from Velox pipeline from C++ to Java.
-class UpIterator {
+class ExportIterator {
  public:
   enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
 
   // CTOR.
-  UpIterator() = default;
+  ExportIterator() = default;
 
   // Delete copy/move CTORs.
-  UpIterator(UpIterator&&) = delete;
-  UpIterator(const UpIterator&) = delete;
-  UpIterator& operator=(const UpIterator&) = delete;
-  UpIterator& operator=(UpIterator&&) = delete;
+  ExportIterator(ExportIterator&&) = delete;
+  ExportIterator(const ExportIterator&) = delete;
+  ExportIterator& operator=(const ExportIterator&) = delete;
+  ExportIterator& operator=(ExportIterator&&) = delete;
 
   // DTOR.
-  virtual ~UpIterator() = default;
+  virtual ~ExportIterator() = default;
 
   // Gets the next state.
   virtual State advance() = 0;

@@ -32,7 +32,7 @@ import org.boostscale.velox4j.connector.ExternalStreams;
 import org.boostscale.velox4j.data.BaseVectorTests;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.iterator.CloseableIterator;
-import org.boostscale.velox4j.iterator.UpIterators;
+import org.boostscale.velox4j.iterator.ExportIterators;
 import org.boostscale.velox4j.plan.TableScanNode;
 import org.boostscale.velox4j.query.Query;
 import org.boostscale.velox4j.query.SerialTask;
@@ -175,7 +175,7 @@ public class MemoryPoolNameCollisionTest {
     queue.put(rv);
     queue.noMoreInput();
 
-    CloseableIterator<RowVector> iter = UpIterators.asJavaIterator(task);
+    CloseableIterator<RowVector> iter = ExportIterators.asJavaIterator(task);
     int count = 0;
     while (iter.hasNext()) {
       RowVector result = iter.next();

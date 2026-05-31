@@ -16,10 +16,10 @@ package org.boostscale.velox4j.iterator;
 import org.boostscale.velox4j.jni.CalledFromNative;
 
 /**
- * An ExternalStream that is backed by a down-iterator. What is down-iterator: A down-iterator is an
- * iterator passed From Java to C++ for Velox to read data from Java.
+ * An ExternalStream that is backed by an import-iterator. What is import-iterator: An
+ * import-iterator is an iterator passed From Java to C++ for Velox to read data from Java.
  */
-public interface DownIterator {
+public interface ImportIterator {
   enum State {
     AVAILABLE(0),
     BLOCKED(1),
@@ -51,7 +51,7 @@ public interface DownIterator {
   @CalledFromNative
   long get();
 
-  /** Closes the down-iterator. */
+  /** Closes the import-iterator. */
   @CalledFromNative
   void close();
 }

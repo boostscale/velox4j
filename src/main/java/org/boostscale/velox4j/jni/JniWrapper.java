@@ -15,7 +15,7 @@ package org.boostscale.velox4j.jni;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import org.boostscale.velox4j.iterator.DownIterator;
+import org.boostscale.velox4j.iterator.ImportIterator;
 import org.boostscale.velox4j.memory.AllocationListener;
 
 /** JNI native method declarations for both global and session-aware APIs. */
@@ -52,19 +52,19 @@ final class JniWrapper {
 
   native long queryExecutorExecute(long id);
 
-  // For UpIterator.
-  static native int upIteratorAdvance(long id);
+  // For ExportIterator.
+  static native int exportIteratorAdvance(long id);
 
-  static native void upIteratorWait(long id);
+  static native void exportIteratorWait(long id);
 
-  native long upIteratorGet(long id);
+  native long exportIteratorGet(long id);
 
-  // For DownIterator.
+  // For ImportIterator.
   static native void blockingQueuePut(long id, long rvId);
 
   static native void blockingQueueNoMoreInput(long id);
 
-  native long createExternalStreamFromDownIterator(DownIterator itr);
+  native long createExternalStreamFromImportIterator(ImportIterator itr);
 
   native long createBlockingQueue();
 
@@ -147,5 +147,5 @@ final class JniWrapper {
   native long iSerializableAsCpp(String json);
 
   @VisibleForTesting
-  native long createUpIteratorWithExternalStream(long id);
+  native long createExportIteratorWithExternalStream(long id);
 }

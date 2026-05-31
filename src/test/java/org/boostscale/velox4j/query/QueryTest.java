@@ -127,7 +127,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
@@ -144,7 +144,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-region.tsv"))
@@ -168,7 +168,7 @@ public class QueryTest {
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final List<RowVector> allRvs =
-        Streams.fromIterator(UpIterators.asJavaIterator(task))
+        Streams.fromIterator(ExportIterators.asJavaIterator(task))
             .map(v -> v.flattenedVector().asRowVector())
             .collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
@@ -202,7 +202,7 @@ public class QueryTest {
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
     final List<RowVector> allRvs =
-        Streams.fromIterator(UpIterators.asJavaIterator(task)).collect(Collectors.toList());
+        Streams.fromIterator(ExportIterators.asJavaIterator(task)).collect(Collectors.toList());
     Assert.assertTrue(allRvs.size() > 1);
     for (int i = 0; i < allRvs.size(); i++) {
       final RowVector rv = allRvs.get(i);
@@ -230,7 +230,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-aggregate-1.tsv"))
@@ -250,7 +250,7 @@ public class QueryTest {
     final SerialTask serialTask = session.queryOps().execute(query);
     serialTask.addSplit(scanNode.getId(), split);
     serialTask.noMoreSplits(scanNode.getId());
-    UpIteratorTests.collect(serialTask);
+    ExportIteratorTests.collect(serialTask);
     final SerialTaskStats serialTaskStats = serialTask.collectStats();
 
     final JsonNode scanStats = serialTaskStats.planStats("id-1");
@@ -268,8 +268,9 @@ public class QueryTest {
   @Test
   public void testExternalStreamFromJavaIterator() {
     final String json = SampleQueryTests.readQueryJson();
-    final UpIterator sampleIn = session.queryOps().execute(Serde.fromJson(json, Query.class));
-    final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(sampleIn));
+    final ExportIterator sampleIn = session.queryOps().execute(Serde.fromJson(json, Query.class));
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(sampleIn));
     final ExternalStream es = session.externalStreamOps().bind(down);
     final TableScanNode scanNode =
         new TableScanNode(
@@ -288,7 +289,7 @@ public class QueryTest {
 
   @Test
   public void testExternalStreamFromEmptyJavaIterator() {
-    final DownIterator down = DownIterators.fromJavaIterator(Collections.emptyIterator());
+    final ImportIterator down = ImportIterators.fromJavaIterator(Collections.emptyIterator());
     final ExternalStream es = session.externalStreamOps().bind(down);
     final TableScanNode scanNode =
         new TableScanNode(
@@ -302,7 +303,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task).assertNumRowVectors(0).run();
+    ExportIteratorTests.assertIterator(task).assertNumRowVectors(0).run();
   }
 
   @Test
@@ -324,34 +325,34 @@ public class QueryTest {
 
     // No input added, the up-iterator is considered blocked.
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add one input.
     queue.put(rv);
     task.waitFor();
-    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add multiple inputs at a time.
     queue.put(rv);
     queue.put(rv);
     task.waitFor();
     Assert.assertThrows(VeloxException.class, task::waitFor);
-    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
   }
 
   @Test
@@ -373,27 +374,27 @@ public class QueryTest {
 
     // No input added, the up-iterator is considered blocked.
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add one input.
     queue.put(rv);
     task.waitFor();
-    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add another input, then signal no-more-input.
     queue.put(rv);
     queue.noMoreInput();
     task.waitFor();
-    Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+    Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
     Assert.assertThrows(VeloxException.class, task::advance);
     BaseVectorTests.assertEquals(rv, task.get());
-    Assert.assertEquals(UpIterator.State.FINISHED, task.advance());
+    Assert.assertEquals(ExportIterator.State.FINISHED, task.advance());
     Assert.assertThrows(VeloxException.class, task::get);
   }
 
@@ -417,12 +418,12 @@ public class QueryTest {
         TestThreads.newTestThread(
             () -> {
               while (true) {
-                final UpIterator.State state = task.advance();
-                if (state == UpIterator.State.BLOCKED) {
+                final ExportIterator.State state = task.advance();
+                if (state == ExportIterator.State.BLOCKED) {
                   task.waitFor();
                   continue;
                 }
-                Assert.assertEquals(UpIterator.State.FINISHED, state);
+                Assert.assertEquals(ExportIterator.State.FINISHED, state);
                 Assert.assertThrows(VeloxException.class, task::get);
                 break;
               }
@@ -454,7 +455,7 @@ public class QueryTest {
       final SerialTask task = session.queryOps().execute(query);
       task.addSplit(scanNode.getId(), split);
       task.noMoreSplits(scanNode.getId());
-      out = UpIterators.asInfiniteIterator(task);
+      out = ExportIterators.asInfiniteIterator(task);
     }
 
     // No input added, the iterator is not available.
@@ -531,8 +532,8 @@ public class QueryTest {
 
     // No input added, the up-iterator is considered blocked.
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     final Thread testThread =
         TestThreads.newTestThread(
@@ -546,12 +547,12 @@ public class QueryTest {
                   // The wait calls should not throw.
                   task.waitFor();
                   Assert.assertThrows(VeloxException.class, task::waitFor);
-                  Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+                  Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
                   Assert.assertThrows(VeloxException.class, task::advance);
                   BaseVectorTests.assertEquals(rv, task.get());
                   Assert.assertThrows(VeloxException.class, task::get);
-                  Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-                  Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+                  Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+                  Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
                   // Signals the main thread to add two inputs after 500ms.
                   control.notifyAll();
@@ -560,16 +561,16 @@ public class QueryTest {
                   // The wait calls should not throw.
                   task.waitFor();
                   Assert.assertThrows(VeloxException.class, task::waitFor);
-                  Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+                  Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
                   Assert.assertThrows(VeloxException.class, task::advance);
                   BaseVectorTests.assertEquals(rv, task.get());
                   Assert.assertThrows(VeloxException.class, task::get);
-                  Assert.assertEquals(UpIterator.State.AVAILABLE, task.advance());
+                  Assert.assertEquals(ExportIterator.State.AVAILABLE, task.advance());
                   Assert.assertThrows(VeloxException.class, task::advance);
                   BaseVectorTests.assertEquals(rv, task.get());
                   Assert.assertThrows(VeloxException.class, task::get);
-                  Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-                  Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+                  Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+                  Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
                   // Signals the main thread that the test has passed.
                   control.notifyAll();
@@ -645,21 +646,21 @@ public class QueryTest {
 
     // No input added, the up-iterator is considered blocked.
     Assert.assertThrows(VeloxException.class, task::get);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add one input.
     queue.put(rv);
     Thread.sleep(500L);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
 
     // Add multiple inputs at a time.
     queue.put(rv);
     queue.put(rv);
     Thread.sleep(500L);
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
-    Assert.assertEquals(UpIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
+    Assert.assertEquals(ExportIterator.State.BLOCKED, task.advance());
   }
 
   @Test
@@ -680,7 +681,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-project-1.tsv"))
@@ -707,7 +708,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-filter-1.tsv"))
@@ -746,7 +747,7 @@ public class QueryTest {
     task.addSplit(regionScanNode.getId(), regionSplit);
     task.noMoreSplits(nationScanNode.getId());
     task.noMoreSplits(regionScanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-join-1.tsv"))
@@ -772,7 +773,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-orderby-1.tsv"))
@@ -790,7 +791,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-limit-1.tsv"))
@@ -819,7 +820,7 @@ public class QueryTest {
     task.addSplit(scanNode2.getId(), split2);
     task.noMoreSplits(scanNode2.getId());
 
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(2)
         .assertRowVectorsToString(
             ResourceTests.readResourceAsString("query-output/tpch-local-partition-gather-1.tsv"))
@@ -840,7 +841,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorTypeJson(
             0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
@@ -863,7 +864,7 @@ public class QueryTest {
     final SerialTask task1 = session.queryOps().execute(query1);
     task1.addSplit(scanNode1.getId(), split1);
     task1.noMoreSplits(scanNode1.getId());
-    UpIteratorTests.assertIterator(task1)
+    ExportIteratorTests.assertIterator(task1)
         .assertNumRowVectors(1)
         .assertRowVectorTypeJson(
             0, ResourceTests.readResourceAsString("query-output-type/tpch-table-write-1.json"))
@@ -878,7 +879,7 @@ public class QueryTest {
     final SerialTask task2 = session.queryOps().execute(query2);
     task2.addSplit(scanNode2.getId(), splits2);
     task2.noMoreSplits(scanNode2.getId());
-    UpIteratorTests.assertIterator(task2)
+    ExportIteratorTests.assertIterator(task2)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-table-scan-nation.tsv"))
@@ -917,7 +918,7 @@ public class QueryTest {
     final SerialTask task = session.queryOps().execute(query);
     task.addSplit(scanNode.getId(), split);
     task.noMoreSplits(scanNode.getId());
-    UpIteratorTests.assertIterator(task)
+    ExportIteratorTests.assertIterator(task)
         .assertNumRowVectors(1)
         .assertRowVectorToString(
             0, ResourceTests.readResourceAsString("query-output/tpch-window-1.tsv"))

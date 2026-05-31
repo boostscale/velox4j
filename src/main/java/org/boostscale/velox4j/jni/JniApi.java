@@ -28,9 +28,9 @@ import org.boostscale.velox4j.connector.ExternalStreams;
 import org.boostscale.velox4j.data.*;
 import org.boostscale.velox4j.eval.Evaluation;
 import org.boostscale.velox4j.eval.Evaluator;
-import org.boostscale.velox4j.iterator.DownIterator;
-import org.boostscale.velox4j.iterator.GenericUpIterator;
-import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.iterator.ExportIterator;
+import org.boostscale.velox4j.iterator.GenericExportIterator;
+import org.boostscale.velox4j.iterator.ImportIterator;
 import org.boostscale.velox4j.memory.AllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.partition.PartitionFunction;
@@ -106,20 +106,20 @@ public final class JniApi {
     return new SerialTask(this, jni.queryExecutorExecute(executor.id()));
   }
 
-  // UpIterator.
-  public static UpIterator.State upIteratorAdvance(UpIterator itr) {
-    return UpIterator.State.get(JniWrapper.upIteratorAdvance(itr.id()));
+  // ExportIterator.
+  public static ExportIterator.State exportIteratorAdvance(ExportIterator itr) {
+    return ExportIterator.State.get(JniWrapper.exportIteratorAdvance(itr.id()));
   }
 
-  public static void upIteratorWait(UpIterator itr) {
-    JniWrapper.upIteratorWait(itr.id());
+  public static void exportIteratorWait(ExportIterator itr) {
+    JniWrapper.exportIteratorWait(itr.id());
   }
 
-  public RowVector upIteratorGet(UpIterator itr) {
-    return baseVectorCreateById(jni.upIteratorGet(itr.id())).asRowVector();
+  public RowVector exportIteratorGet(ExportIterator itr) {
+    return baseVectorCreateById(jni.exportIteratorGet(itr.id())).asRowVector();
   }
 
-  // DownIterator.
+  // ImportIterator.
   public static void blockingQueuePut(ExternalStreams.BlockingQueue queue, RowVector rowVector) {
     JniWrapper.blockingQueuePut(queue.id(), rowVector.id());
   }
@@ -128,8 +128,9 @@ public final class JniApi {
     JniWrapper.blockingQueueNoMoreInput(queue.id());
   }
 
-  public ExternalStream createExternalStreamFromDownIterator(DownIterator itr) {
-    return new ExternalStreams.GenericExternalStream(jni.createExternalStreamFromDownIterator(itr));
+  public ExternalStream createExternalStreamFromImportIterator(ImportIterator itr) {
+    return new ExternalStreams.GenericExternalStream(
+        jni.createExternalStreamFromImportIterator(itr));
   }
 
   public ExternalStreams.BlockingQueue createBlockingQueue() {
@@ -335,8 +336,8 @@ public final class JniApi {
   }
 
   @VisibleForTesting
-  public UpIterator createUpIteratorWithExternalStream(ExternalStream es) {
-    return new GenericUpIterator(this, jni.createUpIteratorWithExternalStream(es.id()));
+  public ExportIterator createExportIteratorWithExternalStream(ExternalStream es) {
+    return new GenericExportIterator(this, jni.createExportIteratorWithExternalStream(es.id()));
   }
 
   private BaseVector baseVectorCreateById(long id) {

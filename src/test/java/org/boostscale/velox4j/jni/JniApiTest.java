@@ -32,17 +32,17 @@ import org.boostscale.velox4j.data.BaseVector;
 import org.boostscale.velox4j.data.BaseVectorTests;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.exception.VeloxException;
-import org.boostscale.velox4j.iterator.DownIterator;
-import org.boostscale.velox4j.iterator.DownIterators;
-import org.boostscale.velox4j.iterator.UpIterator;
-import org.boostscale.velox4j.iterator.UpIterators;
+import org.boostscale.velox4j.iterator.ExportIterator;
+import org.boostscale.velox4j.iterator.ExportIterators;
+import org.boostscale.velox4j.iterator.ImportIterator;
+import org.boostscale.velox4j.iterator.ImportIterators;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.query.QueryExecutor;
 import org.boostscale.velox4j.session.Session;
+import org.boostscale.velox4j.test.ExportIteratorTests;
 import org.boostscale.velox4j.test.SampleQueryTests;
 import org.boostscale.velox4j.test.TestThreads;
-import org.boostscale.velox4j.test.UpIteratorTests;
 import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.DoubleType;
 import org.boostscale.velox4j.type.IntegerType;
@@ -105,7 +105,7 @@ public class JniApiTest {
     final LocalSession session = createLocalSession(memoryManager);
     final JniApi jniApi = getJniApi(session);
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
+    final ExportIterator itr = queryExecutor.execute();
     itr.close();
     session.close();
   }
@@ -116,7 +116,7 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
+    final ExportIterator itr = queryExecutor.execute();
     SampleQueryTests.assertIterator(itr);
     session.close();
     ;
@@ -128,8 +128,8 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr1 = queryExecutor.execute();
-    final UpIterator itr2 = queryExecutor.execute();
+    final ExportIterator itr1 = queryExecutor.execute();
+    final ExportIterator itr2 = queryExecutor.execute();
     SampleQueryTests.assertIterator(itr1);
     SampleQueryTests.assertIterator(itr2);
     session.close();
@@ -155,8 +155,8 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
-    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
+    final ExportIterator itr = queryExecutor.execute();
+    final RowVector vector = ExportIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = ImmutableList.of(vector);
     final String serialized = JniApi.baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
@@ -171,8 +171,8 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
-    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
+    final ExportIterator itr = queryExecutor.execute();
+    final RowVector vector = ExportIteratorTests.collectSingleVector(itr);
     final List<RowVector> vectors = ImmutableList.of(vector, vector);
     final String serialized = JniApi.baseVectorSerialize(vectors);
     final List<BaseVector> deserialized = jniApi.baseVectorDeserialize(serialized);
@@ -186,8 +186,8 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
-    final RowVector vector = UpIteratorTests.collectSingleVector(itr);
+    final ExportIterator itr = queryExecutor.execute();
+    final RowVector vector = ExportIteratorTests.collectSingleVector(itr);
     final FieldVector arrowVector = Arrow.toArrowVector(arrowAlloc, vector);
     final BaseVector imported = session.arrowOps().fromArrowVector(arrowAlloc, arrowVector);
     BaseVectorTests.assertEquals(vector, imported);
@@ -208,10 +208,11 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
-    final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
-    final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
+    final ExportIterator itr = queryExecutor.execute();
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
+    final ExternalStream es = jniApi.createExternalStreamFromImportIterator(down);
+    final ExportIterator up = jniApi.createExportIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
     session.close();
   }
@@ -222,10 +223,11 @@ public class JniApiTest {
     final JniApi jniApi = getJniApi(session);
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
-    final UpIterator itr = queryExecutor.execute();
-    final DownIterator down = DownIterators.fromJavaIterator(UpIterators.asJavaIterator(itr));
-    final ExternalStream es = jniApi.createExternalStreamFromDownIterator(down);
-    final UpIterator up = jniApi.createUpIteratorWithExternalStream(es);
+    final ExportIterator itr = queryExecutor.execute();
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
+    final ExternalStream es = jniApi.createExternalStreamFromImportIterator(down);
+    final ExportIterator up = jniApi.createExportIteratorWithExternalStream(es);
     final Thread thread =
         TestThreads.newTestThread(
             new Runnable() {

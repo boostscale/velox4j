@@ -229,7 +229,7 @@ public static void main(String[] args) {
   task.noMoreSplits(scanNode.getId());
 
   // 8. Create a Java iterator from the Velox task.
-  final Iterator<RowVector> itr = UpIterators.asJavaIterator(task);
+  final Iterator<RowVector> itr = ExportIterators.asJavaIterator(task);
 
   // 9. Collect and print results.
   while (itr.hasNext()) {

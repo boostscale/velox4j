@@ -5,8 +5,8 @@ set(VELOX4J_SOURCES
     velox4j/jni/JniError.cc
     velox4j/jni/JniLoader.cc
     velox4j/jni/JniWrapper.cc
-    velox4j/iterator/UpIterator.cc
-    velox4j/iterator/DownIterator.cc
+    velox4j/iterator/ExportIterator.cc
+    velox4j/iterator/ImportIterator.cc
     velox4j/lifecycle/ObjectStore.cc
     velox4j/lifecycle/Session.cc
     velox4j/arrow/Arrow.cc

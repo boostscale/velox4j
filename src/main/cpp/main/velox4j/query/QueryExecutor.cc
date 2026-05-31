@@ -81,7 +81,7 @@ SerialTask::~SerialTask() {
   }
 }
 
-UpIterator::State SerialTask::advance() {
+ExportIterator::State SerialTask::advance() {
   if (hasPendingState_) {
     hasPendingState_ = false;
     return pendingState_;
@@ -125,7 +125,7 @@ std::unique_ptr<SerialTaskStats> SerialTask::collectStats() {
   return std::make_unique<SerialTaskStats>(stats);
 }
 
-UpIterator::State SerialTask::advance0(bool wait) {
+ExportIterator::State SerialTask::advance0(bool wait) {
   while (true) {
     auto future = ContinueFuture::makeEmpty();
     auto out = task_->next(&future);

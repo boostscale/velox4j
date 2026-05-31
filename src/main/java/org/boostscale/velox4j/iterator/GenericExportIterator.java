@@ -16,28 +16,28 @@ package org.boostscale.velox4j.iterator;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.jni.JniApi;
 
-public class GenericUpIterator implements UpIterator {
+public class GenericExportIterator implements ExportIterator {
   private final JniApi jniApi;
   private final long id;
 
-  public GenericUpIterator(JniApi jniApi, long id) {
+  public GenericExportIterator(JniApi jniApi, long id) {
     this.jniApi = jniApi;
     this.id = id;
   }
 
   @Override
   public State advance() {
-    return JniApi.upIteratorAdvance(this);
+    return JniApi.exportIteratorAdvance(this);
   }
 
   @Override
   public void waitFor() {
-    JniApi.upIteratorWait(this);
+    JniApi.exportIteratorWait(this);
   }
 
   @Override
   public RowVector get() {
-    return jniApi.upIteratorGet(this);
+    return jniApi.exportIteratorGet(this);
   }
 
   @Override

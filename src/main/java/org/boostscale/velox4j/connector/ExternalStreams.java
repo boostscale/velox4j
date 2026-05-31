@@ -14,7 +14,7 @@
 package org.boostscale.velox4j.connector;
 
 import org.boostscale.velox4j.data.RowVector;
-import org.boostscale.velox4j.iterator.DownIterator;
+import org.boostscale.velox4j.iterator.ImportIterator;
 import org.boostscale.velox4j.jni.JniApi;
 
 /** A factory for creating {@link ExternalStream} instances. */
@@ -25,8 +25,8 @@ public class ExternalStreams {
     this.jniApi = jniApi;
   }
 
-  public ExternalStream bind(DownIterator itr) {
-    return jniApi.createExternalStreamFromDownIterator(itr);
+  public ExternalStream bind(ImportIterator itr) {
+    return jniApi.createExternalStreamFromImportIterator(itr);
   }
 
   /**

@@ -20,14 +20,14 @@
 #include "velox4j/connector/ExternalStream.h"
 
 namespace velox4j {
-// JNI wrapper that exposes a down-iterator to Java.
-class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
+// JNI wrapper that exposes an import-iterator to Java.
+class ImportIteratorJniWrapper final : public spotify::jni::JavaClass {
  public:
-  explicit DownIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
-    DownIteratorJniWrapper::initialize(env);
+  explicit ImportIteratorJniWrapper(JNIEnv* env) : JavaClass(env) {
+    ImportIteratorJniWrapper::initialize(env);
   }
 
-  DownIteratorJniWrapper() : JavaClass() {};
+  ImportIteratorJniWrapper() : JavaClass() {};
 
   const char* getCanonicalName() const override;
 
@@ -36,26 +36,26 @@ class DownIteratorJniWrapper final : public spotify::jni::JavaClass {
   void mapFields() override;
 };
 
-/// An ExternalStream that is backed by a down-iterator.
-/// What is down-iterator: A down-iterator is an iterator passed
+/// An ExternalStream that is backed by an import-iterator.
+/// What is import-iterator: An import-iterator is an iterator passed
 /// From Java to C++ for Velox to read data from Java.
-/// An instance of this class is operating on a Java-side down-iterator
+/// An instance of this class is operating on a Java-side import-iterator
 /// through JNI.
-class DownIterator : public ExternalStream {
+class ImportIterator : public ExternalStream {
  public:
   enum class State { AVAILABLE = 0, BLOCKED = 1, FINISHED = 2 };
 
   // CTOR.
-  DownIterator(JNIEnv* env, jobject ref);
+  ImportIterator(JNIEnv* env, jobject ref);
 
   // Delete copy/move CTORs.
-  DownIterator(DownIterator&&) = delete;
-  DownIterator(const DownIterator&) = delete;
-  DownIterator& operator=(const DownIterator&) = delete;
-  DownIterator& operator=(DownIterator&&) = delete;
+  ImportIterator(ImportIterator&&) = delete;
+  ImportIterator(const ImportIterator&) = delete;
+  ImportIterator& operator=(const ImportIterator&) = delete;
+  ImportIterator& operator=(ImportIterator&&) = delete;
 
   // DTOR.
-  ~DownIterator() override;
+  ~ImportIterator() override;
 
   std::optional<facebook::velox::RowVectorPtr> read(
       facebook::velox::ContinueFuture& future) override;

@@ -17,7 +17,7 @@
 #include <velox/exec/Driver.h>
 #include <velox/exec/TaskStats.h>
 
-#include "velox4j/iterator/UpIterator.h"
+#include "velox4j/iterator/ExportIterator.h"
 #include "velox4j/memory/MemoryManager.h"
 #include "velox4j/query/Query.h"
 
@@ -35,9 +35,9 @@ class SerialTaskStats {
   facebook::velox::exec::TaskStats taskStats_;
 };
 
-/// An UpIterator implementation that is backed by a Velox task which is
+/// An ExportIterator implementation that is backed by a Velox task which is
 /// executed in serial execution mode.
-class SerialTask : public UpIterator {
+class SerialTask : public ExportIterator {
  public:
   SerialTask(MemoryManager* memoryManager, std::shared_ptr<const Query> query);
 

@@ -26,24 +26,24 @@ import org.boostscale.velox4j.collection.Streams;
 import org.boostscale.velox4j.data.BaseVectors;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.iterator.CloseableIterator;
-import org.boostscale.velox4j.iterator.UpIterator;
-import org.boostscale.velox4j.iterator.UpIterators;
+import org.boostscale.velox4j.iterator.ExportIterator;
+import org.boostscale.velox4j.iterator.ExportIterators;
 import org.boostscale.velox4j.serde.Serde;
 
-public final class UpIteratorTests {
-  public static RowVector collectSingleVector(UpIterator itr) {
+public final class ExportIteratorTests {
+  public static RowVector collectSingleVector(ExportIterator itr) {
     final List<RowVector> vectors = collect(itr);
     Assert.assertEquals(1, vectors.size());
     return vectors.get(0);
   }
 
-  public static List<RowVector> collect(UpIterator itr) {
+  public static List<RowVector> collect(ExportIterator itr) {
     final List<RowVector> vectors =
-        Streams.fromIterator(UpIterators.asJavaIterator(itr)).collect(Collectors.toList());
+        Streams.fromIterator(ExportIterators.asJavaIterator(itr)).collect(Collectors.toList());
     return vectors;
   }
 
-  public static IteratorAssertionBuilder assertIterator(UpIterator itr) {
+  public static IteratorAssertionBuilder assertIterator(ExportIterator itr) {
     return new IteratorAssertionBuilder(itr);
   }
 
@@ -53,8 +53,8 @@ public final class UpIteratorTests {
     private final List<Consumer<Argument>> assertions = new ArrayList<>();
     private final List<Runnable> finalAssertions = new ArrayList<>();
 
-    private IteratorAssertionBuilder(UpIterator itr) {
-      this.itr = UpIterators.asJavaIterator(itr);
+    private IteratorAssertionBuilder(ExportIterator itr) {
+      this.itr = ExportIterators.asJavaIterator(itr);
     }
 
     public IteratorAssertionBuilder assertNumRowVectors(int expected) {
