@@ -17,13 +17,13 @@ import java.util.Iterator;
 
 import org.boostscale.velox4j.data.RowVector;
 
-public final class DownIterators {
-  /** Creates a down-iterator instance from a given Java iterator. */
-  public static DownIterator fromJavaIterator(Iterator<RowVector> itr) {
+public final class ImportIterators {
+  /** Creates an import-iterator instance from a given Java iterator. */
+  public static ImportIterator fromJavaIterator(Iterator<RowVector> itr) {
     return new FromJavaIterator(itr);
   }
 
-  private static class FromJavaIterator extends BaseDownIterator {
+  private static class FromJavaIterator extends BaseImportIterator {
     private final Iterator<RowVector> itr;
 
     private FromJavaIterator(Iterator<RowVector> itr) {
@@ -52,8 +52,8 @@ public final class DownIterators {
     public void close() {}
   }
 
-  private abstract static class BaseDownIterator implements DownIterator {
-    protected BaseDownIterator() {}
+  private abstract static class BaseImportIterator implements ImportIterator {
+    protected BaseImportIterator() {}
 
     @Override
     public final int advance() {
@@ -65,7 +65,7 @@ public final class DownIterators {
       return get0().id();
     }
 
-    protected abstract DownIterator.State advance0();
+    protected abstract ImportIterator.State advance0();
 
     protected abstract RowVector get0();
   }

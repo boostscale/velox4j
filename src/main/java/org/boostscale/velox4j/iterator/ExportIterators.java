@@ -16,29 +16,29 @@ package org.boostscale.velox4j.iterator;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.exception.VeloxException;
 
-public final class UpIterators {
-  public static CloseableIterator<RowVector> asJavaIterator(UpIterator upIterator) {
-    return new AsJavaIterator(upIterator);
+public final class ExportIterators {
+  public static CloseableIterator<RowVector> asJavaIterator(ExportIterator exportIterator) {
+    return new AsJavaIterator(exportIterator);
   }
 
-  public static InfiniteIterator<RowVector> asInfiniteIterator(UpIterator upIterator) {
-    return new AsInfiniteIterator(upIterator);
+  public static InfiniteIterator<RowVector> asInfiniteIterator(ExportIterator exportIterator) {
+    return new AsInfiniteIterator(exportIterator);
   }
 
   private static class AsJavaIterator implements CloseableIterator<RowVector> {
-    private final UpIterator upIterator;
+    private final ExportIterator exportIterator;
 
-    private AsJavaIterator(UpIterator upIterator) {
-      this.upIterator = upIterator;
+    private AsJavaIterator(ExportIterator exportIterator) {
+      this.exportIterator = exportIterator;
     }
 
     @Override
     public boolean hasNext() {
       while (true) {
-        final UpIterator.State state = upIterator.advance();
+        final ExportIterator.State state = exportIterator.advance();
         switch (state) {
           case BLOCKED:
-            upIterator.waitFor();
+            exportIterator.waitFor();
             continue;
           case AVAILABLE:
             return true;
@@ -50,21 +50,21 @@ public final class UpIterators {
 
     @Override
     public RowVector next() {
-      return upIterator.get();
+      return exportIterator.get();
     }
 
     @Override
     public void close() throws Exception {
-      upIterator.close();
+      exportIterator.close();
     }
   }
 
   private static class AsInfiniteIterator implements InfiniteIterator<RowVector> {
-    private final UpIterator upIterator;
+    private final ExportIterator exportIterator;
     private boolean isAvailable = false;
 
-    private AsInfiniteIterator(UpIterator upIterator) {
-      this.upIterator = upIterator;
+    private AsInfiniteIterator(ExportIterator exportIterator) {
+      this.exportIterator = exportIterator;
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class UpIterators {
       if (isAvailable) {
         return true;
       }
-      final UpIterator.State state = upIterator.advance();
+      final ExportIterator.State state = exportIterator.advance();
       switch (state) {
         case BLOCKED:
           return false;
@@ -92,10 +92,10 @@ public final class UpIterators {
       if (isAvailable) {
         return;
       }
-      final UpIterator.State state = upIterator.advance();
+      final ExportIterator.State state = exportIterator.advance();
       switch (state) {
         case BLOCKED:
-          upIterator.waitFor();
+          exportIterator.waitFor();
           return;
         case AVAILABLE:
           isAvailable = true;
@@ -114,14 +114,14 @@ public final class UpIterators {
         throw new VeloxException(
             "AsInfiniteIterator#get can only be called after #available() returns true");
       }
-      final RowVector rv = upIterator.get();
+      final RowVector rv = exportIterator.get();
       isAvailable = false;
       return rv;
     }
 
     @Override
     public void close() throws Exception {
-      upIterator.close();
+      exportIterator.close();
     }
   }
 }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-#include "velox4j/iterator/DownIterator.h"
+#include "velox4j/iterator/ImportIterator.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/lifecycle/ObjectStore.h"
 
@@ -20,16 +20,16 @@ namespace velox4j {
 using namespace facebook::velox;
 
 namespace {
-const char* kClassName = "org/boostscale/velox4j/iterator/DownIterator";
+const char* kClassName = "org/boostscale/velox4j/iterator/ImportIterator";
 } // namespace
 
-void DownIteratorJniWrapper::mapFields() {}
+void ImportIteratorJniWrapper::mapFields() {}
 
-const char* DownIteratorJniWrapper::getCanonicalName() const {
+const char* ImportIteratorJniWrapper::getCanonicalName() const {
   return kClassName;
 }
 
-void DownIteratorJniWrapper::initialize(JNIEnv* env) {
+void ImportIteratorJniWrapper::initialize(JNIEnv* env) {
   JavaClass::setClass(env);
 
   cacheMethod(env, "advance", kTypeInt, nullptr);
@@ -40,29 +40,29 @@ void DownIteratorJniWrapper::initialize(JNIEnv* env) {
   registerNativeMethods(env);
 }
 
-DownIterator::DownIterator(JNIEnv* env, jobject ref) : ExternalStream() {
+ImportIterator::ImportIterator(JNIEnv* env, jobject ref) : ExternalStream() {
   ref_ = env->NewGlobalRef(ref);
   waitExecutor_ = std::make_unique<folly::IOThreadPoolExecutor>(1);
 }
 
-DownIterator::~DownIterator() {
+ImportIterator::~ImportIterator() {
   try {
     close();
     getLocalJNIEnv()->DeleteGlobalRef(ref_);
   } catch (const std::exception& ex) {
     LOG(WARNING) << "Unable to destroy the global reference to the Java side "
-                    "down iterator: "
+                    "import iterator: "
                  << ex.what();
   }
 }
 
-std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
+std::optional<RowVectorPtr> ImportIterator::read(ContinueFuture& future) {
   VELOX_CHECK(!closed_);
   {
     std::lock_guard l(mutex_);
     VELOX_CHECK(
         promises_.empty(),
-        "DownIterator::read is called while the last read operation is "
+        "ImportIterator::read is called while the last read operation is "
         "awaiting. Aborting.");
   }
   const State state = advance();
@@ -74,7 +74,7 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
     }
     case State::BLOCKED: {
       auto [readPromise, readFuture] =
-          makeVeloxContinuePromiseContract(fmt::format("DownIterator::read"));
+          makeVeloxContinuePromiseContract(fmt::format("ImportIterator::read"));
       // Returns a future that is fulfilled immediately to signal Velox
       // that this stream is still open and is currently waiting for input.
       future = std::move(readFuture);
@@ -117,7 +117,7 @@ std::optional<RowVectorPtr> DownIterator::read(ContinueFuture& future) {
   return std::nullopt;
 }
 
-void DownIterator::close() {
+void ImportIterator::close() {
   bool expected = false;
   if (!closed_.compare_exchange_strong(expected, true)) {
     return;
@@ -130,7 +130,7 @@ void DownIterator::close() {
   waitExecutor_->join();
 }
 
-void DownIterator::wait() {
+void ImportIterator::wait() {
   auto* env = getLocalJNIEnv();
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("waitFor");
@@ -138,7 +138,7 @@ void DownIterator::wait() {
   checkException(env);
 }
 
-DownIterator::State DownIterator::advance() {
+ImportIterator::State ImportIterator::advance() {
   auto* env = getLocalJNIEnv();
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("advance");
@@ -147,7 +147,7 @@ DownIterator::State DownIterator::advance() {
   return state;
 }
 
-RowVectorPtr DownIterator::get() {
+RowVectorPtr ImportIterator::get() {
   auto* env = getLocalJNIEnv();
   static const auto* clazz = jniClassRegistry()->get(kClassName);
   static jmethodID methodId = clazz->getMethod("get");

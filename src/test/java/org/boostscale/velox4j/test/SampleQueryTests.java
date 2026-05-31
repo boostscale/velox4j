@@ -15,7 +15,7 @@ package org.boostscale.velox4j.test;
 
 import com.google.common.collect.ImmutableList;
 
-import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.iterator.ExportIterator;
 import org.boostscale.velox4j.type.BigIntType;
 import org.boostscale.velox4j.type.RowType;
 
@@ -35,13 +35,13 @@ public final class SampleQueryTests {
     return ResourceTests.readResourceAsString(SAMPLE_QUERY_PATH);
   }
 
-  public static void assertIterator(UpIterator itr) {
+  public static void assertIterator(ExportIterator itr) {
     assertIterator(itr, 1);
   }
 
-  public static void assertIterator(UpIterator itr, int repeatTimes) {
-    UpIteratorTests.IteratorAssertionBuilder builder =
-        UpIteratorTests.assertIterator(itr).assertNumRowVectors(repeatTimes);
+  public static void assertIterator(ExportIterator itr, int repeatTimes) {
+    ExportIteratorTests.IteratorAssertionBuilder builder =
+        ExportIteratorTests.assertIterator(itr).assertNumRowVectors(repeatTimes);
     for (int i = 0; i < repeatTimes; i++) {
       builder =
           builder.assertRowVectorToString(

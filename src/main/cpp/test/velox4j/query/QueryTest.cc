@@ -52,20 +52,20 @@ class QueryTest : public testing::Test, public test::VectorTestBase {
         std::make_shared<MemoryManager>(AllocationListener::noop());
   }
 
-  std::vector<RowVectorPtr> collect(UpIterator& itr) {
+  std::vector<RowVectorPtr> collect(ExportIterator& itr) {
     std::vector<RowVectorPtr> out{};
     while (true) {
-      const UpIterator::State state = itr.advance();
+      const ExportIterator::State state = itr.advance();
       switch (state) {
-        case UpIterator::State::AVAILABLE: {
+        case ExportIterator::State::AVAILABLE: {
           const auto rv = itr.get();
           out.push_back(std::dynamic_pointer_cast<RowVector>(
               RowVector::loadedVectorShared(rv)));
           break;
         }
-        case UpIterator::State::BLOCKED:
+        case ExportIterator::State::BLOCKED:
           continue;
-        case UpIterator::State::FINISHED:
+        case ExportIterator::State::FINISHED:
           goto OUT;
       }
     }

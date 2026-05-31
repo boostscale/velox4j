@@ -22,10 +22,10 @@ import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.jni.CppObject;
 
 /**
- * An up-iterator is the opposite of down-iterator. It transmits data that is output from Velox
+ * An export-iterator is the opposite of import-iterator. It transmits data that is output from Velox
  * pipeline from C++ to Java.
  */
-public interface UpIterator extends CppObject {
+public interface ExportIterator extends CppObject {
   enum State {
     AVAILABLE(0),
     BLOCKED(1),

@@ -28,8 +28,8 @@
 #include "velox4j/eval/Evaluator.h"
 #include "velox4j/init/Init.h"
 #include "velox4j/iterator/BlockingQueue.h"
-#include "velox4j/iterator/DownIterator.h"
-#include "velox4j/iterator/UpIterator.h"
+#include "velox4j/iterator/ImportIterator.h"
+#include "velox4j/iterator/ExportIterator.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
@@ -142,23 +142,23 @@ jlong queryExecutorExecute(
   JNI_METHOD_END(kInvalidObjectHandle)
 }
 
-jint upIteratorAdvance(JNIEnv* env, jclass clazz, jlong itrId) {
+jint exportIteratorAdvance(JNIEnv* env, jclass clazz, jlong itrId) {
   JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  auto itr = ObjectStore::retrieve<ExportIterator>(itrId);
   return static_cast<jint>(itr->advance());
   JNI_METHOD_END(kInvalidObjectHandle)
 }
 
-void upIteratorWait(JNIEnv* env, jclass clazz, jlong itrId) {
+void exportIteratorWait(JNIEnv* env, jclass clazz, jlong itrId) {
   JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  auto itr = ObjectStore::retrieve<ExportIterator>(itrId);
   itr->wait();
   JNI_METHOD_END()
 }
 
-jlong upIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
+jlong exportIteratorGet(JNIEnv* env, jobject javaThis, jlong itrId) {
   JNI_METHOD_START
-  auto itr = ObjectStore::retrieve<UpIterator>(itrId);
+  auto itr = ObjectStore::retrieve<ExportIterator>(itrId);
   return sessionOf(env, javaThis)->objectStore()->save(itr->get());
   JNI_METHOD_END(kInvalidObjectHandle)
 }
@@ -178,12 +178,12 @@ void blockingQueueNoMoreInput(JNIEnv* env, jclass clazz, jlong queueId) {
   JNI_METHOD_END()
 }
 
-jlong createExternalStreamFromDownIterator(
+jlong createExternalStreamFromImportIterator(
     JNIEnv* env,
     jobject javaThis,
     jobject itrRef) {
   JNI_METHOD_START
-  auto es = std::make_shared<DownIterator>(env, itrRef);
+  auto es = std::make_shared<ImportIterator>(env, itrRef);
   return sessionOf(env, javaThis)->objectStore()->save(es);
   JNI_METHOD_END(kInvalidObjectHandle)
 }
@@ -787,9 +787,9 @@ jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
   JNI_METHOD_END(kInvalidObjectHandle)
 }
 
-class ExternalStreamAsUpIterator : public UpIterator {
+class ExternalStreamAsExportIterator : public ExportIterator {
  public:
-  explicit ExternalStreamAsUpIterator(const std::shared_ptr<ExternalStream>& es)
+  explicit ExternalStreamAsExportIterator(const std::shared_ptr<ExternalStream>& es)
       : es_(es) {}
 
   State advance() override {
@@ -817,7 +817,7 @@ class ExternalStreamAsUpIterator : public UpIterator {
   RowVectorPtr get() override {
     VELOX_CHECK_NOT_NULL(
         pending_,
-        "ExternalStreamAsUpIterator: No pending row vector to return. Make "
+        "ExternalStreamAsExportIterator: No pending row vector to return. Make "
         "sure the iterator is available via member function advance() first");
     auto out = pending_;
     pending_ = nullptr;
@@ -829,7 +829,7 @@ class ExternalStreamAsUpIterator : public UpIterator {
   RowVectorPtr pending_{nullptr};
 };
 
-jlong createUpIteratorWithExternalStream(
+jlong createExportIteratorWithExternalStream(
     JNIEnv* env,
     jobject javaThis,
     jlong id) {
@@ -837,7 +837,7 @@ jlong createUpIteratorWithExternalStream(
   auto es = ObjectStore::retrieve<ExternalStream>(id);
   return sessionOf(env, javaThis)
       ->objectStore()
-      ->save(std::make_shared<ExternalStreamAsUpIterator>(es));
+      ->save(std::make_shared<ExternalStreamAsExportIterator>(es));
   JNI_METHOD_END(kInvalidObjectHandle)
 }
 } // namespace
@@ -898,15 +898,15 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "upIteratorAdvance",
-      (void*)upIteratorAdvance,
+      "exportIteratorAdvance",
+      (void*)exportIteratorAdvance,
       kTypeInt,
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "upIteratorWait", (void*)upIteratorWait, kTypeVoid, kTypeLong, nullptr);
+      "exportIteratorWait", (void*)exportIteratorWait, kTypeVoid, kTypeLong, nullptr);
   addNativeMethod(
-      "upIteratorGet", (void*)upIteratorGet, kTypeLong, kTypeLong, nullptr);
+      "exportIteratorGet", (void*)exportIteratorGet, kTypeLong, kTypeLong, nullptr);
   addNativeMethod(
       "blockingQueuePut",
       (void*)blockingQueuePut,
@@ -921,10 +921,10 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "createExternalStreamFromDownIterator",
-      (void*)createExternalStreamFromDownIterator,
+      "createExternalStreamFromImportIterator",
+      (void*)createExternalStreamFromImportIterator,
       kTypeLong,
-      "org/boostscale/velox4j/iterator/DownIterator",
+      "org/boostscale/velox4j/iterator/ImportIterator",
       nullptr);
   addNativeMethod(
       "createBlockingQueue", (void*)createBlockingQueue, kTypeLong, nullptr);
@@ -1144,8 +1144,8 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeString,
       nullptr);
   addNativeMethod(
-      "createUpIteratorWithExternalStream",
-      (void*)createUpIteratorWithExternalStream,
+      "createExportIteratorWithExternalStream",
+      (void*)createExportIteratorWithExternalStream,
       kTypeLong,
       kTypeLong,
       nullptr);

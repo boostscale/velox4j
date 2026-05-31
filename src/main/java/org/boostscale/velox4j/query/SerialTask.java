@@ -15,13 +15,13 @@ package org.boostscale.velox4j.query;
 
 import org.boostscale.velox4j.connector.ConnectorSplit;
 import org.boostscale.velox4j.data.RowVector;
-import org.boostscale.velox4j.iterator.UpIterator;
+import org.boostscale.velox4j.iterator.ExportIterator;
 import org.boostscale.velox4j.jni.JniApi;
 
 /**
- * An up-iterator implementation that is backed by a Velox task that runs in serial execution mode.
+ * An export-iterator implementation that is backed by a Velox task that runs in serial execution mode.
  */
-public class SerialTask implements UpIterator {
+public class SerialTask implements ExportIterator {
   private final JniApi jniApi;
   private final long id;
 
@@ -32,17 +32,17 @@ public class SerialTask implements UpIterator {
 
   @Override
   public State advance() {
-    return JniApi.upIteratorAdvance(this);
+    return JniApi.exportIteratorAdvance(this);
   }
 
   @Override
   public void waitFor() {
-    JniApi.upIteratorWait(this);
+    JniApi.exportIteratorWait(this);
   }
 
   @Override
   public RowVector get() {
-    return jniApi.upIteratorGet(this);
+    return jniApi.exportIteratorGet(this);
   }
 
   @Override

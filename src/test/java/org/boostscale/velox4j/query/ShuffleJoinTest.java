@@ -30,7 +30,7 @@ import org.boostscale.velox4j.data.BaseVector;
 import org.boostscale.velox4j.data.BaseVectors;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.expression.FieldAccessTypedExpr;
-import org.boostscale.velox4j.iterator.UpIterators;
+import org.boostscale.velox4j.iterator.ExportIterators;
 import org.boostscale.velox4j.join.JoinType;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
@@ -182,7 +182,7 @@ public class ShuffleJoinTest {
       task.noMoreSplits("left-scan");
       task.noMoreSplits("right-scan");
 
-      Iterator<RowVector> results = UpIterators.asJavaIterator(task);
+      Iterator<RowVector> results = ExportIterators.asJavaIterator(task);
       while (results.hasNext()) {
         RowVector batch = results.next();
         totalJoinedRows += batch.getSize();
@@ -273,7 +273,7 @@ public class ShuffleJoinTest {
     task.noMoreSplits("right-scan");
 
     int totalRows = 0;
-    Iterator<RowVector> results = UpIterators.asJavaIterator(task);
+    Iterator<RowVector> results = ExportIterators.asJavaIterator(task);
     while (results.hasNext()) {
       totalRows += results.next().getSize();
     }
@@ -291,7 +291,7 @@ public class ShuffleJoinTest {
     task.noMoreSplits(scan.getId());
 
     List<RowVector> batches = new ArrayList<>();
-    Iterator<RowVector> itr = UpIterators.asJavaIterator(task);
+    Iterator<RowVector> itr = ExportIterators.asJavaIterator(task);
     while (itr.hasNext()) {
       batches.add(itr.next());
     }
