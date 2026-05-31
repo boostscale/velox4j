@@ -32,17 +32,17 @@ import org.boostscale.velox4j.data.BaseVector;
 import org.boostscale.velox4j.data.BaseVectorTests;
 import org.boostscale.velox4j.data.RowVector;
 import org.boostscale.velox4j.exception.VeloxException;
-import org.boostscale.velox4j.iterator.ImportIterator;
-import org.boostscale.velox4j.iterator.ImportIterators;
 import org.boostscale.velox4j.iterator.ExportIterator;
 import org.boostscale.velox4j.iterator.ExportIterators;
+import org.boostscale.velox4j.iterator.ImportIterator;
+import org.boostscale.velox4j.iterator.ImportIterators;
 import org.boostscale.velox4j.memory.BytesAllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.query.QueryExecutor;
 import org.boostscale.velox4j.session.Session;
+import org.boostscale.velox4j.test.ExportIteratorTests;
 import org.boostscale.velox4j.test.SampleQueryTests;
 import org.boostscale.velox4j.test.TestThreads;
-import org.boostscale.velox4j.test.ExportIteratorTests;
 import org.boostscale.velox4j.test.Velox4jTests;
 import org.boostscale.velox4j.type.DoubleType;
 import org.boostscale.velox4j.type.IntegerType;
@@ -209,7 +209,8 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final ExportIterator itr = queryExecutor.execute();
-    final ImportIterator down = ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.createExternalStreamFromImportIterator(down);
     final ExportIterator up = jniApi.createExportIteratorWithExternalStream(es);
     SampleQueryTests.assertIterator(up);
@@ -223,7 +224,8 @@ public class JniApiTest {
     final String json = SampleQueryTests.readQueryJson();
     final QueryExecutor queryExecutor = jniApi.createQueryExecutor(json);
     final ExportIterator itr = queryExecutor.execute();
-    final ImportIterator down = ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(itr));
     final ExternalStream es = jniApi.createExternalStreamFromImportIterator(down);
     final ExportIterator up = jniApi.createExportIteratorWithExternalStream(es);
     final Thread thread =

@@ -19,7 +19,8 @@ import org.boostscale.velox4j.iterator.ExportIterator;
 import org.boostscale.velox4j.jni.JniApi;
 
 /**
- * An export-iterator implementation that is backed by a Velox task that runs in serial execution mode.
+ * An export-iterator implementation that is backed by a Velox task that runs in serial execution
+ * mode.
  */
 public class SerialTask implements ExportIterator {
   private final JniApi jniApi;

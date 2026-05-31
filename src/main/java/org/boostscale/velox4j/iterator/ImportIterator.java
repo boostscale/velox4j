@@ -16,8 +16,8 @@ package org.boostscale.velox4j.iterator;
 import org.boostscale.velox4j.jni.CalledFromNative;
 
 /**
- * An ExternalStream that is backed by an import-iterator. What is import-iterator: An import-iterator is an
- * iterator passed From Java to C++ for Velox to read data from Java.
+ * An ExternalStream that is backed by an import-iterator. What is import-iterator: An
+ * import-iterator is an iterator passed From Java to C++ for Velox to read data from Java.
  */
 public interface ImportIterator {
   enum State {

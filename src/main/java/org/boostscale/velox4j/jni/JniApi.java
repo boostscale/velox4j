@@ -28,9 +28,9 @@ import org.boostscale.velox4j.connector.ExternalStreams;
 import org.boostscale.velox4j.data.*;
 import org.boostscale.velox4j.eval.Evaluation;
 import org.boostscale.velox4j.eval.Evaluator;
-import org.boostscale.velox4j.iterator.ImportIterator;
-import org.boostscale.velox4j.iterator.GenericExportIterator;
 import org.boostscale.velox4j.iterator.ExportIterator;
+import org.boostscale.velox4j.iterator.GenericExportIterator;
+import org.boostscale.velox4j.iterator.ImportIterator;
 import org.boostscale.velox4j.memory.AllocationListener;
 import org.boostscale.velox4j.memory.MemoryManager;
 import org.boostscale.velox4j.partition.PartitionFunction;
@@ -129,7 +129,8 @@ public final class JniApi {
   }
 
   public ExternalStream createExternalStreamFromImportIterator(ImportIterator itr) {
-    return new ExternalStreams.GenericExternalStream(jni.createExternalStreamFromImportIterator(itr));
+    return new ExternalStreams.GenericExternalStream(
+        jni.createExternalStreamFromImportIterator(itr));
   }
 
   public ExternalStreams.BlockingQueue createBlockingQueue() {

@@ -269,7 +269,8 @@ public class QueryTest {
   public void testExternalStreamFromJavaIterator() {
     final String json = SampleQueryTests.readQueryJson();
     final ExportIterator sampleIn = session.queryOps().execute(Serde.fromJson(json, Query.class));
-    final ImportIterator down = ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(sampleIn));
+    final ImportIterator down =
+        ImportIterators.fromJavaIterator(ExportIterators.asJavaIterator(sampleIn));
     final ExternalStream es = session.externalStreamOps().bind(down);
     final TableScanNode scanNode =
         new TableScanNode(

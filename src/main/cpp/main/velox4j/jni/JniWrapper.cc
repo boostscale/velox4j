@@ -28,8 +28,8 @@
 #include "velox4j/eval/Evaluator.h"
 #include "velox4j/init/Init.h"
 #include "velox4j/iterator/BlockingQueue.h"
-#include "velox4j/iterator/ImportIterator.h"
 #include "velox4j/iterator/ExportIterator.h"
+#include "velox4j/iterator/ImportIterator.h"
 #include "velox4j/jni/JniCommon.h"
 #include "velox4j/jni/JniError.h"
 #include "velox4j/lifecycle/Session.h"
@@ -789,7 +789,8 @@ jlong iSerializableAsCpp(JNIEnv* env, jobject javaThis, jstring json) {
 
 class ExternalStreamAsExportIterator : public ExportIterator {
  public:
-  explicit ExternalStreamAsExportIterator(const std::shared_ptr<ExternalStream>& es)
+  explicit ExternalStreamAsExportIterator(
+      const std::shared_ptr<ExternalStream>& es)
       : es_(es) {}
 
   State advance() override {
@@ -904,9 +905,17 @@ void JniWrapper::initialize(JNIEnv* env) {
       kTypeLong,
       nullptr);
   addNativeMethod(
-      "exportIteratorWait", (void*)exportIteratorWait, kTypeVoid, kTypeLong, nullptr);
+      "exportIteratorWait",
+      (void*)exportIteratorWait,
+      kTypeVoid,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
-      "exportIteratorGet", (void*)exportIteratorGet, kTypeLong, kTypeLong, nullptr);
+      "exportIteratorGet",
+      (void*)exportIteratorGet,
+      kTypeLong,
+      kTypeLong,
+      nullptr);
   addNativeMethod(
       "blockingQueuePut",
       (void*)blockingQueuePut,
