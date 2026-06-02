@@ -172,12 +172,4 @@ std::unique_ptr<StatefulSerialTask> StatefulQueryExecutor::execute() const {
   return std::make_unique<StatefulSerialTask>(memoryManager_, query_);
 }
 
-// void StatefulSerialTask::onProcessingTime(int64_t key, int64_t ns, int64_t timestamp) {
-//   task_->onProcessingTime(key, ns, timestamp);
-// }
-
-// void StatefulSerialTask::onEventTime(int64_t key, int64_t ns, int64_t timestamp) {
-//   task_->onEventTime(key, ns, timestamp);
-// }
-
 } // namespace velox4j
