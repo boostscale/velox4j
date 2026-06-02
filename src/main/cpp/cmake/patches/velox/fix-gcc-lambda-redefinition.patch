@@ -1,0 +1,36 @@
+--- a/velox/common/config/IConfig.h	2026-06-02 15:05:39.451405932 +0000
++++ b/velox/common/config/IConfig.h	2026-06-02 15:05:57.907633761 +0000
+@@ -31,13 +31,19 @@
+ /// externally managed system configuration.
+ class IConfig {
+  public:
++  // Do not inline this member function as a lambda. Otherwise, a GCC bug
++  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103186 might be triggered
++  // with older GCC versions (e.g., GCC 8 on CentOS 7, GCC 11.1/11.2).
++  template <typename T>
++  static T defaultToT(std::string /* unused */, std::string value) {
++    return folly::to<T>(value);
++  }
++
+   template <typename T>
+   std::optional<T> get(
+       const std::string& key,
+       const std::function<T(std::string, std::string)>& toT =
+-          [](auto /* unused */, auto value) {
+-            return folly::to<T>(value);
+-          }) const {
++          defaultToT<T>) const {
+     if (auto val = access(key)) {
+       return toT(key, *val);
+     }
+@@ -49,9 +55,7 @@
+       const std::string& key,
+       const T& defaultValue,
+       const std::function<T(std::string, std::string)>& toT =
+-          [](auto /* unused */, auto value) {
+-            return folly::to<T>(value);
+-          }) const {
++          defaultToT<T>) const {
+     if (auto val = access(key)) {
+       return toT(key, *val);
+     }
