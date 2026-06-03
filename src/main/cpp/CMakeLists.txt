@@ -99,6 +99,15 @@ target_link_libraries(
   JniHelpers
   PRIVATE JNI::JNI)
 
+# Add aarch64 assembly sources for folly
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64")
+  file(GLOB FOLLY_AARCH64_ASM_SOURCES "${folly_SOURCE_DIR}/folly/external/aor/*.S")
+  if(FOLLY_AARCH64_ASM_SOURCES)
+    set_source_files_properties(${FOLLY_AARCH64_ASM_SOURCES} PROPERTIES LANGUAGE C)
+    target_sources(folly PRIVATE ${FOLLY_AARCH64_ASM_SOURCES})
+  endif()
+endif()
+
 # Directories of Velox4J.
 set(VELOX4J_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/main)
 set(VELOX4J_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
