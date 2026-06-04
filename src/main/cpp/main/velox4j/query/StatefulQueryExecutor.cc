@@ -171,5 +171,4 @@ StatefulQueryExecutor::StatefulQueryExecutor(
 std::unique_ptr<StatefulSerialTask> StatefulQueryExecutor::execute() const {
   return std::make_unique<StatefulSerialTask>(memoryManager_, query_);
 }
-
 } // namespace velox4j

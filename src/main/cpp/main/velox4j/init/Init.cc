@@ -42,8 +42,6 @@
 #include <velox/experimental/stateful/StatefulPlanNode.h>
 #include <velox/experimental/stateful/state/StateBackend.h>
 #include <velox/experimental/stateful/state/RocksDBStateBackend.h>
-#include <velox/experimental/stateful/InternalTimerService.h>
-#include <velox/experimental/stateful/StatefulOperator.h>
 #include <velox/functions/prestosql/aggregates/RegisterAggregateFunctions.h>
 #include <velox/functions/prestosql/window/WindowFunctionsRegistration.h>
 #include <velox/functions/sparksql/aggregates/Register.h>
@@ -58,7 +56,6 @@
 #include "velox4j/eval/Evaluation.h"
 #include "velox4j/init/Config.h"
 #include "velox4j/query/Query.h"
-#include "velox4j/jni/FlinkJniCaller.h"
 
 namespace velox4j {
 
@@ -171,7 +168,6 @@ void initForSpark() {
   stateful::StatefulPlanNode::registerSerDe();
   stateful::KeyedStateBackendParameters::registerSerDe();
   stateful::RocksDBKeyedStateBackendParameters::registerSerDe();
-  stateful::StatefulOperator::setJniCaller(std::make_shared<FlinkJniCaller>());
   core::ITypedExpr::registerSerDe();
   exec::registerPartitionFunctionSerDe();
 }

@@ -37,10 +37,7 @@ public class StreamWindowAggregationNode extends PlanNode {
   private final Long offset;
   private final Integer windowType;
   private final RowType outputType;
-  private final boolean isEventTime;
   private final Integer rowtimeIndex;
-  private final Integer windowStart;
-  private final Integer windowEnd;
 
   @JsonCreator
   public StreamWindowAggregationNode(
@@ -57,10 +54,7 @@ public class StreamWindowAggregationNode extends PlanNode {
       @JsonProperty("offset") Long offset,
       @JsonProperty("windowType") Integer windowType,
       @JsonProperty("outputType") RowType outputType,
-      @JsonProperty("isRowTime") boolean isEventTime,
-      @JsonProperty("rowtimeIndex") Integer rowtimeIndex,
-      @JsonProperty("windowStartIndex") Integer windowStart,
-      @JsonProperty("windowEndIndex") Integer windowEnd) {
+      @JsonProperty("rowtimeIndex") Integer rowtimeIndex) {
     super(id);
     this.aggregation = aggregation;
     this.localAgg = localAgg;
@@ -74,10 +68,7 @@ public class StreamWindowAggregationNode extends PlanNode {
     this.offset = offset;
     this.windowType = windowType;
     this.outputType = outputType;
-    this.isEventTime = isEventTime;
     this.rowtimeIndex = rowtimeIndex;
-    this.windowStart = windowStart;
-    this.windowEnd = windowEnd;
   }
 
   @JsonGetter("keySelectorSpec")
@@ -143,21 +134,6 @@ public class StreamWindowAggregationNode extends PlanNode {
   @JsonGetter("rowtimeIndex")
   public Integer getRowtimeIndex() {
     return rowtimeIndex;
-  }
-
-  @JsonProperty("isEventTime")
-  public boolean getIsEventTime() {
-    return isEventTime;
-  }
-
-  @JsonProperty("windowStartIndex")
-  public Integer getWindowStart() {
-    return windowStart;
-  }
-
-  @JsonProperty("windowEndIndex")
-  public Integer getWindowEnd() {
-    return windowEnd;
   }
 
   @Override
