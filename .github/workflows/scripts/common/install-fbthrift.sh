@@ -128,7 +128,7 @@ install_fbthrift() {
         "https://github.com/facebook/fbthrift/archive/refs/tags/${FB_OS_VERSION}.tar.gz" \
         fbthrift
 
-    # Apply CompactV1 protocol refiller patch so derived classes (like Velox's
+    # Apply CompactV1 protocol refiller patch so derived classes (like Velox
     # CompactV1ProtocolReaderWithRefill) can read from the internal buffer
     # without a friend declaration in the upstream library.
     #
