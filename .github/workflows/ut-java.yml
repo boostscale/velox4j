@@ -70,7 +70,9 @@ jobs:
       - name: Run setup script
         run: |
           docker exec test-container bash -c '
+            set -euo pipefail
             bash .github/workflows/scripts/common/${{ matrix.setup_script }}
+            bash .github/workflows/scripts/common/install-fbthrift.sh
           '
       - name: Build C++ libraries
         run: |
