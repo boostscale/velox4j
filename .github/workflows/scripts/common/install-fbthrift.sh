@@ -126,6 +126,39 @@ install_fbthrift() {
     wget_and_untar \
         "https://github.com/facebook/fbthrift/archive/refs/tags/${FB_OS_VERSION}.tar.gz" \
         fbthrift
+
+    # Apply CompactV1 protocol refiller patch so derived classes (like Velox's
+    # CompactV1ProtocolReaderWithRefill) can read from the internal buffer
+    # without a friend declaration in the upstream library.
+    echo "Applying CompactV1 protocol refiller patch..."
+    cd "$DEPENDENCY_DIR/fbthrift"
+    patch -p1 <<'PATCH'
+--- a/thrift/lib/cpp2/protocol/ProtocolReaderWithRefill.h
++++ b/thrift/lib/cpp2/protocol/ProtocolReaderWithRefill.h
+@@ -172,6 +172,20 @@
+     protocol_.skipBytes(bytes);
+   }
+
++ protected:
++  /**
++   * Allow derived refill readers to use this helper where they cannot access
++   * CompactProtocolReader::in_ directly (due to not having a friend
++   * declaration).
++   * Allows users to implement refill readers for CompactV1ProtocolReader if
++   * necessary, without supporting it in the Thrift codebase or having to patch
++   * in a friend declaration.
++   */
++  template <typename T>
++  T readLEFromBuffer() {
++    return protocol_.in_.template readLE<T>();
++  }
++
+   private:
+    /**
+     * Make sure a varint can be read from the current buffer after idx bytes.
+PATCH
+    cd "$DEPENDENCY_DIR"
+
     cmake_install_dir fbthrift \
         -Denable_tests=OFF \
         -DBUILD_TESTS=OFF \
