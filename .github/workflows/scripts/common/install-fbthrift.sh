@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # --- Configuration ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local}"
 DEPENDENCY_DIR="${DEPENDENCY_DIR:-$(pwd)/deps-download}"
 NPROC="${NPROC:-$(nproc)}"
@@ -130,33 +131,12 @@ install_fbthrift() {
     # Apply CompactV1 protocol refiller patch so derived classes (like Velox's
     # CompactV1ProtocolReaderWithRefill) can read from the internal buffer
     # without a friend declaration in the upstream library.
+    #
+    # NOTE: This patch was merged upstream starting from fbthrift v2026.05.04.00.
+    # If the version is bumped past that, the patch is a no-op (already applied).
     echo "Applying CompactV1 protocol refiller patch..."
     cd "$DEPENDENCY_DIR/fbthrift"
-    patch -p1 <<'PATCH'
---- a/thrift/lib/cpp2/protocol/ProtocolReaderWithRefill.h
-+++ b/thrift/lib/cpp2/protocol/ProtocolReaderWithRefill.h
-@@ -172,6 +172,20 @@
-     protocol_.skipBytes(bytes);
-   }
-
-+ protected:
-+  /**
-+   * Allow derived refill readers to use this helper where they cannot access
-+   * CompactProtocolReader::in_ directly (due to not having a friend
-+   * declaration).
-+   * Allows users to implement refill readers for CompactV1ProtocolReader if
-+   * necessary, without supporting it in the Thrift codebase or having to patch
-+   * in a friend declaration.
-+   */
-+  template <typename T>
-+  T readLEFromBuffer() {
-+    return protocol_.in_.template readLE<T>();
-+  }
-+
-   private:
-    /**
-     * Make sure a varint can be read from the current buffer after idx bytes.
-PATCH
+    patch -p1 < "$SCRIPT_DIR/fbthrift-compact-refiller.patch"
     cd "$DEPENDENCY_DIR"
 
     cmake_install_dir fbthrift \
