@@ -57,10 +57,6 @@ set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
 set(VELOX_BUILD_STATIC OFF)
 set(VELOX_ENABLE_ARROW ON)
-# Parquet is temporarily disabled because of the lack of bundled-build support
-# for fbthrift dependencies:
-# https://github.com/facebookincubator/velox/pull/16019.
-set(VELOX_ENABLE_PARQUET OFF)
 if(NOT VELOX4J_BUILD_TESTING)
   set(VELOX_BUILD_TESTING OFF)
 endif()
