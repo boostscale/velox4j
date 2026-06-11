@@ -27,13 +27,17 @@ yum -y install lz4-devel lzo-devel libzstd-devel snappy-devel double-conversion-
 yum -y install libevent-devel devtoolset-11-libatomic-devel
 
 # Link cc / c++ to the ones in devtoolset.
-rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld
+rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld /usr/bin/gcc /usr/bin/g++
 ln -s /opt/rh/devtoolset-11/root/usr/bin/cc /usr/bin/cc
 ln -s /opt/rh/devtoolset-11/root/usr/bin/c++ /usr/bin/c++
 ln -s /opt/rh/devtoolset-11/root/usr/bin/ld /usr/bin/ld
+ln -s /opt/rh/devtoolset-11/root/usr/bin/gcc /usr/bin/gcc
+ln -s /opt/rh/devtoolset-11/root/usr/bin/g++ /usr/bin/g++
 cc --version
 c++ --version
 ld --version
+gcc --version
+g++ --version
 
 pip3 install --upgrade pip
 
