@@ -92,15 +92,29 @@ The minimum toolchain versions for building Velox4J:
 
 ## Releases
 
-Velox4J currently only provides SNAPSHOT jar releases.
+Velox4J provides both stable and SNAPSHOT jar releases on Maven Central.
 
-### Maven
+NOTE:
+1. The released Jars are built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
+2. The released Jars are verified by daily CI job maintained in [velox4j-integration-test](https://github.com/boostscale/velox4j-integration-test).
+
+### Stable
 
 ```xml
 <dependency>
   <groupId>org.boostscale</groupId>
   <artifactId>velox4j</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
+</dependency>
+```
+
+### Snapshot
+
+```xml
+<dependency>
+  <groupId>org.boostscale</groupId>
+  <artifactId>velox4j</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -122,10 +136,6 @@ to be added:
   </repository>
 </repositories>
 ```
-
-NOTE:
-1. The released Jar is built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
-2. The released Jar is verified by daily CI job maintained in [velox4j-integration-test](https://github.com/boostscale/velox4j-integration-test).
 
 ## Build From Source
 
