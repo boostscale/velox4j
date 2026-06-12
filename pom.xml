@@ -4,7 +4,7 @@
 
   <groupId>org.boostscale</groupId>
   <artifactId>velox4j</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>Velox4J</name>
   <description>Java bindings for Velox</description>
   <url>https://github.com/velox4j/velox4j</url>
