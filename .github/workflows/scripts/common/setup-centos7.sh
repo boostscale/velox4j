@@ -27,23 +27,18 @@ yum -y install lz4-devel lzo-devel libzstd-devel snappy-devel double-conversion-
 yum -y install libevent-devel devtoolset-11-libatomic-devel
 
 # Link cc / c++ to the ones in devtoolset.
-rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld /usr/bin/gcc /usr/bin/g++
+rm -f /usr/bin/cc /usr/bin/c++ /usr/bin/ld
 ln -s /opt/rh/devtoolset-11/root/usr/bin/cc /usr/bin/cc
 ln -s /opt/rh/devtoolset-11/root/usr/bin/c++ /usr/bin/c++
 ln -s /opt/rh/devtoolset-11/root/usr/bin/ld /usr/bin/ld
-ln -s /opt/rh/devtoolset-11/root/usr/bin/gcc /usr/bin/gcc
-ln -s /opt/rh/devtoolset-11/root/usr/bin/g++ /usr/bin/g++
 cc --version
 c++ --version
 ld --version
-gcc --version
-g++ --version
 
 pip3 install --upgrade pip
 
 # Install CMake >= 3.28.3.
 pip3 install cmake==3.28.3
-ln -s /usr/local/bin/cmake /usr/bin/cmake
 
 # Add FindSnappy.cmake to system CMake modules as it's removed by Velox in https://github.com/facebookincubator/velox/pull/14564.
 curl -fsSL https://raw.githubusercontent.com/facebookincubator/velox/c43eab52c9f4cd7d24a729025266d77dc2e52ca0/CMake/FindSnappy.cmake \
