@@ -23,10 +23,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  publish-centos7:
+  publish:
     runs-on: ubuntu-latest
     env:
+      OS: ubuntu22
+      IMAGE: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
       CACHE_DIR: .ccache
     steps:
       - uses: actions/checkout@v4
@@ -34,17 +35,17 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-centos7-ccache-${{github.sha}}
+          key: ut-java-${{ env.OS }}-ccache-${{ github.sha }}
           restore-keys: |
-            ut-java-centos7-ccache-
+            ut-java-${{ env.OS }}-ccache-
       - name: Run setup script / Build
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w / centos:7 bash -c '
+          docker run -v ${{ github.workspace }}:/velox4j -w / ${{ env.IMAGE }} bash -c '
             set -euo pipefail
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
-            bash .github/workflows/scripts/common/setup-centos7.sh
+            bash .github/workflows/scripts/common/setup-${{ env.OS }}.sh
             mvn generate-resources
           '
       - name: Set up Java / Maven environment

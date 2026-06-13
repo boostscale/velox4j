@@ -32,8 +32,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   ut-cpp:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu22
+            image: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
@@ -43,16 +47,16 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-centos7-ccache-${{github.sha}}
+          key: ut-cpp-${{ matrix.os }}-ccache-${{github.sha}}
           restore-keys: |
-            ut-cpp-centos7-ccache-
+            ut-cpp-${{ matrix.os }}-ccache-
       - name: Run setup script / Build and run UTs
         run: |
-          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j centos:7 bash -c '
+          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j ${{ matrix.image }} bash -c '
             set -euo pipefail
             export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
             export CCACHE_MAXSIZE=3000M
-            bash .github/workflows/scripts/common/setup-centos7.sh
+            bash .github/workflows/scripts/common/setup-${{ matrix.os }}.sh
             bash src/main/cpp/test.sh
           '
       - name: Save Ccache
@@ -60,4 +64,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-centos7-ccache-${{github.sha}}
+          key: ut-cpp-${{ matrix.os }}-ccache-${{github.sha}}

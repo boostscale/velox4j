@@ -52,8 +52,6 @@ endif()
 
 # Set Velox options.
 set(VELOX_DEPENDENCY_SOURCE AUTO)
-set(folly_SOURCE BUNDLED) # Use velox-bundled folly because we have a custom
-                          # patch for folly setup.
 set(VELOX_ENABLE_CCACHE ON)
 set(VELOX_MONO_LIBRARY ON)
 set(VELOX_BUILD_SHARED ON)
@@ -65,6 +63,7 @@ endif()
 if(NOT VELOX4J_ENABLE_CCACHE)
   set(VELOX_ENABLE_CCACHE OFF)
 endif()
+set(gflags_SOURCE BUNDLED)
 
 # Import Velox.
 set(VELOX_PATCH_DIR ${CMAKE_CURRENT_LIST_DIR}/cmake/patches/velox)
