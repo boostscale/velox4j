@@ -2,7 +2,7 @@
 # Invoked by FetchContent_Declare's PATCH_COMMAND.
 # Variables: SOURCE_DIR, PATCH_DIR
 
-set(PATCHES fix-gcc-lambda-redefinition.patch)
+set(PATCHES)
 
 foreach(patch IN LISTS PATCHES)
   execute_process(
