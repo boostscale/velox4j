@@ -95,7 +95,7 @@ The minimum toolchain versions for building Velox4J:
 Velox4J provides both stable and SNAPSHOT jar releases on Maven Central.
 
 NOTE:
-1. The released Jars are built with x86-64 CPU + CentOS 7 (glibc 2.17) operating system.
+1. The released Jars are built with x86-64 CPU + Ubuntu 22.04 (glibc 2.35) operating system using the official Velox development Docker image.
 2. The released Jars are verified by daily CI job maintained in [velox4j-integration-test](https://github.com/boostscale/velox4j-integration-test).
 
 ### Stable
@@ -143,25 +143,17 @@ to be added:
 mvn clean install
 ```
 
-### Build on Amazon Linux 2023
+### Build Using Velox Docker Image
 
-A setup script is provided to install all required dependencies on AL2023:
-
-```shell
-# 1. Run the setup script (as root or with sudo).
-sudo bash .github/workflows/scripts/common/setup-al2023.sh
-
-# 2. Build.
-mvn clean install -DskipTests
-```
-
-Alternatively, use Docker from any Linux machine:
+The recommended way to build Velox4J is using the official Velox development Docker image,
+which includes all C++ build dependencies. A setup script is provided to install the
+additional Java/Maven toolchain:
 
 ```shell
-docker run --init -it -v $(pwd):/velox4j -w /velox4j amazonlinux:2023 bash
+docker run --init -it -v $(pwd):/velox4j -w /velox4j ghcr.io/facebookincubator/velox-dev:ubuntu-22.04 bash
 
 # Inside the container:
-bash .github/workflows/scripts/common/setup-al2023.sh
+bash .github/workflows/scripts/common/setup-ubuntu22.sh
 mvn clean install -DskipTests
 ```
 

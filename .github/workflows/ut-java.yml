@@ -32,20 +32,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   ut-java:
     strategy:
       matrix:
         include:
-          - name: ubuntu24
-            image: ubuntu:24.04
-            setup_script: setup-ubuntu24.sh
-          - name: al2023
-            image: amazonlinux:2023
-            setup_script: setup-al2023.sh
-          - name: centos7
-            image: centos:7
-            setup_script: setup-centos7.sh
+          - os: ubuntu22
+            image: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
@@ -56,9 +48,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.os }}-ccache-${{github.sha}}
           restore-keys: |
-            ut-java-${{ matrix.name }}-ccache-
+            ut-java-${{ matrix.os }}-ccache-
       - name: Start Docker container
         run: |
           docker run --init -d --name test-container \
@@ -70,7 +62,7 @@ jobs:
       - name: Run setup script
         run: |
           docker exec test-container bash -c '
-            bash .github/workflows/scripts/common/${{ matrix.setup_script }}
+            bash .github/workflows/scripts/common/setup-${{ matrix.os }}.sh
           '
       - name: Build C++ libraries
         run: |
@@ -110,4 +102,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-${{ matrix.name }}-ccache-${{github.sha}}
+          key: ut-java-${{ matrix.os }}-ccache-${{github.sha}}
