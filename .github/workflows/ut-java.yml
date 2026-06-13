@@ -38,15 +38,22 @@ jobs:
       matrix:
         include:
           - name: ubuntu24
+            runner: ubuntu-24.04
+            image: ubuntu:24.04
+            setup_script: setup-ubuntu24.sh
+          - name: ubuntu24-arm
+            runner: ubuntu-24.04-arm
             image: ubuntu:24.04
             setup_script: setup-ubuntu24.sh
           - name: al2023
+            runner: ubuntu-24.04
             image: amazonlinux:2023
             setup_script: setup-al2023.sh
           - name: centos7
+            runner: ubuntu-24.04
             image: centos:7
             setup_script: setup-centos7.sh
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     env:
       CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
