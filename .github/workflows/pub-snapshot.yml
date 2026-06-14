@@ -26,8 +26,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      OS: ubuntu22
-      IMAGE: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
+      OS: centos9
+      IMAGE: ghcr.io/facebookincubator/velox-dev:centos9
       CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
     steps:
