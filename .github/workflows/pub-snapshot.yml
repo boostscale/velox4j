@@ -26,10 +26,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      OS: centos9
-      IMAGE: ghcr.io/facebookincubator/velox-dev:centos9
+      OS: ubuntu22
+      IMAGE: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
       CACHE_DIR: .ccache
-      CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
       - name: Restore Ccache
@@ -39,28 +38,16 @@ jobs:
           key: ut-java-${{ env.OS }}-ccache-${{ github.sha }}
           restore-keys: |
             ut-java-${{ env.OS }}-ccache-
-      - name: Start Docker container
+      - name: Run setup script / Build
         run: |
-          docker run --init -d --name test-container \
-            -e CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }} \
-            -e CCACHE_MAXSIZE=${{ env.CCACHE_MAXSIZE }} \
-            -v ${{ github.workspace }}:/velox4j \
-            -w /velox4j \
-            ${{ env.IMAGE }} sleep infinity
-      - name: Run setup script
-        run: |
-          docker exec test-container bash -c '
+          docker run -v ${{ github.workspace }}:/velox4j -w / ${{ env.IMAGE }} bash -c '
+            set -euo pipefail
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
+            export CCACHE_MAXSIZE=3000M
+            cd /velox4j
             bash .github/workflows/scripts/common/setup-${{ env.OS }}.sh
+            ./mvnw generate-resources
           '
-      - name: Build C++ libraries
-        run: |
-          docker exec test-container bash -c '
-            ./mvnw clean generate-resources
-          '
-      - name: Stop Docker container
-        if: always()
-        run: |
-          docker stop test-container
       - name: Set up Java / Maven environment
         uses: actions/setup-java@v4
         with:
