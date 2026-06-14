@@ -2,7 +2,7 @@
 # Invoked by FetchContent_Declare's PATCH_COMMAND.
 # Variables: SOURCE_DIR, PATCH_DIR
 
-set(PATCHES)
+set(PATCHES fix-cmake-project-dir.patch)
 
 foreach(patch IN LISTS PATCHES)
   execute_process(
