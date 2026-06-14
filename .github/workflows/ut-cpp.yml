@@ -38,12 +38,9 @@ jobs:
         include:
           - os: ubuntu22
             image: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
-          - os: centos9
-            image: ghcr.io/facebookincubator/velox-dev:centos9
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
-      CCACHE_MAXSIZE: 3000M
     steps:
       - uses: actions/checkout@v4
       - name: Restore Ccache
@@ -53,36 +50,15 @@ jobs:
           key: ut-cpp-${{ matrix.os }}-ccache-${{github.sha}}
           restore-keys: |
             ut-cpp-${{ matrix.os }}-ccache-
-      - name: Start Docker container
+      - name: Run setup script / Build and run UTs
         run: |
-          docker run --init -d --name test-container \
-            -e CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }} \
-            -e CCACHE_MAXSIZE=${{ env.CCACHE_MAXSIZE }} \
-            -v ${{ github.workspace }}:/velox4j \
-            -w /velox4j \
-            ${{ matrix.image }} sleep infinity
-      - name: Run setup script
-        run: |
-          docker exec test-container bash -c '
+          docker run -v ${{ github.workspace }}:/velox4j -w /velox4j ${{ matrix.image }} bash -c '
+            set -euo pipefail
+            export CCACHE_DIR=/velox4j/${{ env.CACHE_DIR }}
+            export CCACHE_MAXSIZE=3000M
             bash .github/workflows/scripts/common/setup-${{ matrix.os }}.sh
+            bash src/main/cpp/test.sh
           '
-      - name: Build C++ libraries
-        run: |
-          docker exec test-container bash -c '
-            NUM_THREADS=$(nproc)
-            cmake -DCMAKE_BUILD_TYPE=Release -DVELOX4J_ENABLE_CCACHE=ON -DVELOX4J_BUILD_TESTING=ON -S src/main/cpp -B src/main/cpp/build
-            cmake --build src/main/cpp/build -j "$NUM_THREADS"
-          '
-      - name: Run UTs
-        run: |
-          docker exec test-container bash -c '
-            cd src/main/cpp/build/test
-            ctest -V
-          '
-      - name: Stop Docker container
-        if: always()
-        run: |
-          docker stop test-container
       - name: Save Ccache
         if: always()
         uses: actions/cache/save@v4

@@ -38,8 +38,6 @@ jobs:
         include:
           - os: ubuntu22
             image: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
-          - os: centos9
-            image: ghcr.io/facebookincubator/velox-dev:centos9
     runs-on: ubuntu-latest
     env:
       CACHE_DIR: .ccache
