@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 # Install essentials.
-dnf install -y maven-openjdk11
+dnf install -y maven-openjdk11 patch
 
 # Install patchelf.
 cd /tmp
