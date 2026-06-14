@@ -140,7 +140,7 @@ to be added:
 ## Build From Source
 
 ```shell
-mvn clean install
+./mvnw clean install
 ```
 
 ### Build Using Velox Docker Image
@@ -154,7 +154,7 @@ docker run --init -it -v $(pwd):/velox4j -w /velox4j ghcr.io/facebookincubator/v
 
 # Inside the container:
 bash .github/workflows/scripts/common/setup-ubuntu22.sh
-mvn clean install -DskipTests
+./mvnw clean install -DskipTests
 ```
 
 ## Get Started

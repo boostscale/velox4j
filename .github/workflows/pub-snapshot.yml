@@ -46,7 +46,7 @@ jobs:
             export CCACHE_MAXSIZE=3000M
             cd /velox4j
             bash .github/workflows/scripts/common/setup-${{ env.OS }}.sh
-            mvn generate-resources
+            ./mvnw generate-resources
           '
       - name: Set up Java / Maven environment
         uses: actions/setup-java@v4
@@ -59,7 +59,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package
-        run: mvn -P release --batch-mode deploy -Dskip.cpp.build=true
+        run: ./mvnw -P release --batch-mode deploy -Dskip.cpp.build=true
         env:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
