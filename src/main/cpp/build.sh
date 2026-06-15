@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 BASE_DIR=$(dirname "$0")
-NUM_THREADS=$(nproc)
+NUM_THREADS=${VELOX4J_BUILD_JOBS:-$(nproc)}
 SOURCE_DIR=$BASE_DIR
 BUILD_DIR=$BASE_DIR/build
 INSTALL_DESTINATION=$BUILD_DIR/dist/lib
