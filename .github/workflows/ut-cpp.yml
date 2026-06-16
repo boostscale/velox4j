@@ -69,6 +69,7 @@ jobs:
       - name: Build C++ libraries
         run: |
           docker exec test-container bash -c '
+            set -euo pipefail
             NUM_THREADS=$(nproc)
             cmake -DCMAKE_BUILD_TYPE=Release -DVELOX4J_ENABLE_CCACHE=ON -DVELOX4J_BUILD_TESTING=ON -S src/main/cpp -B src/main/cpp/build
             cmake --build src/main/cpp/build -j "$NUM_THREADS"
@@ -76,6 +77,7 @@ jobs:
       - name: Run UTs
         run: |
           docker exec test-container bash -c '
+            set -euo pipefail
             cd src/main/cpp/build/test
             ctest -V
           '
