@@ -81,6 +81,13 @@ jobs:
             cd src/main/cpp/build/test
             ctest -V
           '
+      - name: DEBUG
+        if: always()
+        run: |
+          docker exec test-container bash -c '
+            dnf install -y epel-release pax-utils
+            lddtree /velox4j/src/main/cpp/build/test/velox4j_query_serde_test
+          '
       - name: Stop Docker container
         if: always()
         run: |
