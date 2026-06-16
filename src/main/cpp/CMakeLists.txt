@@ -63,6 +63,8 @@ endif()
 if(NOT VELOX4J_ENABLE_CCACHE)
   set(VELOX_ENABLE_CCACHE OFF)
 endif()
+set(gflags_SOURCE BUNDLED)
+set(glog_SOURCE BUNDLED)
 
 # Import Velox.
 set(VELOX_PATCH_DIR ${CMAKE_CURRENT_LIST_DIR}/cmake/patches/velox)
