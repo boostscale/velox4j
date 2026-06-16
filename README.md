@@ -95,7 +95,7 @@ The minimum toolchain versions for building Velox4J:
 Velox4J provides both stable and SNAPSHOT jar releases on Maven Central.
 
 NOTE:
-1. The released Jars are built with x86-64 CPU + Ubuntu 22.04 (glibc 2.35) operating system using the official Velox development Docker image.
+1. The released Jars are built with x86-64 CPU + CentOS 9 (glibc 2.34) operating system using the official Velox development Docker image.
 2. The released Jars are verified by daily CI job maintained in [velox4j-integration-test](https://github.com/boostscale/velox4j-integration-test).
 
 ### Stable
