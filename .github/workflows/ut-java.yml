@@ -44,6 +44,10 @@ jobs:
             runner: ubuntu-24.04
             image: ghcr.io/facebookincubator/velox-dev:centos9
             setup-script: setup-centos9.sh
+          - name: centos9-arm
+            runner: ubuntu-24.04-arm
+            image: ghcr.io/facebookincubator/velox-dev:centos9-arm64
+            setup-script: setup-centos9.sh
     runs-on: ${{ matrix.runner }}
     env:
       CACHE_DIR: .ccache
