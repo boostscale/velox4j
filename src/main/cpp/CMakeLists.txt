@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 project(velox4jcpp)
 
+# Allow bundled dependencies (e.g., glog) that still use cmake_policy(VERSION)
+# calls requiring compatibility with CMake < 3.5, which was removed in CMake 4.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 include(FetchContent)
 
 # Preconditions.
