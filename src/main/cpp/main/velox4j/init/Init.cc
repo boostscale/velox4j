@@ -112,7 +112,9 @@ void initForSpark() {
           {connector::hive::HiveConfig::kMaxCoalescedDistance, "512KB"},
           {connector::hive::HiveConfig::kPrefetchRowGroups, "1"},
           {connector::hive::HiveConfig::kLoadQuantum, "268435456"},
-          {connector::hive::FileConfig::kFilePreloadThreshold, "1048576"}}),
+          {"hive." +
+               std::string(connector::hive::FileConfig::kFilePreloadThreshold),
+           "1048576"}}),
       nullptr));
   ExternalStreamConnectorSplit::registerSerDe();
   ExternalStreamTableHandle::registerSerDe();
