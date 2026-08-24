@@ -36,13 +36,13 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testProperties() {
-    final FileProperties in = new FileProperties(100L, 50L);
+    final FileProperties in = new FileProperties(100L, 50L, null);
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 
   @Test
   public void testPropertiesWithMissingFields() {
-    final FileProperties in = new FileProperties(100L, null);
+    final FileProperties in = new FileProperties(100L, null, null);
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 

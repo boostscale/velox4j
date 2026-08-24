@@ -23,13 +23,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FileProperties implements Serializable {
   private final Long fileSize;
   private final Long modificationTime;
+  private final String extraFileInfo;
 
   @JsonCreator
   public FileProperties(
       @JsonProperty("fileSize") Long fileSize,
-      @JsonProperty("modificationTime") Long modificationTime) {
+      @JsonProperty("modificationTime") Long modificationTime,
+      @JsonProperty("extraFileInfo") String extraFileInfo) {
     this.fileSize = fileSize;
     this.modificationTime = modificationTime;
+    this.extraFileInfo = extraFileInfo;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -42,5 +45,11 @@ public class FileProperties implements Serializable {
   @JsonGetter("modificationTime")
   public Long getModificationTime() {
     return modificationTime;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("extraFileInfo")
+  public String getExtraFileInfo() {
+    return extraFileInfo;
   }
 }
