@@ -186,7 +186,7 @@ public final class SerdeTests {
         "extra",
         ImmutableMap.of("serde_key", "serde_value"),
         ImmutableMap.of("info_key", "info_value"),
-        new FileProperties(100L, 50L, null),
+        new FileProperties(100L, 50L, "extra"),
         new RowIdProperties(5, 10, "UUID-100"));
   }
 

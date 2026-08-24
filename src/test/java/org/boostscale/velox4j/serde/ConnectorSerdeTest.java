@@ -36,7 +36,7 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testProperties() {
-    final FileProperties in = new FileProperties(100L, 50L, null);
+    final FileProperties in = new FileProperties(100L, 50L, "extra");
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 
