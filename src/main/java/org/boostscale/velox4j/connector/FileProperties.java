@@ -14,6 +14,7 @@
 package org.boostscale.velox4j.connector;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -24,15 +25,18 @@ public class FileProperties implements Serializable {
   private final Long fileSize;
   private final Long modificationTime;
   private final String extraFileInfo;
+  private final Map<String, String> fileReadOps;
 
   @JsonCreator
   public FileProperties(
       @JsonProperty("fileSize") Long fileSize,
       @JsonProperty("modificationTime") Long modificationTime,
-      @JsonProperty("extraFileInfo") String extraFileInfo) {
+      @JsonProperty("extraFileInfo") String extraFileInfo,
+      @JsonProperty("fileReadOps") Map<String, String> fileReadOps) {
     this.fileSize = fileSize;
     this.modificationTime = modificationTime;
     this.extraFileInfo = extraFileInfo;
+    this.fileReadOps = fileReadOps;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -51,5 +55,11 @@ public class FileProperties implements Serializable {
   @JsonGetter("extraFileInfo")
   public String getExtraFileInfo() {
     return extraFileInfo;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("fileReadOps")
+  public Map<String, String> getFileReadOps() {
+    return fileReadOps;
   }
 }
