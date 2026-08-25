@@ -14,6 +14,7 @@
 package org.boostscale.velox4j.connector;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -23,13 +24,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FileProperties implements Serializable {
   private final Long fileSize;
   private final Long modificationTime;
+  private final Long readRangeHint;
+  private final String extraFileInfo;
+  private final Map<String, String> fileReadOps;
 
   @JsonCreator
   public FileProperties(
       @JsonProperty("fileSize") Long fileSize,
-      @JsonProperty("modificationTime") Long modificationTime) {
+      @JsonProperty("modificationTime") Long modificationTime,
+      @JsonProperty("readRangeHint") Long readRangeHint,
+      @JsonProperty("extraFileInfo") String extraFileInfo,
+      @JsonProperty("fileReadOps") Map<String, String> fileReadOps) {
     this.fileSize = fileSize;
     this.modificationTime = modificationTime;
+    this.readRangeHint = readRangeHint;
+    this.extraFileInfo = extraFileInfo;
+    this.fileReadOps = fileReadOps;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -42,5 +52,23 @@ public class FileProperties implements Serializable {
   @JsonGetter("modificationTime")
   public Long getModificationTime() {
     return modificationTime;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("readRangeHint")
+  public Long getReadRangeHint() {
+    return readRangeHint;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("extraFileInfo")
+  public String getExtraFileInfo() {
+    return extraFileInfo;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  @JsonGetter("fileReadOps")
+  public Map<String, String> getFileReadOps() {
+    return fileReadOps;
   }
 }
