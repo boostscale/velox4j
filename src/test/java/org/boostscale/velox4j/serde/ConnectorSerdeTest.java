@@ -37,7 +37,8 @@ public class ConnectorSerdeTest {
 
   @Test
   public void testProperties() {
-    final FileProperties in = new FileProperties(100L, 50L, 4096L, "extra", ImmutableMap.of("k", "v"));
+    final FileProperties in =
+        new FileProperties(100L, 50L, 4096L, "extra", ImmutableMap.of("k", "v"));
     SerdeTests.testJavaBeanRoundTrip(in);
   }
 
