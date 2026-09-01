@@ -36,9 +36,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu22
+          - name: ubuntu22
+            runner: ubuntu-24.04
             image: ghcr.io/facebookincubator/velox-dev:ubuntu-22.04
-    runs-on: ubuntu-latest
+            setup-script: setup-ubuntu22.sh
+    runs-on: ${{ matrix.runner }}
     env:
       CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
@@ -48,9 +50,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-${{ matrix.os }}-ccache-${{github.sha}}
+          key: ut-cpp-${{ matrix.name }}-ccache-${{github.sha}}
           restore-keys: |
-            ut-cpp-${{ matrix.os }}-ccache-
+            ut-cpp-${{ matrix.name }}-ccache-
       - name: Start Docker container
         run: |
           docker run --init -d --name test-container \
@@ -62,7 +64,7 @@ jobs:
       - name: Run setup script
         run: |
           docker exec test-container bash -c '
-            bash .github/workflows/scripts/common/setup-${{ matrix.os }}.sh
+            bash .github/workflows/scripts/common/${{ matrix.setup-script }}
           '
       - name: Build C++ libraries
         run: |
@@ -88,4 +90,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-cpp-${{ matrix.os }}-ccache-${{github.sha}}
+          key: ut-cpp-${{ matrix.name }}-ccache-${{github.sha}}

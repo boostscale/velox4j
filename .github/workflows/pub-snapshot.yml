@@ -24,10 +24,15 @@ concurrency:
 
 jobs:
   publish:
+    strategy:
+      matrix:
+        include:
+          - name: centos9
+            runner: ubuntu-24.04
+            image: ghcr.io/facebookincubator/velox-dev:centos9
+            setup-script: setup-centos9.sh
     runs-on: ubuntu-latest
     env:
-      OS: centos9
-      IMAGE: ghcr.io/facebookincubator/velox-dev:centos9
       CACHE_DIR: .ccache
       CCACHE_MAXSIZE: 3000M
     steps:
@@ -36,9 +41,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '${{ github.workspace }}/${{ env.CACHE_DIR }}'
-          key: ut-java-${{ env.OS }}-ccache-${{ github.sha }}
+          key: ut-java-${{ matrix.name }}-ccache-${{ github.sha }}
           restore-keys: |
-            ut-java-${{ env.OS }}-ccache-
+            ut-java-${{ matrix.name }}-ccache-
       - name: Start Docker container
         run: |
           docker run --init -d --name test-container \
@@ -46,11 +51,11 @@ jobs:
             -e CCACHE_MAXSIZE=${{ env.CCACHE_MAXSIZE }} \
             -v ${{ github.workspace }}:/velox4j \
             -w /velox4j \
-            ${{ env.IMAGE }} sleep infinity
+            ${{ matrix.image }} sleep infinity
       - name: Run setup script
         run: |
           docker exec test-container bash -c '
-            bash .github/workflows/scripts/common/setup-${{ env.OS }}.sh
+            bash .github/workflows/scripts/common/${{ matrix.setup-script }}
           '
       - name: Build C++ libraries
         run: |
