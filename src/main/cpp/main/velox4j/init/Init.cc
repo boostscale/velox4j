@@ -14,7 +14,7 @@
 
 #include "velox4j/init/Init.h"
 #include <velox/common/memory/Memory.h>
-#include <velox/connectors/hive/FileConfig.h>
+#include <velox/connectors/common/FileConfig.h>
 #include <velox/connectors/hive/HiveConnector.h>
 #include <velox/connectors/hive/HiveConnectorSplit.h>
 #include <velox/connectors/hive/HiveDataSink.h>
@@ -105,15 +105,14 @@ void initForSpark() {
           {connector::hive::HiveConfig::kIgnoreMissingFilesSession, "false"},
           {connector::hive::HiveConfig::kReadTimestampPartitionValueAsLocalTime,
            "false"},
-          {"hive." + std::string(connector::hive::FileConfig::kUseColumnNames),
+          {"hive." + std::string(connector::FileConfig::kUseColumnNames),
            "true"},
           {connector::hive::HiveConfig::kEnableFileHandleCache, "false"},
           {connector::hive::HiveConfig::kMaxCoalescedBytes, "67108864"},
           {connector::hive::HiveConfig::kMaxCoalescedDistance, "512KB"},
           {connector::hive::HiveConfig::kPrefetchRowGroups, "1"},
           {connector::hive::HiveConfig::kLoadQuantum, "268435456"},
-          {"hive." +
-               std::string(connector::hive::FileConfig::kFilePreloadThreshold),
+          {"hive." + std::string(connector::FileConfig::kFilePreloadThreshold),
            "1048576"}}),
       nullptr));
   ExternalStreamConnectorSplit::registerSerDe();
