@@ -29,7 +29,7 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
   private final HiveBucketProperty bucketProperty;
   private final CompressionKind compressionKind;
   private final Map<String, String> serdeParameters;
-  private final boolean ensureFiles;
+  private final boolean writeEmptyFile;
   private final FileNameGenerator fileNameGenerator;
   private final Map<String, String> storageParameters;
 
@@ -41,7 +41,7 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
       @JsonProperty("bucketProperty") HiveBucketProperty bucketProperty,
       @JsonProperty("compressionKind") CompressionKind compressionKind,
       @JsonProperty("serdeParameters") Map<String, String> serdeParameters,
-      @JsonProperty("ensureFiles") boolean ensureFiles,
+      @JsonProperty("writeEmptyFile") boolean writeEmptyFile,
       @JsonProperty("fileNameGenerator") FileNameGenerator fileNameGenerator,
       @JsonProperty("storageParameters") Map<String, String> storageParameters) {
     this.inputColumns = inputColumns;
@@ -50,7 +50,7 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
     this.bucketProperty = bucketProperty;
     this.compressionKind = compressionKind;
     this.serdeParameters = serdeParameters;
-    this.ensureFiles = ensureFiles;
+    this.writeEmptyFile = writeEmptyFile;
     this.fileNameGenerator = fileNameGenerator;
     this.storageParameters = storageParameters;
   }
@@ -85,9 +85,9 @@ public class HiveInsertTableHandle extends ConnectorInsertTableHandle {
     return serdeParameters;
   }
 
-  @JsonGetter("ensureFiles")
-  public boolean ensureFiles() {
-    return ensureFiles;
+  @JsonGetter("writeEmptyFile")
+  public boolean writeEmptyFile() {
+    return writeEmptyFile;
   }
 
   @JsonGetter("fileNameGenerator")
